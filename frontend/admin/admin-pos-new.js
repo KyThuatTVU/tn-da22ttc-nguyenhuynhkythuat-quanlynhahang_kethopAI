@@ -45,13 +45,34 @@ function updateClock() {
 
 async function initAuth() {
     try {
+        // Bước 1: Kiểm tra Staff từ localStorage
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien && staff.tai_khoan) {
+                    adminUser = {
+                        ...staff,
+                        ten_hien_thi: staff.ten_nhan_vien,
+                        role: 'staff'
+                    };
+                    const nameEl = document.getElementById('admin-name-display');
+                    if (nameEl) nameEl.textContent = staff.ten_nhan_vien || staff.tai_khoan;
+                    console.log('✅ POS: Staff authenticated:', staff.ten_nhan_vien);
+                    return;
+                }
+            } catch (e) { sessionStorage.removeItem('staff_user'); }
+        }
+
+        // Bước 2: Kiểm tra Admin session (Google OAuth)
         const res = await fetch(`${BASE_URL}/admin-auth/check-session`, { credentials: 'include' });
         const data = await res.json();
         if (data.isAuthenticated) {
             adminUser = data.data;
-            document.getElementById('admin-name-display').textContent = adminUser.ten_hien_thi || adminUser.ho_ten;
+            const nameEl = document.getElementById('admin-name-display');
+            if (nameEl) nameEl.textContent = adminUser.ten_hien_thi || adminUser.ho_ten;
         } else {
-            window.location.href = 'dang-nhap-admin.html';
+            window.location.href = '../staff/login.html';
         }
     } catch (e) {
         console.error("Auth error", e);

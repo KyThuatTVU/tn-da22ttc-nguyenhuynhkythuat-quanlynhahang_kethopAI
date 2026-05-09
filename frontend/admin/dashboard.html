@@ -424,7 +424,7 @@
     <script src="admin-mobile.js"></script>
     <script>
         // API_URL đã được khai báo trong admin-layout.js
-        const API_BASE = API_URL; // Alias để tương thích
+         // Alias để tương thích
         let gaugeChart, revenueChart, ordersChart, customerChart, reservationChart, newsViewsChart, reviewStarChart, reviewStatusChart, paymentMethodsChart, dailyRevenueChart;
         let dailyRevenueData = []; // Lưu trữ dữ liệu doanh thu theo ngày
         
@@ -663,15 +663,15 @@
                 
                 // Load tất cả dữ liệu song song với filter năm
                 const [ordersRes, customersRes, reservationsRes, revenueMonthlyRes, customersMonthlyRes, reservationsByTimeRes, newsViewsRes, newsViewsMonthlyRes, reviewsRes] = await Promise.all([
-                    fetch(`${API_BASE}/orders/stats${yearParam}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/customers/stats`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/reservations/stats`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/revenue-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/customers-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/reservations-by-time${yearParam}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/news-views`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/news-views-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/reviews/admin/all`, { credentials: 'include' }).catch(() => null)
+                    fetch(`${API_URL}/orders/stats${yearParam}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/customers/stats`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/reservations/stats`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/revenue-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/customers-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/reservations-by-time${yearParam}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/news-views`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/news-views-monthly${yearParam}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/reviews/admin/all`, { credentials: 'include' }).catch(() => null)
                 ]);
 
                 // KPI Cards
@@ -765,7 +765,7 @@
                 }
 
                 // Load payment methods stats với filter năm
-                const paymentMethodsRes2 = await fetch(`${API_BASE}/stats/payment-methods${yearParam}`, { credentials: 'include' }).catch(() => null);
+                const paymentMethodsRes2 = await fetch(`${API_URL}/stats/payment-methods${yearParam}`, { credentials: 'include' }).catch(() => null);
                 if (paymentMethodsRes2 && paymentMethodsRes2.ok) {
                     const data = await paymentMethodsRes2.json();
                     if (data.success && data.data) {
@@ -944,7 +944,7 @@
                 // Lấy filter hiện tại
                 const filters = getFilterValues();
                 const yearParam = `?year=${filters.year || 2026}`;
-                const response = await fetch(`${API_BASE}/stats/top-products${yearParam}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/stats/top-products${yearParam}`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success && data.data && data.data.length > 0) {
@@ -977,7 +977,7 @@
             const statusText = { delivered: 'Hoàn thành', confirmed: 'Đã xác nhận', preparing: 'Đang chuẩn bị', pending: 'Chờ xác nhận', cancelled: 'Đã hủy' };
             
             try {
-                const response = await fetch(`${API_BASE}/orders/all?limit=5`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/orders/all?limit=5`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success && data.data && data.data.length > 0) {
@@ -1028,8 +1028,8 @@
                 const queryString = params.toString() ? `?${params.toString()}` : '';
 
                 const [customersRes, reservationsRes] = await Promise.all([
-                    fetch(`${API_BASE}/customers/stats${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/reservations/stats${queryString}`, { credentials: 'include' }).catch(() => null)
+                    fetch(`${API_URL}/customers/stats${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/reservations/stats${queryString}`, { credentials: 'include' }).catch(() => null)
                 ]);
 
                 if (customersRes && customersRes.ok) {
@@ -1204,13 +1204,13 @@
 
                 // Load TẤT CẢ dữ liệu với filter
                 const [ordersRes, revenueMonthlyRes, customersMonthlyRes, reservationsByTimeRes, newsViewsMonthlyRes, topProductsRes, paymentMethodsRes] = await Promise.all([
-                    fetch(`${API_BASE}/orders/stats${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/revenue-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/customers-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/reservations-by-time${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/news-views-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/top-products${queryString}`, { credentials: 'include' }).catch(() => null),
-                    fetch(`${API_BASE}/stats/payment-methods${queryString}`, { credentials: 'include' }).catch(() => null)
+                    fetch(`${API_URL}/orders/stats${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/revenue-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/customers-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/reservations-by-time${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/news-views-monthly${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/top-products${queryString}`, { credentials: 'include' }).catch(() => null),
+                    fetch(`${API_URL}/stats/payment-methods${queryString}`, { credentials: 'include' }).catch(() => null)
                 ]);
 
                 // Cập nhật KPI Cards
@@ -1474,7 +1474,7 @@
             const statusText = { delivered: 'Hoàn thành', confirmed: 'Đã xác nhận', preparing: 'Đang chuẩn bị', pending: 'Chờ xác nhận', cancelled: 'Đã hủy' };
             
             try {
-                let url = `${API_BASE}/orders/all?limit=5`;
+                let url = `${API_URL}/orders/all?limit=5`;
                 if (status && status !== 'all') {
                     url += `&status=${status}`;
                 }
@@ -1512,7 +1512,7 @@
                 const month = filterMonth || (filters.month > 0 ? filters.month : new Date().getMonth() + 1);
                 const year = filterYear || filters.year || new Date().getFullYear();
                 
-                const response = await fetch(`${API_BASE}/admin-chatbot/goals?month=${month}&year=${year}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/admin-chatbot/goals?month=${month}&year=${year}`, { credentials: 'include' });
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1636,7 +1636,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Đang tạo...';
             
             try {
-                const response = await fetch(`${API_BASE}/admin-chatbot/goals/generate`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/goals/generate`, {
                     method: 'POST',
                     credentials: 'include'
                 });
@@ -1700,7 +1700,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/admin-chatbot/goals`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/goals`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
@@ -1792,7 +1792,7 @@
             try {
                 console.log('📜 Loading admin chat history for session:', sessionId);
                 
-                const response = await fetch(`${API_BASE}/admin-chatbot/history/${sessionId}`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/history/${sessionId}`, {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -1885,7 +1885,7 @@
             try {
                 console.log('📜 Loading admin chat sessions');
                 
-                const response = await fetch(`${API_BASE}/admin-chatbot/sessions`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/sessions`, {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -2045,7 +2045,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
             
             try {
-                const response = await fetch(`${API_BASE}/admin-chatbot/chat`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -2169,7 +2169,7 @@
             appendAdminMessage('Đang tạo 5 mục tiêu...', 'user');
             
             try {
-                const response = await fetch(`${API_BASE}/admin-chatbot/goals/generate`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/goals/generate`, {
                     method: 'POST',
                     credentials: 'include'
                 });
@@ -2190,7 +2190,7 @@
         
         async function setMonthlyTarget(revenue, orders) {
             try {
-                const response = await fetch(`${API_BASE}/admin-chatbot/target`, {
+                const response = await fetch(`${API_URL}/admin-chatbot/target`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -2218,7 +2218,7 @@
         async function loadTargetForGauge() {
             try {
                 // Lấy dữ liệu từ goals API để cập nhật gauge
-                const response = await fetch(`${API_BASE}/admin-chatbot/goals`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/admin-chatbot/goals`, { credentials: 'include' });
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.hasGoals) {
@@ -2227,7 +2227,7 @@
                     document.getElementById('gauge-value').textContent = totalProgress + '%';
                 } else {
                     // Fallback to old gauge-data API
-                    const gaugeResponse = await fetch(`${API_BASE}/admin-chatbot/gauge-data`, { credentials: 'include' });
+                    const gaugeResponse = await fetch(`${API_URL}/admin-chatbot/gauge-data`, { credentials: 'include' });
                     const gaugeResult = await gaugeResponse.json();
                     
                     if (gaugeResult.success && gaugeResult.data) {
@@ -2258,7 +2258,7 @@
 
         async function loadDailyRevenueData(range) {
             try {
-                const response = await fetch(`${API_BASE}/stats/revenue-daily?range=${range}`, { credentials: 'include' });
+                const response = await fetch(`${API_URL}/stats/revenue-daily?range=${range}`, { credentials: 'include' });
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success && result.data) {

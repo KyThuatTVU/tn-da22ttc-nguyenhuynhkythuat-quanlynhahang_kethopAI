@@ -1,19 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/wastageController');
-const { isAdmin } = require('../middleware/auth.middleware');
+const { requireAdminAuth } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-// Cấu hình lưu trữ ảnh hao hụt
+// Cấu hình multer để upload ảnh
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads/wastage');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
+        cb(null, 'uploads/wastage/');
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -21,21 +16,23 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ 
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Chỉ chấp nhận file ảnh!'), false);
+    }
+};
+
+const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn 5MB
-    fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png|webp/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error('Chỉ chấp nhận file ảnh!'));
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB
     }
 });
 
-router.get('/', isAdmin, controller.getAllWastage);
-router.post('/', isAdmin, upload.single('hinh_anh'), controller.createWastageReport);
+router.get('/', requireAdminAuth, controller.getAllWastage);
+router.post('/', requireAdminAuth, upload.single('hinh_anh'), controller.createWastageReport);
 
 module.exports = router;

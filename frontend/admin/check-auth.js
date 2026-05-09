@@ -1,9 +1,32 @@
-// Kiểm tra xác thực admin bằng session
+// Kiểm tra xác thực admin/staff
+// Admin: dùng Google session (cookie)
+// Staff: dùng localStorage
+
 async function checkAdminAuth() {
     try {
+        // Bước 1: Kiểm tra Staff từ localStorage
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien && staff.tai_khoan) {
+                    console.log('✅ Staff authenticated (localStorage):', staff.ten_nhan_vien);
+                    return {
+                        ...staff,
+                        role: 'staff',
+                        name: staff.ten_nhan_vien,
+                        avatar: staff.anh_dai_dien
+                    };
+                }
+            } catch (e) {
+                sessionStorage.removeItem('staff_user');
+            }
+        }
+
+        // Bước 2: Kiểm tra Admin session (Google OAuth)
         const response = await fetch('http://localhost:3000/api/admin-auth/check-session', {
             method: 'GET',
-            credentials: 'include' // Quan trọng: gửi cookie session
+            credentials: 'include'
         });
 
         const result = await response.json();
@@ -15,56 +38,56 @@ async function checkAdminAuth() {
             return false;
         }
 
-        // Đã đăng nhập, trả về thông tin admin
-        console.log('✅ Authenticated:', result.data?.email || result.user?.email);
+        // Đã đăng nhập admin
+        console.log('✅ Admin authenticated:', result.data?.email);
         return result.data || result.user;
 
     } catch (error) {
         console.error('Lỗi kiểm tra xác thực:', error);
+        // Fallback: check localStorage
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien) return { ...staff, role: 'staff' };
+            } catch (e) { /* ignore */ }
+        }
         return false;
     }
 }
 
-// Đăng xuất admin
+// Đăng xuất
 async function logoutAdmin() {
-    if (!confirm('Bạn có chắc muốn đăng xuất?')) {
-        return;
-    }
+    if (!confirm('Bạn có chắc muốn đăng xuất?')) return;
 
-    try {
-        const response = await fetch('http://localhost:3000/api/admin-auth/logout', {
-            method: 'POST',
-            credentials: 'include' // Gửi cookie session
-        });
+    const staffUser = sessionStorage.getItem('staff_user');
 
-        const result = await response.json();
-
-        if (result.success) {
-            // Chuyển về trang đăng nhập
+    if (staffUser) {
+        // Staff logout - chỉ cần xóa localStorage
+        sessionStorage.removeItem('staff_user');
+        window.location.href = '../staff/login.html';
+    } else {
+        // Admin logout - gọi API xóa session
+        try {
+            const response = await fetch('http://localhost:3000/api/admin-auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = 'dang-nhap-admin.html?logout=success';
+            } else {
+                alert('Lỗi đăng xuất. Vui lòng thử lại!');
+            }
+        } catch (error) {
+            console.error('Lỗi đăng xuất:', error);
             window.location.href = 'dang-nhap-admin.html?logout=success';
-        } else {
-            alert('Lỗi đăng xuất. Vui lòng thử lại!');
         }
-
-    } catch (error) {
-        console.error('Lỗi đăng xuất:', error);
-        alert('Lỗi đăng xuất. Vui lòng thử lại!');
     }
 }
 
-// Export functions
-window.checkAdminAuth = checkAdminAuth;
-window.logoutAdmin = logoutAdmin;
-
-// KHÔNG tự động kiểm tra khi load trang - để admin-layout.js xử lý
-// Tránh xung đột và redirect loop
-// document.addEventListener('DOMContentLoaded', async function() {
-//     // Logic đã được chuyển sang admin-layout.js
-// });
-
 // Hàm cập nhật thông tin admin trên UI
 function updateAdminUI(user) {
-    // Cập nhật avatar
     const avatarElements = document.querySelectorAll('#admin-avatar, #admin-avatar-header');
     avatarElements.forEach(el => {
         if (el && user.avatar) {
@@ -72,7 +95,6 @@ function updateAdminUI(user) {
         }
     });
     
-    // Cập nhật tên
     const nameElements = document.querySelectorAll('#admin-name, #admin-name-header');
     nameElements.forEach(el => {
         if (el && user.name) {
@@ -80,7 +102,6 @@ function updateAdminUI(user) {
         }
     });
     
-    // Cập nhật email
     const emailElement = document.getElementById('admin-email');
     if (emailElement && user.email) {
         emailElement.textContent = user.email;
@@ -88,3 +109,7 @@ function updateAdminUI(user) {
     
     console.log('✅ Admin UI updated');
 }
+
+// Export functions
+window.checkAdminAuth = checkAdminAuth;
+window.logoutAdmin = logoutAdmin;

@@ -1,23 +1,54 @@
 /**
  * Session Middleware Configuration
- * Cấu hình Express Session
+ * Cấu hình Express Session - TÁCH RIÊNG cho Admin và Staff
  */
 
 const session = require('express-session');
 
-const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET || 'your-session-secret-change-this',
-    resave: false, // Không lưu lại session nếu không thay đổi
-    saveUninitialized: false, // Không lưu session rỗng
-    name: 'admin.sid', // Tên cookie session
+// Session store chung
+const sessionStore = new session.MemoryStore();
+
+// Session middleware cho ADMIN
+const adminSessionMiddleware = session({
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || 'admin-session-secret-change-this',
+    resave: false,
+    saveUninitialized: false,
+    name: 'admin.sid', // Cookie riêng cho admin
     cookie: {
-        secure: false, // false cho localhost (không dùng HTTPS)
+        secure: false,
         httpOnly: true,
-        sameSite: 'lax', // Quan trọng: cho phép cookie cross-site
-        maxAge: 24 * 60 * 60 * 1000, // 24 giờ
-        path: '/' // Đảm bảo cookie được gửi cho tất cả paths
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/'
     },
-    rolling: true // Gia hạn session mỗi request
+    rolling: true,
+    proxy: false
 });
 
-module.exports = sessionMiddleware;
+// Session middleware cho STAFF
+const staffSessionMiddleware = session({
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || 'staff-session-secret-change-this',
+    resave: false,
+    saveUninitialized: false,
+    name: 'staff.sid', // Cookie riêng cho staff
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/'
+    },
+    rolling: true,
+    proxy: false
+});
+
+console.log('📦 Session store initialized:', sessionStore.constructor.name);
+console.log('🔐 Admin session cookie: admin.sid');
+console.log('🔐 Staff session cookie: staff.sid');
+
+module.exports = {
+    adminSessionMiddleware,
+    staffSessionMiddleware
+};

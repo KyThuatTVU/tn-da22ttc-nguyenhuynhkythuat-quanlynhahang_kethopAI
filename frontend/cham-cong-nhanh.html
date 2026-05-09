@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công Nhanh - Phương Nam</title>
+    <link rel="icon" type="image/png" href="images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        #video {
+            transform: scaleX(-1);
+        }
+        .btn-checkin {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .btn-checkout {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .metadata-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            line-height: 1.6;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .number-btn {
+            aspect-ratio: 1;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .number-btn:active {
+            transform: scale(0.95);
+            background: #f3f4f6;
+        }
+        #qr-reader {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <!-- Main Card -->
+    <div class="card rounded-3xl p-6 sm:p-8 w-full max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <img src="images/Green Simple Clean Vegan Food Logo.png" 
+                 alt="Logo" 
+                 class="w-20 h-20 mx-auto rounded-full border-4 border-purple-500 shadow-lg mb-4">
+            <h1 class="text-3xl font-bold text-gray-800">Chấm Công</h1>
+            <p class="text-gray-600 mt-2">Nhà hàng Phương Nam</p>
+            <div class="mt-3 text-sm font-bold text-purple-600">
+                <i class="fas fa-clock mr-2"></i>
+                <span id="currentTime"></span>
+            </div>
+        </div>
+
+        <!-- BƯỚC 1: Nhập mã nhân viên -->
+        <div id="step1" class="step active">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">Nhập Mã Nhân Viên</h2>
+                <p class="text-sm text-gray-600 text-center mb-4">Ví dụ: NV001, NV002...</p>
+                
+                <!-- Display mã đã nhập -->
+                <div class="bg-gray-100 rounded-xl p-4 mb-4 text-center">
+                    <input type="text" 
+                           id="staffCode" 
+                           class="text-3xl font-bold text-center bg-transparent border-none outline-none w-full uppercase"
+                           placeholder="NV___"
+                           maxlength="10"
+                           readonly>
+                </div>
+
+                <!-- Number Pad -->
+                <div class="number-pad mb-4">
+                    <button class="number-btn" onclick="addDigit('1')">1</button>
+                    <button class="number-btn" onclick="addDigit('2')">2</button>
+                    <button class="number-btn" onclick="addDigit('3')">3</button>
+                    <button class="number-btn" onclick="addDigit('4')">4</button>
+                    <button class="number-btn" onclick="addDigit('5')">5</button>
+                    <button class="number-btn" onclick="addDigit('6')">6</button>
+                    <button class="number-btn" onclick="addDigit('7')">7</button>
+                    <button class="number-btn" onclick="addDigit('8')">8</button>
+                    <button class="number-btn" onclick="addDigit('9')">9</button>
+                    <button class="number-btn" onclick="clearCode()">
+                        <i class="fas fa-backspace"></i>
+                    </button>
+                    <button class="number-btn" onclick="addDigit('0')">0</button>
+                    <button class="number-btn bg-green-500 text-white border-green-500" onclick="confirmCode()">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+
+                <!-- Hoặc quét QR -->
+                <div class="text-center">
+                    <button onclick="showQRScanner()" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                        <i class="fas fa-qrcode mr-2"></i>Hoặc quét mã QR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BƯỚC 1B: Quét QR Code -->
+        <div id="step1b" class="step">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Quét Mã QR</h2>
+                <div id="qr-reader" class="mb-4"></div>
+                <button onclick="hideQRScanner()" class="w-full py-3 bg-gray-500 text-white rounded-xl font-bold">
+                    <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                </button>
+            </div>
+        </div>
+
+        <!-- BƯỚC 2: Xác nhận thông tin -->
+        <div id="step2" class="step">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Xác Nhận Thông Tin</h2>
+                
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6 text-center">
+                    <div class="w-20 h-20 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2" id="staffName">---</h3>
+                    <p class="text-lg text-gray-600 font-bold" id="staffCodeDisplay">---</p>
+                    <p class="text-sm text-gray-500 mt-2" id="staffRole">---</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="backToStep1()" class="py-3 bg-gray-500 text-white rounded-xl font-bold">
+                        <i class="fas fa-arrow-left mr-2"></i>Sai
+                    </button>
+                    <button onclick="goToStep3()" class="py-3 bg-green-500 text-white rounded-xl font-bold">
+                        <i class="fas fa-check mr-2"></i>Đúng
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BƯỚC 3: Chụp ảnh -->
+        <div id="step3" class="step">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Chụp Ảnh Chấm Công</h2>
+                
+                <!-- Camera Preview -->
+                <div class="relative bg-gray-900 rounded-2xl overflow-hidden mb-4" style="aspect-ratio: 4/3;">
+                    <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
+                    
+                    <!-- Metadata Overlay -->
+                    <div class="metadata-overlay" id="metadataOverlay">
+                        <div id="staffInfoOverlay">---</div>
+                        <div id="locationText">📍 Đang lấy vị trí...</div>
+                        <div id="timeText">🕐 --:--:--</div>
+                    </div>
+                </div>
+
+                <!-- Chọn loại chấm công -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button id="btnCheckin" onclick="capturePhoto('checkin')" 
+                            class="btn-checkin text-white py-4 rounded-xl font-bold text-lg transition hover:scale-105">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Vào Ca
+                    </button>
+                    <button id="btnCheckout" onclick="capturePhoto('checkout')" 
+                            class="btn-checkout text-white py-4 rounded-xl font-bold text-lg transition hover:scale-105">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Tan Ca
+                    </button>
+                </div>
+
+                <button onclick="backToStep1()" class="w-full py-3 bg-gray-500 text-white rounded-xl font-bold">
+                    <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                </button>
+            </div>
+        </div>
+
+        <!-- BƯỚC 4: Thành công -->
+        <div id="step4" class="step">
+            <div class="text-center mb-6">
+                <div class="w-24 h-24 bg-green-500 rounded-full mx-auto mb-6 flex items-center justify-center text-white text-5xl animate-bounce">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" id="successTitle">Thành Công!</h2>
+                <p class="text-gray-600 mb-4" id="successMessage">---</p>
+                
+                <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-500">Nhân viên</p>
+                            <p class="font-bold text-gray-800" id="successStaff">---</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Thời gian</p>
+                            <p class="font-bold text-gray-800" id="successTime">---</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Trạng thái</p>
+                            <p class="font-bold text-gray-800" id="successStatus">---</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Số giờ</p>
+                            <p class="font-bold text-gray-800" id="successHours">---</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="resetToStep1()" class="w-full py-4 bg-purple-600 text-white rounded-xl font-bold text-lg">
+                    <i class="fas fa-redo mr-2"></i>Chấm Công Người Khác
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="hidden mt-4 p-4 rounded-xl"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let video, canvas, stream;
+        let currentLocation = null;
+        let currentStaff = null;
+        let html5QrCode = null;
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            getLocation();
+            
+            // Auto-focus vào input mã nhân viên
+            document.getElementById('staffCode').focus();
+        });
+
+        // Cập nhật thời gian
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN');
+            const dateStr = now.toLocaleDateString('vi-VN');
+            document.getElementById('currentTime').textContent = `${dateStr} ${timeStr}`;
+            document.getElementById('timeText').textContent = `🕐 ${timeStr}`;
+        }
+
+        // Lấy vị trí GPS
+        function getLocation() {
+            if (!navigator.geolocation) {
+                document.getElementById('locationText').textContent = '📍 Không hỗ trợ GPS';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    document.getElementById('locationText').textContent = 
+                        `📍 ${currentLocation.latitude.toFixed(6)}, ${currentLocation.longitude.toFixed(6)}`;
+                },
+                (error) => {
+                    console.error('Location error:', error);
+                    document.getElementById('locationText').textContent = '📍 Không lấy được vị trí';
+                }
+            );
+        }
+
+        // Thêm số vào mã nhân viên
+        function addDigit(digit) {
+            const input = document.getElementById('staffCode');
+            if (input.value.length < 10) {
+                input.value += digit;
+            }
+        }
+
+        // Xóa ký tự cuối
+        function clearCode() {
+            const input = document.getElementById('staffCode');
+            input.value = input.value.slice(0, -1);
+        }
+
+        // Xác nhận mã nhân viên
+        async function confirmCode() {
+            const code = document.getElementById('staffCode').value.trim();
+            if (!code) {
+                showStatus('Vui lòng nhập mã nhân viên!', 'error');
+                return;
+            }
+
+            // Tìm nhân viên theo mã
+            try {
+                const response = await fetch(`${API_URL}/staff?search=${code}`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    const staff = result.data.find(s => s.ma_nv_code && s.ma_nv_code.toUpperCase() === code.toUpperCase());
+                    if (staff) {
+                        currentStaff = staff;
+                        showStep2(staff);
+                    } else {
+                        showStatus('Không tìm thấy nhân viên với mã: ' + code, 'error');
+                    }
+                } else {
+                    showStatus('Không tìm thấy nhân viên với mã: ' + code, 'error');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                showStatus('Lỗi kết nối server!', 'error');
+            }
+        }
+
+        // Hiển thị bước 2
+        function showStep2(staff) {
+            document.getElementById('staffName').textContent = staff.ten_nhan_vien;
+            document.getElementById('staffCodeDisplay').textContent = staff.ma_nv_code;
+            
+            const roleMap = {
+                'manager': 'Quản lý',
+                'waiter': 'Phục vụ',
+                'kitchen': 'Bếp',
+                'cashier': 'Thu ngân'
+            };
+            document.getElementById('staffRole').textContent = roleMap[staff.vai_tro] || staff.vai_tro;
+            
+            showStep('step2');
+        }
+
+        // Quay lại bước 1
+        function backToStep1() {
+            document.getElementById('staffCode').value = '';
+            currentStaff = null;
+            showStep('step1');
+        }
+
+        // Sang bước 3
+        async function goToStep3() {
+            showStep('step3');
+            await initCamera();
+            
+            // Cập nhật overlay
+            document.getElementById('staffInfoOverlay').textContent = 
+                `${currentStaff.ten_nhan_vien} (${currentStaff.ma_nv_code})`;
+        }
+
+        // Khởi tạo camera
+        async function initCamera() {
+            try {
+                video = document.getElementById('video');
+                canvas = document.getElementById('canvas');
+                
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 960 }
+                    } 
+                });
+                
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('Camera error:', err);
+                showStatus('Không thể truy cập camera!', 'error');
+            }
+        }
+
+        // Chụp ảnh và chấm công
+        async function capturePhoto(type) {
+            if (!currentStaff) {
+                showStatus('Lỗi: Không có thông tin nhân viên!', 'error');
+                return;
+            }
+
+            const btn = type === 'checkin' ? document.getElementById('btnCheckin') : document.getElementById('btnCheckout');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang xử lý...';
+
+            try {
+                // Chụp ảnh
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.save();
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                // Vẽ metadata
+                const now = new Date();
+                const metadata = [
+                    `Nhân viên: ${currentStaff.ten_nhan_vien} (${currentStaff.ma_nv_code})`,
+                    `Thời gian: ${now.toLocaleString('vi-VN')}`,
+                    `Vị trí: ${currentLocation ? currentLocation.latitude.toFixed(6) + ', ' + currentLocation.longitude.toFixed(6) : 'N/A'}`,
+                    `Loại: ${type === 'checkin' ? 'VÀO CA' : 'TAN CA'}`
+                ];
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(10, canvas.height - 110, 600, 100);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px monospace';
+                metadata.forEach((text, i) => {
+                    ctx.fillText(text, 20, canvas.height - 85 + (i * 22));
+                });
+
+                // Chuyển thành blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                
+                // Tạo FormData
+                const formData = new FormData();
+                formData.append('image', blob, `${type}_${Date.now()}.jpg`);
+                formData.append('ma_nhan_vien', currentStaff.ma_nhan_vien);
+                formData.append('loai', type);
+                if (currentLocation) {
+                    formData.append('latitude', currentLocation.latitude);
+                    formData.append('longitude', currentLocation.longitude);
+                    formData.append('accuracy', currentLocation.accuracy);
+                }
+
+                // Gửi lên server
+                const response = await fetch(`${API_URL}/attendance/checkin`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStep4(result, type);
+                } else {
+                    showStatus('❌ ' + result.message, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = type === 'checkin' ? 
+                        '<i class="fas fa-sign-in-alt mr-2"></i>Vào Ca' : 
+                        '<i class="fas fa-sign-out-alt mr-2"></i>Tan Ca';
+                }
+            } catch (err) {
+                console.error('Capture error:', err);
+                showStatus('❌ Có lỗi xảy ra!', 'error');
+                btn.disabled = false;
+                btn.innerHTML = type === 'checkin' ? 
+                    '<i class="fas fa-sign-in-alt mr-2"></i>Vào Ca' : 
+                    '<i class="fas fa-sign-out-alt mr-2"></i>Tan Ca';
+            }
+        }
+
+        // Hiển thị bước 4 (thành công)
+        function showStep4(result, type) {
+            // Dừng camera
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            document.getElementById('successTitle').textContent = 
+                type === 'checkin' ? '✅ Vào Ca Thành Công!' : '✅ Tan Ca Thành Công!';
+            document.getElementById('successMessage').textContent = result.message;
+            document.getElementById('successStaff').textContent = currentStaff.ten_nhan_vien;
+            document.getElementById('successTime').textContent = 
+                result.data.gio_vao || result.data.gio_ra || new Date().toLocaleTimeString('vi-VN');
+            document.getElementById('successStatus').textContent = result.data.trang_thai || 'OK';
+            document.getElementById('successHours').textContent = result.data.so_gio_lam ? result.data.so_gio_lam + 'h' : '--';
+
+            showStep('step4');
+        }
+
+        // Reset về bước 1
+        function resetToStep1() {
+            document.getElementById('staffCode').value = '';
+            currentStaff = null;
+            showStep('step1');
+        }
+
+        // Hiển thị QR Scanner
+        function showQRScanner() {
+            showStep('step1b');
+            
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    html5QrCode.stop();
+                    document.getElementById('staffCode').value = decodedText;
+                    hideQRScanner();
+                    confirmCode();
+                }
+            ).catch(err => {
+                console.error('QR Scanner error:', err);
+                showStatus('Không thể khởi động camera!', 'error');
+            });
+        }
+
+        // Ẩn QR Scanner
+        function hideQRScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop();
+            }
+            showStep('step1');
+        }
+
+        // Hiển thị step
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        // Hiển thị thông báo
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `mt-4 p-4 rounded-xl ${
+                type === 'success' ? 'bg-green-100 text-green-800 border-2 border-green-300' :
+                type === 'error' ? 'bg-red-100 text-red-800 border-2 border-red-300' :
+                'bg-yellow-100 text-yellow-800 border-2 border-yellow-300'
+            }`;
+            statusDiv.textContent = message;
+            statusDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (html5QrCode) {
+                html5QrCode.stop();
+            }
+        });
+    </script>
+</body>
+</html>

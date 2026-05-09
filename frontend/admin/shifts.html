@@ -58,8 +58,138 @@
             border-radius: 8px;
             font-weight: 500;
             transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            position: relative;
+            z-index: 10;
         }
 
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* Ensure buttons are clickable */
+        .content-card button {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal.show {
+            display: block !important;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Badge styles */
+        .badge-completed {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-cancelled {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-scheduled {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
     </style>
 </head>
 
@@ -81,8 +211,9 @@
                             <h3 class="text-lg font-bold text-gray-800">Cấu hình Ca làm việc</h3>
                             <p class="text-sm text-gray-500">Thiết lập khung giờ và hệ số lương cho các ca</p>
                         </div>
-                        <button onclick="openShiftModal()" class="btn-primary flex items-center space-x-2">
-                            <i class="fas fa-plus"></i><span>Thêm khung ca mới</span>
+                        <button type="button" id="btn-add-shift" onclick="if(window.openShiftModal) window.openShiftModal(null)" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 relative z-50">
+                            <i class="fas fa-plus"></i>
+                            <span>Thêm khung ca mới</span>
                         </button>
                     </div>
                     <div class="overflow-x-auto">
@@ -109,12 +240,13 @@
                             <p class="text-sm text-gray-500">Phân bổ nhân sự trực theo ngày</p>
                         </div>
                         <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-xl">
-                            <button onclick="changeDay(-1)" class="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50"><i class="fas fa-chevron-left"></i></button>
-                            <input type="date" id="schedule-date" class="form-input w-48 border-none bg-transparent font-bold text-center" onchange="loadSchedules()">
-                            <button onclick="changeDay(1)" class="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50"><i class="fas fa-chevron-right"></i></button>
+                            <button type="button" id="btn-prev-day" class="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50" style="cursor: pointer;"><i class="fas fa-chevron-left"></i></button>
+                            <input type="date" id="schedule-date" class="form-input w-48 border-none bg-transparent font-bold text-center">
+                            <button type="button" id="btn-next-day" class="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50" style="cursor: pointer;"><i class="fas fa-chevron-right"></i></button>
                         </div>
-                        <button onclick="openScheduleModal()" class="btn-primary flex items-center space-x-2">
-                            <i class="fas fa-calendar-plus"></i><span>Phân ca ngay</span>
+                        <button type="button" id="btn-schedule" onclick="if(window.openScheduleModal) window.openScheduleModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 relative z-50">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Phân ca ngày</span>
                         </button>
                     </div>
                     <div class="overflow-x-auto">
@@ -141,7 +273,7 @@
         <div class="modal-content">
             <div class="modal-header flex justify-between">
                 <h3 id="shift-modal-title" class="font-bold">Thiết lập khung ca</h3>
-                <button onclick="closeModal('shiftModal')"><i class="fas fa-times"></i></button>
+                <button type="button" id="btn-close-shift-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="shiftForm">
@@ -152,7 +284,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-group">
-                            <label class="form-label">Giở bắt đầu</label>
+                            <label class="form-label">Giờ bắt đầu</label>
                             <div class="relative">
                                 <input type="text" id="shift-start" class="form-input time-picker" required placeholder="00:00">
                                 <i class="fas fa-clock absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -182,7 +314,7 @@
         <div class="modal-content">
             <div class="modal-header flex justify-between">
                 <h3 class="font-bold">Phân bổ nhân sự</h3>
-                <button onclick="closeModal('scheduleModal')"><i class="fas fa-times"></i></button>
+                <button type="button" id="btn-close-schedule-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="scheduleForm">
@@ -212,223 +344,338 @@
     <script src="check-auth.js"></script>
     <script src="admin-layout.js"></script>
     <script>
-        const SHIFT_API = `${API_URL}/shifts`;
-        const STAFF_API = `${API_URL}/staff`;
+        // ========== 1. AN TOÀN KHỞI TẠO API URL (chống ReferenceError) ==========
+        var BASE_API;
+        try {
+            BASE_API = window.API_URL || API_URL || 'http://localhost:3000/api';
+        } catch(e) {
+            BASE_API = 'http://localhost:3000/api';
+            console.warn('⚠️ API_URL không tồn tại, dùng mặc định:', BASE_API);
+        }
+        var SHIFT_API = BASE_API + '/shifts';
+        var STAFF_API = BASE_API + '/staff';
+        console.log('✅ API URLs:', { SHIFT_API: SHIFT_API, STAFF_API: STAFF_API });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('schedule-date').value = today;
-            document.getElementById('select-date').value = today;
-            loadShifts();
-            loadSchedules();
-            loadStaffOptions();
+        // ========== 2. ĐỊNH NGHĨA CÁC HÀM TRÊN WINDOW NGAY LẬP TỨC ==========
 
-            // Khởi tạo Flatpickr cho các input giờ
-            const fpConfig = {
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-                time_24hr: true,
-                disableMobile: "true"
-            };
-            flatpickr("#shift-start", fpConfig);
-            flatpickr("#shift-end", fpConfig);
-        });
+        window.openShiftModal = function(id) {
+            if (id && typeof id === 'object') id = null;
+            console.log('🔵 openShiftModal called, id:', id);
+            var modal = document.getElementById('shiftModal');
+            if (!modal) { console.error('shiftModal not found!'); return; }
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            if (!id || typeof id !== 'number') {
+                var form = document.getElementById('shiftForm');
+                if (form) form.reset();
+                var idInput = document.getElementById('shift-id');
+                if (idInput) idInput.value = '';
+                var title = document.getElementById('shift-modal-title');
+                if (title) title.innerText = 'Tạo Ca Làm Việc Mới';
+            }
+        };
 
-        function changeDay(offset) {
-            const dateInput = document.getElementById('schedule-date');
-            const date = new Date(dateInput.value);
+        window.openScheduleModal = function() {
+            console.log('🟢 openScheduleModal called');
+            var modal = document.getElementById('scheduleModal');
+            if (!modal) { console.error('scheduleModal not found!'); return; }
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            var schedDate = document.getElementById('schedule-date');
+            var selDate = document.getElementById('select-date');
+            if (schedDate && selDate) selDate.value = schedDate.value;
+        };
+
+        window.closeModal = function(id) {
+            var modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        };
+
+        window.changeDay = function(offset) {
+            var dateInput = document.getElementById('schedule-date');
+            if (!dateInput) return;
+            var date = new Date(dateInput.value);
             date.setDate(date.getDate() + offset);
             dateInput.value = date.toISOString().split('T')[0];
-            loadSchedules();
-        }
+            window.loadSchedules();
+        };
 
-        async function loadShifts() {
+        // ========== 3. DATA LOADING (wrapped in try-catch) ==========
+
+        window.loadShifts = async function() {
             try {
-                const res = await fetch(SHIFT_API);
-                const data = await res.json();
-                const body = document.getElementById('shift-table-body');
-                const selectShift = document.getElementById('select-shift');
-                
+                var res = await fetch(SHIFT_API, { credentials: 'include' });
+                var data = await res.json();
+                var body = document.getElementById('shift-table-body');
+                var selectShift = document.getElementById('select-shift');
+                if (!body) return;
+
                 if (!data.success || !Array.isArray(data.data)) {
                     body.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Lỗi tải danh sách ca</td></tr>';
                     return;
                 }
-
                 if (data.data.length === 0) {
                     body.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">Chưa có ca làm việc nào</td></tr>';
-                    selectShift.innerHTML = '<option value="">-- Chưa có ca --</option>';
+                    if (selectShift) selectShift.innerHTML = '<option value="">-- Chưa có ca --</option>';
                     return;
                 }
 
-                body.innerHTML = data.data.map(s => `
-                    <tr class="border-b transition hover:bg-gray-50">
-                        <td class="py-4 px-4 font-bold text-gray-800">${s.ten_ca}</td>
-                        <td class="py-4 px-4 text-gray-600 font-medium">${s.gio_bat_dau}</td>
-                        <td class="py-4 px-4 text-gray-600 font-medium">${s.gio_ket_thuc}</td>
-                        <td class="py-4 px-4"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-bold">x${s.he_so_luong}</span></td>
-                        <td class="py-4 px-4 text-center">
-                            <button onclick="editShift(${s.ma_ca})" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition mr-2"><i class="fas fa-edit text-xs"></i></button>
-                            <button onclick="deleteShift(${s.ma_ca})" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash text-xs"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
+                body.innerHTML = data.data.map(function(s) {
+                    return '<tr class="border-b transition hover:bg-gray-50">' +
+                        '<td class="py-4 px-4 font-bold text-gray-800">' + s.ten_ca + '</td>' +
+                        '<td class="py-4 px-4 text-gray-600 font-medium">' + s.gio_bat_dau + '</td>' +
+                        '<td class="py-4 px-4 text-gray-600 font-medium">' + s.gio_ket_thuc + '</td>' +
+                        '<td class="py-4 px-4"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-bold">x' + s.he_so_luong + '</span></td>' +
+                        '<td class="py-4 px-4 text-center">' +
+                            '<button data-action="edit-shift" data-id="' + s.ma_ca + '" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition mr-2"><i class="fas fa-edit text-xs"></i></button>' +
+                            '<button data-action="delete-shift" data-id="' + s.ma_ca + '" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash text-xs"></i></button>' +
+                        '</td></tr>';
+                }).join('');
 
-                selectShift.innerHTML = data.data.map(s => `<option value="${s.ma_ca}">${s.ten_ca} (${s.gio_bat_dau} - ${s.gio_ket_thuc})</option>`).join('');
+                if (selectShift) {
+                    selectShift.innerHTML = data.data.map(function(s) {
+                        return '<option value="' + s.ma_ca + '">' + s.ten_ca + ' (' + s.gio_bat_dau + ' - ' + s.gio_ket_thuc + ')</option>';
+                    }).join('');
+                }
             } catch (err) { console.error('Error loading shifts:', err); }
-        }
+        };
 
-        async function loadSchedules() {
+        window.loadSchedules = async function() {
             try {
-                const date = document.getElementById('schedule-date').value;
-                const res = await fetch(`${SHIFT_API}/schedules?start=${date}&end=${date}`);
-                const data = await res.json();
-                const body = document.getElementById('schedule-table-body');
-                
+                var dateEl = document.getElementById('schedule-date');
+                if (!dateEl) return;
+                var date = dateEl.value;
+                var res = await fetch(SHIFT_API + '/schedules?start=' + date + '&end=' + date, { credentials: 'include' });
+                var data = await res.json();
+                var body = document.getElementById('schedule-table-body');
+                if (!body) return;
+
                 if (!data.success || !Array.isArray(data.data)) {
                     body.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-red-500">Lỗi kết nối server</td></tr>';
                     return;
                 }
-
                 if (data.data.length === 0) {
                     body.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-400 italic">Chưa có ai làm việc ngày này</td></tr>';
                     return;
                 }
 
-                body.innerHTML = data.data.map(s => {
-                    let statusBadge = '';
+                body.innerHTML = data.data.map(function(s) {
+                    var statusBadge = '';
                     switch(s.trang_thai) {
                         case 'completed': statusBadge = '<span class="badge-completed">Hoàn thành</span>'; break;
                         case 'cancelled': statusBadge = '<span class="badge-cancelled">Đã hủy</span>'; break;
                         default: statusBadge = '<span class="badge-scheduled">Đã phân lịch</span>';
                     }
-
-                    return `
-                        <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-xs font-bold text-blue-600">#${s.ma_nv_code || '-'}</span>
-                                    <span class="font-bold text-gray-800">${s.ten_nhan_vien}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4"><span class="font-medium text-gray-700 uppercase text-xs tracking-wider">${s.ten_ca}</span></td>
-                            <td class="py-4 px-4 text-sm text-gray-600 font-bold font-mono">${s.gio_bat_dau} - ${s.gio_ket_thuc}</td>
-                            <td class="py-4 px-4">${statusBadge}</td>
-                            <td class="py-4 px-4 text-center">
-                                ${s.trang_thai === 'scheduled' ? `
-                                    <button onclick="deleteSchedule(${s.ma_phan_ca})" class="w-10 h-10 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
-                                ` : '-'}
-                            </td>
-                        </tr>
-                    `;
+                    var cancelBtn = s.trang_thai === 'scheduled' 
+                        ? '<button data-action="delete-schedule" data-id="' + s.ma_phan_ca + '" class="w-10 h-10 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>'
+                        : '-';
+                    return '<tr class="border-b hover:bg-gray-50 transition">' +
+                        '<td class="py-4 px-4"><div class="flex items-center space-x-2"><span class="text-xs font-bold text-blue-600">#' + (s.ma_nv_code || '-') + '</span><span class="font-bold text-gray-800">' + s.ten_nhan_vien + '</span></div></td>' +
+                        '<td class="py-4 px-4"><span class="font-medium text-gray-700 uppercase text-xs tracking-wider">' + s.ten_ca + '</span></td>' +
+                        '<td class="py-4 px-4 text-sm text-gray-600 font-bold font-mono">' + s.gio_bat_dau + ' - ' + s.gio_ket_thuc + '</td>' +
+                        '<td class="py-4 px-4">' + statusBadge + '</td>' +
+                        '<td class="py-4 px-4 text-center">' + cancelBtn + '</td></tr>';
                 }).join('');
             } catch (err) { console.error('Error loading schedules:', err); }
-        }
+        };
 
-        async function loadStaffOptions() {
+        window.loadStaffOptions = async function() {
             try {
-                const res = await fetch(STAFF_API);
-                const data = await res.json();
+                var res = await fetch(STAFF_API, { credentials: 'include' });
+                var data = await res.json();
                 if (data.success && Array.isArray(data.data)) {
-                    document.getElementById('select-staff').innerHTML = data.data
-                        .filter(s => s.trang_thai === 1)
-                        .map(s => `<option value="${s.ma_nhan_vien}">${s.ten_nhan_vien} (${s.vai_tro})</option>`).join('');
+                    var el = document.getElementById('select-staff');
+                    if (el) {
+                        el.innerHTML = data.data
+                            .filter(function(s) { return s.trang_thai === 1; })
+                            .map(function(s) { return '<option value="' + s.ma_nhan_vien + '">' + s.ten_nhan_vien + ' (' + s.vai_tro + ')</option>'; })
+                            .join('');
+                    }
                 }
             } catch (err) { console.error('Error loading staff options:', err); }
-        }
+        };
 
-        function openShiftModal(id = null) {
-            document.getElementById('shiftModal').style.display = 'block';
-            if(!id) {
-                document.getElementById('shiftForm').reset();
-                document.getElementById('shift-id').value = '';
-                document.getElementById('shift-modal-title').innerText = 'Tạo Ca Làm Việc Mới';
-            }
-        }
-
-        async function editShift(id) {
+        window.editShift = async function(id) {
             try {
-                const res = await fetch(SHIFT_API);
-                const data = await res.json();
-                const s = data.data.find(x => x.ma_ca === id || x.ma_ca === parseInt(id));
-                if(s) {
+                var res = await fetch(SHIFT_API, { credentials: 'include' });
+                var data = await res.json();
+                var s = data.data.find(function(x) { return x.ma_ca === id || x.ma_ca === parseInt(id); });
+                if (s) {
                     document.getElementById('shift-id').value = s.ma_ca;
                     document.getElementById('shift-name').value = s.ten_ca;
                     document.getElementById('shift-start').value = s.gio_bat_dau;
                     document.getElementById('shift-end').value = s.gio_ket_thuc;
                     document.getElementById('shift-factor').value = s.he_so_luong;
                     document.getElementById('shift-modal-title').innerText = 'Cập Nhật Cấu Hình Ca';
-                    document.getElementById('shiftModal').style.display = 'block';
+                    window.openShiftModal(s.ma_ca);
                 }
             } catch (err) { console.error(err); }
-        }
+        };
 
-        document.getElementById('shiftForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('shift-id').value;
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${SHIFT_API}/${id}` : SHIFT_API;
-            const payload = {
-                ten_ca: document.getElementById('shift-name').value,
-                gio_bat_dau: document.getElementById('shift-start').value,
-                gio_ket_thuc: document.getElementById('shift-end').value,
-                he_so_luong: document.getElementById('shift-factor').value
-            };
-            const res = await fetch(url, {
-                method,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+        window.deleteShift = async function(id) {
+            if (confirm('Chú ý: Xóa ca làm việc sẽ ảnh hưởng đến các lịch phân ca đã có. Tiếp tục?')) {
+                try {
+                    await fetch(SHIFT_API + '/' + id, { method: 'DELETE', credentials: 'include' });
+                    window.loadShifts();
+                } catch (err) { console.error(err); }
+            }
+        };
+
+        window.deleteSchedule = async function(id) {
+            if (confirm('Xác nhận hủy lịch làm việc này?')) {
+                try {
+                    await fetch(SHIFT_API + '/schedules/' + id, { method: 'DELETE', credentials: 'include' });
+                    window.loadSchedules();
+                } catch (err) { console.error(err); }
+            }
+        };
+
+        console.log('✅ All functions defined on window');
+
+        // ========== 4. EVENT DELEGATION (chống CSP + Google Translate) ==========
+        document.addEventListener('click', function(e) {
+            var target = e.target;
+
+            // Nút "Thêm khung ca mới"
+            if (target.closest('#btn-add-shift')) {
+                e.preventDefault();
+                window.openShiftModal(null);
+                return;
+            }
+            // Nút "Phân ca ngày"
+            if (target.closest('#btn-schedule')) {
+                e.preventDefault();
+                window.openScheduleModal();
+                return;
+            }
+            // Nút ngày trước / sau
+            if (target.closest('#btn-prev-day')) { e.preventDefault(); window.changeDay(-1); return; }
+            if (target.closest('#btn-next-day')) { e.preventDefault(); window.changeDay(1); return; }
+            // Nút đóng modal
+            if (target.closest('#btn-close-shift-modal')) { e.preventDefault(); window.closeModal('shiftModal'); return; }
+            if (target.closest('#btn-close-schedule-modal')) { e.preventDefault(); window.closeModal('scheduleModal'); return; }
+            // Nút Edit/Delete shift (dynamic buttons từ table)
+            var editBtn = target.closest('[data-action="edit-shift"]');
+            if (editBtn) { e.preventDefault(); window.editShift(parseInt(editBtn.dataset.id)); return; }
+            var deleteBtn = target.closest('[data-action="delete-shift"]');
+            if (deleteBtn) { e.preventDefault(); window.deleteShift(parseInt(deleteBtn.dataset.id)); return; }
+            var delSchedBtn = target.closest('[data-action="delete-schedule"]');
+            if (delSchedBtn) { e.preventDefault(); window.deleteSchedule(parseInt(delSchedBtn.dataset.id)); return; }
+            // Click bên ngoài modal để đóng
+            if (target.classList && target.classList.contains('modal')) {
+                window.closeModal(target.id);
+            }
+        });
+
+        // Change event cho date input
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'schedule-date') {
+                window.loadSchedules();
+            }
+        });
+
+        // ESC key đóng modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.closeModal('shiftModal');
+                window.closeModal('scheduleModal');
+            }
+        });
+
+        console.log('✅ Event delegation attached');
+
+        // ========== 5. FORM SUBMISSION ==========
+        var shiftForm = document.getElementById('shiftForm');
+        if (shiftForm) {
+            shiftForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                try {
+                    var id = document.getElementById('shift-id').value;
+                    var method = id ? 'PUT' : 'POST';
+                    var url = id ? (SHIFT_API + '/' + id) : SHIFT_API;
+                    var payload = {
+                        ten_ca: document.getElementById('shift-name').value,
+                        gio_bat_dau: document.getElementById('shift-start').value,
+                        gio_ket_thuc: document.getElementById('shift-end').value,
+                        he_so_luong: document.getElementById('shift-factor').value
+                    };
+                    var res = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(payload)
+                    });
+                    var result = await res.json();
+                    if (result.success) {
+                        window.closeModal('shiftModal');
+                        window.loadShifts();
+                    } else { alert(result.message); }
+                } catch (err) { alert('Lỗi kết nối server!'); console.error(err); }
             });
-            const result = await res.json();
-            if(result.success) {
-                closeModal('shiftModal');
-                loadShifts();
-            } else alert(result.message);
-        };
-
-        async function deleteShift(id) {
-            if(confirm('Chú ý: Xóa ca làm việc sẽ ảnh hưởng đến các lịch phân ca đã có. Tiếp tục?')) {
-                await fetch(`${SHIFT_API}/${id}`, {method: 'DELETE'});
-                loadShifts();
-            }
         }
 
-        function openScheduleModal() {
-            document.getElementById('scheduleModal').style.display = 'block';
-            document.getElementById('select-date').value = document.getElementById('schedule-date').value;
+        var scheduleForm = document.getElementById('scheduleForm');
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                try {
+                    var payload = {
+                        ma_nhan_vien: document.getElementById('select-staff').value,
+                        ma_ca: document.getElementById('select-shift').value,
+                        ngay: document.getElementById('select-date').value
+                    };
+                    var res = await fetch(SHIFT_API + '/schedules', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(payload)
+                    });
+                    var result = await res.json();
+                    if (result.success) {
+                        window.closeModal('scheduleModal');
+                        window.loadSchedules();
+                    } else { alert('LỖI: ' + result.message); }
+                } catch (err) { alert('Lỗi kết nối server!'); console.error(err); }
+            });
         }
 
-        document.getElementById('scheduleForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const payload = {
-                ma_nhan_vien: document.getElementById('select-staff').value,
-                ma_ca: document.getElementById('select-shift').value,
-                ngay: document.getElementById('select-date').value
-            };
+        // ========== 6. KHỞI TẠO TRANG ==========
+        (function initPage() {
             try {
-                const res = await fetch(`${SHIFT_API}/schedules`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if(result.success) {
-                    closeModal('scheduleModal');
-                    loadSchedules();
-                } else {
-                    alert('LỖI: ' + result.message);
-                }
-            } catch (err) { alert('Lỗi kết nối server!'); }
-        };
-
-        async function deleteSchedule(id) {
-            if(confirm('Xác nhận hủy lịch làm việc này?')) {
-                await fetch(`${SHIFT_API}/schedules/${id}`, {method: 'DELETE'});
-                loadSchedules();
+                var today = new Date().toISOString().split('T')[0];
+                var schedDate = document.getElementById('schedule-date');
+                var selDate = document.getElementById('select-date');
+                if (schedDate) schedDate.value = today;
+                if (selDate) selDate.value = today;
+                window.loadShifts();
+                window.loadSchedules();
+                window.loadStaffOptions();
+            } catch(err) {
+                console.error('Lỗi khởi tạo trang:', err);
             }
-        }
+        })();
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        // Khởi tạo Flatpickr cho các input giờ
+        try {
+            flatpickr("#shift-start", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                disableMobile: true
+            });
+            flatpickr("#shift-end", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                disableMobile: true
+            });
+        } catch(err) {
+            console.warn('⚠️ Flatpickr chưa sẵn sàng:', err);
+        }
     </script>
 </body>
 

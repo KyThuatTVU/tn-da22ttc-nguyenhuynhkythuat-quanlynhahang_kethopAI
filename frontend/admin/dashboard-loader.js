@@ -5,44 +5,54 @@ async function loadDashboardDataWithAuth(retryCount = 0) {
     try {
         const API_URL = 'http://localhost:3000/api';
 
-        // First check if user is authenticated
+        // Kiểm tra xác thực: Staff (localStorage) hoặc Admin (session)
         console.log(`1. Checking authentication (attempt ${retryCount + 1})...`);
-        const authResponse = await fetch('http://localhost:3000/api/admin-auth/check-session', {
-            credentials: 'include',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
+        
+        let isAuthenticated = false;
 
-        if (!authResponse.ok) {
-            console.error('Authentication check failed with status:', authResponse.status);
-            
-            // Retry nếu chưa đến giới hạn
-            if (retryCount < 2) {
-                console.log(`⏳ Auth check failed, retrying in 500ms...`);
-                await new Promise(resolve => setTimeout(resolve, 500));
-                return loadDashboardDataWithAuth(retryCount + 1);
-            }
-            
-            window.location.href = '/admin/dang-nhap-admin.html?error=session_expired';
-            return;
+        // Check staff từ localStorage trước
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien) {
+                    isAuthenticated = true;
+                    console.log('2. Staff authenticated from localStorage:', staff.ten_nhan_vien);
+                }
+            } catch (e) { sessionStorage.removeItem('staff_user'); }
         }
 
-        const authResult = await authResponse.json();
-        console.log('2. Auth result:', authResult);
+        // Nếu không phải staff, check admin session
+        if (!isAuthenticated) {
+            const authResponse = await fetch('http://localhost:3000/api/admin-auth/check-session', {
+                credentials: 'include',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
 
-        if (!authResult.isAuthenticated) {
-            // Retry nếu chưa đến giới hạn
-            if (retryCount < 2) {
-                console.log(`⏳ Not authenticated yet, retrying in 500ms...`);
-                await new Promise(resolve => setTimeout(resolve, 500));
-                return loadDashboardDataWithAuth(retryCount + 1);
+            if (!authResponse.ok) {
+                if (retryCount < 2) {
+                    console.log(`⏳ Auth check failed, retrying in 500ms...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return loadDashboardDataWithAuth(retryCount + 1);
+                }
+                window.location.href = '../staff/login.html';
+                return;
             }
-            
-            console.error('Not authenticated after retries, redirecting to login...');
-            window.location.href = '/admin/dang-nhap-admin.html?error=session_expired';
-            return;
+
+            const authResult = await authResponse.json();
+            console.log('2. Admin auth result:', authResult);
+
+            if (!authResult.isAuthenticated) {
+                if (retryCount < 2) {
+                    console.log(`⏳ Not authenticated yet, retrying in 500ms...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return loadDashboardDataWithAuth(retryCount + 1);
+                }
+                window.location.href = '../staff/login.html';
+                return;
+            }
         }
+
 
         // Now fetch dashboard data
         console.log('3. Fetching dashboard data...');
@@ -56,7 +66,7 @@ async function loadDashboardDataWithAuth(retryCount = 0) {
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Unauthorized, redirecting to login...');
-                window.location.href = '/admin/dang-nhap-admin.html?error=unauthorized';
+                window.location.href = '../staff/login.html';
                 return;
             }
             throw new Error(`HTTP error! status: ${response.status}`);

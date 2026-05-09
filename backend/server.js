@@ -11,7 +11,8 @@ const { typeDefs, resolvers } = require('./graphql');
 // Import middleware
 const {
     corsMiddleware,
-    sessionMiddleware,
+    adminSessionMiddleware,
+    staffSessionMiddleware,
     loggerMiddleware,
     notFoundHandler,
     errorHandler
@@ -29,8 +30,9 @@ app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session middleware (phải đặt trước passport)
-app.use(sessionMiddleware);
+// Session middleware - TÁCH RIÊNG cho Admin và Staff
+app.use(adminSessionMiddleware);  // Cookie: admin.sid
+app.use(staffSessionMiddleware);  // Cookie: staff.sid
 
 // Debug/Logger middleware
 app.use(loggerMiddleware);
@@ -44,7 +46,16 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads/wastage', express.static(path.join(__dirname, 'uploads/wastage')));
 app.use('/uploads/staff', express.static(path.join(__dirname, 'uploads/staff')));
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend'), {
+    setHeaders: (res, filePath) => {
+        // Không cache HTML và JS để luôn lấy phiên bản mới nhất
+        if (filePath.endsWith('.html') || filePath.endsWith('.js')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+    }
+}));
 
 // ==================== GRAPHQL SETUP ====================
 
@@ -410,6 +421,7 @@ const categoryRoutes = require('./routes/categories');
 const albumRoutes = require('./routes/albums');
 const authRoutes = require('./routes/auth');
 const adminAuthRoutes = require('./routes/admin-auth');
+const adminsRoutes = require('./routes/admins');
 const cartRoutes = require('./routes/cart');
 const newsRoutes = require('./routes/news');
 const orderRoutes = require('./routes/orders');
@@ -444,6 +456,7 @@ const wastageRoutes = require('./routes/wastage');
 const uploadRoutes = require('./routes/upload');
 const expenseRoutes = require('./routes/expenses');
 const expenseCategoryRoutes = require('./routes/expenseCategories');
+const dailySalaryRoutes = require('./routes/dailySalary');
 
 
 // Register routes
@@ -454,6 +467,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/albums', albumRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin-auth', adminAuthRoutes);
+app.use('/api/admins', adminsRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/orders', orderRoutes);
@@ -487,6 +501,7 @@ app.use('/api/wastage', wastageRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/expense-categories', expenseCategoryRoutes);
+app.use('/api/daily-salary', dailySalaryRoutes);
 
 
 // Admin notifications routes

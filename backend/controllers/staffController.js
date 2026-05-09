@@ -94,6 +94,14 @@ const createStaff = async (req, res) => {
             ]
         );
         
+        // Tự động tạo quyền mặc định cho nhân viên mới
+        try {
+            await db.query('CALL create_default_permissions(?, ?)', [result.insertId, vai_tro || 'waiter']);
+        } catch (permError) {
+            console.error('Error creating default permissions:', permError);
+            // Không fail nếu tạo quyền lỗi, vẫn trả về success
+        }
+        
         res.json({ 
             success: true, 
             message: 'Thêm nhân viên thành công!',
@@ -200,29 +208,28 @@ const staffLogin = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Mật khẩu không đúng!' });
         }
         
-        // Tạo session
+        // Tạo dữ liệu trả về (không lưu session)
         const userData = {
             ma_nhan_vien: staff[0].ma_nhan_vien,
             ma_nv_code: staff[0].ma_nv_code,
             ten_nhan_vien: staff[0].ten_nhan_vien,
             tai_khoan: staff[0].tai_khoan,
             vai_tro: staff[0].vai_tro,
-            so_dien_thoai: staff[0].so_dien_thoai
+            so_dien_thoai: staff[0].so_dien_thoai,
+            anh_dai_dien: staff[0].anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff[0].ten_nhan_vien)}&background=10b981&color=fff`
         };
         
-        req.session.admin = {
-            ma_admin: staff[0].ma_nhan_vien, 
-            tai_khoan: staff[0].tai_khoan,
-            email: `${staff[0].tai_khoan}@pos.local`,
-            ten_hien_thi: staff[0].ten_nhan_vien,
-            anh_dai_dien: staff[0].anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff[0].ten_nhan_vien)}&background=10b981&color=fff`,
-            role: staff[0].vai_tro
-        };
+        console.log('👤 Staff login - Tài khoản:', staff[0].tai_khoan);
+        console.log('👤 Staff login - Vai trò:', staff[0].vai_tro);
+        console.log('✅ Trả về dữ liệu staff (không dùng session)');
         
-        req.session.save((err) => {
-            if (err) return res.status(500).json({ success: false, message: 'Lỗi tạo phiên đăng nhập' });
-            res.json({ success: true, message: 'Đăng nhập thành công!', data: userData });
+        // Trả về thông tin luôn, không cần session
+        res.json({ 
+            success: true, 
+            message: 'Đăng nhập thành công!', 
+            data: userData 
         });
+        
     } catch (error) {
         console.error('Error staff login:', error);
         res.status(500).json({ success: false, message: error.message });

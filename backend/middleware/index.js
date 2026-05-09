@@ -4,13 +4,14 @@
  */
 
 const corsMiddleware = require('./cors');
-const sessionMiddleware = require('./session');
+const { adminSessionMiddleware, staffSessionMiddleware } = require('./session');
 const loggerMiddleware = require('./logger');
 const { notFoundHandler, errorHandler } = require('./errorHandler');
 
 module.exports = {
     corsMiddleware,
-    sessionMiddleware,
+    adminSessionMiddleware,
+    staffSessionMiddleware,
     loggerMiddleware,
     notFoundHandler,
     errorHandler

@@ -47,45 +47,14 @@
                     Đăng nhập bằng Google (Admin)
                 </button>
 
-                <!-- Divider -->
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-600"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-gray-800 text-gray-400">hoặc dùng tài khoản cấp phát</span>
-                    </div>
+                <!-- Link to Staff Portal -->
+                <div class="mt-8 pt-6 border-t border-gray-700 text-center">
+                    <p class="text-gray-400 mb-4 text-sm sm:text-base">Bạn là nhân viên nhà hàng?</p>
+                    <a href="../staff/login.html" 
+                        class="inline-block w-full bg-transparent border-2 border-orange-600 text-orange-500 hover:bg-orange-600 hover:text-white py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg transition shadow-md">
+                        <i class="fas fa-users mr-2"></i> Chuyển đến Cổng đăng nhập Nhân viên
+                    </a>
                 </div>
-
-                <!-- Staff & Manager Login Form -->
-                <form id="staffLoginForm" onsubmit="handleStaffLogin(event)" class="space-y-4">
-                    <div>
-                        <label for="username" class="sr-only">Tên đăng nhập</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-user text-gray-400"></i>
-                            </div>
-                            <input type="text" id="username" name="username" required
-                                class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg pl-10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors"
-                                placeholder="Tên đăng nhập (Nhân viên / Quản lý)">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="password" class="sr-only">Mật khẩu</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
-                            </div>
-                            <input type="password" id="password" name="password" required
-                                class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg pl-10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors"
-                                placeholder="Mật khẩu">
-                        </div>
-                    </div>
-                    <button type="submit" id="btnStaffLogin"
-                        class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg transition shadow-md flex justify-center items-center">
-                        <span>Đăng nhập hệ thống</span>
-                    </button>
-                </form>
 
                 <!-- Alert -->
                 <div id="alert-message" class="hidden p-4 rounded-lg mt-6"></div>

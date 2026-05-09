@@ -440,10 +440,11 @@
                         </span>
                     </td>
                     <td class="py-4 px-4">
-                        <div class="flex justify-center space-x-3">
-                            <button onclick="openEditModal(${s.ma_nhan_vien})" class="text-blue-600 hover:scale-110 transition"><i class="fas fa-edit"></i></button>
-                            <button onclick="openPasswordModal(${s.ma_nhan_vien})" class="text-orange-500 hover:scale-110 transition"><i class="fas fa-key"></i></button>
-                            <button onclick="deleteStaff(${s.ma_nhan_vien})" class="text-red-600 hover:scale-110 transition"><i class="fas fa-trash"></i></button>
+                        <div class="flex justify-center space-x-1">
+                            <button onclick="openEditModal(${s.ma_nhan_vien})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Chỉnh sửa"><i class="fas fa-edit text-lg"></i></button>
+                            <button onclick="openPasswordModal(${s.ma_nhan_vien})" class="p-2 text-orange-500 hover:bg-orange-50 rounded-full transition-colors" title="Đổi mật khẩu"><i class="fas fa-key text-lg"></i></button>
+                            <button onclick="window.location.href='quan-ly-quyen-nhan-vien.html?id=${s.ma_nhan_vien}'" class="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors" title="Phân quyền"><i class="fas fa-shield-alt text-lg"></i></button>
+                            <button onclick="deleteStaff(${s.ma_nhan_vien})" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Xóa"><i class="fas fa-trash text-lg"></i></button>
                         </div>
                     </td>
                 </tr>

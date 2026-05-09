@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Thẻ Nhân Viên - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .card { page-break-inside: avoid; }
+            body { background: white; }
+        }
+        .card {
+            width: 8.5cm;
+            height: 5.5cm;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        .qr-code {
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6 no-print">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-id-card mr-3 text-purple-600"></i>
+                In Thẻ Nhân Viên
+            </h1>
+            <p class="text-gray-600 mb-4">Tạo và in thẻ nhân viên với mã QR để chấm công</p>
+            
+            <!-- Controls -->
+            <div class="flex gap-4">
+                <button onclick="loadStaff()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-sync-alt mr-2"></i>Tải Danh Sách
+                </button>
+                <button onclick="window.print()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-print mr-2"></i>In Thẻ
+                </button>
+                <button onclick="selectAll()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition">
+                    <i class="fas fa-check-square mr-2"></i>Chọn Tất Cả
+                </button>
+                <button onclick="deselectAll()" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transition">
+                    <i class="fas fa-square mr-2"></i>Bỏ Chọn
+                </button>
+            </div>
+        </div>
+
+        <!-- Staff Selection -->
+        <div id="staffList" class="bg-white rounded-lg shadow-lg p-6 mb-6 no-print">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Chọn Nhân Viên Cần In Thẻ</h2>
+            <div id="staffCheckboxes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-gray-500">Đang tải danh sách nhân viên...</p>
+            </div>
+        </div>
+
+        <!-- Cards Preview -->
+        <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Cards will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let staffData = [];
+
+        // Load staff list
+        async function loadStaff() {
+            try {
+                const response = await fetch(`${API_BASE}/staff`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    staffData = data.data.filter(s => s.trang_thai === 1); // Chỉ lấy nhân viên đang hoạt động
+                    displayStaffCheckboxes();
+                } else {
+                    alert('Không thể tải danh sách nhân viên: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Load staff error:', error);
+                alert('Lỗi kết nối server!');
+            }
+        }
+
+        // Display staff checkboxes
+        function displayStaffCheckboxes() {
+            const container = document.getElementById('staffCheckboxes');
+            
+            if (staffData.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Không có nhân viên nào.</p>';
+                return;
+            }
+
+            container.innerHTML = staffData.map(staff => `
+                <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="checkbox" 
+                           class="staff-checkbox w-5 h-5 text-purple-600 mr-3" 
+                           value="${staff.ma_nhan_vien}"
+                           onchange="updateCards()">
+                    <div>
+                        <div class="font-semibold text-gray-800">${staff.ten_nhan_vien}</div>
+                        <div class="text-sm text-gray-600">
+                            ${staff.ma_nv_code} - ${getRoleName(staff.vai_tro)}
+                        </div>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        // Get role name in Vietnamese
+        function getRoleName(role) {
+            const roles = {
+                'admin': 'Quản trị',
+                'manager': 'Quản lý',
+                'cashier': 'Thu ngân',
+                'waiter': 'Phục vụ',
+                'chef': 'Bếp',
+                'kitchen': 'Bếp',
+                'cleaner': 'Tạp vụ'
+            };
+            return roles[role] || role;
+        }
+
+        // Update cards based on selection
+        function updateCards() {
+            const checkboxes = document.querySelectorAll('.staff-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            const selectedStaff = staffData.filter(s => selectedIds.includes(s.ma_nhan_vien));
+            
+            const container = document.getElementById('cardsContainer');
+            
+            if (selectedStaff.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-8">Chọn nhân viên để xem thẻ</p>';
+                return;
+            }
+
+            container.innerHTML = selectedStaff.map(staff => createCard(staff)).join('');
+            
+            // Generate QR codes
+            selectedStaff.forEach(staff => {
+                generateQRCode(staff.ma_nv_code);
+            });
+        }
+
+        // Create card HTML
+        function createCard(staff) {
+            return `
+                <div class="card">
+                    <div class="card-content">
+                        <!-- Header -->
+                        <div class="text-center mb-3">
+                            <div class="text-xs font-semibold opacity-90">NHÀ HÀNG ẨM THỰC</div>
+                            <div class="text-lg font-bold">PHƯƠNG NAM</div>
+                        </div>
+
+                        <!-- Staff Info -->
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+                                <div class="text-xl font-bold mb-1">${staff.ten_nhan_vien}</div>
+                                <div class="text-sm opacity-90 mb-1">
+                                    <i class="fas fa-briefcase mr-1"></i>${getRoleName(staff.vai_tro)}
+                                </div>
+                                <div class="text-sm opacity-90 mb-2">
+                                    <i class="fas fa-phone mr-1"></i>${staff.so_dien_thoai || 'N/A'}
+                                </div>
+                                <div class="bg-white bg-opacity-20 rounded px-3 py-2 inline-block">
+                                    <div class="text-xs opacity-90">Mã Nhân Viên</div>
+                                    <div class="text-2xl font-bold">${staff.ma_nv_code}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Code -->
+                            <div class="qr-code" id="qr-${staff.ma_nv_code}"></div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-xs text-center mt-3 opacity-75">
+                            Quét mã để chấm công nhanh
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate QR code
+        function generateQRCode(code) {
+            setTimeout(() => {
+                const element = document.getElementById(`qr-${code}`);
+                if (element && element.innerHTML === '') {
+                    new QRCode(element, {
+                        text: code,
+                        width: 80,
+                        height: 80,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+            }, 100);
+        }
+
+        // Select all
+        function selectAll() {
+            document.querySelectorAll('.staff-checkbox').forEach(cb => cb.checked = true);
+            updateCards();
+        }
+
+        // Deselect all
+        function deselectAll() {
+            document.querySelectorAll('.staff-checkbox').forEach(cb => cb.checked = false);
+            updateCards();
+        }
+
+        // Auto load on page load
+        window.addEventListener('DOMContentLoaded', loadStaff);
+    </script>
+</body>
+</html>

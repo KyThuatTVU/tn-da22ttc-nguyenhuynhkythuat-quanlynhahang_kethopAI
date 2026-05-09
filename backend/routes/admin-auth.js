@@ -226,9 +226,12 @@ router.get('/google/callback',
     }),
     async (req, res) => {
         try {
+            console.log('🔐 Google OAuth callback - User object:', req.user);
+            console.log('🔐 Session before save:', req.session);
+
             const email = req.user.email;
-            const googleDisplayName = req.user.ten_hien_thi; // Lấy tên hiển thị từ user object
-            const googleAvatar = req.user.anh_dai_dien; // Lấy avatar đã xử lý từ passport
+            const googleDisplayName = req.user.ten_hien_thi;
+            const googleAvatar = req.user.anh_dai_dien;
 
             console.log('🔍 Google login data:', { email, googleDisplayName, googleAvatar });
 
@@ -239,6 +242,7 @@ router.get('/google/callback',
             );
 
             if (admins.length === 0) {
+                console.log('❌ Email không phải admin:', email);
                 // Email không phải admin, từ chối đăng nhập
                 req.logout(() => {
                     res.redirect('/admin/dang-nhap-admin.html?error=not_admin');
@@ -247,6 +251,7 @@ router.get('/google/callback',
             }
 
             const admin = admins[0];
+            console.log('✅ Admin found in database:', admin.email);
 
             // Cập nhật thông tin Google vào database (tên hiển thị và avatar)
             const updateFields = [];
@@ -272,7 +277,9 @@ router.get('/google/callback',
                 console.log('✅ Updated admin info from Google:', { googleDisplayName, googleAvatar });
             }
 
-            // Lưu thông tin admin vào session (bao gồm avatar từ Google)
+            // QUAN TRỌNG: Lưu thông tin admin vào req.session.admin
+            // Passport đã lưu vào req.session.passport.user, nhưng ta cũng cần lưu vào req.session.admin
+            // để check-session endpoint có thể đọc được
             req.session.admin = {
                 ma_admin: admin.ma_admin,
                 tai_khoan: admin.tai_khoan,
@@ -283,13 +290,26 @@ router.get('/google/callback',
                 role: 'admin'
             };
 
-            console.log('📦 Session admin data:', req.session.admin);
+            console.log('📦 Session admin data set:', req.session.admin);
+            console.log('📦 Passport session:', req.session.passport);
 
-            // Redirect về trang admin (không có token trong URL)
-            res.redirect('/admin/index.html?login=success');
+            // Lưu session trước khi redirect
+            req.session.save((err) => {
+                if (err) {
+                    console.error('❌ Lỗi lưu session:', err);
+                    res.redirect('/admin/dang-nhap-admin.html?error=session_save_failed');
+                    return;
+                }
+
+                console.log('✅ Session đã được lưu thành công');
+                console.log('🔐 Session after save:', req.session);
+                
+                // Redirect về dashboard với query param để frontend biết đã login thành công
+                res.redirect('/admin/dashboard.html?login=success');
+            });
 
         } catch (error) {
-            console.error('Lỗi Google callback admin:', error);
+            console.error('❌ Lỗi Google callback admin:', error);
             res.redirect('/admin/dang-nhap-admin.html?error=google_callback_failed');
         }
     }
@@ -314,23 +334,34 @@ router.get('/check-session', (req, res) => {
 
 // Đăng xuất admin
 router.post('/logout', (req, res) => {
+    console.log('🚪 Admin logout request');
+    console.log('📦 Session before logout:', req.session);
+    
+    // Xóa thông tin admin khỏi session
+    if (req.session) {
+        delete req.session.admin;
+    }
+    
     req.logout((err) => {
         if (err) {
+            console.error('❌ Logout error:', err);
             return res.status(500).json({
                 success: false,
                 message: 'Lỗi đăng xuất'
             });
         }
 
-        // Xóa session
+        // Xóa toàn bộ session
         req.session.destroy((err) => {
             if (err) {
+                console.error('❌ Session destroy error:', err);
                 return res.status(500).json({
                     success: false,
                     message: 'Lỗi xóa session'
                 });
             }
 
+            console.log('✅ Admin logged out successfully');
             res.json({
                 success: true,
                 message: 'Đăng xuất thành công'

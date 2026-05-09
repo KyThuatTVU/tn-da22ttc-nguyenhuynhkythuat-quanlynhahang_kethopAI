@@ -1,12 +1,3 @@
-VẼ SƠ ĐỒ LỚP - HỆ THỐNG NHÀ HÀNG PHƯƠNG NAM
-================================================
-
-## QUY TẮC:
-- Chỉ dùng đường thẳng liền (Association) cho tất cả quan hệ
-- Màu nền: Xanh nhạt (#ADD8E6)
-- Hiển thị: Tên lớp | Thuộc tính | Phương thức
-
----
 
 ## CÁC LỚP:
 
@@ -158,6 +149,3 @@ DonHang ────── ThanhToan (1 to 0..1)
 NguoiDung ────── DanhGia (1 to *)
 MonAn ────── DanhGia (1 to *)
 
----
-
-VẼ SƠ ĐỒ với 14 lớp và 14 quan hệ như trên.

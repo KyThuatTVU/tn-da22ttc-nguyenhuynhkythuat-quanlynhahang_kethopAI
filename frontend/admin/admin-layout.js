@@ -84,9 +84,16 @@ const SIDEBAR_TEMPLATE = `
                 </a>
             </div>
 
-            <!-- 4. Quản lý nhân sự -->
-            <p class="nav-group-title staff-group-title">Quản lý nhân sự</p>
+            <!-- 4. Quản lý nhân sự & Hệ thống -->
+            <p class="nav-group-title staff-group-title">Nhân sự & Quản trị</p>
             <div class="space-y-1 mb-6 staff-group-content">
+                <!-- Nút chấm công nhanh cho nhân viên -->
+                <a href="../staff/cham-cong.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 sidebar-staff-only">
+                    <i class="fas fa-camera w-5"></i><span class="text-sm font-bold">📸 Chấm Công Ngay</span>
+                </a>
+                <a href="admins.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl sidebar-admin-only">
+                    <i class="fas fa-user-shield w-5 text-blue-400"></i><span class="text-sm text-blue-100 font-medium">Tài khoản Admin</span>
+                </a>
                 <a href="staff.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-user-tie w-5"></i><span class="text-sm">Nhân viên</span>
                 </a>
@@ -95,6 +102,9 @@ const SIDEBAR_TEMPLATE = `
                 </a>
                 <a href="attendance.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-check-double w-5"></i><span class="text-sm">Chấm công</span>
+                </a>
+                <a href="luong-hang-ngay.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                    <i class="fas fa-coins w-5"></i><span class="text-sm">Lương hàng ngày</span>
                 </a>
                 <a href="payroll.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-money-bill-wave w-5"></i><span class="text-sm">Bảng lương</span>
@@ -148,7 +158,7 @@ const SIDEBAR_TEMPLATE = `
                     </div>
                 </div>
                 <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
-                    <span class="text-xs text-blue-300"><i class="fab fa-google mr-1"></i>Google</span>
+                    <span id="login-type-badge" class="text-xs text-blue-300"><i class="fab fa-google mr-1"></i>Google</span>
                     <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 transition-colors">
                         <i class="fas fa-sign-out-alt mr-1"></i>Đăng xuất
                     </button>
@@ -170,6 +180,11 @@ const HEADER_TEMPLATE = `
         </div>
     </div>
     <div class="flex items-center space-x-4">
+        <!-- Reload Permissions Button (chỉ hiện cho Staff) -->
+        <button id="reload-permissions-btn" onclick="reloadPermissions()" class="hidden text-white hover:text-blue-200 transition cursor-pointer" title="Kiểm tra quyền mới">
+            <i class="fas fa-sync-alt text-lg"></i>
+        </button>
+        
         <!-- Admin Notification Bell -->
         <div id="admin-notification-container" class="relative">
             <button id="admin-notification-btn" class="relative text-white hover:text-blue-200 transition cursor-pointer">
@@ -202,7 +217,7 @@ const HEADER_TEMPLATE = `
         </div>
     </div>
 </header>
-<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 invisible transition-all duration-300" onclick="toggleSidebar()"></div>
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 invisible pointer-events-none lg:pointer-events-none transition-all duration-300" onclick="toggleSidebar()"></div>
 `;
 
 // Helper to update elements safely
@@ -213,36 +228,87 @@ function safeUpdate(id, prop, val, isAttr = false) {
     else el[prop] = val;
 }
 
-// Load admin info from session
-async function loadAdminInfo(retryCount = 0) {
+// =============================================
+// LOAD ADMIN/STAFF INFO - ĐƠN GIẢN HÓA
+// =============================================
+// Admin: check Google session qua API (cookie)
+// Staff: đọc từ localStorage (đơn giản, không cần cookie)
+// =============================================
+async function loadAdminInfo() {
     try {
-        const response = await fetch(`${API_URL}/admin-auth/check-session`, {
-            method: 'GET',
-            credentials: 'include'
-        });
-        const result = await response.json();
-        
-        if (result.isAuthenticated && result.data) {
-            const admin = result.data;
-            const adminName = admin.ten_hien_thi || admin.tai_khoan || admin.email.split('@')[0];
-            const adminAvatar = admin.anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=3b82f6&color=fff`;
-            
-            // Sync UI
-            updateAdminElements('admin-name', adminName);
-            updateAdminElements('admin-avatar', adminAvatar, true);
-            updateAdminElements('admin-email', admin.email);
-            updateAdminElements('admin-name-header', adminName);
-            updateAdminElements('admin-avatar-header', adminAvatar, true);
-            
-            return admin;
-        } else if (retryCount < 2) {
-            await new Promise(r => setTimeout(r, 500));
-            return loadAdminInfo(retryCount + 1);
+        // ========== BƯỚC 1: Kiểm tra Staff từ sessionStorage TRƯỚC ==========
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien && staff.tai_khoan) {
+                    const staffName = staff.ten_nhan_vien || staff.tai_khoan;
+                    const staffAvatar = staff.anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(staffName)}&background=10b981&color=fff`;
+                    const staffEmail = staff.email || `${staff.tai_khoan}@staff`;
+
+                    console.log('✅ Staff đăng nhập từ sessionStorage:', staffName);
+                    
+                    updateAdminElements('admin-name', staffName);
+                    updateAdminElements('admin-avatar', staffAvatar, true);
+                    updateAdminElements('admin-email', staffEmail);
+                    updateAdminElements('admin-name-header', staffName);
+                    updateAdminElements('admin-avatar-header', staffAvatar, true);
+
+                    const loginBadge = document.getElementById('login-type-badge');
+                    if (loginBadge) {
+                        loginBadge.innerHTML = '<i class="fas fa-user mr-1"></i>Nhân viên';
+                    }
+
+                    const staffData = { ...staff, role: 'staff' };
+                    window.currentUser = staffData;
+                    return staffData;
+                }
+            } catch (parseError) {
+                sessionStorage.removeItem('staff_user');
+            }
         }
-        window.location.href = 'dang-nhap-admin.html';
+
+        // ========== BƯỚC 2: Kiểm tra Admin session (Google OAuth) ==========
+        let isAdmin = false;
+        try {
+            const response = await fetch(`${API_URL}/admin-auth/check-session`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            const result = await response.json();
+
+            if (result.isAuthenticated && result.data) {
+                isAdmin = true;
+                const admin = result.data;
+                const adminName = admin.ten_hien_thi || admin.tai_khoan || admin.email?.split('@')[0] || 'Admin';
+                const adminAvatar = admin.anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=3b82f6&color=fff`;
+
+                console.log('✅ Admin đăng nhập qua Google:', adminName);
+                
+                updateAdminElements('admin-name', adminName);
+                updateAdminElements('admin-avatar', adminAvatar, true);
+                updateAdminElements('admin-email', admin.email);
+                updateAdminElements('admin-name-header', adminName);
+                updateAdminElements('admin-avatar-header', adminAvatar, true);
+
+                const loginBadge = document.getElementById('login-type-badge');
+                if (loginBadge) {
+                    loginBadge.innerHTML = '<i class="fas fa-crown text-yellow-400 mr-1"></i>Admin';
+                }
+
+                const adminData = { ...admin, role: 'admin' };
+                window.currentUser = adminData;
+
+                return adminData;
+            }
+        } catch(e) {
+            console.log('Không có session Admin (hoặc lỗi network)');
+        }
+
         return null;
+
     } catch (error) {
-        console.error('❌ Error loading admin info:', error);
+        console.error('❌ Lỗi:', error);
         return null;
     }
 }
@@ -256,20 +322,50 @@ function updateAdminElements(identifier, value, isImage = false) {
         if (isImage) {
             el.setAttribute('referrerpolicy', 'no-referrer');
             el.src = value;
-            el.onerror = () => el.src = 'https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff';
+            el.onerror = () => el.src = 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
         } else {
             el.textContent = value;
         }
     });
 }
 
+// =============================================
+// ĐĂNG XUẤT
+// =============================================
 async function logout() {
     if (!confirm('Bạn có chắc muốn đăng xuất?')) return;
-    try {
-        const res = await fetch(`${API_URL}/admin-auth/logout`, { method: 'POST', credentials: 'include' });
-        const result = await res.json();
-        if (result.success) window.location.href = 'dang-nhap-admin.html';
-    } catch (e) { alert('Lỗi đăng xuất!'); }
+
+    const isStaff = window.currentUser?.role === 'staff' || sessionStorage.getItem('staff_user');
+
+    if (isStaff) {
+        // ===== STAFF LOGOUT: Xóa localStorage, không cần gọi API =====
+        console.log('🚪 Staff đăng xuất...');
+        sessionStorage.removeItem('staff_user');
+        window.location.href = '../staff/login.html';
+    } else {
+        // ===== ADMIN LOGOUT: Gọi API xóa session Google =====
+        try {
+            console.log('🚪 Admin đăng xuất...');
+            const res = await fetch(`${API_URL}/admin-auth/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                console.log('✅ Admin logout thành công');
+                document.cookie = 'admin.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = 'dang-nhap-admin.html';
+            } else {
+                alert('Lỗi đăng xuất!');
+            }
+        } catch (e) {
+            console.error('❌ Logout error:', e);
+            // Fallback: vẫn xóa cookie và chuyển hướng
+            document.cookie = 'admin.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = 'dang-nhap-admin.html';
+        }
+    }
 }
 
 function toggleSidebar() {
@@ -280,43 +376,339 @@ function toggleSidebar() {
         if (overlay) {
             overlay.classList.toggle('opacity-0');
             overlay.classList.toggle('invisible');
+            // Toggle pointer-events: when sidebar is open, overlay should catch clicks
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                overlay.classList.remove('pointer-events-none');
+            } else {
+                overlay.classList.add('pointer-events-none');
+            }
         }
     }
 }
 
-function applyRBAC(adminUser) {
-    if (!adminUser) return;
-    const currentRole = (adminUser.role || 'staff').toLowerCase();
+// =============================================
+// PHÂN QUYỀN (RBAC)
+// =============================================
+// Admin: full quyền - thấy tất cả menu
+// Staff: dựa vào vai_tro + quyền chi tiết từ bảng nhan_vien_quyen
+// =============================================
+async function applyRBAC(userData) {
+    if (!userData) return;
+
+    const currentRole = (userData.role || userData.vai_tro || 'staff').toLowerCase();
+    console.log('🛡️ Áp dụng phân quyền cho:', currentRole);
+
+    // Admin (đăng nhập Google): Full quyền, không cần ẩn gì
+    if (currentRole === 'admin' || currentRole === 'superadmin') {
+        console.log('👑 Admin - Full quyền');
+        updateRoleBadge('admin');
+        // Ẩn nút reload permissions cho admin
+        const reloadBtn = document.getElementById('reload-permissions-btn');
+        if (reloadBtn) reloadBtn.classList.add('hidden');
+        // Ẩn nút chấm công nhanh cho admin
+        document.querySelectorAll('.sidebar-staff-only').forEach(el => el.style.display = 'none');
+        return;
+    }
+
+    // ===== STAFF: Hiển thị nút reload permissions và nút chấm công =====
+    const reloadBtn = document.getElementById('reload-permissions-btn');
+    if (reloadBtn) reloadBtn.classList.remove('hidden');
+    // Hiển thị nút chấm công cho staff
+    document.querySelectorAll('.sidebar-staff-only').forEach(el => el.style.display = 'flex');
+
+    // ===== STAFF: Load quyền chi tiết từ API =====
+    const staffId = userData.ma_nhan_vien;
+    const vai_tro = (userData.vai_tro || 'waiter').toLowerCase();
+    let permissions = {};
+    let permissionsLoaded = false;
+
+    if (staffId) {
+        try {
+            const res = await fetch(`${API_URL}/staff/${staffId}/permissions`, { cache: 'no-store' });
+            const data = await res.json();
+            if (data.success && data.data) {
+                permissions = data.data;
+                // Kiểm tra có ít nhất 1 quyền được bật không
+                const hasAnyPerm = Object.keys(permissions).some(k => 
+                    !['ma_quyen','ma_nhan_vien','ngay_tao','ngay_cap_nhat'].includes(k) && permissions[k] === 1
+                );
+                permissionsLoaded = hasAnyPerm;
+                console.log('📋 Quyền nhân viên:', permissions, '| Có quyền:', permissionsLoaded);
+            }
+        } catch (err) {
+            console.error('❌ Lỗi load quyền nhân viên:', err);
+        }
+    }
+
+    // ===== FALLBACK: Quyền mặc định theo vai trò nếu chưa có quyền chi tiết =====
+    if (!permissionsLoaded) {
+        console.log('⚠️ Không có quyền chi tiết → dùng quyền mặc định theo vai trò:', vai_tro);
+        permissions = getDefaultPermissions(vai_tro);
+    }
+
+    // Lưu quyền vào window để các trang khác dùng
+    window.staffPermissions = permissions;
+
+    // ===== TỰ ĐỘNG RELOAD QUYỀN MỖI 30 GIÂY =====
+    // Để nhân viên nhận quyền mới ngay khi admin thay đổi mà không cần đăng nhập lại
+    if (staffId) {
+        setInterval(async () => {
+            try {
+                const res = await fetch(`${API_URL}/staff/${staffId}/permissions`, { cache: 'no-store' });
+                const data = await res.json();
+                if (data.success && data.data) {
+                    const newPermissions = data.data;
+                    
+                    // So sánh quyền cũ và mới
+                    const hasChanges = JSON.stringify(permissions) !== JSON.stringify(newPermissions);
+                    
+                    if (hasChanges) {
+                        console.log('🔄 Phát hiện thay đổi quyền! Đang reload...');
+                        window.staffPermissions = newPermissions;
+                        permissions = newPermissions;
+                        
+                        // Reload lại trang để áp dụng quyền mới
+                        location.reload();
+                    }
+                }
+            } catch (err) {
+                console.error('❌ Lỗi kiểm tra quyền:', err);
+            }
+        }, 30000); // 30 giây
+    }
+
+    // ===== ÁP DỤNG: Ẩn/hiện menu dựa trên quyền =====
+    // Map quyền → menu sidebar
+    const permissionMenuMap = {
+        // Tổng quan
+        'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
+        'doanh-thu.html': ['xem_doanh_thu'],
+        'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
+        'loai-chi-phi.html': ['xem_doanh_thu'],
+        // Bán hàng
+        'admin-pos-new.html': ['xem_pos', 'tao_don_pos'],
+        'orders.html': ['xem_don_hang'],
+        'reservations.html': ['dat_ban', 'xem_ban'],
+        'tables.html': ['xem_ban'],
+        // Thực đơn
+        'products.html': ['xem_menu'],
+        'categories.html': ['xem_menu'],
+        'nguyen-lieu.html': ['xem_kho'],
+        'loai-nguyen-lieu.html': ['xem_kho'],
+        'cong-thuc.html': ['xem_cong_thuc'],
+        'nhap-hang.html': ['nhap_kho'],
+        'nha-cung-cap.html': ['xem_kho'],
+        'kiem-ke.html': ['xem_kho'],
+        'hao-hut.html': ['xem_kho'],
+        'ke-do-bep.html': ['xem_phieu_bep'],
+        // Nhân sự (chỉ admin/manager)
+        'admins.html': [],  // Luôn ẩn đối với staff
+        'staff.html': ['xem_nhan_vien'],
+        'shifts.html': ['xem_nhan_vien'],
+        'attendance.html': ['xem_nhan_vien'],
+        'payroll.html': ['xem_nhan_vien'],
+        // Khách hàng
+        'customers.html': ['xem_khach_hang'],
+        'promotions.html': ['xem_khach_hang'],
+        'reviews.html': ['xem_khach_hang'],
+        'contacts.html': ['xem_khach_hang'],
+        'chatbot-history.html': ['xem_khach_hang'],
+        // Hệ thống
+        'news.html': ['xem_cai_dat'],
+        'quan-ly-binh-luan.html': ['xem_cai_dat'],
+        'albums.html': ['xem_cai_dat'],
+        'settings.html': ['xem_cai_dat', 'sua_cai_dat'],
+    };
+
+    // Kiểm tra từng menu
+    const allMenuLinks = document.querySelectorAll('.sidebar-item[href]');
+    const currentPage = window.location.pathname.split('/').pop().split('?')[0];
+
+    allMenuLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const requiredPerms = permissionMenuMap[href];
+
+        // Nếu không có mapping → ẩn (an toàn)
+        if (!requiredPerms || requiredPerms.length === 0) {
+            link.style.display = 'none';
+            return;
+        }
+
+        // Kiểm tra có ít nhất 1 quyền phù hợp (cho phép số 1, chuỗi '1', hoặc boolean true)
+        const hasPermission = requiredPerms.some(perm => 
+            permissions[perm] === 1 || permissions[perm] === '1' || permissions[perm] === true
+        );
+
+        if (!hasPermission) {
+            link.style.display = 'none';
+        }
+    });
+
+    // Kiểm tra trang hiện tại có quyền truy cập không
+    const currentPagePerms = permissionMenuMap[currentPage];
     
-    console.log('🛡️ Applying RBAC for role:', currentRole);
-    
-    // Hide based on role
-    if (currentRole === 'staff') {
-        const forbidden = ['dashboard.html', 'products.html', 'categories.html', 'customers.html', 'staff.html', 'settings.html', 'shifts.html', 'attendance.html', 'payroll.html'];
-        forbidden.forEach(h => {
-            const el = document.querySelector(`a[href="${h}"]`);
-            if (el && !window.location.pathname.endsWith(h)) el.remove();
-        });
-        document.querySelector('.staff-group-title')?.remove();
-        document.querySelector('.staff-group-content')?.remove();
-        document.querySelector('.content-system-title')?.remove();
-        document.querySelector('.content-system-group')?.remove();
-    } else if (currentRole === 'manager') {
-        const forbidden = ['staff.html', 'shifts.html', 'attendance.html', 'payroll.html', 'settings.html'];
-        forbidden.forEach(h => {
-             const el = document.querySelector(`a[href="${h}"]`);
-             if (el && !window.location.pathname.endsWith(h)) el.remove();
-        });
-        // We might keep the group titles if some items remain, but settings is forbidden
-        const settingsLink = document.querySelector('a[href="settings.html"]');
-        if (settingsLink) settingsLink.remove();
+    // Cập nhật role badge sớm để ko bị lầm
+    updateRoleBadge(vai_tro);
+
+    if (currentPagePerms && currentPagePerms.length > 0) {
+        const hasAccess = currentPagePerms.some(perm => 
+            permissions[perm] === 1 || permissions[perm] === '1' || permissions[perm] === true
+        );
+        console.log(`🔍 Trang hiện tại: ${currentPage}, Yêu cầu quyền:`, currentPagePerms, `| Kết quả: ${hasAccess}`);
+        
+        if (!hasAccess) {
+            console.warn('❌ Bị block vì không đủ quyền truy cập trang:', currentPage);
+            alert(`Tài khoản nhân viên của bạn hiện chưa được cấp quyền cho trang này.\n(Hệ thống đang hoạt động đúng chức năng của tài khoản Nhân viên)`);
+            redirectToDefaultPage(vai_tro);
+            return;
+        }
+    }
+
+    // Dọn dẹp: ẩn nhóm menu trống
+    document.querySelectorAll('.nav-group-title').forEach(titleEl => {
+        let sibling = titleEl.nextElementSibling;
+        if (sibling && sibling.classList.contains('space-y-1')) {
+            const visibleLinks = [...sibling.querySelectorAll('a')].filter(a => a.style.display !== 'none');
+            if (visibleLinks.length === 0) {
+                titleEl.style.display = 'none';
+                sibling.style.display = 'none';
+            }
+        }
+    });
+
+    // Cập nhật role badge
+    updateRoleBadge(vai_tro);
+}
+
+// ===== QUYỀN MẶC ĐỊNH THEO VAI TRÒ =====
+// Dùng khi bảng nhan_vien_quyen chưa có dữ liệu
+function getDefaultPermissions(vai_tro) {
+    const defaults = {
+        // Manager: gần như full quyền
+        'manager': {
+            xem_don_hang: 1, tao_don_hang: 1, sua_don_hang: 1, xoa_don_hang: 1, huy_don_hang: 1,
+            xem_ban: 1, dat_ban: 1, sua_ban: 1,
+            xem_menu: 1, them_menu: 1, sua_menu: 1,
+            xem_khach_hang: 1, them_khach_hang: 1, sua_khach_hang: 1,
+            xem_kho: 1, them_kho: 1, sua_kho: 1, nhap_kho: 1, xuat_kho: 1,
+            xem_nhan_vien: 1, them_nhan_vien: 1, sua_nhan_vien: 1, phan_quyen: 1,
+            xem_bao_cao: 1, xem_doanh_thu: 1, xem_thong_ke: 1, xuat_bao_cao: 1,
+            xem_phieu_bep: 1, cap_nhat_trang_thai_mon: 1, xem_cong_thuc: 1,
+            thanh_toan: 1, ap_dung_giam_gia: 1,
+            xem_pos: 1, tao_don_pos: 1,
+            xem_cai_dat: 1
+        },
+        // Waiter (Phục vụ): đơn hàng + bàn + POS
+        'waiter': {
+            xem_don_hang: 1, tao_don_hang: 1,
+            xem_ban: 1, dat_ban: 1,
+            xem_menu: 1,
+            xem_pos: 1, tao_don_pos: 1,
+            thanh_toan: 1
+        },
+        // Kitchen (Bếp): xem đơn hàng + phiếu bếp + kho
+        'kitchen': {
+            xem_don_hang: 1,
+            xem_menu: 1,
+            xem_kho: 1,
+            xem_phieu_bep: 1, cap_nhat_trang_thai_mon: 1, xem_cong_thuc: 1
+        },
+        // Cashier (Thu ngân): đơn hàng + thanh toán + POS
+        'cashier': {
+            xem_don_hang: 1, tao_don_hang: 1,
+            xem_ban: 1,
+            xem_menu: 1,
+            xem_pos: 1, tao_don_pos: 1,
+            thanh_toan: 1,
+            xem_khach_hang: 1
+        }
+    };
+
+    return defaults[vai_tro] || defaults['waiter'];
+}
+
+// Chuyển hướng về trang mặc định theo vai trò
+function redirectToDefaultPage(vai_tro) {
+    if (!window.staffPermissions) {
+        window.location.href = '../staff/login.html';
+        return;
     }
     
-    // Admin role doesn't hide anything
-    
+    const permissions = window.staffPermissions;
+    const currentPath = window.location.pathname.split('/').pop().split('?')[0];
+
+    // Map quyền tương ứng giống applyRBAC
+    const permissionMenuMap = {
+        'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
+        'doanh-thu.html': ['xem_doanh_thu'],
+        'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
+        'loai-chi-phi.html': ['xem_doanh_thu'],
+        'admin-pos-new.html': ['xem_pos', 'tao_don_pos'],
+        'orders.html': ['xem_don_hang'],
+        'reservations.html': ['dat_ban', 'xem_ban'],
+        'tables.html': ['xem_ban'],
+        'products.html': ['xem_menu'],
+        'categories.html': ['xem_menu'],
+        'nguyen-lieu.html': ['xem_kho'],
+        'loai-nguyen-lieu.html': ['xem_kho'],
+        'cong-thuc.html': ['xem_cong_thuc'],
+        'nhap-hang.html': ['nhap_kho'],
+        'nha-cung-cap.html': ['xem_kho'],
+        'kiem-ke.html': ['xem_kho'],
+        'hao-hut.html': ['xem_kho'],
+        'ke-do-bep.html': ['xem_phieu_bep'],
+        'staff.html': ['xem_nhan_vien'],
+        'shifts.html': ['xem_nhan_vien'],
+        'attendance.html': ['xem_nhan_vien'],
+        'payroll.html': ['xem_nhan_vien'],
+        'customers.html': ['xem_khach_hang'],
+        'promotions.html': ['xem_khach_hang'],
+        'reviews.html': ['xem_khach_hang'],
+        'contacts.html': ['xem_khach_hang'],
+        'chatbot-history.html': ['xem_khach_hang'],
+        'news.html': ['xem_cai_dat'],
+        'quan-ly-binh-luan.html': ['xem_cai_dat'],
+        'albums.html': ['xem_cai_dat'],
+        'settings.html': ['xem_cai_dat', 'sua_cai_dat']
+    };
+
+    // Tìm một trang khác trang hiện tại mà nhân viên có quyền để ném nó vào
+    const availableHref = Object.keys(permissionMenuMap).find(href => {
+        if (href === currentPath) return false;
+        const requiredPerms = permissionMenuMap[href];
+        return requiredPerms.some(perm => 
+            permissions[perm] === 1 || permissions[perm] === '1' || permissions[perm] === true
+        );
+    });
+
+    if (availableHref) {
+        window.location.href = availableHref;
+    } else {
+        // Đăng xuất nếu mồ côi (không có bất kì quyền gì trên toàn bộ trang mảng này)
+        alert("Tài khoản của bạn đã bị giới hạn toàn bộ quyền truy cập! Vui lòng liên hệ Admin.");
+        sessionStorage.removeItem('staff_user');
+        window.location.href = '../staff/login.html';
+    }
+}
+
+// Cập nhật badge chức vụ
+function updateRoleBadge(vai_tro) {
     const roleBadge = document.getElementById('user-role-badge');
     if (roleBadge) {
-        roleBadge.textContent = currentRole === 'admin' ? 'Quản trị viên' : (currentRole === 'manager' ? 'Quản lý' : 'Nhân viên');
+        const roleMap = {
+            'admin': 'Quản trị viên',
+            'superadmin': 'Super Admin',
+            'manager': 'Quản lý',
+            'chef': 'Đầu bếp',
+            'kitchen': 'Đầu bếp',
+            'cashier': 'Thu ngân',
+            'waiter': 'Phục vụ',
+            'staff': 'Nhân viên'
+        };
+        roleBadge.textContent = roleMap[vai_tro] || 'Nhân viên';
     }
 }
 
@@ -327,8 +719,7 @@ function setActiveNavLink() {
         const currentPage = path.split('/').pop().split('?')[0] || 'dashboard.html';
         const pageName = currentPage.replace('.html', '').toLowerCase();
         
-        console.log('📍 Current Page Path:', path);
-        console.log('📍 Page Name:', pageName);
+        console.log('📍 Current Page:', pageName);
         
         // Map sub-pages to parent sidebar items
         const subPageMap = {
@@ -337,7 +728,6 @@ function setActiveNavLink() {
             'admin-pos-tables': 'admin-pos-new',
             'quan-ly-binh-luan': 'quan-ly-binh-luan',
             'quan-ly-danh-gia-tin-tuc': 'quan-ly-binh-luan',
-            // Detailed pages for staff, products, etc.
             'staff-detail': 'staff',
             'product-detail': 'products',
             'order-detail': 'orders'
@@ -355,13 +745,12 @@ function setActiveNavLink() {
             if (linkPage === activeBasePage) {
                 link.classList.add('active');
                 activeElement = link;
-                console.log('✅ Active Link Set:', linkPage);
             } else {
                 link.classList.remove('active');
             }
         });
 
-        // AUTO-SCROLL to active item so user always knows where they are
+        // AUTO-SCROLL to active item
         if (activeElement) {
             activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -374,6 +763,7 @@ function injectLayout() {
     const sidebarPlaceholder = document.getElementById('sidebar-placeholder');
     if (sidebarPlaceholder) {
         sidebarPlaceholder.innerHTML = SIDEBAR_TEMPLATE;
+        addMenuDataAttributes();
     }
 
     // 2. Inject Header
@@ -387,10 +777,40 @@ function injectLayout() {
     }
 }
 
+// Thêm data-menu attributes cho các menu items
+function addMenuDataAttributes() {
+    const menuMappings = {
+        'dashboard.html': 'dashboard', 'doanh-thu.html': 'doanh-thu',
+        'chi-phi-hang-ngay.html': 'chi-phi-hang-ngay', 'loai-chi-phi.html': 'loai-chi-phi',
+        'admin-pos-new.html': 'admin-pos-new', 'admin-pos-tables.html': 'admin-pos-tables',
+        'admin-pos-order.html': 'admin-pos-order', 'orders.html': 'orders',
+        'reservations.html': 'reservations', 'tables.html': 'tables',
+        'products.html': 'products', 'categories.html': 'categories',
+        'nguyen-lieu.html': 'nguyen-lieu', 'loai-nguyen-lieu.html': 'loai-nguyen-lieu',
+        'cong-thuc.html': 'cong-thuc', 'nhap-hang.html': 'nhap-hang',
+        'nha-cung-cap.html': 'nha-cung-cap', 'kiem-ke.html': 'kiem-ke',
+        'hao-hut.html': 'hao-hut', 'ke-do-bep.html': 'ke-do-bep',
+        'admins.html': 'admins', 'staff.html': 'staff',
+        'shifts.html': 'shifts', 'attendance.html': 'attendance',
+        'payroll.html': 'payroll', 'customers.html': 'customers',
+        'promotions.html': 'promotions', 'reviews.html': 'reviews',
+        'contacts.html': 'contacts', 'chatbot-history.html': 'chatbot-history',
+        'news.html': 'news', 'quan-ly-binh-luan.html': 'quan-ly-binh-luan',
+        'quan-ly-danh-gia-tin-tuc.html': 'quan-ly-danh-gia-tin-tuc',
+        'albums.html': 'albums', 'settings.html': 'settings'
+    };
+
+    for (const [href, menuName] of Object.entries(menuMappings)) {
+        document.querySelector(`a[href="${href}"]`)?.setAttribute('data-menu', menuName);
+    }
+    
+    console.log('✅ Added data-menu attributes');
+}
+
 async function initAdminLayout() {
     injectLayout();
-    const adminData = await loadAdminInfo();
-    if (adminData) applyRBAC(adminData);
+    const userData = await loadAdminInfo();
+    if (userData) await applyRBAC(userData);
     setActiveNavLink();
 }
 
@@ -401,3 +821,60 @@ else initAdminLayout();
 window.logout = logout;
 window.toggleSidebar = toggleSidebar;
 
+// ===== CHỨC NĂNG RELOAD QUYỀN THỦ CÔNG =====
+window.reloadPermissions = async function() {
+    const staffUserStr = sessionStorage.getItem('staff_user');
+    if (!staffUserStr) {
+        console.log('⚠️ Không phải nhân viên, không cần reload quyền');
+        return;
+    }
+
+    try {
+        const staff = JSON.parse(staffUserStr);
+        const staffId = staff.ma_nhan_vien;
+        
+        if (!staffId) {
+            console.log('⚠️ Không tìm thấy ID nhân viên');
+            return;
+        }
+
+        console.log('🔄 Đang reload quyền...');
+        
+        const res = await fetch(`http://localhost:3000/api/staff/${staffId}/permissions`, { cache: 'no-store' });
+        const data = await res.json();
+        
+        if (data.success && data.data) {
+            const oldPermissions = window.staffPermissions || {};
+            const newPermissions = data.data;
+            
+            // So sánh quyền cũ và mới
+            const hasChanges = JSON.stringify(oldPermissions) !== JSON.stringify(newPermissions);
+            
+            if (hasChanges) {
+                console.log('✅ Phát hiện thay đổi quyền! Đang reload trang...');
+                window.staffPermissions = newPermissions;
+                
+                // Hiển thị thông báo trước khi reload
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-weight: 600;';
+                notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Quyền đã được cập nhật! Đang tải lại...';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                console.log('✅ Quyền không thay đổi');
+                
+                // Hiển thị thông báo
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-weight: 600;';
+                notification.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Quyền của bạn đã là mới nhất';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+    } catch (err) {
+        console.error('❌ Lỗi reload quyền:', err);
+        alert('Lỗi khi kiểm tra quyền. Vui lòng thử lại!');
+    }
+};

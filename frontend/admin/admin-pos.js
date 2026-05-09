@@ -20,31 +20,53 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initPOS() {
-    // admin-layout đã lấy session tại server, lưu kết quả hoặc check nếu role tồn tại
-    // Vì admin-layout.js loadAdminInfo trả về avatar/name nhưng không công khai object đầy đủ cho các scripts khác dễ dàng,
-    // ta gọi lại /check-session để lấy role đầy đủ phục vụ phân quyền frontend POS:
     try {
+        // Bước 1: Kiểm tra Staff từ localStorage
+        const staffUserStr = sessionStorage.getItem('staff_user');
+        if (staffUserStr) {
+            try {
+                const staff = JSON.parse(staffUserStr);
+                if (staff && staff.ma_nhan_vien && staff.tai_khoan) {
+                    adminUser = {
+                        ...staff,
+                        ten_hien_thi: staff.ten_nhan_vien,
+                        role: 'staff',
+                        vai_tro: staff.vai_tro
+                    };
+                    console.log('✅ POS: Staff authenticated:', staff.ten_nhan_vien);
+
+                    // Xử lý Role UI
+                    if (document.getElementById('user-role-badge')) {
+                        const roleMap = { 'manager': 'Quản lý', 'waiter': 'Phục vụ', 'kitchen': 'Đầu bếp', 'cashier': 'Thu ngân' };
+                        document.getElementById('user-role-badge').innerHTML = `<i class="fas fa-id-badge mr-1"></i>${roleMap[staff.vai_tro] || 'Nhân viên'}`;
+                    }
+
+                    if (window.location.pathname.includes('admin-pos-order.html')) {
+                        initOrderScreen();
+                    }
+                    return;
+                }
+            } catch (e) { sessionStorage.removeItem('staff_user'); }
+        }
+
+        // Bước 2: Kiểm tra Admin session (Google OAuth)
         const res = await fetch(`${BASE_URL}/admin-auth/check-session`, { credentials: 'include' });
         const data = await res.json();
         
         if (data.isAuthenticated && data.data) {
-            adminUser = data.data; // { ma_admin, email, ten_hien_thi, role... }
+            adminUser = data.data;
             
-            // Xử lý Role UI
-            if(document.getElementById('user-role-badge')) {
+            if (document.getElementById('user-role-badge')) {
                 const roleName = adminUser.role === 'admin' ? 'Quản trị viên' : 
                                  adminUser.role === 'manager' ? 'Quản lý' : 'Nhân viên';
                 document.getElementById('user-role-badge').innerHTML = `<i class="fas fa-id-badge mr-1"></i>${roleName}`;
             }
 
-            // Gọi hàm init tùy theo trang hiện tại
             if (window.location.pathname.includes('admin-pos-order.html')) {
                 initOrderScreen();
             }
         } else {
-            // Nếu dùng chung login với POS login thì đã xử lý ở dang-nhap-admin.html
-            // Mặc định ném ra login nếu không có session
-            window.location.href = 'dang-nhap-admin.html';
+            window.location.href = '../staff/login.html';
         }
     } catch (err) {
         console.error("Lỗi xác thực POS:", err);

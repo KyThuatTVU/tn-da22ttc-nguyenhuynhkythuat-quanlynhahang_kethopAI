@@ -11,7 +11,8 @@ const corsMiddleware = cors({
         console.log('🌐 CORS Origin:', origin);
         callback(null, true);
     },
-    credentials: true
+    credentials: true, // QUAN TRỌNG: Cho phép gửi cookies
+    exposedHeaders: ['set-cookie'] // Cho phép client đọc Set-Cookie header
 });
 
 module.exports = corsMiddleware;

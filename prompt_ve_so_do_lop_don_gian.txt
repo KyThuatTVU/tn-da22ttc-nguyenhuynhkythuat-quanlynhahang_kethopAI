@@ -1,21 +1,4 @@
-PROMPT VẼ SƠ ĐỒ LỚP ĐỐN GIẢN - HỆ THỐNG NHÀ HÀNG PHƯƠNG NAM
-================================================================
 
-## YÊU CẦU VẼ SƠ ĐỒ:
-
-Vẽ sơ đồ lớp (Class Diagram) đơn giản cho hệ thống quản lý nhà hàng với các lớp và quan hệ sau:
-
-### QUY TẮC VẼ:
-1. **CHỈ SỬ DỤNG ĐƯỜNG THẲNG LIỀN (ASSOCIATION)** cho tất cả quan hệ
-2. Mỗi lớp có 3 phần: Tên lớp | Thuộc tính | Phương thức
-3. Thuộc tính: +TenThuocTinh: KieuDuLieu
-4. Phương thức: +TenPhuongThuc(): KieuTraVe
-5. Màu nền: Xanh nhạt (#ADD8E6)
-6. Multiplicity: 1, *, 0..1, 1..*
-
----
-
-## DANH SÁCH CÁC LỚP:
 
 ### 1. NguoiDung
 **Thuộc tính:**

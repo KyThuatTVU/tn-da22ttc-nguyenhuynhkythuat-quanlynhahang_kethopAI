@@ -80,6 +80,7 @@
                                     <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Vào / Ra</th>
                                     <th class="text-center py-4 px-4 text-sm font-bold text-gray-600">Số giờ</th>
                                     <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Trạng thái</th>
+                                    <th class="text-center py-4 px-4 text-sm font-bold text-gray-600">Ảnh</th>
                                     <th class="text-center py-4 px-4 text-sm font-bold text-gray-600">Thao tác</th>
                                 </tr>
                             </thead>
@@ -238,6 +239,19 @@
                             break;
                     }
 
+                    // Hiển thị ảnh chấm công
+                    let photoHtml = '<span class="text-gray-400 text-xs">Không có</span>';
+                    if (a.anh_cham_cong || a.anh_checkout) {
+                        photoHtml = '<div class="flex gap-1">';
+                        if (a.anh_cham_cong) {
+                            photoHtml += `<button onclick="viewImage('${a.anh_cham_cong}')" class="w-8 h-8 rounded bg-green-100 text-green-600 hover:bg-green-600 hover:text-white transition" title="Ảnh Check-in"><i class="fas fa-sign-in-alt text-xs"></i></button>`;
+                        }
+                        if (a.anh_checkout) {
+                            photoHtml += `<button onclick="viewImage('${a.anh_checkout}')" class="w-8 h-8 rounded bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition" title="Ảnh Check-out"><i class="fas fa-sign-out-alt text-xs"></i></button>`;
+                        }
+                        photoHtml += '</div>';
+                    }
+
                     return `
                         <tr class="border-b hover:bg-gray-50 transition">
                             <td class="py-4 px-4">
@@ -258,6 +272,9 @@
                             <td class="py-4 px-4 text-center font-black text-blue-600">${a.so_gio_lam || '0'}h</td>
                             <td class="py-4 px-4">
                                 <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase ${statusClass}">${statusLabel}</span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                ${photoHtml}
                             </td>
                             <td class="py-4 px-4 text-center">
                                 <button onclick="editAttendance(${a.ma_cham_cong})" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition mr-2"><i class="fas fa-edit text-xs"></i></button>
@@ -350,6 +367,13 @@
                 await fetch(`${ATTENDANCE_API}/${id}`, {method: 'DELETE'});
                 loadAttendance();
             }
+        }
+
+        // Xem ảnh chấm công
+        function viewImage(imagePath) {
+            if (!imagePath) return;
+            const imageUrl = `http://localhost:3000/${imagePath}`;
+            window.open(imageUrl, '_blank', 'width=800,height=600');
         }
 
         function closeModal() { document.getElementById('checkModal').style.display = 'none'; }

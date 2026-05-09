@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Quyền Nhân viên - Nhà hàng Phương Nam</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .permission-card {
+            transition: all 0.3s ease;
+        }
+        .permission-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #10b981;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-manager { background: #3b82f6; color: white; }
+        .role-waiter { background: #10b981; color: white; }
+        .role-kitchen { background: #f59e0b; color: white; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="staff.html" class="text-gray-600 hover:text-gray-900 transition" title="Quay lại Quản lý nhân viên">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-user-shield text-orange-600 mr-2"></i>
+                            Quản lý Quyền Nhân viên
+                        </h1>
+                        <p class="text-sm text-gray-600" id="staffInfo">Đang tải...</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="resetToDefault()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                        <i class="fas fa-undo mr-2"></i>Đặt lại mặc định
+                    </button>
+                    <button onclick="savePermissions()" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                        <i class="fas fa-save mr-2"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleAllPermissions(true)" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                        <i class="fas fa-check-double mr-2"></i>Bật tất cả
+                    </button>
+                    <button onclick="toggleAllPermissions(false)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                        <i class="fas fa-times mr-2"></i>Tắt tất cả
+                    </button>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Bật/tắt các quyền bằng cách nhấn vào công tắc
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Grid -->
+        <div id="permissionsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Permissions will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+            <i class="fas fa-spinner fa-spin text-3xl text-orange-600"></i>
+            <span class="text-lg">Đang xử lý...</span>
+        </div>
+    </div>
+
+    <script>
+        let staffId = null;
+        let currentPermissions = {};
+        let permissionsList = {};
+
+        // Lấy staff ID từ URL
+        function getStaffIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Load thông tin nhân viên
+        async function loadStaffInfo() {
+            try {
+                staffId = getStaffIdFromUrl();
+                if (!staffId) {
+                    alert('Không tìm thấy ID nhân viên!');
+                    window.location.href = 'staff.html';
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:3000/api/staff?search=${staffId}`);
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    const staff = data.data[0];
+                    const roleClass = `role-${staff.vai_tro}`;
+                    const roleName = staff.vai_tro === 'manager' ? 'Quản lý' : 
+                                   staff.vai_tro === 'kitchen' ? 'Bếp' : 'Phục vụ';
+                    
+                    document.getElementById('staffInfo').innerHTML = `
+                        <span class="font-semibold">${staff.ten_nhan_vien}</span>
+                        <span class="role-badge ${roleClass} ml-2">${roleName}</span>
+                        <span class="text-gray-400 ml-2">• ${staff.ma_nv_code}</span>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading staff info:', error);
+            }
+        }
+
+        // Load danh sách quyền
+        async function loadPermissionsList() {
+            try {
+                const response = await fetch('http://localhost:3000/api/staff/permissions/list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    permissionsList = data.data;
+                }
+            } catch (error) {
+                console.error('Error loading permissions list:', error);
+            }
+        }
+
+        // Load quyền hiện tại của nhân viên
+        async function loadCurrentPermissions() {
+            try {
+                showLoading(true);
+                const response = await fetch(`http://localhost:3000/api/staff/${staffId}/permissions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPermissions = data.data;
+                    renderPermissions();
+                }
+            } catch (error) {
+                console.error('Error loading permissions:', error);
+                alert('Lỗi tải quyền!');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Render permissions UI
+        function renderPermissions() {
+            const container = document.getElementById('permissionsContainer');
+            container.innerHTML = '';
+
+            for (const [groupName, permissions] of Object.entries(permissionsList)) {
+                const card = document.createElement('div');
+                card.className = 'permission-card bg-white rounded-lg shadow-md p-5';
+                
+                let permissionsHtml = '';
+                permissions.forEach(perm => {
+                    const isChecked = currentPermissions[perm.key] === 1;
+                    permissionsHtml += `
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas ${perm.icon} text-gray-400 w-5"></i>
+                                <span class="text-sm text-gray-700">${perm.label}</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" 
+                                       data-permission="${perm.key}" 
+                                       ${isChecked ? 'checked' : ''}
+                                       onchange="updatePermission('${perm.key}', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">${groupName}</h3>
+                        <span class="text-xs text-gray-500">${permissions.length} quyền</span>
+                    </div>
+                    <div class="space-y-1">
+                        ${permissionsHtml}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+
+        // Cập nhật quyền trong memory
+        function updatePermission(key, value) {
+            currentPermissions[key] = value ? 1 : 0;
+        }
+
+        // Bật/tắt tất cả quyền
+        function toggleAllPermissions(enable) {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][data-permission]');
+            checkboxes.forEach(cb => {
+                cb.checked = enable;
+                updatePermission(cb.dataset.permission, enable);
+            });
+        }
+
+        // Lưu quyền
+        async function savePermissions() {
+            try {
+                if (!confirm('Bạn có chắc muốn lưu các thay đổi quyền?')) {
+                    return;
+                }
+
+                showLoading(true);
+                
+                const response = await fetch(`http://localhost:3000/api/staff/${staffId}/permissions`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentPermissions)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Lưu quyền thành công!\n\n⚠️ LƯU Ý: Nhân viên cần ĐĂNG XUẤT và ĐĂNG NHẬP LẠI hoặc REFRESH trang để quyền mới có hiệu lực.');
+                    await loadCurrentPermissions();
+                } else {
+                    alert('❌ ' + (data.message || 'Lỗi lưu quyền!'));
+                }
+            } catch (error) {
+                console.error('Error saving permissions:', error);
+                alert('❌ Lỗi kết nối server!');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Đặt lại quyền mặc định
+        async function resetToDefault() {
+            try {
+                if (!confirm('Bạn có chắc muốn đặt lại quyền về mặc định theo vai trò?')) {
+                    return;
+                }
+
+                showLoading(true);
+                
+                const response = await fetch(`http://localhost:3000/api/staff/${staffId}/permissions/reset`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Đặt lại quyền mặc định thành công!');
+                    await loadCurrentPermissions();
+                } else {
+                    alert('❌ ' + (data.message || 'Lỗi đặt lại quyền!'));
+                }
+            } catch (error) {
+                console.error('Error resetting permissions:', error);
+                alert('❌ Lỗi kết nối server!');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Show/hide loading
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+        }
+
+        // Initialize
+        async function init() {
+            await loadStaffInfo();
+            await loadPermissionsList();
+            await loadCurrentPermissions();
+        }
+
+        init();
+    </script>
+</body>
+</html>

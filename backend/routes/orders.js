@@ -3,14 +3,18 @@ const router = express.Router();
 const db = require('../config/database');
 const { createAdminNotification } = require('./admin-notifications');
 const { sendOrderConfirmationEmail } = require('../config/email');
+const { requireAdminAuth, requireStaffAuth } = require('../middleware/auth.middleware');
 
-// Middleware kiểm tra admin session
+// Middleware kiểm tra admin hoặc staff session
 const requireAdmin = (req, res, next) => {
-    if (req.session && req.session.admin) {
-        next();
-    } else {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+    // Cho phép cả admin và staff truy cập
+    if (req.session && (req.session.admin || req.session.staff)) {
+        return next();
     }
+    return res.status(401).json({
+        success: false,
+        message: 'Chưa đăng nhập'
+    });
 };
 
 // Map database status to frontend status

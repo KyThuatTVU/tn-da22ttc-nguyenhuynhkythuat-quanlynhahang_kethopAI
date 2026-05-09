@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lương Của Tôi - Nhân Viên</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .salary-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .day-card {
+            transition: all 0.3s;
+        }
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="card rounded-3xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Lương Của Tôi</h1>
+                        <p class="text-sm text-gray-600" id="staffName">Đang tải...</p>
+                    </div>
+                </div>
+                <img src="../images/Green Simple Clean Vegan Food Logo.png" alt="Logo" class="w-12 h-12 rounded-full">
+            </div>
+
+            <!-- Chọn tháng -->
+            <div class="flex gap-3">
+                <select id="filterMonth" class="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 outline-none">
+                    <option value="1">Tháng 1</option>
+                    <option value="2">Tháng 2</option>
+                    <option value="3">Tháng 3</option>
+                    <option value="4">Tháng 4</option>
+                    <option value="5">Tháng 5</option>
+                    <option value="6">Tháng 6</option>
+                    <option value="7">Tháng 7</option>
+                    <option value="8">Tháng 8</option>
+                    <option value="9">Tháng 9</option>
+                    <option value="10">Tháng 10</option>
+                    <option value="11">Tháng 11</option>
+                    <option value="12">Tháng 12</option>
+                </select>
+                <select id="filterYear" class="px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 outline-none">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+                <button onclick="loadSalary()" class="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tổng lương dự kiến -->
+        <div class="salary-card rounded-3xl p-8 mb-6 text-center">
+            <p class="text-sm opacity-90 mb-2">Tổng Lương Dự Kiến Tháng Này</p>
+            <h2 class="text-5xl font-black mb-4" id="totalSalary">0 đ</h2>
+            <div class="grid grid-cols-3 gap-4 mt-6">
+                <div class="bg-white bg-opacity-20 rounded-xl p-3">
+                    <p class="text-xs opacity-80">Lương cơ bản</p>
+                    <p class="text-xl font-bold" id="baseSalary">0 đ</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-xl p-3">
+                    <p class="text-xs opacity-80">Lương theo giờ</p>
+                    <p class="text-xl font-bold" id="hourlySalary">0 đ</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-xl p-3">
+                    <p class="text-xs opacity-80">Tổng giờ làm</p>
+                    <p class="text-xl font-bold" id="totalHours">0h</p>
+                </div>
+            </div>
+            <div class="mt-4 text-xs opacity-80">
+                <i class="fas fa-info-circle mr-1"></i>
+                Đã làm <span id="workDays">0</span>/<span id="totalDays">30</span> ngày
+            </div>
+        </div>
+
+        <!-- Chi tiết theo ngày -->
+        <div class="card rounded-3xl p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-calendar-day mr-2 text-purple-600"></i>
+                Chi Tiết Theo Ngày
+            </h3>
+            <div id="dailyList" class="space-y-3">
+                <!-- Sẽ được load bằng JS -->
+            </div>
+        </div>
+
+        <!-- Lưu ý -->
+        <div class="card rounded-3xl p-6 mt-6 bg-yellow-50 border-2 border-yellow-200">
+            <div class="flex items-start space-x-3">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý quan trọng</h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Đây là lương <strong>DỰ KIẾN</strong>, chưa bao gồm thưởng/phạt</li>
+                        <li>• Lương chính thức sẽ được tính vào cuối tháng</li>
+                        <li>• Liên hệ quản lý nếu có thắc mắc về lương</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Kiểm tra đăng nhập
+            try {
+                const res = await fetch(`${API_URL}/auth/me`, { credentials: 'include' });
+                const data = await res.json();
+                
+                if (!data.success) {
+                    alert('Vui lòng đăng nhập!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = data.user;
+                document.getElementById('staffName').textContent = currentUser.ten_nhan_vien;
+
+                // Set tháng/năm hiện tại
+                const now = new Date();
+                document.getElementById('filterMonth').value = now.getMonth() + 1;
+                document.getElementById('filterYear').value = now.getFullYear();
+
+                loadSalary();
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Lỗi kết nối server!');
+            }
+        });
+
+        async function loadSalary() {
+            try {
+                const month = document.getElementById('filterMonth').value;
+                const year = document.getElementById('filterYear').value;
+
+                // Tính ngày đầu và cuối tháng
+                const startDate = `${year}-${month.padStart(2, '0')}-01`;
+                const lastDay = new Date(year, month, 0).getDate();
+                const endDate = `${year}-${month.padStart(2, '0')}-${lastDay}`;
+
+                const res = await fetch(`${API_URL}/daily-salary/my-salary?start=${startDate}&end=${endDate}`, {
+                    credentials: 'include'
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    displaySalary(result.data, result.summary);
+                } else {
+                    alert('Không thể tải dữ liệu lương!');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Lỗi kết nối server!');
+            }
+        }
+
+        function displaySalary(data, summary) {
+            // Hiển thị tổng
+            document.getElementById('totalSalary').textContent = 
+                parseFloat(summary.tong_luong_du_kien).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('baseSalary').textContent = 
+                parseFloat(summary.luong_co_ban).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('hourlySalary').textContent = 
+                parseFloat(summary.luong_theo_gio).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('totalHours').textContent = 
+                parseFloat(summary.tong_gio_lam).toFixed(1) + 'h';
+            document.getElementById('workDays').textContent = summary.so_ngay_lam;
+            document.getElementById('totalDays').textContent = summary.so_ngay_trong_thang;
+
+            // Hiển thị chi tiết theo ngày
+            const dailyList = document.getElementById('dailyList');
+            
+            if (data.length === 0) {
+                dailyList.innerHTML = `
+                    <div class="text-center py-10 text-gray-400">
+                        <i class="fas fa-calendar-times text-4xl mb-3"></i>
+                        <p>Chưa có dữ liệu chấm công trong tháng này</p>
+                    </div>
+                `;
+                return;
+            }
+
+            dailyList.innerHTML = data.map(d => {
+                const date = new Date(d.ngay);
+                const dayName = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][date.getDay()];
+                
+                let statusColor = 'bg-green-100 text-green-600';
+                let statusIcon = 'fa-check-circle';
+                
+                if (d.trang_thai_cham_cong && d.trang_thai_cham_cong.includes('muộn')) {
+                    statusColor = 'bg-yellow-100 text-yellow-600';
+                    statusIcon = 'fa-clock';
+                } else if (d.trang_thai_cham_cong && d.trang_thai_cham_cong.includes('sớm')) {
+                    statusColor = 'bg-red-100 text-red-600';
+                    statusIcon = 'fa-exclamation-circle';
+                }
+
+                return `
+                    <div class="day-card bg-white border-2 border-gray-100 rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <div class="text-xs text-purple-600 font-bold">${dayName}</div>
+                                        <div class="text-lg font-black text-purple-800">${date.getDate()}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800">${date.toLocaleDateString('vi-VN')}</p>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="text-xs ${statusColor} px-2 py-1 rounded-full font-bold">
+                                            <i class="fas ${statusIcon} mr-1"></i>
+                                            ${d.trang_thai_cham_cong || 'Đúng giờ'}
+                                        </span>
+                                        <span class="text-xs text-gray-500">
+                                            <i class="fas fa-clock mr-1"></i>${parseFloat(d.so_gio_lam).toFixed(1)}h
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-black text-green-600">
+                                    ${parseFloat(d.luong_ngay).toLocaleString('vi-VN')}đ
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    ${parseFloat(d.luong_theo_gio).toLocaleString('vi-VN')}đ/h
+                                </p>
+                            </div>
+                        </div>
+                        ${d.ghi_chu ? `
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <p class="text-xs text-gray-500">
+                                    <i class="fas fa-sticky-note mr-1"></i>${d.ghi_chu}
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
