@@ -60,29 +60,23 @@ async function checkAdminAuth() {
 async function logoutAdmin() {
     if (!confirm('Bạn có chắc muốn đăng xuất?')) return;
 
-    const staffUser = sessionStorage.getItem('staff_user');
+    // Xóa staff sessionStorage dọn dẹp trình duyệt cục bộ ngay lập tức
+    sessionStorage.removeItem('staff_user');
 
-    if (staffUser) {
-        // Staff logout - chỉ cần xóa localStorage
-        sessionStorage.removeItem('staff_user');
-        window.location.href = '../staff/login.html';
-    } else {
-        // Admin logout - gọi API xóa session
-        try {
-            const response = await fetch('http://localhost:3000/api/admin-auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            const result = await response.json();
-            if (result.success) {
-                window.location.href = 'dang-nhap-admin.html?logout=success';
-            } else {
-                alert('Lỗi đăng xuất. Vui lòng thử lại!');
-            }
-        } catch (error) {
-            console.error('Lỗi đăng xuất:', error);
-            window.location.href = 'dang-nhap-admin.html?logout=success';
-        }
+    // Admin logout - bắt buộc gọi API xóa session để giết tiến trình trên server
+    try {
+        const response = await fetch('http://localhost:3000/api/admin-auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        const result = await response.json();
+        
+        // Luôn chuyển hướng về trang đăng nhập admin kể cả thành công hay lỗi
+        // vì cơ bản ở client ta đã coi như thoát rồi
+        window.location.href = 'dang-nhap-admin.html?logout=success';
+    } catch (error) {
+        console.error('Lỗi đăng xuất:', error);
+        window.location.href = 'dang-nhap-admin.html?logout=success';
     }
 }
 
@@ -113,3 +107,5 @@ function updateAdminUI(user) {
 // Export functions
 window.checkAdminAuth = checkAdminAuth;
 window.logoutAdmin = logoutAdmin;
+
+

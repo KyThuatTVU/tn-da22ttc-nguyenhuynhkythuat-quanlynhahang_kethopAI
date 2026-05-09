@@ -159,7 +159,7 @@ const SIDEBAR_TEMPLATE = `
                 </div>
                 <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
                     <span id="login-type-badge" class="text-xs text-blue-300"><i class="fab fa-google mr-1"></i>Google</span>
-                    <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 transition-colors">
+                    <button onclick="if(typeof logoutAdmin !== 'undefined') logoutAdmin(); else alert('Hàm đăng xuất chưa sẵn sàng!');" class="text-xs text-red-400 hover:text-red-300 transition-colors cursor-pointer relative z-50">
                         <i class="fas fa-sign-out-alt mr-1"></i>Đăng xuất
                     </button>
                 </div>
@@ -808,10 +808,53 @@ function addMenuDataAttributes() {
 }
 
 async function initAdminLayout() {
+    // Không chạy redirect hoặc check nếu đang ở trang login
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('login.html') || currentPath.includes('dang-nhap-admin.html')) {
+        return;
+    }
+
     injectLayout();
     const userData = await loadAdminInfo();
-    if (userData) await applyRBAC(userData);
-    setActiveNavLink();
+    
+    if (userData) {
+        await applyRBAC(userData);
+        setActiveNavLink();
+    } else {
+        // Nếu không có userData, chuyển ngay ra trang login
+        console.warn('⚠️ Phiên đăng nhập hết hạn. Đang chuyển hướng...');
+        window.location.href = 'dang-nhap-admin.html?error=session_expired';
+    }
+
+    // Thiết lập Heartbeat toàn cục (kiểm tra liên tục mỗi 5 giây)
+    setInterval(async () => {
+        try {
+            const response = await fetch(`${API_URL}/admin-auth/check-session`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            const result = await response.json();
+            if (!result.isAuthenticated && !sessionStorage.getItem('staff_user')) {
+                window.location.href = 'dang-nhap-admin.html?error=session_expired';
+            }
+        } catch (error) {
+            console.warn('⚠️ Mất kết nối tới máy chủ!');
+            if (!document.getElementById('server-offline-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'server-offline-overlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;';
+                overlay.innerHTML = `
+                    <div style="background:white;color:red;padding:30px;border-radius:15px;text-align:center;max-width:400px;">
+                        <i class="fas fa-plug" style="font-size:3rem;margin-bottom:15px;"></i>
+                        <h2 style="font-size:1.5rem;font-weight:bold;margin-bottom:10px;">Đã Mất Kết Nối Server</h2>
+                        <p style="color:#555;margin-bottom:20px;">Server Localhost:3000 đã bị tắt. Hệ thống tạm thời bị đóng băng để bảo vệ dữ liệu.</p>
+                        <p style="font-size:0.9rem;color:#777;">Hãy bật lại server <br><code>node server.js</code><br> rồi nhấn F5.</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+        }
+    }, 5000);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAdminLayout);

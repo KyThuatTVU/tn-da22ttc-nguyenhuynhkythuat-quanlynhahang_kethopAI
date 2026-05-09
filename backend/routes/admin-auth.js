@@ -337,6 +337,10 @@ router.post('/logout', (req, res) => {
     console.log('🚪 Admin logout request');
     console.log('📦 Session before logout:', req.session);
     
+    // Xóa cookie khỏi trình duyệt cực kì triệt để
+    res.clearCookie('admin.sid', { path: '/' });
+    res.clearCookie('connect.sid', { path: '/' });
+
     // Xóa thông tin admin khỏi session
     if (req.session) {
         delete req.session.admin;
@@ -352,21 +356,29 @@ router.post('/logout', (req, res) => {
         }
 
         // Xóa toàn bộ session
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('❌ Session destroy error:', err);
-                return res.status(500).json({
-                    success: false,
-                    message: 'Lỗi xóa session'
-                });
-            }
+        if (req.session && req.session.destroy) {
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error('❌ Session destroy error:', err);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Lỗi xóa session'
+                    });
+                }
 
-            console.log('✅ Admin logged out successfully');
+                console.log('✅ Admin logged out successfully');
+                res.json({
+                    success: true,
+                    message: 'Đăng xuất thành công'
+                });
+            });
+        } else {
+            console.log('✅ Admin logged out successfully (No session)');
             res.json({
                 success: true,
                 message: 'Đăng xuất thành công'
             });
-        });
+        }
     });
 });
 
