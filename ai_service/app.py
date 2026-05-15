@@ -4,9 +4,66 @@ from flask_cors import CORS
 from model import get_svd_recommendations, train_collaborative_model
 from apriori_service import train_apriori_model, get_apriori_recommendations
 from admin_bot_service import ask_business_bot
+from hybrid_recommendation import get_hybrid_recommendations
 
 app = Flask(__name__)
 CORS(app)  # Allow Node.js calling this API
+
+@app.route('/api/ml/recommend/hybrid', methods=['GET'])
+def get_hybrid():
+    """
+    Gợi ý lai ghép kết hợp 4 yếu tố:
+    1. Collaborative Filtering (lọc cộng tác)
+    2. Content-based (từ khóa tìm kiếm)
+    3. Context-aware (dữ liệu chatbot)
+    4. Rating-based (số sao đánh giá)
+    """
+    try:
+        user_id = request.args.get('user_id')
+        search_keyword = request.args.get('keyword', '')
+        limit = int(request.args.get('limit', 10))
+        
+        # Trọng số tùy chỉnh (optional)
+        weight_collab = float(request.args.get('w_collab', 0.30))
+        weight_content = float(request.args.get('w_content', 0.25))
+        weight_chatbot = float(request.args.get('w_chatbot', 0.25))
+        weight_rating = float(request.args.get('w_rating', 0.20))
+        
+        weights = {
+            'collaborative': weight_collab,
+            'content': weight_content,
+            'chatbot': weight_chatbot,
+            'rating': weight_rating
+        }
+        
+        if not user_id:
+            return jsonify({"success": False, "message": "Thiếu user_id"}), 400
+        
+        results = get_hybrid_recommendations(
+            user_id=int(user_id),
+            search_keyword=search_keyword,
+            top_n=limit,
+            weights=weights
+        )
+        
+        if not results:
+            return jsonify({
+                "success": True,
+                "data": [],
+                "message": "Không có gợi ý phù hợp."
+            }), 200
+        
+        return jsonify({
+            "success": True,
+            "data": results,
+            "message": "Gợi ý cá nhân hóa từ hệ thống lai ghép.",
+            "weights_used": weights
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route('/api/ml/recommend/collaborative', methods=['GET'])
 def get_recommendations():
