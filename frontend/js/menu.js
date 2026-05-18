@@ -14,6 +14,7 @@ let sortBy = 'default'; // default, newest, price-asc, price-desc, popular
 let currentPage = 1;
 let itemsPerPage = 9;
 let searchQuery = '';
+let recommendedProducts = []; // Cá nhân hóa sở thích người dùng
 
 // Fetch categories from API
 async function fetchCategories() {
@@ -78,6 +79,12 @@ function applyFiltersAndSort() {
         );
     }
     
+    // Lọc theo mục Gợi ý cho bạn
+    if (selectedCategory === 'recommended') {
+        const recIds = new Set(recommendedProducts.filter(r => r.score >= 70).map(r => r.ma_mon));
+        filtered = filtered.filter(product => recIds.has(product.ma_mon));
+    }
+    
     // Filter by price range
     if (selectedPriceRange) {
         filtered = filtered.filter(product => {
@@ -98,24 +105,48 @@ function applyFiltersAndSort() {
         });
     }
     
-    // Sort products
-    switch(sortBy) {
-        case 'newest':
-            filtered.sort((a, b) => b.ma_mon - a.ma_mon);
-            break;
-        case 'price-asc':
-            filtered.sort((a, b) => (parseFloat(a.gia_tien) || 0) - (parseFloat(b.gia_tien) || 0));
-            break;
-        case 'price-desc':
-            filtered.sort((a, b) => (parseFloat(b.gia_tien) || 0) - (parseFloat(a.gia_tien) || 0));
-            break;
-        case 'popular':
-            // Sort by stock quantity (assuming popular items have lower stock)
-            filtered.sort((a, b) => a.so_luong_ton - b.so_luong_ton);
-            break;
-        default:
-            // Keep original order
-            break;
+    // ✨ ƯU TIÊN HIỂN THỊ MÓN THEO SỞ THÍCH (áp dụng trước khi sắp xếp)
+    // Nếu có gợi ý cá nhân hóa và không đang lọc "Gợi ý cho bạn"
+    if (recommendedProducts.length > 0 && selectedCategory !== 'recommended') {
+        const personalizedRecs = recommendedProducts.filter(r => r.score >= 70);
+        
+        if (personalizedRecs.length > 0) {
+            const recIds = new Set(personalizedRecs.map(r => r.ma_mon));
+            const recMap = new Map(personalizedRecs.map(r => [r.ma_mon, r.score || 1]));
+            
+            // Tách món thành 2 nhóm: Gợi ý và Không gợi ý
+            const recommendedItems = filtered.filter(p => recIds.has(p.ma_mon));
+            const otherItems = filtered.filter(p => !recIds.has(p.ma_mon));
+            
+            // Sắp xếp món gợi ý theo điểm số (score cao nhất lên đầu)
+            recommendedItems.sort((a, b) => {
+                const scoreA = recMap.get(a.ma_mon) || 0;
+                const scoreB = recMap.get(b.ma_mon) || 0;
+                return scoreB - scoreA;
+            });
+            
+            // Ghép lại: Món gợi ý trước, món khác sau
+            filtered = [...recommendedItems, ...otherItems];
+        }
+    }
+    
+    // Sort products (chỉ áp dụng khi user chọn sắp xếp thủ công)
+    if (sortBy !== 'default') {
+        switch(sortBy) {
+            case 'newest':
+                filtered.sort((a, b) => b.ma_mon - a.ma_mon);
+                break;
+            case 'price-asc':
+                filtered.sort((a, b) => (parseFloat(a.gia_tien) || 0) - (parseFloat(b.gia_tien) || 0));
+                break;
+            case 'price-desc':
+                filtered.sort((a, b) => (parseFloat(b.gia_tien) || 0) - (parseFloat(a.gia_tien) || 0));
+                break;
+            case 'popular':
+                // Sort by stock quantity (assuming popular items have lower stock)
+                filtered.sort((a, b) => a.so_luong_ton - b.so_luong_ton);
+                break;
+        }
     }
     
     menuProducts = filtered;
@@ -134,21 +165,34 @@ function renderCategoryFilters() {
     const categoryContainer = document.querySelector('.space-y-2');
     if (!categoryContainer) return;
 
-    const categoryHTML = `
+    let categoryHTML = `
         <label class="flex items-center cursor-pointer">
             <input type="radio" name="category" class="w-4 h-4 text-orange-600 category-filter" 
                    data-category="all" ${!selectedCategory ? 'checked' : ''}>
             <span class="ml-2 text-gray-700">Tất cả</span>
         </label>
-        ${categories.map(cat => `
-            <label class="flex items-center cursor-pointer">
-                <input type="radio" name="category" class="w-4 h-4 text-orange-600 category-filter" 
-                       data-category="${cat.ma_danh_muc}" 
-                       ${selectedCategory === cat.ma_danh_muc ? 'checked' : ''}>
-                <span class="ml-2 text-gray-700">${cat.ten_danh_muc}</span>
-            </label>
-        `).join('')}
     `;
+    
+    if (recommendedProducts.length > 0) {
+        categoryHTML += `
+            <label class="flex items-center cursor-pointer font-medium text-purple-600">
+                <input type="radio" name="category" class="w-4 h-4 text-purple-600 category-filter" 
+                       data-category="recommended" ${selectedCategory === 'recommended' ? 'checked' : ''}>
+                <span class="ml-2 flex items-center gap-1.5">
+                    <i class="fas fa-sparkles text-xs animate-pulse"></i> Gợi ý cho bạn
+                </span>
+            </label>
+        `;
+    }
+    
+    categoryHTML += categories.map(cat => `
+        <label class="flex items-center cursor-pointer">
+            <input type="radio" name="category" class="w-4 h-4 text-orange-600 category-filter" 
+                   data-category="${cat.ma_danh_muc}" 
+                   ${selectedCategory === cat.ma_danh_muc ? 'checked' : ''}>
+            <span class="ml-2 text-gray-700">${cat.ten_danh_muc}</span>
+        </label>
+    `).join('');
     
     categoryContainer.innerHTML = categoryHTML;
 
@@ -156,8 +200,16 @@ function renderCategoryFilters() {
     document.querySelectorAll('.category-filter').forEach(radio => {
         radio.addEventListener('change', function() {
             const category = this.dataset.category;
-            selectedCategory = category === 'all' ? null : parseInt(category);
-            fetchMenuProducts(selectedCategory);
+            if (category === 'recommended') {
+                selectedCategory = 'recommended';
+                applyFiltersAndSort();
+                renderMenuProducts();
+                updateProductCount();
+                renderPagination();
+            } else {
+                selectedCategory = category === 'all' ? null : parseInt(category);
+                fetchMenuProducts(selectedCategory);
+            }
             
             // Smooth scroll to products
             if (typeof window.smoothScrollToProducts === 'function') {
@@ -191,6 +243,28 @@ function renderMenuProducts() {
             imagePath = '/images/' + imagePath;
         }
         
+        // Kiểm tra xem món ăn này có trong gợi ý cá nhân hóa không
+        const recItem = recommendedProducts.find(r => r.ma_mon === product.ma_mon && r.score >= 70);
+        let preferredBadgeHTML = '';
+        
+        if (recItem) {
+            if (recItem.recommendation_type === 'collaborative') {
+                // Badge cho lọc cộng tác - màu xanh dương
+                preferredBadgeHTML = `
+                    <span class="category-badge text-blue-600 border-blue-200 bg-blue-50 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+                        <i class="fas fa-users mr-1"></i>Khách tương tự thích
+                    </span>
+                `;
+            } else {
+                // Badge cho sở thích cá nhân - màu hồng
+                preferredBadgeHTML = `
+                    <span class="category-badge text-pink-600 border-pink-200 bg-pink-50 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+                        <i class="fas fa-heart mr-1"></i>Phù hợp sở thích
+                    </span>
+                `;
+            }
+        }
+        
         return `
         <div class="dish-card flex flex-col bg-white rounded-2xl overflow-hidden shadow-md h-full">
             <!-- Image Container -->
@@ -217,6 +291,7 @@ function renderMenuProducts() {
                             <i class="fas fa-tag mr-1"></i>${product.ten_danh_muc}
                            </span>`
                         : ''}
+                    ${preferredBadgeHTML}
                 </div>
                 
                 <!-- Favorite Button -->
@@ -739,4 +814,43 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSearch();
     setupMobileFilter();
     // setupMobileSort();
+    
+    // Tải gợi ý cá nhân hóa
+    loadRecommendedProducts();
 });
+
+// Tải danh sách gợi ý cá nhân hóa của người dùng đăng nhập
+async function loadRecommendedProducts() {
+    const token = (localStorage.getItem('token') || sessionStorage.getItem('token'));
+    if (!token) return; // Bỏ qua nếu là khách vãng lai
+    
+    try {
+        if (typeof window.RecommendationSystem !== 'undefined') {
+            const recs = await window.RecommendationSystem.getRecommendations(100); // Lấy nhiều món hơn
+            if (recs && recs.length > 0) {
+                recommendedProducts = recs;
+                console.log('✨ [Personalization] Loaded recommendations for menu:', recommendedProducts.length);
+                console.log('📊 [Personalization] Top 5 recommendations:', 
+                    recommendedProducts.slice(0, 5).map(r => ({
+                        id: r.ma_mon,
+                        name: r.ten_mon,
+                        type: r.recommendation_type,
+                        score: r.score,
+                        reason: r.reason
+                    }))
+                );
+                
+                // Render lại bộ lọc danh mục và món ăn để cập nhật badge/reason
+                renderCategoryFilters();
+                
+                // Áp dụng sắp xếp theo sở thích ngay lập tức
+                applyFiltersAndSort();
+                renderMenuProducts();
+                updateProductCount();
+                renderPagination();
+            }
+        }
+    } catch (err) {
+        console.error('Lỗi tải gợi ý cá nhân hóa cho thực đơn:', err);
+    }
+}

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sở thích Khách hàng - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Page Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Sở thích Khách hàng (User Preferences)</h1>
+                        <p class="text-slate-500 text-sm">Quản lý và thống kê sở thích, khẩu vị của khách hàng dựa trên AI</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="rebuildPreferenceProfiles(this)" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">
+                            <i class="fas fa-brain mr-2"></i>Huấn luyện lại
+                        </button>
+                        <button onclick="fetchStats()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-sync-alt mr-2"></i>Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <!-- Categories Chart -->
+                    <div class="content-card">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4">Danh mục được yêu thích (Explicit)</h2>
+                        <div class="relative h-64 w-full">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Keywords/Tags Chart -->
+                    <div class="content-card">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4">Từ khóa / Khẩu vị phổ biến (Implicit)</h2>
+                        <div class="relative h-64 w-full">
+                            <canvas id="keywordChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review-based Preference Intelligence -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div class="content-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-bold text-slate-800">Sở thích học từ đánh giá</h2>
+                            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Số sao + bình luận</span>
+                        </div>
+                        <div id="positive-preference-tags" class="space-y-3">
+                            <div class="py-6 text-center text-slate-400">Đang tải dữ liệu...</div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-bold text-slate-800">Nội dung nên hạn chế gợi ý</h2>
+                            <span class="text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-1 rounded-full">Tín hiệu tiêu cực</span>
+                        </div>
+                        <div id="negative-preference-tags" class="space-y-3">
+                            <div class="py-6 text-center text-slate-400">Đang tải dữ liệu...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users List -->
+                <div class="content-card mb-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Hồ sơ Sở thích Khách hàng Nổi bật</h2>
+                    <div class="table-container rounded-xl border border-slate-200 overflow-x-auto">
+                        <table class="w-full text-left border-collapse" id="users-table">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-600 text-sm border-b border-slate-200">
+                                    <th class="py-3 px-4 font-semibold">Khách hàng</th>
+                                    <th class="py-3 px-4 font-semibold">Liên hệ</th>
+                                    <th class="py-3 px-4 font-semibold">Sở thích khai báo</th>
+                                    <th class="py-3 px-4 font-semibold">AI học từ đánh giá</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Tổng đơn</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Chi tiêu (VNĐ)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100" id="users-table-body">
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-slate-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i> Đang tải dữ liệu...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+    
+    <script>
+        let categoryChartInstance = null;
+        let keywordChartInstance = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(fetchStats, 500);
+        });
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/recommendations/admin/stats', {
+                    credentials: 'include'
+                });
+                
+                if (!res.ok) {
+                    const message = await res.text();
+                    throw new Error(`Failed to fetch data (${res.status}): ${message || res.statusText}`);
+                }
+                
+                const data = await res.json();
+                if (data.success) {
+                    renderCategoryChart(data.data.categories);
+                    renderKeywordChart(data.data.keywords);
+                    renderPreferenceTags(data.data.preferenceTags, data.data.negativePreferenceTags);
+                    renderUsersTable(data.data.users);
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('users-table-body').innerHTML = `
+                    <tr><td colspan="5" class="py-8 text-center text-red-500">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Có lỗi xảy ra khi tải dữ liệu
+                    </td></tr>
+                `;
+            }
+        }
+
+        async function rebuildPreferenceProfiles(button) {
+            const originalHtml = button?.innerHTML;
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang huấn luyện...';
+            }
+
+            try {
+                const res = await fetch('/api/recommendations/admin/rebuild-preferences', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (!res.ok) throw new Error('Không thể huấn luyện lại hồ sơ sở thích');
+                await fetchStats();
+            } catch (err) {
+                console.error(err);
+                alert('Không thể huấn luyện lại hồ sơ sở thích. Vui lòng kiểm tra server.');
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        function renderCategoryChart(categories) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+            
+            // Xóa danh mục 0 người dùng để chart đẹp hơn
+            const filtered = categories.filter(c => c.total_users > 0);
+            const labels = filtered.map(c => c.ten_danh_muc);
+            const data = filtered.map(c => c.total_users);
+            
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+                            '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+        }
+        
+        function renderKeywordChart(keywords) {
+            const ctx = document.getElementById('keywordChart').getContext('2d');
+            
+            if (keywordChartInstance) {
+                keywordChartInstance.destroy();
+            }
+            
+            const labels = keywords.map(k => k.keyword.substring(0, 15) + (k.keyword.length > 15 ? '...' : ''));
+            const data = keywords.map(k => k.total_orders);
+            
+            keywordChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số Lượt Đặt Từ Món Có Chứa Từ Khóa',
+                        data: data,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function renderPreferenceTags(positiveTags = [], negativeTags = []) {
+            renderTagList('positive-preference-tags', positiveTags, 'positive');
+            renderTagList('negative-preference-tags', negativeTags, 'negative');
+        }
+
+        function renderTagList(containerId, tags, type) {
+            const container = document.getElementById(containerId);
+            const isNegative = type === 'negative';
+
+            if (!tags || tags.length === 0) {
+                container.innerHTML = `<div class="py-6 text-center text-slate-400">Chưa có tín hiệu ${isNegative ? 'tiêu cực' : 'tích cực'} từ đánh giá</div>`;
+                return;
+            }
+
+            const barColor = isNegative ? 'bg-rose-500' : 'bg-emerald-500';
+            const badgeColor = isNegative ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700';
+            const maxValue = Math.max(...tags.map(tag => Math.abs(Number(tag.avg_score || 0))), 1);
+
+            container.innerHTML = tags.map(tag => {
+                const score = Math.abs(Number(tag.avg_score || 0));
+                const width = Math.max(8, Math.round((score / maxValue) * 100));
+                return `
+                    <div class="border border-slate-100 rounded-lg p-3">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <div>
+                                <div class="font-semibold text-slate-800">${tag.ten_tag}</div>
+                                <div class="text-xs text-slate-500">${tag.nhom_tag} · ${tag.total_users || 0} khách</div>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full ${badgeColor}">${Number(tag.avg_score || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full ${barColor}" style="width:${width}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Chưa có dữ liệu</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3 px-4 border-b border-slate-100">
+                        <div class="font-medium text-slate-800">${user.ho_ten || 'Không tên'}</div>
+                        <div class="text-xs text-slate-500">ID: ${user.ma_nguoi_dung}</div>
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-600">${user.so_dien_thoai || '-'}</td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${user.ten_danh_muc_thich ? 
+                            user.ten_danh_muc_thich.split(', ').map(t => `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full mr-1 mb-1">${t}</span>`).join('') 
+                            : '<span class="text-slate-400 italic">Chưa khai báo</span>'
+                        }
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${renderUserPreferenceBadges(user.preference_tags)}
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-right font-medium text-slate-700">${user.total_orders || 0}</td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-right text-emerald-600 font-medium">
+                        ${new Intl.NumberFormat('vi-VN').format(user.total_spent || 0)} ₫
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderUserPreferenceBadges(tags = []) {
+            if (!tags || tags.length === 0) {
+                return '<span class="text-slate-400 italic">Chưa đủ dữ liệu</span>';
+            }
+
+            return tags.slice(0, 5).map(tag => {
+                const score = Number(tag.score || 0);
+                const color = score >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700';
+                return `<span class="inline-block ${color} text-xs px-2 py-1 rounded-full mr-1 mb-1">${tag.ten_tag} (${score.toFixed(1)})</span>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

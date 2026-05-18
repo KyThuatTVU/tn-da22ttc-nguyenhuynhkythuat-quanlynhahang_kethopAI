@@ -7,14 +7,14 @@ const { analyzeUserIntent, extractFoodSearchTerms, getCartByUserId } = require('
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
-// Khởi tạo Groq AI client
+// Khá»Ÿi táº¡o Groq AI client
 const groq = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: 'https://api.groq.com/openai/v1'
 });
 
-console.log('🤖 Chatbot using: Groq (Free) + GraphQL');
-console.log('🔑 Groq API Key:', process.env.GROQ_API_KEY ? '✅ Configured (***' + process.env.GROQ_API_KEY.slice(-8) + ')' : '❌ NOT SET');
+console.log('ðŸ¤– Chatbot using: Groq (Free) + GraphQL');
+console.log('ðŸ”‘ Groq API Key:', process.env.GROQ_API_KEY ? 'âœ… Configured (***' + process.env.GROQ_API_KEY.slice(-8) + ')' : 'âŒ NOT SET');
 
 // Cache
 let settingsCache = { data: null, lastUpdate: 0 };
@@ -75,7 +75,7 @@ async function getChatbotContextForMessage(message) {
     };
 
     try {
-        // 1. Hỏi về món ăn cụ thể
+        // 1. Há»i vá» mÃ³n Äƒn cá»¥ thá»ƒ
         if (intent.hoi_mon_an || intent.hoi_thuc_don || intent.hoi_danh_muc || intent.hoi_gia) {
             const searchTerms = extractFoodSearchTerms(message);
             
@@ -111,7 +111,7 @@ async function getChatbotContextForMessage(message) {
                 }
             }
 
-            // Tìm theo danh mục
+            // TÃ¬m theo danh má»¥c
             if (intent.hoi_danh_muc && intent.tu_khoa_danh_muc.length > 0) {
                 for (const catKw of intent.tu_khoa_danh_muc) {
                     const [cats] = await db.query(
@@ -137,7 +137,7 @@ async function getChatbotContextForMessage(message) {
                 }
             }
 
-            // Thực đơn tổng quát
+            // Thá»±c Ä‘Æ¡n tá»•ng quÃ¡t
             if (intent.hoi_thuc_don && context.mon_an_lien_quan.length === 0) {
                 const [allCats] = await db.query('SELECT * FROM danh_muc WHERE trang_thai = 1');
                 for (const cat of allCats) {
@@ -153,7 +153,7 @@ async function getChatbotContextForMessage(message) {
             }
         }
 
-        // 2. Khoảng giá
+        // 2. Khoáº£ng giÃ¡
         if (intent.khoang_gia) {
             const [priceFiltered] = await db.query(`
                 SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.don_vi_tinh, m.anh_mon, m.mo_ta_chi_tiet, d.ten_danh_muc
@@ -169,7 +169,7 @@ async function getChatbotContextForMessage(message) {
             });
         }
 
-        // 3. Top bán chạy / Gợi ý
+        // 3. Top bÃ¡n cháº¡y / Gá»£i Ã½
         if (intent.hoi_top_ban_chay || intent.hoi_goi_y) {
             const [topDishes] = await db.query(`
                 SELECT m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.don_vi_tinh, m.mo_ta_chi_tiet,
@@ -190,7 +190,7 @@ async function getChatbotContextForMessage(message) {
             });
         }
 
-        // Giới hạn
+        // Giá»›i háº¡n
         context.mon_an_lien_quan = context.mon_an_lien_quan.slice(0, 8);
         context.has_food_data = context.mon_an_lien_quan.length > 0;
 
@@ -209,7 +209,7 @@ async function getChatbotContextForMessage(message) {
     return context;
 }
 
-// Menu đầy đủ (fallback)
+// Menu Ä‘áº§y Ä‘á»§ (fallback)
 async function getCompactMenu() {
     try {
         const [categories] = await db.query('SELECT * FROM danh_muc WHERE trang_thai = 1 ORDER BY ma_danh_muc');
@@ -239,44 +239,44 @@ async function getCompactMenu() {
 
 // ==================== CHATBOT ORDER AUTOMATION (GraphQL) ====================
 
-// Tạo system prompt chuẩn cho AI
+// Táº¡o system prompt chuáº©n cho AI
 function systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) {
-    return 'BẠN LÀ TRÀ MY - trợ lý ảo thông minh của ' + tenNhaHang + '.\n\n'
-        + '=== DANH TÍNH ===\n'
-        + '- Tên: TRÀ MY - tiếp viên ảo dễ thương, ngọt ngào\n'
-        + '- Xưng "em", gọi khách là "anh/chị"\n'
-        + '- Nói ngắn gọn (2-4 câu), trọng tâm, chính xác\n'
-        + '- Emoji: 🌸 💕 😊 🍜 ✨ 🛒\n\n'
-        + '=== THÔNG TIN NHÀ HÀNG ===\n'
-        + '📍 ' + tenNhaHang + ' - "PHƯƠNG NAM – NGON NHƯ MẸ NẤU"\n'
-        + '📍 Địa chỉ: ' + diaChi + '\n'
-        + '📍 Hotline: ' + soDienThoai + ' | Email: ' + email + ' | Web: ' + website + '\n'
-        + '📍 Giờ mở cửa: T2-T6: ' + gioMoCuaT2T6 + ' | T7-CN: ' + gioMoCuaT7CN + '\n'
-        + '📍 Giao hàng: ' + new Intl.NumberFormat('vi-VN').format(phiGiaoHang) + 'đ | Miễn phí từ ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'đ\n'
-        + '📍 Miễn phí giao hàng cho đơn từ ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'đ\n\n'
-        + '=== CHỨC NĂNG ĐẶT HÀNG ===\n'
-        + 'Bạn có thể giúp khách: thêm món vào giỏ hàng, xem giỏ hàng, đặt hàng, xem đơn hàng.\n'
-        + 'Khi khách muốn đặt món, hãy xác nhận lại món và số lượng, rồi thêm vào giỏ hàng.\n'
-        + 'Hướng dẫn khách: "Chỉ cần nói: đặt 2 phần phở bò, 1 cơm tấm"\n\n'
-        + '=== ĐỘI NGŨ ===\n'
-        + '👩‍💼 Chủ: Hoàng Thục Linh (10 năm KN)\n'
-        + '👨‍🍳 Bếp trưởng: Nguyễn Nhật Trường (20 năm KN)\n'
-        + '👨‍🍳 Phó bếp: Nguyễn Huỳnh Kỳ Thuật (12 năm KN)\n'
-        + '👩‍💼 Quản lý: Hứa Thị Thảo Vy (8 năm KN)\n\n'
-        + '=== QUY TẮC (BẮT BUỘC) ===\n'
-        + '1. NGẮN GỌN, TRỌNG TÂM (2-4 câu), không lan man\n'
-        + '2. Hỏi món ăn -> DÙNG tên và giá từ dữ liệu\n'
-        + '3. Chào/hỏi tên -> "Em là Trà My, trợ lý ảo của ' + tenNhaHang + '"\n'
-        + '4. "Trà My" là TÊN BẠN, KHÔNG phải đồ uống\n'
-        + '5. Hỏi đội ngũ -> DÙNG tên, chức vụ\n'
-        + '6. Hỏi liên hệ -> DÙNG SDT, địa chỉ, giờ\n'
-        + '7. Không biết -> Gọi hotline ' + soDienThoai + '\n'
-        + '8. KHÔNG bịa đặt. Liệt kê món: Tên - Giá rõ ràng\n'
-        + '9. Khi khách đặt hàng -> xác nhận món, số lượng, tổng tiền\n'
-        + '10. Sau khi thêm giỏ hàng -> hỏi muốn đặt thêm hay thanh toán\n'; 
+    return 'Báº N LÃ€ TRÃ€ MY - trá»£ lÃ½ áº£o thÃ´ng minh cá»§a ' + tenNhaHang + '.\n\n'
+        + '=== DANH TÃNH ===\n'
+        + '- TÃªn: TRÃ€ MY - tiáº¿p viÃªn áº£o dá»… thÆ°Æ¡ng, ngá»t ngÃ o\n'
+        + '- XÆ°ng "em", gá»i khÃ¡ch lÃ  "anh/chá»‹"\n'
+        + '- NÃ³i ngáº¯n gá»n (2-4 cÃ¢u), trá»ng tÃ¢m, chÃ­nh xÃ¡c\n'
+        + '- Emoji: ðŸŒ¸ ðŸ’• ðŸ˜Š ðŸœ âœ¨ ðŸ›’\n\n'
+        + '=== THÃ”NG TIN NHÃ€ HÃ€NG ===\n'
+        + 'ðŸ“ ' + tenNhaHang + ' - "PHÆ¯Æ NG NAM â€“ NGON NHÆ¯ Máº¸ Náº¤U"\n'
+        + 'ðŸ“ Äá»‹a chá»‰: ' + diaChi + '\n'
+        + 'ðŸ“ Hotline: ' + soDienThoai + ' | Email: ' + email + ' | Web: ' + website + '\n'
+        + 'ðŸ“ Giá» má»Ÿ cá»­a: T2-T6: ' + gioMoCuaT2T6 + ' | T7-CN: ' + gioMoCuaT7CN + '\n'
+        + 'ðŸ“ Giao hÃ ng: ' + new Intl.NumberFormat('vi-VN').format(phiGiaoHang) + 'Ä‘ | Miá»…n phÃ­ tá»« ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'Ä‘\n'
+        + 'ðŸ“ Miá»…n phÃ­ giao hÃ ng cho Ä‘Æ¡n tá»« ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'Ä‘\n\n'
+        + '=== CHá»¨C NÄ‚NG Äáº¶T HÃ€NG ===\n'
+        + 'Báº¡n cÃ³ thá»ƒ giÃºp khÃ¡ch: thÃªm mÃ³n vÃ o giá» hÃ ng, xem giá» hÃ ng, Ä‘áº·t hÃ ng, xem Ä‘Æ¡n hÃ ng.\n'
+        + 'Khi khÃ¡ch muá»‘n Ä‘áº·t mÃ³n, hÃ£y xÃ¡c nháº­n láº¡i mÃ³n vÃ  sá»‘ lÆ°á»£ng, rá»“i thÃªm vÃ o giá» hÃ ng.\n'
+        + 'HÆ°á»›ng dáº«n khÃ¡ch: "Chá»‰ cáº§n nÃ³i: Ä‘áº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m"\n\n'
+        + '=== Äá»˜I NGÅ¨ ===\n'
+        + 'ðŸ‘©â€ðŸ’¼ Chá»§: HoÃ ng Thá»¥c Linh (10 nÄƒm KN)\n'
+        + 'ðŸ‘¨â€ðŸ³ Báº¿p trÆ°á»Ÿng: Nguyá»…n Nháº­t TrÆ°á»ng (20 nÄƒm KN)\n'
+        + 'ðŸ‘¨â€ðŸ³ PhÃ³ báº¿p: Nguyá»…n Huá»³nh Ká»³ Thuáº­t (12 nÄƒm KN)\n'
+        + 'ðŸ‘©â€ðŸ’¼ Quáº£n lÃ½: Há»©a Thá»‹ Tháº£o Vy (8 nÄƒm KN)\n\n'
+        + '=== QUY Táº®C (Báº®T BUá»˜C) ===\n'
+        + '1. NGáº®N Gá»ŒN, TRá»ŒNG TÃ‚M (2-4 cÃ¢u), khÃ´ng lan man\n'
+        + '2. Há»i mÃ³n Äƒn -> DÃ™NG tÃªn vÃ  giÃ¡ tá»« dá»¯ liá»‡u\n'
+        + '3. ChÃ o/há»i tÃªn -> "Em lÃ  TrÃ  My, trá»£ lÃ½ áº£o cá»§a ' + tenNhaHang + '"\n'
+        + '4. "TrÃ  My" lÃ  TÃŠN Báº N, KHÃ”NG pháº£i Ä‘á»“ uá»‘ng\n'
+        + '5. Há»i Ä‘á»™i ngÅ© -> DÃ™NG tÃªn, chá»©c vá»¥\n'
+        + '6. Há»i liÃªn há»‡ -> DÃ™NG SDT, Ä‘á»‹a chá»‰, giá»\n'
+        + '7. KhÃ´ng biáº¿t -> Gá»i hotline ' + soDienThoai + '\n'
+        + '8. KHÃ”NG bá»‹a Ä‘áº·t. Liá»‡t kÃª mÃ³n: TÃªn - GiÃ¡ rÃµ rÃ ng\n'
+        + '9. Khi khÃ¡ch Ä‘áº·t hÃ ng -> xÃ¡c nháº­n mÃ³n, sá»‘ lÆ°á»£ng, tá»•ng tiá»n\n'
+        + '10. Sau khi thÃªm giá» hÃ ng -> há»i muá»‘n Ä‘áº·t thÃªm hay thanh toÃ¡n\n'; 
 }
 
-// Xử lý thêm món vào giỏ hàng qua chatbot
+// Xá»­ lÃ½ thÃªm mÃ³n vÃ o giá» hÃ ng qua chatbot
 async function chatbotAddToCart(ma_nguoi_dung, items) {
     const results = { added: [], errors: [], gio_hang: null };
 
@@ -285,7 +285,7 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
             let ma_mon = null;
             let dish = null;
 
-            // Tìm món theo tên
+            // TÃ¬m mÃ³n theo tÃªn
             if (item.ten_mon) {
                 const [found] = await db.query(`
                     SELECT ma_mon, ten_mon, gia_tien, so_luong_ton, anh_mon, don_vi_tinh
@@ -298,7 +298,7 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
                     dish = found[0];
                     ma_mon = dish.ma_mon;
                 } else {
-                    results.errors.push(`Không tìm thấy "${item.ten_mon}"`);
+                    results.errors.push(`KhÃ´ng tÃ¬m tháº¥y "${item.ten_mon}"`);
                     continue;
                 }
             } else if (item.ma_mon) {
@@ -307,7 +307,7 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
                     dish = found[0];
                     ma_mon = dish.ma_mon;
                 } else {
-                    results.errors.push(`Món #${item.ma_mon} không tồn tại`);
+                    results.errors.push(`MÃ³n #${item.ma_mon} khÃ´ng tá»“n táº¡i`);
                     continue;
                 }
             }
@@ -316,11 +316,11 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
 
             const soLuong = item.so_luong || 1;
             if (dish.so_luong_ton < soLuong) {
-                results.errors.push(`"${dish.ten_mon}" hết hàng`);
+                results.errors.push(`"${dish.ten_mon}" háº¿t hÃ ng`);
                 continue;
             }
 
-            // Lấy/tạo giỏ hàng
+            // Láº¥y/táº¡o giá» hÃ ng
             let [cartRows] = await db.query('SELECT * FROM gio_hang WHERE ma_nguoi_dung = ? AND trang_thai = "active"', [ma_nguoi_dung]);
             let ma_gio_hang;
             if (cartRows.length === 0) {
@@ -330,7 +330,7 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
                 ma_gio_hang = cartRows[0].ma_gio_hang;
             }
 
-            // Kiểm tra đã có trong giỏ chưa
+            // Kiá»ƒm tra Ä‘Ã£ cÃ³ trong giá» chÆ°a
             const [existing] = await db.query('SELECT * FROM chi_tiet_gio_hang WHERE ma_gio_hang = ? AND ma_mon = ?', [ma_gio_hang, ma_mon]);
             if (existing.length > 0) {
                 const newQty = Math.min(existing[0].so_luong + soLuong, 10);
@@ -346,36 +346,36 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
             results.added.push({ ten_mon: dish.ten_mon, so_luong: soLuong, gia_tien: dish.gia_tien, price_formatted: price, anh_mon: dish.anh_mon, ma_mon: dish.ma_mon });
         } catch (error) {
             console.error('chatbotAddToCart item error:', error.message);
-            results.errors.push(`Lỗi thêm "${item.ten_mon || item.ma_mon}"`);
+            results.errors.push(`Lá»—i thÃªm "${item.ten_mon || item.ma_mon}"`);
         }
     }
 
-    // Lấy giỏ hàng cập nhật
+    // Láº¥y giá» hÃ ng cáº­p nháº­t
     results.gio_hang = await getCartByUserId(ma_nguoi_dung);
     return results;
 }
 
-// Lấy thông tin giỏ hàng để chatbot hiển thị
+// Láº¥y thÃ´ng tin giá» hÃ ng Ä‘á»ƒ chatbot hiá»ƒn thá»‹
 async function chatbotGetCart(ma_nguoi_dung) {
     const gioHang = await getCartByUserId(ma_nguoi_dung);
     if (!gioHang || gioHang.items.length === 0) {
-        return { has_items: false, summary: 'Giỏ hàng hiện đang trống.', gio_hang: gioHang };
+        return { has_items: false, summary: 'Giá» hÃ ng hiá»‡n Ä‘ang trá»‘ng.', gio_hang: gioHang };
     }
 
     const summary = gioHang.items.map(i => {
         const price = new Intl.NumberFormat('vi-VN').format(i.gia_tai_thoi_diem);
-        return `- ${i.ten_mon}: ${i.so_luong} x ${price}đ = ${new Intl.NumberFormat('vi-VN').format(i.thanh_tien)}đ`;
+        return `- ${i.ten_mon}: ${i.so_luong} x ${price}Ä‘ = ${new Intl.NumberFormat('vi-VN').format(i.thanh_tien)}Ä‘`;
     }).join('\n');
 
     const total = new Intl.NumberFormat('vi-VN').format(gioHang.tong_tien);
     return {
         has_items: true,
-        summary: `GIỎ HÀNG HIỆN TẠI (${gioHang.so_luong} món):\n${summary}\n\nTổng cộng: ${total}đ`,
+        summary: `GIá»Ž HÃ€NG HIá»†N Táº I (${gioHang.so_luong} mÃ³n):\n${summary}\n\nTá»•ng cá»™ng: ${total}Ä‘`,
         gio_hang: gioHang
     };
 }
 
-// Lấy lịch sử đơn hàng cho chatbot
+// Láº¥y lá»‹ch sá»­ Ä‘Æ¡n hÃ ng cho chatbot
 async function chatbotGetOrders(ma_nguoi_dung, limit = 5) {
     try {
         const [orders] = await db.query(`
@@ -390,23 +390,23 @@ async function chatbotGetOrders(ma_nguoi_dung, limit = 5) {
             LIMIT ?
         `, [ma_nguoi_dung, limit]);
 
-        if (orders.length === 0) return { has_orders: false, summary: 'Bạn chưa có đơn hàng nào.' };
+        if (orders.length === 0) return { has_orders: false, summary: 'Báº¡n chÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o.' };
 
         const statusMap = {
-            'pending': 'Chờ xác nhận', 'confirmed': 'Đã xác nhận',
-            'preparing': 'Đang chuẩn bị', 'delivered': 'Hoàn thành', 'cancelled': 'Đã hủy'
+            'pending': 'Chá» xÃ¡c nháº­n', 'confirmed': 'ÄÃ£ xÃ¡c nháº­n',
+            'preparing': 'Äang chuáº©n bá»‹', 'delivered': 'HoÃ n thÃ nh', 'cancelled': 'ÄÃ£ há»§y'
         };
 
         const summary = orders.map(o => {
             const total = new Intl.NumberFormat('vi-VN').format(o.tong_tien);
             const status = statusMap[o.trang_thai] || o.trang_thai;
-            return `#${o.ma_don_hang} - ${status} - ${total}đ\n  Món: ${o.danh_sach_mon}`;
+            return `#${o.ma_don_hang} - ${status} - ${total}Ä‘\n  MÃ³n: ${o.danh_sach_mon}`;
         }).join('\n\n');
 
-        return { has_orders: true, summary: `ĐƠN HÀNG GẦN ĐÂY:\n\n${summary}`, orders };
+        return { has_orders: true, summary: `ÄÆ N HÃ€NG Gáº¦N ÄÃ‚Y:\n\n${summary}`, orders };
     } catch (error) {
         console.error('chatbotGetOrders error:', error.message);
-        return { has_orders: false, summary: 'Không thể lấy thông tin đơn hàng.' };
+        return { has_orders: false, summary: 'KhÃ´ng thá»ƒ láº¥y thÃ´ng tin Ä‘Æ¡n hÃ ng.' };
     }
 }
 
@@ -437,7 +437,163 @@ router.get('/test-data', async (req, res) => {
 
 // ==================== MAIN CHAT API (GraphQL-powered) ====================
 
+async function generateLocalFallbackResponse(graphqlContext, message, settings, ma_nguoi_dung, cartResult = null) {
+    const intent = graphqlContext.intent;
+    
+    const tenNhaHang = settings.ten_nha_hang || 'Nhà hàng Ẩm thực Phương Nam';
+    const diaChi = settings.dia_chi || '123 Đường ABC, Phường 1, TP. Vĩnh Long';
+    const soDienThoai = settings.so_dien_thoai || '0123 456 789';
+    const email = settings.email || 'info@phuongnam.vn';
+    const website = settings.website || 'phuongnam.vn';
+    const gioMoCuaT2T6 = settings.gio_mo_cua_t2_t6 || '08:00-22:00';
+    const gioMoCuaT7CN = settings.gio_mo_cua_t7_cn || '07:00-23:00';
+    const phiGiaoHang = settings.phi_giao_hang || '20000';
+    const mienPhiGiaoHangTu = settings.mien_phi_giao_hang_tu || '200000';
+
+    const formatPrice = (p) => new Intl.NumberFormat('vi-VN').format(p) + 'đ';
+
+    // 1. Xem giỏ hàng
+    if (intent.muon_xem_gio_hang) {
+        if (!ma_nguoi_dung) {
+            return 'Dạ để xem giỏ hàng của mình, anh/chị vui lòng đăng nhập trước giúp em nhé! 🌸';
+        }
+        const cartInfo = await chatbotGetCart(ma_nguoi_dung);
+        if (cartInfo && cartInfo.has_items) {
+            return `Giỏ hàng hiện tại của anh/chị gồm có:\n${cartInfo.summary}\n\nAnh/chị muốn đặt hàng luôn hay muốn thêm món gì khác không ạ? 💕`;
+        }
+        return 'Giỏ hàng của anh/chị hiện tại đang trống ạ! 🌸 Anh/chị có muốn tham khảo menu các món ngon bán chạy của nhà hàng không ạ?';
+    }
+
+    // 2. Xem đơn hàng
+    if (intent.muon_xem_don_hang) {
+        if (!ma_nguoi_dung) {
+            return 'Dạ anh/chị vui lòng đăng nhập để xem lịch sử đơn hàng của mình nhé! 🌸';
+        }
+        const orderInfo = await chatbotGetOrders(ma_nguoi_dung);
+        if (orderInfo && orderInfo.has_orders) {
+            return `Lịch sử đơn hàng gần đây của anh/chị đây ạ:\n\n${orderInfo.summary}\n\nAnh/chị cần em kiểm tra chi tiết đơn hàng nào không ạ? 💕`;
+        }
+        return 'Dạ anh/chị chưa có đơn hàng nào tại hệ thống ạ. Hãy chọn món ngon và lên đơn ngay nhé, em sẽ hỗ trợ đắc lực ạ! 💕';
+    }
+
+    // 3. Thêm món vào giỏ hàng
+    if ((intent.muon_them_gio_hang || intent.muon_dat_hang) && intent.mon_an_dat_hang.length > 0) {
+        if (!ma_nguoi_dung) {
+            return 'Dạ để đặt hàng hoặc thêm món vào giỏ, anh/chị vui lòng đăng nhập trước giúp em nhé! 🌸 Sau khi đăng nhập, anh/chị chỉ cần nói "đặt 2 phần phở bò, 1 cơm tấm" là em làm được ngay ạ! 💕';
+        }
+        const result = cartResult || await chatbotAddToCart(ma_nguoi_dung, intent.mon_an_dat_hang);
+        if (result) {
+            let response = '';
+            if (result.added && result.added.length > 0) {
+                const addedStr = result.added.map(a => `${a.so_luong}x ${a.ten_mon}`).join(', ');
+                response += `Dạ em đã thêm **${addedStr}** vào giỏ hàng của anh/chị rồi ạ! 🛒\n\n`;
+            }
+            if (result.errors && result.errors.length > 0) {
+                response += `Lưu ý nhỏ: ${result.errors.join(', ')} ạ.\n\n`;
+            }
+            if (result.gio_hang && result.gio_hang.items && result.gio_hang.items.length > 0) {
+                const total = formatPrice(result.gio_hang.tong_tien);
+                const gioHangSummary = result.gio_hang.items.map(i => `- ${i.ten_mon}: ${i.so_luong} phần`).join('\n');
+                response += `GIỎ HÀNG HIỆN TẠI:\n${gioHangSummary}\nTổng cộng: ${total}. Anh/chị muốn đặt thêm món gì nữa hay thanh toán luôn ạ? 💕`;
+            } else {
+                response += `Anh/chị muốn chọn thêm món gì nữa không ạ?`;
+            }
+            return response;
+        }
+    }
+
+    // 4. Muốn đặt hàng nhưng chưa chọn món
+    if ((intent.muon_dat_hang || intent.muon_them_gio_hang) && intent.mon_an_dat_hang.length === 0) {
+        if (!ma_nguoi_dung) {
+            return 'Dạ anh/chị ơi, để đặt hàng qua chatbot, anh/chị vui lòng đăng nhập trước giúp em nhé! 🌸 Sau đó anh/chị chỉ cần gõ "Đặt 1 lẩu cá, 2 trà đá" là em lên đơn liền ạ! 💕';
+        }
+        let response = 'Dạ anh/chị muốn đặt món gì thế ạ? Anh/chị chỉ cần gõ tên món kèm số lượng (Ví dụ: "Đặt 1 phần cá tai tượng chiên xù") là em thêm vào giỏ hàng ngay ạ! 🍽️\n\n';
+        if (graphqlContext.top_ban_chay && graphqlContext.top_ban_chay.length > 0) {
+            response += 'Gợi ý các món bán chạy nhất của nhà hàng cho anh/chị:\n' + 
+                graphqlContext.top_ban_chay.slice(0, 3).map((m, i) => `${i+1}. ${m.ten_mon} (${formatPrice(m.gia_tien)})`).join('\n');
+        }
+        return response;
+    }
+
+    // 5. Hỏi giờ mở cửa
+    if (message.toLowerCase().includes('gio mo cua') || message.toLowerCase().includes('mo cua') || message.toLowerCase().includes('may gio')) {
+        return `Dạ nhà hàng ${tenNhaHang} mở cửa phục vụ anh/chị vào các khung giờ sau ạ:\n` +
+            `- Thứ 2 - Thứ 6: từ ${gioMoCuaT2T6} hàng ngày.\n` +
+            `- Thứ 7 - Chủ Nhật: từ ${gioMoCuaT7CN} hàng ngày.\n\n` +
+            `Rất mong được tiếp đón và phục vụ anh/chị tại quán ạ! 🌸💕`;
+    }
+
+    // 6. Hỏi thông tin địa chỉ, liên hệ
+    if (intent.hoi_thong_tin || message.toLowerCase().includes('dia chi') || message.toLowerCase().includes('o dau') || message.toLowerCase().includes('sdt') || message.toLowerCase().includes('hotline')) {
+        return `Dạ em xin gửi anh/chị thông tin liên hệ chính thức của nhà hàng ${tenNhaHang} ạ:\n` +
+            `📍 Địa chỉ: ${diaChi}\n` +
+            `📞 Hotline đặt bàn: ${soDienThoai}\n` +
+            `📧 Email hỗ trợ: ${email}\n` +
+            `🌐 Website: ${website}\n\n` +
+            `Anh/chị có thể gọi hotline để đặt bàn trước hoặc đặt trực tiếp qua em nhé! 💕🌸`;
+    }
+
+    // 7. Hỏi giao hàng / phí giao hàng
+    if (intent.hoi_giao_hang || message.toLowerCase().includes('giao hang') || message.toLowerCase().includes('ship')) {
+        return `Dạ bên em có dịch vụ giao hàng tận nơi cho anh/chị đấy ạ! 🛵\n` +
+            `- Phí giao hàng: ${formatPrice(phiGiaoHang)} đồng toàn khu vực.\n` +
+            `- Đặc biệt: Miễn phí giao hàng hoàn toàn cho đơn hàng từ ${formatPrice(mienPhiGiaoHangTu)} đồng trở lên ạ!\n\n` +
+            `Anh/chị chỉ cần chọn món và điền địa chỉ giao hàng lúc thanh toán nhé! 💕`;
+    }
+
+    // 8. Hỏi đặt bàn
+    if (intent.hoi_dat_ban) {
+        return `Dạ để đặt bàn trước tại nhà hàng, anh/chị vui lòng nhấn vào mục **Đặt Bàn** trên thanh menu hoặc gọi trực tiếp đến Hotline: **${soDienThoai}** để bên em chuẩn bị chỗ ngồi đẹp nhất cho mình ạ! 📞 Cảm ơn anh/chị rất nhiều! 💕`;
+    }
+
+    // 9. Hỏi khuyến mãi
+    if (intent.hoi_khuyen_mai) {
+        return `Dạ hiện tại nhà hàng ${tenNhaHang} đang có chương trình khuyến mãi vô cùng hấp dẫn đấy ạ! 🎉\n` +
+            `- Miễn phí giao hàng cho đơn hàng đạt giá trị tối thiểu ${formatPrice(mienPhiGiaoHangTu)} đồng.\n` +
+            `- Tích điểm thành viên đổi quà cho khách hàng thân thiết.\n\n` +
+            `Anh/chị hãy đặt món ngay để được hưởng các ưu đãi tốt nhất nhé! 🎁💕`;
+    }
+
+    // 10. Tìm thấy món ăn cụ thể phù hợp
+    if (graphqlContext.has_food_data) {
+        let response = `Dạ em tìm thấy các món ăn vô cùng hấp dẫn phù hợp với yêu cầu của anh/chị đây ạ: 🍽️\n\n`;
+        response += graphqlContext.mon_an_lien_quan.slice(0, 5).map(m => {
+            return `- **${m.ten_mon}**: ${formatPrice(m.gia_tien)}/${m.don_vi_tinh || 'phần'} ${m.diem_danh_gia ? `(⭐ ${parseFloat(m.diem_danh_gia).toFixed(1)})` : ''}`;
+        }).join('\n');
+        response += `\n\nAnh/chị muốn đặt món nào không ạ? Chỉ cần nói "Đặt 1 phần [Tên món]" là em thêm vào giỏ hàng ngay ạ! 💕`;
+        return response;
+    }
+
+    // 11. Hỏi thực đơn / menu nói chung
+    if (intent.hoi_thuc_don || intent.hoi_mon_an) {
+        let response = `Dạ nhà hàng em có thực đơn phong phú với rất nhiều món ngon đậm đà hương vị Phương Nam! 🌾 Em xin gợi ý các món nổi bật nhất:\n\n`;
+        if (graphqlContext.top_ban_chay && graphqlContext.top_ban_chay.length > 0) {
+            response += graphqlContext.top_ban_chay.slice(0, 5).map(m => {
+                return `- **${m.ten_mon}**: ${formatPrice(m.gia_tien)} (${m.ten_danh_muc || 'Món chính'})`;
+            }).join('\n');
+        } else {
+            response += `- Cá lóc nướng trui\n- Gà đốt ô thum\n- Lẩu mắm miền Tây\n- Cá tai tượng chiên xù`;
+        }
+        response += `\n\nAnh/chị có thể xem thực đơn đầy đủ trên trang web hoặc gõ tên món để em tìm kiếm và đặt món giúp mình nhé! 💕🌸`;
+        return response;
+    }
+
+    // 12. Fallback mặc định
+    return `Dạ Trà My xin chào anh/chị ạ! 🌸 Em là trợ lý ảo hỗ trợ đặt món và giải đáp mọi thông tin của nhà hàng ${tenNhaHang}.\n\n` +
+        `Hiện tại do lượt truy cập AI đang quá tải, em xin phép trả lời nhanh một số thông tin:\n` +
+        `📍 Địa chỉ nhà hàng: ${diaChi}\n` +
+        `📞 Hotline: ${soDienThoai}\n` +
+        `🕐 Giờ mở cửa: ${gioMoCuaT2T6} (T2-T6) và ${gioMoCuaT7CN} (T7-CN).\n\n` +
+        `Anh/chị có thể gõ "Xem thực đơn", "Đặt bàn", "Giờ mở cửa", hoặc gõ tên món ăn để em tư vấn trực tiếp nhé! 💕🌸`;
+}
+
 router.post('/chat', async (req, res) => {
+    let graphqlContext = null;
+    let settings = null;
+    let ma_nguoi_dung = null;
+    let chatSessionId = null;
+    let cartResult = null;
+    
     try {
         const { message, session_id } = req.body;
         
@@ -445,18 +601,18 @@ router.post('/chat', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Vui long nhap tin nhan' });
         }
         if (!process.env.GROQ_API_KEY) {
-            return res.json({ success: false, message: 'Chua cau hinh GROQ_API_KEY' });
+            throw new Error('GROQ_API_KEY_NOT_SET');
         }
 
-        const ma_nguoi_dung = getUserFromToken(req);
-        const chatSessionId = session_id || 'guest_' + Date.now();
+        ma_nguoi_dung = getUserFromToken(req);
+        chatSessionId = session_id || 'guest_' + Date.now();
 
         await saveChatHistory(ma_nguoi_dung, chatSessionId, 'user', message.trim());
 
         // GraphQL: Lay context chinh xac
         console.log('GraphQL: Analyzing message...');
-        const graphqlContext = await getChatbotContextForMessage(message);
-        const settings = await getRestaurantSettings();
+        graphqlContext = await getChatbotContextForMessage(message);
+        settings = await getRestaurantSettings();
 
         const tenNhaHang = settings.ten_nha_hang || 'Nha hang Am thuc Phuong Nam';
         const diaChi = settings.dia_chi || '123 Duong ABC, Phuong 1, TP. Vinh Long';
@@ -482,15 +638,15 @@ router.post('/chat', async (req, res) => {
             order_items: graphqlContext.intent.mon_an_dat_hang
         }));
 
-        // ==================== XỬ LÝ ĐẶT HÀNG QUA CHATBOT ====================
+        // ==================== Xá»¬ LÃ Äáº¶T HÃ€NG QUA CHATBOT ====================
         
-        // 1. Xem giỏ hàng
+        // 1. Xem giá» hÃ ng
         if (graphqlContext.intent.muon_xem_gio_hang && ma_nguoi_dung) {
             const cartInfo = await chatbotGetCart(ma_nguoi_dung);
             
             const cartPrompt = cartInfo.has_items 
-                ? `\n=== GIỎ HÀNG HIỆN TẠI ===\n${cartInfo.summary}\n\nHãy tóm tắt giỏ hàng cho khách và hỏi khách muốn đặt hàng hay thêm món gì khác.`
-                : `\nGiỏ hàng của khách đang trống. Hãy gợi ý một vài món ăn ngon cho khách.`;
+                ? `\n=== GIá»Ž HÃ€NG HIá»†N Táº I ===\n${cartInfo.summary}\n\nHÃ£y tÃ³m táº¯t giá» hÃ ng cho khÃ¡ch vÃ  há»i khÃ¡ch muá»‘n Ä‘áº·t hÃ ng hay thÃªm mÃ³n gÃ¬ khÃ¡c.`
+                : `\nGiá» hÃ ng cá»§a khÃ¡ch Ä‘ang trá»‘ng. HÃ£y gá»£i Ã½ má»™t vÃ i mÃ³n Äƒn ngon cho khÃ¡ch.`;
             
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
@@ -502,7 +658,7 @@ router.post('/chat', async (req, res) => {
                 temperature: 0.6
             });
 
-            const botResponse = completion.choices[0]?.message?.content || 'Em không lấy được thông tin giỏ hàng ạ!';
+            const botResponse = completion.choices[0]?.message?.content || 'Em khÃ´ng láº¥y Ä‘Æ°á»£c thÃ´ng tin giá» hÃ ng áº¡!';
             await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
 
             return res.json({
@@ -516,13 +672,13 @@ router.post('/chat', async (req, res) => {
             });
         }
 
-        // 2. Xem đơn hàng
+        // 2. Xem Ä‘Æ¡n hÃ ng
         if (graphqlContext.intent.muon_xem_don_hang && ma_nguoi_dung) {
             const orderInfo = await chatbotGetOrders(ma_nguoi_dung);
             
             const orderPrompt = orderInfo.has_orders
-                ? `\n=== ĐƠN HÀNG CỦA KHÁCH ===\n${orderInfo.summary}\n\nHãy tóm tắt các đơn hàng cho khách.`
-                : `\nKhách chưa có đơn hàng nào. Gợi ý khách xem thực đơn và đặt hàng.`;
+                ? `\n=== ÄÆ N HÃ€NG Cá»¦A KHÃCH ===\n${orderInfo.summary}\n\nHÃ£y tÃ³m táº¯t cÃ¡c Ä‘Æ¡n hÃ ng cho khÃ¡ch.`
+                : `\nKhÃ¡ch chÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o. Gá»£i Ã½ khÃ¡ch xem thá»±c Ä‘Æ¡n vÃ  Ä‘áº·t hÃ ng.`;
 
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
@@ -534,7 +690,7 @@ router.post('/chat', async (req, res) => {
                 temperature: 0.6
             });
 
-            const botResponse = completion.choices[0]?.message?.content || 'Em không lấy được thông tin đơn hàng ạ!';
+            const botResponse = completion.choices[0]?.message?.content || 'Em khÃ´ng láº¥y Ä‘Æ°á»£c thÃ´ng tin Ä‘Æ¡n hÃ ng áº¡!';
             await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
 
             return res.json({
@@ -548,27 +704,27 @@ router.post('/chat', async (req, res) => {
             });
         }
 
-        // 3. Thêm món vào giỏ hàng
+        // 3. ThÃªm mÃ³n vÃ o giá» hÃ ng
         if ((graphqlContext.intent.muon_them_gio_hang || graphqlContext.intent.muon_dat_hang) 
             && graphqlContext.intent.mon_an_dat_hang.length > 0 && ma_nguoi_dung) {
             
-            console.log('🛒 Chatbot: Adding to cart:', graphqlContext.intent.mon_an_dat_hang);
-            const cartResult = await chatbotAddToCart(ma_nguoi_dung, graphqlContext.intent.mon_an_dat_hang);
+            console.log('ðŸ›’ Chatbot: Adding to cart:', graphqlContext.intent.mon_an_dat_hang);
+            cartResult = await chatbotAddToCart(ma_nguoi_dung, graphqlContext.intent.mon_an_dat_hang);
             
             let actionPrompt = '';
             if (cartResult.added.length > 0) {
-                const addedList = cartResult.added.map(a => `${a.so_luong}x ${a.ten_mon} (${a.price_formatted}đ)`).join(', ');
-                actionPrompt += `\n=== ĐÃ THÊM VÀO GIỎ HÀNG ===\n${addedList}\n`;
+                const addedList = cartResult.added.map(a => `${a.so_luong}x ${a.ten_mon} (${a.price_formatted}Ä‘)`).join(', ');
+                actionPrompt += `\n=== ÄÃƒ THÃŠM VÃ€O GIá»Ž HÃ€NG ===\n${addedList}\n`;
             }
             if (cartResult.errors.length > 0) {
-                actionPrompt += `\nLỗi: ${cartResult.errors.join(', ')}\n`;
+                actionPrompt += `\nLá»—i: ${cartResult.errors.join(', ')}\n`;
             }
             if (cartResult.gio_hang && cartResult.gio_hang.items.length > 0) {
-                const gioHangSummary = cartResult.gio_hang.items.map(i => `- ${i.ten_mon}: ${i.so_luong} phần`).join('\n');
+                const gioHangSummary = cartResult.gio_hang.items.map(i => `- ${i.ten_mon}: ${i.so_luong} pháº§n`).join('\n');
                 const total = new Intl.NumberFormat('vi-VN').format(cartResult.gio_hang.tong_tien);
-                actionPrompt += `\nGIỎ HÀNG HIỆN TẠI:\n${gioHangSummary}\nTổng cộng: ${total}đ\n`;
+                actionPrompt += `\nGIá»Ž HÃ€NG HIá»†N Táº I:\n${gioHangSummary}\nTá»•ng cá»™ng: ${total}Ä‘\n`;
             }
-            actionPrompt += `\nHãy xác nhận đã thêm món vào giỏ hàng và hỏi khách muốn đặt hàng hay thêm món gì khác. Ngắn gọn, thân thiện.`;
+            actionPrompt += `\nHÃ£y xÃ¡c nháº­n Ä‘Ã£ thÃªm mÃ³n vÃ o giá» hÃ ng vÃ  há»i khÃ¡ch muá»‘n Ä‘áº·t hÃ ng hay thÃªm mÃ³n gÃ¬ khÃ¡c. Ngáº¯n gá»n, thÃ¢n thiá»‡n.`;
 
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
@@ -580,7 +736,7 @@ router.post('/chat', async (req, res) => {
                 temperature: 0.6
             });
 
-            const botResponse = completion.choices[0]?.message?.content || 'Em đã thêm món vào giỏ hàng rồi ạ! 🛒';
+            const botResponse = completion.choices[0]?.message?.content || 'Em Ä‘Ã£ thÃªm mÃ³n vÃ o giá» hÃ ng rá»“i áº¡! ðŸ›’';
             await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
 
             return res.json({
@@ -603,13 +759,13 @@ router.post('/chat', async (req, res) => {
             });
         }
 
-        // 4. Yêu cầu đặt hàng nhưng chưa chọn món (hướng dẫn)
+        // 4. YÃªu cáº§u Ä‘áº·t hÃ ng nhÆ°ng chÆ°a chá»n mÃ³n (hÆ°á»›ng dáº«n)
         if ((graphqlContext.intent.muon_dat_hang || graphqlContext.intent.muon_them_gio_hang) 
             && graphqlContext.intent.mon_an_dat_hang.length === 0) {
             
-            // Có thể user chưa đăng nhập
+            // CÃ³ thá»ƒ user chÆ°a Ä‘Äƒng nháº­p
             if (!ma_nguoi_dung) {
-                const botResponse = 'Anh/chị ơi, để đặt hàng qua chatbot, anh/chị cần đăng nhập trước ạ! 🌸 Sau khi đăng nhập, anh/chị chỉ cần nói: "Đặt 2 phần phở bò, 1 cơm tấm" là em xử lý ngay ạ! 💕';
+                const botResponse = 'Anh/chá»‹ Æ¡i, Ä‘á»ƒ Ä‘áº·t hÃ ng qua chatbot, anh/chá»‹ cáº§n Ä‘Äƒng nháº­p trÆ°á»›c áº¡! ðŸŒ¸ Sau khi Ä‘Äƒng nháº­p, anh/chá»‹ chá»‰ cáº§n nÃ³i: "Äáº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m" lÃ  em xá»­ lÃ½ ngay áº¡! ðŸ’•';
                 await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
                 return res.json({
                     success: true,
@@ -621,12 +777,12 @@ router.post('/chat', async (req, res) => {
                 });
             }
             
-            // Đã đăng nhập nhưng chưa chọn món -> gợi ý
-            let suggestPrompt = '\nKhách muốn đặt hàng nhưng chưa chọn món cụ thể. Hãy hỏi khách muốn đặt món gì và gợi ý top món bán chạy.';
+            // ÄÃ£ Ä‘Äƒng nháº­p nhÆ°ng chÆ°a chá»n mÃ³n -> gá»£i Ã½
+            let suggestPrompt = '\nKhÃ¡ch muá»‘n Ä‘áº·t hÃ ng nhÆ°ng chÆ°a chá»n mÃ³n cá»¥ thá»ƒ. HÃ£y há»i khÃ¡ch muá»‘n Ä‘áº·t mÃ³n gÃ¬ vÃ  gá»£i Ã½ top mÃ³n bÃ¡n cháº¡y.';
             if (graphqlContext.top_ban_chay.length > 0) {
-                suggestPrompt += '\n=== GỢI Ý ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'đ').join('\n');
+                suggestPrompt += '\n=== Gá»¢I Ã ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'Ä‘').join('\n');
             }
-            suggestPrompt += '\n\nHướng dẫn: "Chỉ cần nói: đặt 2 phần phở bò, 1 cơm tấm là em thêm vào giỏ hàng liền ạ!"';
+            suggestPrompt += '\n\nHÆ°á»›ng dáº«n: "Chá»‰ cáº§n nÃ³i: Ä‘áº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m lÃ  em thÃªm vÃ o giá» hÃ ng liá»n áº¡!"';
 
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
@@ -638,7 +794,7 @@ router.post('/chat', async (req, res) => {
                 temperature: 0.6
             });
 
-            const botResponse = completion.choices[0]?.message?.content || 'Anh/chị muốn đặt món gì ạ? 🍜';
+            const botResponse = completion.choices[0]?.message?.content || 'Anh/chá»‹ muá»‘n Ä‘áº·t mÃ³n gÃ¬ áº¡? ðŸœ';
             await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
 
             const responseData = {
@@ -656,21 +812,21 @@ router.post('/chat', async (req, res) => {
             return res.json({ success: true, data: responseData });
         }
 
-        // ==================== XỬ LÝ BÌNH THƯỜNG (hỏi đáp) ====================
+        // ==================== Xá»¬ LÃ BÃŒNH THÆ¯á»œNG (há»i Ä‘Ã¡p) ====================
 
         // System Prompt toi uu
         let foodContextPrompt = '';
         
         if (graphqlContext.has_food_data) {
-            foodContextPrompt = '\n=== MÓN ĂN LIÊN QUAN (GraphQL) ===\n' + graphqlContext.compact_menu + '\n\nQUA TRỌNG: Trả lời DỰA TRÊN dữ liệu trên, kèm giá chính xác. Ngắn gọn, trọng tâm.\n';
+            foodContextPrompt = '\n=== MÃ“N Ä‚N LIÃŠN QUAN (GraphQL) ===\n' + graphqlContext.compact_menu + '\n\nQUA TRá»ŒNG: Tráº£ lá»i Dá»°A TRÃŠN dá»¯ liá»‡u trÃªn, kÃ¨m giÃ¡ chÃ­nh xÃ¡c. Ngáº¯n gá»n, trá»ng tÃ¢m.\n';
         } else if (graphqlContext.intent.hoi_mon_an || graphqlContext.intent.hoi_thuc_don) {
             const fullMenu = await getCompactMenu();
-            foodContextPrompt = '\n=== THỰC ĐƠN ===\n' + fullMenu + '\n';
+            foodContextPrompt = '\n=== THá»°C ÄÆ N ===\n' + fullMenu + '\n';
         }
 
         let topDishesPrompt = '';
         if (graphqlContext.top_ban_chay.length > 0) {
-            topDishesPrompt = '\n=== TOP BÁN CHẠY ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'đ (' + p.so_luong_ban + ' phần)').join('\n') + '\n';
+            topDishesPrompt = '\n=== TOP BÃN CHáº Y ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'Ä‘ (' + p.so_luong_ban + ' pháº§n)').join('\n') + '\n';
         }
 
         const systemPrompt = systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + foodContextPrompt + topDishesPrompt;
@@ -724,16 +880,60 @@ router.post('/chat', async (req, res) => {
             return res.json({ success: true, data: responseData });
         }
 
-        return res.json({ success: false, message: 'Không nhận được phản hồi từ AI' });
+        return res.json({ success: false, message: 'KhÃ´ng nháº­n Ä‘Æ°á»£c pháº£n há»“i tá»« AI' });
 
     } catch (error) {
-        console.error('Chatbot error:', error.message);
-        console.error('Chatbot error status:', error.status);
-        console.error('Chatbot error stack:', error.stack?.split('\n').slice(0, 5).join('\n'));
-        if (error.error) console.error('Chatbot error body:', JSON.stringify(error.error));
-        if (error.status === 401) return res.json({ success: false, message: 'API Key không hợp lệ' });
-        if (error.status === 429) return res.json({ success: false, message: 'Vượt giới hạn API. Thử lại sau!' });
-        return res.json({ success: false, message: 'Lỗi chatbot: ' + error.message });
+        console.warn('⚠️ Chatbot error occurred, triggering local DB fallback agent:', error.message);
+        
+        try {
+            // Re-fetch context if not defined
+            const fallbackContext = graphqlContext || await getChatbotContextForMessage(message);
+            const fallbackSettings = settings || await getRestaurantSettings();
+            
+            const activeUserId = ma_nguoi_dung || getUserFromToken(req);
+            const activeSessionId = chatSessionId || (req.body.session_id || 'guest_' + Date.now());
+            
+            // Build fallback response
+            const botResponse = await generateLocalFallbackResponse(fallbackContext, message, fallbackSettings, activeUserId, cartResult);
+            
+            // Save to chat history
+            await saveChatHistory(activeUserId, activeSessionId, 'bot', botResponse);
+            
+            const responseData = {
+                response: botResponse,
+                source: 'local_fallback_agent'
+            };
+            
+            // Add dishes to UI just like normal flow!
+            if (fallbackContext.has_food_data) {
+                responseData.dishes = fallbackContext.mon_an_lien_quan.map(m => ({
+                    ma_mon: m.ma_mon,
+                    ten_mon: m.ten_mon,
+                    gia_tien: m.gia_tien,
+                    don_vi_tinh: m.don_vi_tinh || 'phan',
+                    anh_mon: m.anh_mon,
+                    ten_danh_muc: m.ten_danh_muc,
+                    mo_ta: m.mo_ta_chi_tiet ? m.mo_ta_chi_tiet.substring(0, 80) : '',
+                    diem_danh_gia: m.diem_danh_gia || 0
+                }));
+            } else if (fallbackContext.top_ban_chay && fallbackContext.top_ban_chay.length > 0) {
+                responseData.dishes = fallbackContext.top_ban_chay.map(m => ({
+                    ma_mon: m.ma_mon,
+                    ten_mon: m.ten_mon,
+                    gia_tien: m.gia_tien,
+                    don_vi_tinh: m.don_vi_tinh || 'phan',
+                    anh_mon: m.anh_mon,
+                    ten_danh_muc: m.ten_danh_muc,
+                    so_luong_ban: m.so_luong_ban
+                }));
+            }
+            
+            return res.json({ success: true, data: responseData });
+            
+        } catch (fallbackError) {
+            console.error('Fatal fallback error:', fallbackError);
+            return res.json({ success: false, message: 'Lỗi hệ thống: ' + error.message });
+        }
     }
 });
 
@@ -768,17 +968,17 @@ router.get('/graphql/search', async (req, res) => {
 
 // ==================== CHATBOT ORDER API (GraphQL-powered) ====================
 
-// API: Thêm món vào giỏ hàng qua chatbot
+// API: ThÃªm mÃ³n vÃ o giá» hÃ ng qua chatbot
 router.post('/order/add-to-cart', async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) {
-            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để đặt hàng' });
+            return res.status(401).json({ success: false, message: 'Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ Ä‘áº·t hÃ ng' });
         }
 
         const { items } = req.body; // [{ten_mon, so_luong, ma_mon}]
         if (!items || !Array.isArray(items) || items.length === 0) {
-            return res.status(400).json({ success: false, message: 'Vui lòng chọn món ăn' });
+            return res.status(400).json({ success: false, message: 'Vui lÃ²ng chá»n mÃ³n Äƒn' });
         }
 
         const result = await chatbotAddToCart(ma_nguoi_dung, items);
@@ -791,20 +991,20 @@ router.post('/order/add-to-cart', async (req, res) => {
                 gio_hang: result.gio_hang
             },
             message: result.added.length > 0 
-                ? `Đã thêm ${result.added.length} món vào giỏ hàng`
-                : 'Không thêm được món nào'
+                ? `ÄÃ£ thÃªm ${result.added.length} mÃ³n vÃ o giá» hÃ ng`
+                : 'KhÃ´ng thÃªm Ä‘Æ°á»£c mÃ³n nÃ o'
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// API: Xem giỏ hàng qua chatbot
+// API: Xem giá» hÃ ng qua chatbot
 router.get('/order/cart', async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) {
-            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+            return res.status(401).json({ success: false, message: 'Vui lÃ²ng Ä‘Äƒng nháº­p' });
         }
 
         const cartInfo = await chatbotGetCart(ma_nguoi_dung);
@@ -814,24 +1014,24 @@ router.get('/order/cart', async (req, res) => {
     }
 });
 
-// API: Đặt hàng từ giỏ hàng qua chatbot
+// API: Äáº·t hÃ ng tá»« giá» hÃ ng qua chatbot
 router.post('/order/checkout', async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) {
-            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để đặt hàng' });
+            return res.status(401).json({ success: false, message: 'Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ Ä‘áº·t hÃ ng' });
         }
 
         const { ten_nguoi_nhan, so_dien_thoai, dia_chi, tinh_thanh, quan_huyen, phuong_xa, ghi_chu, phuong_thuc_thanh_toan } = req.body;
 
         if (!ten_nguoi_nhan || !so_dien_thoai || !dia_chi) {
-            return res.status(400).json({ success: false, message: 'Vui lòng cung cấp thông tin giao hàng (tên, SĐT, địa chỉ)' });
+            return res.status(400).json({ success: false, message: 'Vui lÃ²ng cung cáº¥p thÃ´ng tin giao hÃ ng (tÃªn, SÄT, Ä‘á»‹a chá»‰)' });
         }
 
-        // Lấy giỏ hàng
+        // Láº¥y giá» hÃ ng
         const [cartRows] = await db.query('SELECT * FROM gio_hang WHERE ma_nguoi_dung = ? AND trang_thai = "active"', [ma_nguoi_dung]);
         if (cartRows.length === 0) {
-            return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
+            return res.status(400).json({ success: false, message: 'Giá» hÃ ng trá»‘ng' });
         }
 
         const ma_gio_hang = cartRows[0].ma_gio_hang;
@@ -845,13 +1045,13 @@ router.post('/order/checkout', async (req, res) => {
         `, [ma_gio_hang]);
 
         if (cartItems.length === 0) {
-            return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
+            return res.status(400).json({ success: false, message: 'Giá» hÃ ng trá»‘ng' });
         }
 
-        // Kiểm tra tồn kho
+        // Kiá»ƒm tra tá»“n kho
         for (const item of cartItems) {
             if (item.so_luong_ton < item.so_luong) {
-                return res.status(400).json({ success: false, message: `"${item.ten_mon}" không đủ số lượng (còn ${item.so_luong_ton})` });
+                return res.status(400).json({ success: false, message: `"${item.ten_mon}" khÃ´ng Ä‘á»§ sá»‘ lÆ°á»£ng (cÃ²n ${item.so_luong_ton})` });
             }
         }
 
@@ -864,7 +1064,7 @@ router.post('/order/checkout', async (req, res) => {
             const tong_tien = tong_tien_hang + phi_giao_hang;
             const dia_chi_day_du = [dia_chi, phuong_xa, quan_huyen, tinh_thanh].filter(Boolean).join(', ');
 
-            // Tạo đơn hàng
+            // Táº¡o Ä‘Æ¡n hÃ ng
             const [orderResult] = await connection.query(
                 `INSERT INTO don_hang (ma_nguoi_dung, ten_khach_vang_lai, so_dt_khach, dia_chi_giao, tong_tien, trang_thai, ghi_chu)
                  VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
@@ -872,7 +1072,7 @@ router.post('/order/checkout', async (req, res) => {
             );
             const ma_don_hang = orderResult.insertId;
 
-            // Chi tiết + giảm tồn kho
+            // Chi tiáº¿t + giáº£m tá»“n kho
             for (const item of cartItems) {
                 await connection.query(
                     'INSERT INTO chi_tiet_don_hang (ma_don_hang, ma_mon, so_luong, gia_tai_thoi_diem) VALUES (?, ?, ?, ?)',
@@ -881,13 +1081,13 @@ router.post('/order/checkout', async (req, res) => {
                 await connection.query('UPDATE mon_an SET so_luong_ton = so_luong_ton - ? WHERE ma_mon = ?', [item.so_luong, item.ma_mon]);
             }
 
-            // Thanh toán
+            // Thanh toÃ¡n
             await connection.query(
                 'INSERT INTO thanh_toan (ma_don_hang, so_tien, phuong_thuc, trang_thai) VALUES (?, ?, ?, ?)',
                 [ma_don_hang, tong_tien, phuong_thuc_thanh_toan || 'cod', 'pending']
             );
 
-            // Đánh dấu giỏ hàng
+            // ÄÃ¡nh dáº¥u giá» hÃ ng
             await connection.query('UPDATE gio_hang SET trang_thai = "ordered" WHERE ma_gio_hang = ?', [ma_gio_hang]);
             await connection.query('INSERT INTO gio_hang (ma_nguoi_dung, trang_thai) VALUES (?, "active")', [ma_nguoi_dung]);
 
@@ -895,7 +1095,7 @@ router.post('/order/checkout', async (req, res) => {
 
             res.json({
                 success: true,
-                message: `Đặt hàng thành công! Mã đơn: #${ma_don_hang}`,
+                message: `Äáº·t hÃ ng thÃ nh cÃ´ng! MÃ£ Ä‘Æ¡n: #${ma_don_hang}`,
                 data: {
                     ma_don_hang,
                     tong_tien,
@@ -916,23 +1116,23 @@ router.post('/order/checkout', async (req, res) => {
         }
     } catch (error) {
         console.error('Chatbot checkout error:', error.message);
-        res.status(500).json({ success: false, message: 'Lỗi đặt hàng: ' + error.message });
+        res.status(500).json({ success: false, message: 'Lá»—i Ä‘áº·t hÃ ng: ' + error.message });
     }
 });
 
-// API: Đặt hàng nhanh (chọn món + đặt luôn không qua giỏ)
+// API: Äáº·t hÃ ng nhanh (chá»n mÃ³n + Ä‘áº·t luÃ´n khÃ´ng qua giá»)
 router.post('/order/quick', async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) {
-            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để đặt hàng' });
+            return res.status(401).json({ success: false, message: 'Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ Ä‘áº·t hÃ ng' });
         }
 
         const { items, ten_nguoi_nhan, so_dien_thoai, dia_chi, tinh_thanh, quan_huyen, phuong_xa, ghi_chu, phuong_thuc_thanh_toan } = req.body;
 
-        if (!items || items.length === 0) return res.status(400).json({ success: false, message: 'Chưa chọn món' });
+        if (!items || items.length === 0) return res.status(400).json({ success: false, message: 'ChÆ°a chá»n mÃ³n' });
         if (!ten_nguoi_nhan || !so_dien_thoai || !dia_chi) {
-            return res.status(400).json({ success: false, message: 'Thiếu thông tin giao hàng' });
+            return res.status(400).json({ success: false, message: 'Thiáº¿u thÃ´ng tin giao hÃ ng' });
         }
 
         const connection = await db.getConnection();
@@ -949,7 +1149,7 @@ router.post('/order/quick', async (req, res) => {
                     );
                     if (found.length === 0) {
                         await connection.rollback();
-                        return res.status(400).json({ success: false, message: `Không tìm thấy "${item.ten_mon}"` });
+                        return res.status(400).json({ success: false, message: `KhÃ´ng tÃ¬m tháº¥y "${item.ten_mon}"` });
                     }
                     ma_mon = found[0].ma_mon;
                 }
@@ -957,13 +1157,13 @@ router.post('/order/quick', async (req, res) => {
                 const [dish] = await connection.query('SELECT * FROM mon_an WHERE ma_mon = ? AND trang_thai = 1', [ma_mon]);
                 if (dish.length === 0) {
                     await connection.rollback();
-                    return res.status(400).json({ success: false, message: `Món #${ma_mon} không tồn tại` });
+                    return res.status(400).json({ success: false, message: `MÃ³n #${ma_mon} khÃ´ng tá»“n táº¡i` });
                 }
 
                 const soLuong = item.so_luong || 1;
                 if (dish[0].so_luong_ton < soLuong) {
                     await connection.rollback();
-                    return res.status(400).json({ success: false, message: `"${dish[0].ten_mon}" hết hàng` });
+                    return res.status(400).json({ success: false, message: `"${dish[0].ten_mon}" háº¿t hÃ ng` });
                 }
 
                 orderItems.push({
@@ -1002,7 +1202,7 @@ router.post('/order/quick', async (req, res) => {
 
             res.json({
                 success: true,
-                message: `Đặt hàng nhanh thành công! Mã đơn: #${ma_don_hang}`,
+                message: `Äáº·t hÃ ng nhanh thÃ nh cÃ´ng! MÃ£ Ä‘Æ¡n: #${ma_don_hang}`,
                 data: {
                     ma_don_hang, tong_tien, phi_giao_hang, tong_tien_hang,
                     chi_tiet: orderItems
@@ -1016,16 +1216,16 @@ router.post('/order/quick', async (req, res) => {
         }
     } catch (error) {
         console.error('Chatbot quick order error:', error.message);
-        res.status(500).json({ success: false, message: 'Lá»—i: ' + error.message });
+        res.status(500).json({ success: false, message: 'LÃ¡Â»â€”i: ' + error.message });
     }
 });
 
-// API: Xem đơn hàng của user
+// API: Xem Ä‘Æ¡n hÃ ng cá»§a user
 router.get('/order/history', async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) {
-            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+            return res.status(401).json({ success: false, message: 'Vui lÃ²ng Ä‘Äƒng nháº­p' });
         }
 
         const orderInfo = await chatbotGetOrders(ma_nguoi_dung, parseInt(req.query.limit) || 5);
@@ -1147,12 +1347,12 @@ router.get('/admin/session/:session_id', async (req, res) => {
     }
 });
 
-// API cho user load lịch sử chat của session hiện tại (không cần admin)
+// API cho user load lá»‹ch sá»­ chat cá»§a session hiá»‡n táº¡i (khÃ´ng cáº§n admin)
 router.get('/history/:session_id', async (req, res) => {
     try {
         const sessionId = req.params.session_id;
         
-        // Lấy lịch sử chat của session này (giới hạn 50 tin nhắn gần nhất)
+        // Láº¥y lá»‹ch sá»­ chat cá»§a session nÃ y (giá»›i háº¡n 50 tin nháº¯n gáº§n nháº¥t)
         const [messages] = await db.query(
             `SELECT ma_tin_nhan, session_id, nguoi_gui, noi_dung, thoi_diem_chat 
              FROM lich_su_chatbot 
@@ -1162,11 +1362,11 @@ router.get('/history/:session_id', async (req, res) => {
             [sessionId]
         );
         
-        console.log(`📜 Loaded ${messages.length} messages for session: ${sessionId}`);
+        console.log(`ðŸ“œ Loaded ${messages.length} messages for session: ${sessionId}`);
         res.json({ success: true, data: messages });
     } catch (error) {
         console.error('Error loading chat history:', error);
-        res.status(500).json({ success: false, message: 'Lỗi tải lịch sử chat' });
+        res.status(500).json({ success: false, message: 'Lá»—i táº£i lá»‹ch sá»­ chat' });
     }
 });
 
@@ -1180,3 +1380,6 @@ router.delete('/admin/message/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
+

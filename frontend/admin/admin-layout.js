@@ -117,6 +117,9 @@ const SIDEBAR_TEMPLATE = `
                 <a href="customers.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-users w-5"></i><span class="text-sm">Khách hàng</span>
                 </a>
+                <a href="customer-preferences.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                    <i class="fas fa-heart w-5"></i><span class="text-sm">Sở thích khách hàng</span>
+                </a>
                 <a href="promotions.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-ticket-alt w-5"></i><span class="text-sm">Khuyến mãi</span>
                 </a>
@@ -510,6 +513,7 @@ async function applyRBAC(userData) {
         'payroll.html': ['xem_nhan_vien'],
         // Khách hàng
         'customers.html': ['xem_khach_hang'],
+        'customer-preferences.html': ['xem_khach_hang'],
         'promotions.html': ['xem_khach_hang'],
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
@@ -665,6 +669,7 @@ function redirectToDefaultPage(vai_tro) {
         'attendance.html': ['xem_nhan_vien'],
         'payroll.html': ['xem_nhan_vien'],
         'customers.html': ['xem_khach_hang'],
+        'customer-preferences.html': ['xem_khach_hang'],
         'promotions.html': ['xem_khach_hang'],
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
@@ -793,6 +798,7 @@ function addMenuDataAttributes() {
         'admins.html': 'admins', 'staff.html': 'staff',
         'shifts.html': 'shifts', 'attendance.html': 'attendance',
         'payroll.html': 'payroll', 'customers.html': 'customers',
+        'customer-preferences.html': 'customer-preferences',
         'promotions.html': 'promotions', 'reviews.html': 'reviews',
         'contacts.html': 'contacts', 'chatbot-history.html': 'chatbot-history',
         'news.html': 'news', 'quan-ly-binh-luan.html': 'quan-ly-binh-luan',
@@ -862,6 +868,7 @@ else initAdminLayout();
 
 // Export
 window.logout = logout;
+window.logoutAdmin = logout;
 window.toggleSidebar = toggleSidebar;
 
 // ===== CHỨC NĂNG RELOAD QUYỀN THỦ CÔNG =====

@@ -269,7 +269,7 @@ async function getCollaborativeRecommendations(userId, limit = 5) {
                     return mlRecommendations.map(r => ({
                         ...r,
                         recommendation_type: 'collaborative',
-                        reason: 'Gợi ý từ AI Dữ liệu lớn (Collaborative - SVD)'
+                        reason: 'Được nhiều khách hàng có sở thích giống bạn yêu thích'
                     }));
                 }
             } 
@@ -330,7 +330,7 @@ async function getSQLCollaborativeRecommendations(userId, limit = 5) {
         return recommendations.map(r => ({
             ...r,
             recommendation_type: 'collaborative',
-            reason: '✨ Gợi ý phân tích bằng Lọc cộng tác (Collaborative)'
+            reason: 'Món ngon bán chạy được các thực khách thân quen lựa chọn'
         }));
     } catch (error) {
         console.error('Error getting collaborative SQL recommendations:', error.message);
@@ -343,29 +343,48 @@ async function getSQLCollaborativeRecommendations(userId, limit = 5) {
 
 /**
  * Gợi ý món dựa trên nội dung (danh mục, giá, đặc điểm)
+ * CẢI TIẾN: Ưu tiên sở thích từ bảng so_thich_nguoi_dung
  */
 async function getContentBasedRecommendations(userId, limit = 5) {
     try {
-        // Lấy các món user đã mua và thích (rating >= 4)
-        const [userPreferences] = await db.query(
-            `SELECT m.ma_danh_muc, AVG(m.gia_tien) as avg_price, 
-                    COUNT(*) as purchase_count
-             FROM chi_tiet_don_hang ct
-             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
-             JOIN mon_an m ON ct.ma_mon = m.ma_mon
-             WHERE dh.ma_nguoi_dung = ?
-             GROUP BY m.ma_danh_muc
-             ORDER BY purchase_count DESC`,
+        // 1. Lấy sở thích danh mục từ bảng so_thich_nguoi_dung (ưu tiên cao nhất)
+        const [explicitPrefs] = await db.query(
+            `SELECT ma_danh_muc FROM so_thich_nguoi_dung WHERE ma_nguoi_dung = ?`,
             [userId]
         );
         
-        if (userPreferences.length === 0) return [];
+        let favoriteCategories = explicitPrefs.map(p => p.ma_danh_muc);
         
-        // Lấy danh mục yêu thích nhất
-        const favoriteCategories = userPreferences.slice(0, 3).map(p => p.ma_danh_muc);
-        const avgPrice = userPreferences.reduce((sum, p) => sum + parseFloat(p.avg_price), 0) / userPreferences.length;
+        // 2. Nếu không có sở thích rõ ràng, phân tích từ lịch sử mua hàng
+        if (favoriteCategories.length === 0) {
+            const [userPreferences] = await db.query(
+                `SELECT m.ma_danh_muc, AVG(m.gia_tien) as avg_price, 
+                        COUNT(*) as purchase_count
+                 FROM chi_tiet_don_hang ct
+                 JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+                 JOIN mon_an m ON ct.ma_mon = m.ma_mon
+                 WHERE dh.ma_nguoi_dung = ?
+                 GROUP BY m.ma_danh_muc
+                 ORDER BY purchase_count DESC`,
+                [userId]
+            );
+            
+            if (userPreferences.length === 0) return [];
+            favoriteCategories = userPreferences.slice(0, 3).map(p => p.ma_danh_muc);
+        }
         
-        // Lấy các món user chưa mua trong danh mục yêu thích
+        // 3. Lấy giá trung bình người dùng hay mua
+        const [priceStats] = await db.query(
+            `SELECT AVG(m.gia_tien) as avg_price
+             FROM chi_tiet_don_hang ct
+             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+             JOIN mon_an m ON ct.ma_mon = m.ma_mon
+             WHERE dh.ma_nguoi_dung = ?`,
+            [userId]
+        );
+        const avgPrice = priceStats[0]?.avg_price || 150000; // Default 150k
+        
+        // 4. Lấy các món user chưa mua trong danh mục yêu thích
         const [userOrders] = await db.query(
             `SELECT DISTINCT ct.ma_mon 
              FROM chi_tiet_don_hang ct
@@ -394,13 +413,21 @@ async function getContentBasedRecommendations(userId, limit = 5) {
         query += ` GROUP BY m.ma_mon 
                    ORDER BY ABS(m.gia_tien - ?) ASC, avg_rating DESC 
                    LIMIT ?`;
-        params.push(avgPrice, limit);
+        params.push(avgPrice, limit * 2); // Lấy nhiều hơn để có thể filter
         
         const [recommendations] = await db.query(query, params);
-        return recommendations.map(r => ({
+        
+        // Lấy tên danh mục để hiển thị lý do
+        const [categoryNames] = await db.query(
+            `SELECT ma_danh_muc, ten_danh_muc FROM danh_muc WHERE ma_danh_muc IN (?)`,
+            [favoriteCategories]
+        );
+        const categoryMap = new Map(categoryNames.map(c => [c.ma_danh_muc, c.ten_danh_muc]));
+        
+        return recommendations.slice(0, limit).map(r => ({
             ...r,
             recommendation_type: 'content_based',
-            reason: `Phù hợp với sở thích của bạn (${r.ten_danh_muc})`
+            reason: `Phù hợp với sở thích của bạn (${categoryMap.get(r.ma_danh_muc) || 'Món yêu thích'})`
         }));
     } catch (error) {
         console.error('Error getting content-based recommendations:', error.message);
@@ -740,23 +767,141 @@ async function getTopRatedDishes(limit = 5) {
 router.get('/', async (req, res) => {
     try {
         const userId = getUserFromToken(req);
-        const limit = parseInt(req.query.limit) || 8;
+        const limit = parseInt(req.query.limit) || 50; // Tăng limit để có đủ món cho trang thực đơn
         
         let recommendations = [];
         
         if (userId) {
+            // Lấy sở thích danh mục rõ ràng của người dùng (từ khảo sát/cold start)
+            const [explicitPrefs] = await db.query(
+                `SELECT ma_danh_muc FROM so_thich_nguoi_dung WHERE ma_nguoi_dung = ?`,
+                [userId]
+            );
+            const preferredCatIds = explicitPrefs.map(p => p.ma_danh_muc);
+
             // User đã đăng nhập - sử dụng ML recommendations
-            const [chatBased, collaborative, contentBased] = await Promise.all([
-                getChatBasedRecommendations(userId, 3),
-                getCollaborativeRecommendations(userId, 3),
-                getContentBasedRecommendations(userId, 2)
+            // Ưu tiên: Content-based (sở thích rõ ràng) > Chat-based > Collaborative
+            const [contentBased, chatBased, collaborative] = await Promise.all([
+                getContentBasedRecommendations(userId, Math.ceil(limit * 0.6)), // 60% từ sở thích
+                getChatBasedRecommendations(userId, Math.ceil(limit * 0.2)),    // 20% từ chat
+                getCollaborativeRecommendations(userId, Math.ceil(limit * 0.2)) // 20% từ collaborative
             ]);
             
-            recommendations = [...chatBased, ...collaborative, ...contentBased];
+            // Gán điểm ưu tiên (score) cho từng loại gợi ý
+            contentBased.forEach((item, index) => {
+                item.score = 100 - index;
+            });
             
-            // Nếu không đủ, bổ sung trending
+            chatBased.forEach((item, index) => {
+                item.score = 89 - index;
+            });
+            
+            collaborative.forEach((item, index) => {
+                item.score = 79 - index;
+            });
+            
+            // Nếu người dùng có sở thích danh mục rõ ràng, chỉ lọc content-based và chat-based theo danh mục
+            // KHÔNG lọc collaborative filtering - vì đây là gợi ý từ hành vi người dùng tương tự, có giá trị riêng
+            if (preferredCatIds.length > 0) {
+                const filteredContent = contentBased.filter(r => preferredCatIds.includes(r.ma_danh_muc));
+                const filteredChat = chatBased.filter(r => preferredCatIds.includes(r.ma_danh_muc));
+                // Giữ nguyên collaborative - không lọc theo danh mục
+                recommendations = [...filteredContent, ...filteredChat, ...collaborative];
+            } else {
+                recommendations = [...contentBased, ...chatBased, ...collaborative];
+            }
+            
+            // Loại trùng lặp (giữ item có score cao nhất)
+            const seen = new Set();
+            recommendations = recommendations.filter(r => {
+                if (seen.has(r.ma_mon)) return false;
+                seen.add(r.ma_mon);
+                return true;
+            });
+            
+            console.log(`✨ [Recommendation] User ${userId}: ${contentBased.length} content-based, ${chatBased.length} chat-based, ${collaborative.length} collaborative. Total (deduped): ${recommendations.length} recommendations.`);
+            
+            // Nếu không đủ, bổ sung các món khác từ danh mục ưa thích của người dùng
+            if (recommendations.length < limit && preferredCatIds.length > 0) {
+                const excludedIds = recommendations.map(r => r.ma_mon);
+                const query = `
+                    SELECT m.*, d.ten_danh_muc, AVG(dg.so_sao) as avg_rating
+                    FROM mon_an m
+                    LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+                    LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
+                    WHERE m.trang_thai = 1 AND m.ma_danh_muc IN (?) ${excludedIds.length > 0 ? 'AND m.ma_mon NOT IN (?)' : ''}
+                    GROUP BY m.ma_mon
+                    ORDER BY avg_rating DESC
+                    LIMIT ?
+                `;
+                const params = excludedIds.length > 0 
+                    ? [preferredCatIds, excludedIds, limit - recommendations.length]
+                    : [preferredCatIds, limit - recommendations.length];
+                
+                const [extraDishes] = await db.query(query, params);
+                if (extraDishes.length > 0) {
+                    extraDishes.forEach((item, index) => {
+                        item.score = 69 - index;
+                        item.recommendation_type = 'content_based';
+                        item.reason = `Phù hợp với sở thích của bạn (${item.ten_danh_muc})`;
+                    });
+                    recommendations.push(...extraDishes);
+                }
+            }
+
+            // Nếu vẫn không đủ (hoặc không có sở thích rõ ràng), bổ sung trending
             if (recommendations.length < limit) {
-                const trending = await getTrendingDishes(limit - recommendations.length);
+                const excludedIds = recommendations.map(r => r.ma_mon);
+                const trendingLimit = limit - recommendations.length;
+                
+                // Nếu có sở thích rõ ràng, ưu tiên bổ sung trending cùng danh mục, nếu không thì trending chung
+                let trending = [];
+                if (preferredCatIds.length > 0) {
+                    const query = `
+                        SELECT m.*, d.ten_danh_muc, COUNT(ct.ma_ct_don) as order_count, AVG(dg.so_sao) as avg_rating
+                        FROM mon_an m
+                        LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+                        LEFT JOIN chi_tiet_don_hang ct ON m.ma_mon = ct.ma_mon
+                        LEFT JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang AND dh.thoi_gian_tao >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                        LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
+                        WHERE m.trang_thai = 1 AND m.ma_danh_muc IN (?) ${excludedIds.length > 0 ? 'AND m.ma_mon NOT IN (?)' : ''}
+                        GROUP BY m.ma_mon
+                        ORDER BY order_count DESC, avg_rating DESC
+                        LIMIT ?
+                    `;
+                    const params = excludedIds.length > 0 ? [preferredCatIds, excludedIds, trendingLimit] : [preferredCatIds, trendingLimit];
+                    const [res] = await db.query(query, params);
+                    trending = res;
+                }
+                
+                // Nếu vẫn thiếu, lấy trending chung
+                if (trending.length < trendingLimit) {
+                    const finalTrendingLimit = trendingLimit - trending.length;
+                    const finalExcludedIds = [...excludedIds, ...trending.map(t => t.ma_mon)];
+                    const query = `
+                        SELECT m.*, d.ten_danh_muc, COUNT(ct.ma_ct_don) as order_count, AVG(dg.so_sao) as avg_rating
+                        FROM mon_an m
+                        LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+                        LEFT JOIN chi_tiet_don_hang ct ON m.ma_mon = ct.ma_mon
+                        LEFT JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang AND dh.thoi_gian_tao >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                        LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
+                        WHERE m.trang_thai = 1 ${finalExcludedIds.length > 0 ? 'AND m.ma_mon NOT IN (?)' : ''}
+                        GROUP BY m.ma_mon
+                        ORDER BY order_count DESC, avg_rating DESC
+                        LIMIT ?
+                    `;
+                    const params = finalExcludedIds.length > 0 ? [finalExcludedIds, finalTrendingLimit] : [finalTrendingLimit];
+                    const [res] = await db.query(query, params);
+                    trending.push(...res);
+                }
+
+                trending.forEach((item, index) => {
+                    item.score = 59 - index;
+                    if (!item.recommendation_type) {
+                        item.recommendation_type = 'trending';
+                        item.reason = '🔥 Đang được nhiều người đặt trong tuần này';
+                    }
+                });
                 recommendations.push(...trending);
             }
         } else {
@@ -765,30 +910,114 @@ router.get('/', async (req, res) => {
                 getTrendingDishes(Math.ceil(limit / 2)),
                 getTopRatedDishes(Math.floor(limit / 2))
             ]);
+            
+            trending.forEach((item, index) => {
+                item.score = 50 - index;
+            });
+            
+            topRated.forEach((item, index) => {
+                item.score = 30 - index;
+            });
+            
             recommendations = [...trending, ...topRated];
         }
         
-        // Loại bỏ trùng lặp
+        // Loại bỏ trùng lặp (giữ món có score cao hơn)
         const uniqueRecommendations = [];
-        const seenIds = new Set();
+        const seenIds = new Map();
         for (const rec of recommendations) {
-            if (!seenIds.has(rec.ma_mon)) {
-                seenIds.add(rec.ma_mon);
+            const existingScore = seenIds.get(rec.ma_mon);
+            if (!existingScore || rec.score > existingScore) {
+                if (existingScore) {
+                    // Xóa món cũ có score thấp hơn
+                    const index = uniqueRecommendations.findIndex(r => r.ma_mon === rec.ma_mon);
+                    if (index !== -1) uniqueRecommendations.splice(index, 1);
+                }
+                seenIds.set(rec.ma_mon, rec.score);
                 uniqueRecommendations.push(rec);
             }
         }
+        
+        // Sắp xếp theo score giảm dần
+        uniqueRecommendations.sort((a, b) => (b.score || 0) - (a.score || 0));
         
         res.json({
             success: true,
             data: uniqueRecommendations.slice(0, limit),
             meta: {
                 user_logged_in: !!userId,
-                total: uniqueRecommendations.length
+                total: uniqueRecommendations.length,
+                breakdown: {
+                    content_based: recommendations.filter(r => r.recommendation_type === 'content_based').length,
+                    chat_based: recommendations.filter(r => r.recommendation_type === 'chat_based').length,
+                    collaborative: recommendations.filter(r => r.recommendation_type === 'collaborative').length,
+                    trending: recommendations.filter(r => r.recommendation_type === 'trending').length
+                }
             }
         });
     } catch (error) {
         console.error('Error getting recommendations:', error.message);
         res.status(500).json({ success: false, message: 'Lỗi lấy gợi ý' });
+    }
+});
+
+/**
+ * API: Lưu sở thích người dùng (Cold Start)
+ * POST /api/recommendations/preferences
+ */
+router.post('/preferences', async (req, res) => {
+    try {
+        const userId = getUserFromToken(req);
+        if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+        const { categoryIds, keywords } = req.body; 
+        
+        // 1. Lưu danh mục (nếu có)
+        if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) {
+            await db.query('DELETE FROM so_thich_nguoi_dung WHERE ma_nguoi_dung = ?', [userId]);
+            const values = categoryIds.map(catId => [userId, catId]);
+            await db.query('INSERT IGNORE INTO so_thich_nguoi_dung (ma_nguoi_dung, ma_danh_muc) VALUES ?', [values]);
+        }
+
+        // 2. Lưu khẩu vị / từ khóa vào bảng dữ liệu tìm kiếm (giúp AI nhận diện)
+        if (keywords && Array.isArray(keywords) && keywords.length > 0) {
+            // Giả lập lịch sử tìm kiếm để AI học từ khóa
+            const keywordValues = keywords.map(kw => [kw, userId]);
+            await db.query('INSERT INTO du_lieu_tim_kiem (tu_khoa, ma_nguoi_dung) VALUES ?', [keywordValues]);
+        }
+
+        res.json({ success: true, message: 'Lưu cấu hình cá nhân hóa thành công' });
+    } catch (error) {
+        console.error('Error saving preferences:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+});
+
+/**
+ * API: Kiểm tra xem người dùng đã thiết lập sở thích chưa
+ * GET /api/recommendations/check-preferences
+ */
+router.get('/check-preferences', async (req, res) => {
+    try {
+        const userId = getUserFromToken(req);
+        if (!userId) return res.json({ success: true, hasPreferences: false }); // Guest
+
+        // Kiểm tra đồng thời cả 2 bảng: Sở thích danh mục (Explicit) và Từ khóa khảo sát (Implicit/Keywords)
+        const [catRows] = await db.query(
+            'SELECT COUNT(*) as count FROM so_thich_nguoi_dung WHERE ma_nguoi_dung = ?',
+            [userId]
+        );
+        
+        const [kwRows] = await db.query(
+            'SELECT COUNT(*) as count FROM du_lieu_tim_kiem WHERE ma_nguoi_dung = ?',
+            [userId]
+        );
+        
+        const hasPrefs = catRows[0].count > 0 || kwRows[0].count > 0;
+        res.json({ success: true, hasPreferences: hasPrefs });
+    } catch (error) {
+        console.error('Error checking preferences:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 });
 

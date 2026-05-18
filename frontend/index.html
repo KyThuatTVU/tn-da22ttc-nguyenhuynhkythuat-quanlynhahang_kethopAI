@@ -767,7 +767,7 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
-                const response = await fetch('http://localhost:3000/api/recommendations?limit=4', { headers });
+                const response = await fetch('http://localhost:3000/api/recommendations?limit=8&t=' + Date.now(), { headers });
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.length > 0) {
@@ -784,15 +784,15 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                         let badgeText = 'Gợi ý';
                         
                         if (dish.recommendation_type === 'collaborative') {
-                            badgeColor = 'bg-blue-500'; badgeIcon = 'fa-users'; badgeText = 'Nhiều người mua';
+                            badgeColor = 'bg-blue-500'; badgeIcon = 'fa-users'; badgeText = 'Đề xuất cho bạn';
                         } else if (dish.recommendation_type === 'content_based') {
-                            badgeColor = 'bg-purple-500'; badgeIcon = 'fa-heart'; badgeText = 'Theo sở thích';
+                            badgeColor = 'bg-purple-500'; badgeIcon = 'fa-heart'; badgeText = 'Hợp khẩu vị';
                         } else if (dish.recommendation_type === 'trending') {
-                            badgeColor = 'bg-red-500'; badgeIcon = 'fa-fire'; badgeText = 'Trending';
+                            badgeColor = 'bg-red-500'; badgeIcon = 'fa-fire'; badgeText = 'Đang Hot';
                         } else if (dish.recommendation_type === 'top_rated') {
                             badgeColor = 'bg-yellow-500'; badgeIcon = 'fa-medal'; badgeText = 'Đánh giá cao';
                         } else if (dish.recommendation_type === 'chat_based') {
-                            badgeColor = 'bg-green-500'; badgeIcon = 'fa-comment-dots'; badgeText = 'Từ hội thoại';
+                            badgeColor = 'bg-green-500'; badgeIcon = 'fa-comment-dots'; badgeText = 'Từ Chatbot';
                         }
                         
                         return `
@@ -1846,6 +1846,289 @@ relative overflow-hidden">
     
     <!-- Tet Intro Animation -->
     <script src="js/tet-intro.js"></script>
+
+    <!-- Modal Khảo Sát Sở Thích Cực Kỳ Cao Cấp (Cold Start) -->
+    <style>
+        .pref-modal-backdrop {
+            background: rgba(15, 23, 42, 0.65) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+        }
+        .pref-modal-card {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 25px 60px -15px rgba(234, 88, 12, 0.25), 
+                        0 0 50px 0 rgba(234, 88, 12, 0.05) !important;
+        }
+        .pref-pill-box {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        .pref-pill-box:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.15) !important;
+        }
+        .pref-pill-box:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .pref-step-number {
+            background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+            box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
+        }
+        .pref-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .pref-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .pref-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .pref-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .gradient-text-pref {
+            background: linear-gradient(to right, #ea580c, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+
+    <div id="preferences-modal" class="fixed inset-0 z-[100] hidden pref-modal-backdrop transition-opacity duration-300 opacity-0 overflow-hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 pb-10">
+            <div class="pref-modal-card rounded-[32px] w-full max-w-xl p-6 md:p-8 transform scale-95 transition-transform duration-300 relative flex flex-col max-h-[85vh] border border-white/20">
+                <div class="absolute top-0 left-0 w-full h-2.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-t-[32px]"></div>
+                
+                <div class="text-center mb-6 shrink-0 mt-2">
+                    <div class="w-16 h-16 bg-gradient-to-tr from-orange-100 to-red-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 hover:rotate-12 transition-transform duration-300 shadow-sm">
+                        <i class="fas fa-utensils text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">Khám phá chân ái ẩm thực! 🥰</h3>
+                    <p class="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">Chọn khẩu vị yêu thích để AI đề xuất những món ngon chuẩn gu, tiết kiệm thời gian nhất nhé!</p>
+                </div>
+
+                <!-- Giao diện Khảo sát 3 bước -->
+                <div class="space-y-6 mb-6 overflow-y-auto pr-2 pref-scrollbar flex-1">
+                    
+                    <!-- Nhóm 1: Loại hình bữa ăn (Categories) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center text-sm md:text-base">
+                            <span class="pref-step-number text-white w-6 h-6 rounded-full flex items-center justify-center mr-2.5 text-xs font-extrabold">1</span> 
+                            Bạn thích kiểu món ăn nào nè? 😋
+                        </h4>
+                        <div id="categories-grid" class="flex flex-wrap gap-2.5 pl-8">
+                            <!-- Render qua API Categories -->
+                        </div>
+                    </div>
+
+                    <!-- Nhóm 2: Khẩu vị (Keywords) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center text-sm md:text-base">
+                            <span class="pref-step-number text-white w-6 h-6 rounded-full flex items-center justify-center mr-2.5 text-xs font-extrabold">2</span> 
+                            Bạn chuộng khẩu vị nào nhất? 🌶️🍯
+                        </h4>
+                        <div class="flex flex-wrap gap-2.5 pl-8" id="tastes-grid">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="cay" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🌶️ Đồ cay nồng</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="ngọt" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🧁 Hảo ngọt</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="thanh đạm" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🥗 Thanh đạm / Healthy</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="đậm đà" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🍲 Đậm đà bản sắc</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Nhóm 3: Nguyên liệu (Keywords) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center text-sm md:text-base">
+                            <span class="pref-step-number text-white w-6 h-6 rounded-full flex items-center justify-center mr-2.5 text-xs font-extrabold">3</span> 
+                            Bạn 'ghiền' món nào nhất? 🦞🥩
+                        </h4>
+                        <div class="flex flex-wrap gap-2.5 pl-8" id="ingredients-grid">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="hải sản" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🦞 Trùm hải sản</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="thịt bò" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🥩 Tín đồ thịt bò</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="thịt gà" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🍗 Fan của thịt gà</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="rau củ" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🥦 Rau củ vạn tuế</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" value="lẩu" class="pref-keyword hidden">
+                                <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">🍲 Nước lẩu sùm sụp</div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex gap-4 shrink-0 pt-4 border-t border-slate-100">
+                    <button onclick="skipPreferences()" class="flex-1 px-5 py-3.5 rounded-2xl border border-slate-300 text-slate-500 font-bold hover:bg-slate-100 hover:text-slate-800 transition-all duration-300 text-sm shadow-sm active:scale-95">
+                        Bỏ qua nhen 🥲
+                    </button>
+                    <button onclick="savePreferences()" class="flex-[1.5] px-5 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-white font-extrabold hover:shadow-[0_8px_25px_rgba(234,88,12,0.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-magic"></i> Lưu sở thích cho mình! ✨
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logic chọn UI Style
+        function bindSelectableLabels(containerId, activeClasses, inactiveClasses) {
+            const container = document.getElementById(containerId);
+            if(!container) return;
+            const labels = container.querySelectorAll('label');
+            labels.forEach(lbl => {
+                const input = lbl.querySelector('input');
+                const box = lbl.querySelector('div');
+                input.addEventListener('change', () => {
+                    if (input.checked) {
+                        box.classList.add(...activeClasses);
+                        box.classList.remove(...inactiveClasses);
+                    } else {
+                        box.classList.remove(...activeClasses);
+                        box.classList.add(...inactiveClasses);
+                    }
+                });
+            });
+        }
+
+        // Custom Preference Modal Script
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) return; // Chỉ hiển thị khi đã đăng nhập
+
+            // Nếu người dùng đã bỏ qua sở thích trong phiên này thì không làm phiền lại
+            if (sessionStorage.getItem('preferences_session_skipped')) return;
+
+            // Kiểm tra xem người dùng đã thực sự cấu hình sở thích trong DB chưa
+            try {
+                const checkRes = await fetch('http://localhost:3000/api/recommendations/check-preferences', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                const checkData = await checkRes.json();
+                
+                // Nếu đã lưu sở thích rồi, kết thúc và không hiện modal nữa
+                if (checkData.success && checkData.hasPreferences) {
+                    return;
+                }
+
+                // Lấy danh mục từ API
+                const res = await fetch('http://localhost:3000/api/categories?trang_thai=1');
+                const data = await res.json();
+                
+                if (data.success && data.data) {
+                    const categoriesContainer = document.getElementById('categories-grid');
+                    categoriesContainer.innerHTML = data.data.map(cat => `
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="${cat.ma_danh_muc}" class="pref-category hidden">
+                            <div class="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 transition-all duration-300 pref-pill-box">
+                                🍔 ${cat.ten_danh_muc}
+                            </div>
+                        </label>
+                    `).join('');
+
+                    const activeClasses = ['bg-gradient-to-br', 'from-orange-500', 'to-red-500', 'text-white', 'border-transparent', 'scale-[1.05]', 'shadow-[0_4px_12px_rgba(234,88,12,0.3)]', 'font-semibold'];
+                    const inactiveClasses = ['bg-slate-50', 'border-slate-200', 'text-slate-700'];
+
+                    // Bind events for UI categories
+                    bindSelectableLabels('categories-grid', activeClasses, inactiveClasses);
+                    
+                    // Bind events for keywords
+                    bindSelectableLabels('tastes-grid', activeClasses, inactiveClasses);
+                    bindSelectableLabels('ingredients-grid', activeClasses, inactiveClasses);
+
+                    // Hiển thị modal
+                    const modal = document.getElementById('preferences-modal');
+                    modal.classList.remove('hidden');
+                    // Kích hoạt animation
+                    setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                        modal.querySelector('.transform').classList.remove('scale-95');
+                    }, 50);
+                }
+            } catch (err) {
+                console.error("Lỗi khởi tạo modal sở thích:", err);
+            }
+        });
+
+        function closePreferenceModal() {
+            const modal = document.getElementById('preferences-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function skipPreferences() {
+            // Lưu trạng thái đã bỏ qua vào sessionStorage để không hiện lại trong phiên làm việc hiện tại
+            sessionStorage.setItem('preferences_session_skipped', 'true');
+            closePreferenceModal();
+        }
+
+        async function savePreferences() {
+            const categoryInputs = document.querySelectorAll('.pref-category:checked');
+            const categoryIds = Array.from(categoryInputs).map(i => parseInt(i.value));
+            
+            const keywordInputs = document.querySelectorAll('.pref-keyword:checked');
+            const keywords = Array.from(keywordInputs).map(i => i.value);
+
+            if (categoryIds.length === 0 && keywords.length === 0) {
+                alert('Vui lòng chọn ít nhất một sở thích món ăn của bạn nhé! Hoặc bấm "Bỏ qua nhen 🥲".');
+                return;
+            }
+
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            try {
+                const res = await fetch('http://localhost:3000/api/recommendations/preferences', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ categoryIds, keywords })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    closePreferenceModal();
+                    // Tải lại gợi ý cá nhân hóa tức thì ở trang chủ
+                    if(typeof loadPersonalizedRecommendations === 'function') {
+                        loadPersonalizedRecommendations();
+                    }
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            } catch (err) {
+                console.error('Lưu sở thích lỗi:', err);
+                closePreferenceModal();
+            }
+        }
+    </script>
 </body>
 
 </html>

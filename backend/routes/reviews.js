@@ -6,8 +6,30 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { createAdminNotification } = require('./admin-notifications');
+const {
+  processReviewPreference,
+  removeReviewPreference
+} = require('../services/preferenceService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+async function syncReviewPreference(reviewId) {
+  try {
+    return await processReviewPreference(reviewId);
+  } catch (error) {
+    console.error('Error syncing review preference:', error.message);
+    return null;
+  }
+}
+
+async function deleteReviewPreference(reviewId, userId = null) {
+  try {
+    return await removeReviewPreference(reviewId, userId);
+  } catch (error) {
+    console.error('Error removing review preference:', error.message);
+    return null;
+  }
+}
 
 // Cấu hình multer để upload ảnh đánh giá
 const reviewImageStorage = multer.diskStorage({
@@ -270,6 +292,8 @@ router.post('/', authenticateToken, (req, res) => {
         result.insertId
       );
 
+      await syncReviewPreference(result.insertId);
+
       res.json({ 
         success: true, 
         message: 'Bình luận thành công!',
@@ -332,6 +356,8 @@ router.put('/:reviewId', authenticateToken, (req, res) => {
         WHERE ma_danh_gia = ?
       `, [so_sao, binh_luan || null, imagesJson, reviewId]);
 
+      await syncReviewPreference(reviewId);
+
       res.json({ success: true, message: 'Cập nhật đánh giá thành công!' });
     } catch (error) {
       console.error('Error updating review:', error);
@@ -362,6 +388,8 @@ router.delete('/:reviewId', authenticateToken, async (req, res) => {
 
     // Xóa đánh giá
     await db.query('DELETE FROM danh_gia_san_pham WHERE ma_danh_gia = ?', [reviewId]);
+
+    await deleteReviewPreference(reviewId, userId);
 
     res.json({ success: true, message: 'Xóa đánh giá thành công!' });
   } catch (error) {
@@ -517,6 +545,8 @@ router.put('/admin/:reviewId/status', async (req, res) => {
 
     await db.query('UPDATE danh_gia_san_pham SET trang_thai = ? WHERE ma_danh_gia = ?', [trang_thai, reviewId]);
 
+    await syncReviewPreference(reviewId);
+
     const statusText = { pending: 'chờ duyệt', approved: 'đã duyệt', rejected: 'đã khóa' };
     res.json({ success: true, message: `Đánh giá đã được chuyển sang trạng thái ${statusText[trang_thai]}` });
   } catch (error) {
@@ -531,7 +561,7 @@ router.delete('/admin/:reviewId', async (req, res) => {
     const reviewId = parseInt(req.params.reviewId);
 
     // Lấy thông tin ảnh trước khi xóa
-    const [existing] = await db.query('SELECT hinh_anh FROM danh_gia_san_pham WHERE ma_danh_gia = ?', [reviewId]);
+    const [existing] = await db.query('SELECT hinh_anh, ma_nguoi_dung FROM danh_gia_san_pham WHERE ma_danh_gia = ?', [reviewId]);
     if (existing.length === 0) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy đánh giá' });
     }
@@ -548,6 +578,8 @@ router.delete('/admin/:reviewId', async (req, res) => {
     }
 
     await db.query('DELETE FROM danh_gia_san_pham WHERE ma_danh_gia = ?', [reviewId]);
+
+    await deleteReviewPreference(reviewId, existing[0].ma_nguoi_dung);
 
     res.json({ success: true, message: 'Đã xóa đánh giá thành công' });
   } catch (error) {
@@ -566,7 +598,7 @@ router.post('/admin/bulk-delete', async (req, res) => {
     }
 
     // Lấy thông tin ảnh trước khi xóa
-    const [reviews] = await db.query('SELECT hinh_anh FROM danh_gia_san_pham WHERE ma_danh_gia IN (?)', [ids]);
+    const [reviews] = await db.query('SELECT ma_danh_gia, ma_nguoi_dung, hinh_anh FROM danh_gia_san_pham WHERE ma_danh_gia IN (?)', [ids]);
     
     // Xóa ảnh
     reviews.forEach(review => {
@@ -582,6 +614,10 @@ router.post('/admin/bulk-delete', async (req, res) => {
     });
 
     await db.query('DELETE FROM danh_gia_san_pham WHERE ma_danh_gia IN (?)', [ids]);
+
+    for (const review of reviews) {
+      await deleteReviewPreference(review.ma_danh_gia, review.ma_nguoi_dung);
+    }
 
     res.json({ success: true, message: `Đã xóa ${ids.length} đánh giá` });
   } catch (error) {
@@ -604,6 +640,10 @@ router.post('/admin/bulk-status', async (req, res) => {
     }
 
     await db.query('UPDATE danh_gia_san_pham SET trang_thai = ? WHERE ma_danh_gia IN (?)', [trang_thai, ids]);
+
+    for (const reviewId of ids) {
+      await syncReviewPreference(reviewId);
+    }
 
     const statusText = { pending: 'chờ duyệt', approved: 'đã duyệt', rejected: 'đã khóa' };
     res.json({ success: true, message: `Đã cập nhật ${ids.length} đánh giá sang trạng thái ${statusText[trang_thai]}` });

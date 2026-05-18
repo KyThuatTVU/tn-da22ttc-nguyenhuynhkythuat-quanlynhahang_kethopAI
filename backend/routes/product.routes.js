@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const { 
       page = 1, 
-      limit = 12, 
+      limit = 100, 
       category, 
       search, 
       featured,

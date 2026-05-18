@@ -85,6 +85,7 @@ startApolloServer().catch(err => {
 // ==================== DATABASE INIT ====================
 
 const db = require('./config/database');
+const { ensurePreferenceTables } = require('./services/preferenceService');
 
 // Tự động tạo bảng cai_dat nếu chưa tồn tại
 async function initSettingsTable() {
@@ -208,6 +209,10 @@ async function initAdminNotificationsTable() {
 }
 
 initAdminNotificationsTable();
+
+ensurePreferenceTables()
+    .then(() => console.log('✅ Bảng phân tích sở thích khách hàng đã sẵn sàng'))
+    .catch(error => console.error('❌ Lỗi khởi tạo bảng phân tích sở thích:', error.message));
 
 // Khởi tạo các bảng quản lý nhân sự
 async function initStaffTables() {
