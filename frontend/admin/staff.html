@@ -11,26 +11,8 @@
     <link rel="stylesheet" href="admin-responsive.css">
     <style>
         body { background: #f0f4f8; }
-        .sidebar { background: linear-gradient(180deg, #1e3a5f 0%, #0f2744 100%); }
-        .sidebar-item { color: #94a3b8; transition: all 0.2s; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .sidebar-item.active { background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); color: #fff; }
-        .header-bar { background: linear-gradient(90deg, #1e3a5f 0%, #2d4a6f 100%); color: #fff; padding: 16px 28px; }
-        .content-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(30,58,95,0.08); }
-        .btn-primary { background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 500; transition: all 0.2s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
         .badge-active { background: #dcfce7; color: #16a34a; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
         .badge-inactive { background: #fee2e2; color: #dc2626; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
-        
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; }
-        .modal-content { background: #fff; margin: 2% auto; padding: 0; border-radius: 16px; max-width: 800px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .modal-header { background: linear-gradient(90deg, #1e3a5f 0%, #2d4a6f 100%); color: #fff; padding: 20px 24px; border-radius: 16px 16px 0 0; }
-        .modal-body { padding: 24px; }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #1e3a5f; margin-bottom: 6px; }
-        .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.875rem; transition: all 0.2s; }
-        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .form-select { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.875rem; }
         
         .filter-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
         .search-input { padding-left: 36px; }
@@ -57,6 +39,18 @@
             <div id="header-placeholder"></div>
 
             <main class="flex-1 overflow-y-auto p-6">
+                <!-- Header Title & Add Button -->
+                <div class="flex justify-between items-center mb-6 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <div>
+                        <h3 class="text-xl font-black text-gray-800">Danh sách nhân viên</h3>
+                        <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản, thông tin hồ sơ và bảo mật nhân viên</p>
+                    </div>
+                    <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold transition flex items-center space-x-2 shadow-lg shadow-blue-100">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Thêm nhân viên mới</span>
+                    </button>
+                </div>
+
                 <!-- Filters -->
                 <div class="filter-section flex flex-wrap gap-4 items-center">
                     <div class="relative flex-1 min-w-[300px]">
@@ -226,6 +220,9 @@
                                     </div>
                                 </div>
                                 <input type="file" id="file-avatar" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'staff-avatar', 'avatar-preview', 'avatar-placeholder')">
+                                <button type="button" onclick="openWebcamModal()" class="mt-2 w-full text-xs bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white py-1.5 px-3 rounded-lg flex items-center justify-center gap-1 transition shadow hover:shadow-md font-semibold">
+                                    <i class="fas fa-video animate-pulse"></i> Chụp từ webcam
+                                </button>
                             </div>
                             <!-- Ảnh CCCD mặt trước -->
                             <div class="form-group">
@@ -303,6 +300,43 @@
         </div>
     </div>
 
+    <!-- Webcam Modal -->
+    <div id="webcamModal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="modal-header flex justify-between items-center">
+                <h3 class="text-sm font-bold"><i class="fas fa-camera"></i> Chụp ảnh nhân viên</h3>
+                <button type="button" onclick="closeWebcamModal()" class="text-white hover:text-gray-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="modal-body p-4 flex flex-col items-center">
+                <div class="relative w-full aspect-video bg-black rounded-lg overflow-hidden border border-gray-300 shadow-inner">
+                    <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <!-- Hướng dẫn căn tỷ lệ khuôn mặt (Face Guide Overlay) -->
+                    <div id="webcam-face-guide" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 hidden">
+                        <!-- Khung đứt nét mô phỏng khuôn mặt chuẩn và tạo lớp phủ tối bên ngoài -->
+                        <div class="w-[140px] h-[190px] md:w-[160px] md:h-[210px] border-2 border-dashed border-amber-400 rounded-[50%] opacity-80 flex items-center justify-center shadow-[0_0_0_9999px_rgba(15,23,42,0.5)]">
+                        </div>
+                        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-900/90 text-amber-400 rounded-lg text-[10px] font-bold border border-amber-400/20 shadow-lg text-center whitespace-nowrap">
+                            Căn khuôn mặt vừa vặn vào khung nét đứt
+                        </div>
+                    </div>
+                    <!-- Loading skeleton -->
+                    <div id="webcam-loading" class="absolute inset-0 flex items-center justify-center bg-gray-900 text-white gap-2">
+                        <i class="fas fa-spinner fa-spin text-xl animate-spin"></i>
+                        <span>Đang kết nối camera...</span>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-4 w-full">
+                    <button type="button" onclick="closeWebcamModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition">Hủy</button>
+                    <button type="button" onclick="captureWebcamPhoto()" class="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1 shadow hover:shadow-md">
+                        <i class="fas fa-camera"></i> Chụp ảnh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="check-auth.js"></script>
     <script src="admin-layout.js"></script>
     <script>
@@ -319,34 +353,74 @@
             document.getElementById('photoViewer').classList.remove('open');
         }
 
-        // Upload ảnh lên server và hiển thị preview
+        // Upload ảnh lên server và hiển thị preview (Có tự động trích chọn khuôn mặt nếu là Avatar)
         async function handleFileUpload(input, hiddenId, previewId, placeholderId) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
 
-            // Hiển thị preview tạm bằng local FileReader trước khi upload
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = document.getElementById(previewId);
-                img.src = e.target.result;
-                img.classList.remove('hidden');
-                document.getElementById(placeholderId).classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
+            const isAvatar = hiddenId === 'staff-avatar';
+            const placeholder = document.getElementById(placeholderId);
+            const previewImg = document.getElementById(previewId);
+
+            if (isAvatar) {
+                // Hiển thị trạng thái đang xử lý trích chọn khuôn mặt
+                placeholder.innerHTML = `
+                    <i class="fas fa-spinner fa-spin text-2xl text-indigo-500 mb-1"></i>
+                    <p class="text-xs text-indigo-500">Đang trích xuất mặt...</p>
+                `;
+                placeholder.classList.remove('hidden');
+                previewImg.classList.add('hidden');
+            } else {
+                // Hiển thị preview tạm cho các ảnh tài liệu bằng local FileReader
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
 
             // Upload lên server
             try {
                 const formData = new FormData();
                 formData.append('image', file);
-                const res = await fetch(`${API_URL}/upload/staff`, {
+                
+                // Sử dụng api trích chọn khuôn mặt cho ảnh đại diện, api thường cho cccd
+                const endpoint = isAvatar ? 'crop-face' : 'staff';
+                const res = await fetch(`${API_URL}/upload/${endpoint}`, {
                     method: 'POST',
                     body: formData
                 });
                 const result = await res.json();
+                
                 if (result.success) {
                     document.getElementById(hiddenId).value = result.url;
+                    
+                    if (isAvatar) {
+                        // Hiển thị ảnh khuôn mặt đã được cắt chuẩn từ server
+                        previewImg.src = `${API_URL.replace('/api', '')}${result.url}`;
+                        previewImg.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                        
+                        // Reset placeholder text
+                        placeholder.innerHTML = `
+                            <i class="fas fa-camera text-2xl text-gray-400 mb-1"></i>
+                            <p class="text-xs text-gray-400">Click để chọn ảnh</p>
+                            <p class="text-[10px] text-gray-300">(JPG, PNG • Tối đa 5MB)</p>
+                        `;
+                    }
                 } else {
-                    alert('Upload ảnh thất bại: ' + result.message);
+                    alert('Lỗi upload: ' + result.message);
+                    if (isAvatar) {
+                        previewImg.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
+                        placeholder.innerHTML = `
+                            <i class="fas fa-camera text-2xl text-gray-400 mb-1"></i>
+                            <p class="text-xs text-gray-400">Click để chọn ảnh</p>
+                            <p class="text-[10px] text-gray-300">(JPG, PNG • Tối đa 5MB)</p>
+                        `;
+                    }
                 }
             } catch (err) {
                 console.error('Upload error:', err);
@@ -602,6 +676,224 @@
             const res = await response.json();
             if (res.success) { alert('Đã đổi mật khẩu'); closePasswordModal(); }
         });
+
+        let webcamStream = null;
+        let faceDetectionInterval = null;
+        let detectionCanvas = null;
+
+        function startFaceDetectionLoop() {
+            if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+            if (!detectionCanvas) {
+                detectionCanvas = document.createElement('canvas');
+            }
+            
+            const video = document.getElementById('webcam-video');
+            const faceGuide = document.getElementById('webcam-face-guide');
+            const guideOval = faceGuide.querySelector('.border-dashed');
+            const guideText = faceGuide.querySelector('.absolute.bottom-2');
+            
+            faceDetectionInterval = setInterval(async () => {
+                if (!webcamStream || video.paused || video.ended) return;
+                
+                // Vẽ frame thu nhỏ lên canvas ẩn để gửi đi
+                detectionCanvas.width = 160;
+                detectionCanvas.height = 120;
+                const ctx = detectionCanvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, detectionCanvas.width, detectionCanvas.height);
+                
+                const base64Img = detectionCanvas.toDataURL('image/jpeg', 0.6);
+                
+                try {
+                    const res = await fetch('http://localhost:5000/api/ml/face/detect-only', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image_base64: base64Img })
+                    });
+                    const result = await res.json();
+                    
+                    if (result.success && result.face_detected && result.box) {
+                        const box = result.box;
+                        const x_center = box.x + box.w / 2;
+                        const y_center = box.y + box.h / 2;
+                        
+                        // Định nghĩa vùng trung tâm của ảnh 160x120
+                        const minX = 160 * 0.35; // 56
+                        const maxX = 160 * 0.65; // 104
+                        const minY = 120 * 0.22; // 26
+                        const maxY = 120 * 0.78; // 93
+                        
+                        // Kích thước mặt lý tưởng
+                        const minW = 160 * 0.20; // 32 pixels (không đứng quá xa)
+                        const maxW = 160 * 0.50; // 80 pixels (không đứng quá gần)
+                        
+                        let isCentered = (x_center >= minX && x_center <= maxX && y_center >= minY && y_center <= maxY);
+                        let isCorrectSize = (box.w >= minW && box.w <= maxW);
+                        
+                        if (isCentered && isCorrectSize) {
+                            // Khuôn mặt hoàn toàn hợp lệ -> Xanh lá
+                            guideOval.style.borderColor = '#10b981';
+                            guideOval.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.7)';
+                            
+                            guideText.textContent = 'Khuôn mặt hợp lệ. Sẵn sàng chụp!';
+                            guideText.className = 'absolute bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-900/90 text-green-400 rounded-lg text-[10px] font-bold border border-green-500/30 shadow-lg text-center whitespace-nowrap';
+                        } else {
+                            // Phát hiện mặt nhưng lệch vị trí/tỉ lệ -> Màu vàng cảnh báo
+                            guideOval.style.borderColor = '#f59e0b';
+                            guideOval.style.boxShadow = '0 0 25px rgba(245, 158, 11, 0.6)';
+                            
+                            let promptMsg = 'Căn khuôn mặt vào giữa!';
+                            if (box.w < minW) {
+                                promptMsg = 'Đứng gần camera hơn!';
+                            } else if (box.w > maxW) {
+                                promptMsg = 'Đứng lùi xa camera hơn!';
+                            } else if (!isCentered) {
+                                promptMsg = 'Đưa khuôn mặt vào giữa khung nét đứt!';
+                            }
+                            
+                            guideText.textContent = promptMsg;
+                            guideText.className = 'absolute bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-900/90 text-amber-400 rounded-lg text-[10px] font-bold border border-amber-500/30 shadow-lg text-center whitespace-nowrap';
+                        }
+                    } else {
+                        // Không tìm thấy khuôn mặt -> Màu đỏ
+                        guideOval.style.borderColor = '#f43f5e';
+                        guideOval.style.boxShadow = '0 0 25px rgba(244, 63, 94, 0.7)';
+                        
+                        guideText.textContent = 'Không tìm thấy khuôn mặt!';
+                        guideText.className = 'absolute bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-900/90 text-rose-400 rounded-lg text-[10px] font-bold border border-rose-500/30 shadow-lg text-center whitespace-nowrap';
+                    }
+                } catch (err) {
+                    // Lỗi kết nối âm thầm bỏ qua
+                }
+            }, 500);
+        }
+
+        function stopFaceDetectionLoop() {
+            if (faceDetectionInterval) {
+                clearInterval(faceDetectionInterval);
+                faceDetectionInterval = null;
+            }
+        }
+
+        function openWebcamModal() {
+            const modal = document.getElementById('webcamModal');
+            const video = document.getElementById('webcam-video');
+            const loading = document.getElementById('webcam-loading');
+            const faceGuide = document.getElementById('webcam-face-guide');
+            
+            modal.style.display = 'block';
+            loading.classList.remove('hidden');
+            faceGuide.classList.add('hidden');
+
+            navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: "user" } })
+                .then(stream => {
+                    webcamStream = stream;
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        loading.classList.add('hidden');
+                        faceGuide.classList.remove('hidden');
+                        startFaceDetectionLoop();
+                    };
+                })
+                .catch(err => {
+                    console.error("Lỗi truy cập webcam: ", err);
+                    alert("Không thể truy cập camera. Vui lòng kiểm tra quyền thiết bị hoặc kết nối!");
+                    closeWebcamModal();
+                });
+        }
+
+        function closeWebcamModal() {
+            const modal = document.getElementById('webcamModal');
+            const video = document.getElementById('webcam-video');
+            const faceGuide = document.getElementById('webcam-face-guide');
+            
+            modal.style.display = 'none';
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+            video.srcObject = null;
+            if (faceGuide) faceGuide.classList.add('hidden');
+            stopFaceDetectionLoop();
+        }
+
+        async function captureWebcamPhoto() {
+            const video = document.getElementById('webcam-video');
+            if (!webcamStream) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert canvas to blob
+            canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    alert("Lỗi khi chuyển đổi ảnh chụp!");
+                    return;
+                }
+                const file = new File([blob], `webcam-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                
+                const placeholder = document.getElementById('avatar-placeholder');
+                const previewImg = document.getElementById('avatar-preview');
+
+                // Hiển thị trạng thái đang xử lý trích chọn khuôn mặt
+                placeholder.innerHTML = `
+                    <i class="fas fa-spinner fa-spin text-2xl text-indigo-500 mb-1"></i>
+                    <p class="text-xs text-indigo-500">Đang trích xuất mặt...</p>
+                `;
+                placeholder.classList.remove('hidden');
+                previewImg.classList.add('hidden');
+
+                // Close modal
+                closeWebcamModal();
+
+                // Upload & crop on server
+                try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    const res = await fetch(`${API_URL}/upload/crop-face`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await res.json();
+                    
+                    if (result.success) {
+                        // Hiển thị ảnh khuôn mặt đã được cắt chuẩn từ server
+                        previewImg.src = `${API_URL.replace('/api', '')}${result.url}`;
+                        previewImg.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                        document.getElementById('staff-avatar').value = result.url;
+                        
+                        // Reset placeholder text
+                        placeholder.innerHTML = `
+                            <i class="fas fa-camera text-2xl text-gray-400 mb-1"></i>
+                            <p class="text-xs text-gray-400">Click để chọn ảnh</p>
+                            <p class="text-[10px] text-gray-300">(JPG, PNG • Tối đa 5MB)</p>
+                        `;
+                    } else {
+                        alert('Lỗi trích chọn khuôn mặt: ' + result.message);
+                        previewImg.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
+                        placeholder.innerHTML = `
+                            <i class="fas fa-camera text-2xl text-gray-400 mb-1"></i>
+                            <p class="text-xs text-gray-400">Click để chọn ảnh</p>
+                            <p class="text-[10px] text-gray-300">(JPG, PNG • Tối đa 5MB)</p>
+                        `;
+                    }
+                } catch (err) {
+                    console.error('Upload webcam photo error:', err);
+                    alert('Lỗi kết nối server trích xuất khuôn mặt!');
+                    previewImg.classList.add('hidden');
+                    placeholder.classList.remove('hidden');
+                    placeholder.innerHTML = `
+                        <i class="fas fa-camera text-2xl text-gray-400 mb-1"></i>
+                        <p class="text-xs text-gray-400">Click để chọn ảnh</p>
+                        <p class="text-[10px] text-gray-300">(JPG, PNG • Tối đa 5MB)</p>
+                    `;
+                }
+            }, 'image/jpeg', 0.9);
+        }
 
         loadStaff();
     </script>

@@ -317,13 +317,41 @@ async function initStaffTables() {
                 gio_vao TIME DEFAULT NULL,
                 gio_ra TIME DEFAULT NULL,
                 so_gio_lam FLOAT DEFAULT 0,
+                luong_ngay DECIMAL(15,2) DEFAULT 0,
                 trang_thai VARCHAR(50) DEFAULT 'Đúng giờ',
                 ghi_chu TEXT,
+                anh_cham_cong VARCHAR(255) DEFAULT NULL,
+                anh_checkout VARCHAR(255) DEFAULT NULL,
+                latitude DECIMAL(10,8) DEFAULT NULL,
+                longitude DECIMAL(10,8) DEFAULT NULL,
+                latitude_out DECIMAL(10,8) DEFAULT NULL,
+                longitude_out DECIMAL(10,8) DEFAULT NULL,
                 ngay_tao DATETIME DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (ma_cham_cong),
                 CONSTRAINT fk_cham_cong_nv FOREIGN KEY (ma_nhan_vien) REFERENCES nhan_vien (ma_nhan_vien) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
+
+        // Đảm bảo các cột mới tồn tại trong bảng cham_cong (trường hợp bảng đã tạo trước đó)
+        const [existingAttColumns] = await db.query('SHOW COLUMNS FROM cham_cong');
+        const attColumnNames = existingAttColumns.map(c => c.Field);
+
+        const newAttColumns = [
+            { name: 'luong_ngay', type: 'DECIMAL(15,2) DEFAULT 0 AFTER so_gio_lam' },
+            { name: 'anh_cham_cong', type: 'VARCHAR(255) DEFAULT NULL AFTER ghi_chu' },
+            { name: 'anh_checkout', type: 'VARCHAR(255) DEFAULT NULL AFTER anh_cham_cong' },
+            { name: 'latitude', type: 'DECIMAL(10,8) DEFAULT NULL AFTER anh_checkout' },
+            { name: 'longitude', type: 'DECIMAL(10,8) DEFAULT NULL AFTER latitude' },
+            { name: 'latitude_out', type: 'DECIMAL(10,8) DEFAULT NULL AFTER longitude' },
+            { name: 'longitude_out', type: 'DECIMAL(10,8) DEFAULT NULL AFTER latitude_out' }
+        ];
+
+        for (const col of newAttColumns) {
+            if (!attColumnNames.includes(col.name)) {
+                await db.query(`ALTER TABLE cham_cong ADD COLUMN ${col.name} ${col.type}`);
+                console.log(`✅ Đã thêm cột ${col.name} vào bảng cham_cong`);
+            }
+        }
 
         // 8. Bảng lương (Salaries)
         await db.query(`
@@ -344,6 +372,27 @@ async function initStaffTables() {
                 CONSTRAINT fk_bang_luong_nv FOREIGN KEY (ma_nhan_vien) REFERENCES nhan_vien (ma_nhan_vien) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
+
+        // 9. Bảng lương tạm tính hàng ngày (Daily Salary Estimation)
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS luong_tam_tinh (
+                ma_luong_ngay INT PRIMARY KEY AUTO_INCREMENT,
+                ma_nhan_vien INT NOT NULL,
+                ngay DATE NOT NULL,
+                so_gio_lam DECIMAL(5,2) DEFAULT 0,
+                luong_theo_gio DECIMAL(15,2) DEFAULT 0,
+                luong_ngay DECIMAL(15,2) DEFAULT 0,
+                trang_thai_cham_cong VARCHAR(50),
+                ghi_chu TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (ma_nhan_vien) REFERENCES nhan_vien(ma_nhan_vien) ON DELETE CASCADE,
+                UNIQUE KEY unique_staff_date (ma_nhan_vien, ngay),
+                INDEX idx_ngay (ngay),
+                INDEX idx_nhan_vien_ngay (ma_nhan_vien, ngay)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+        console.log('✅ Bảng luong_tam_tinh đã sẵn sàng');
 
         // Seed default roles and permissions if empty
         const [rolesCount] = await db.query('SELECT COUNT(*) as count FROM vai_tro_he_thong');

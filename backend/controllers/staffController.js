@@ -4,6 +4,21 @@
 
 const db = require('../config/database');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
+
+const triggerFaceTraining = async () => {
+    try {
+        axios.post('http://localhost:5000/api/ml/face/train')
+            .then(res => {
+                console.log('🔄 Python face recognition model trained successfully:', res.data);
+            })
+            .catch(err => {
+                console.error('⚠️ Python face recognition training failed:', err.message);
+            });
+    } catch (err) {
+        console.error('⚠️ Failed to call face training API:', err.message);
+    }
+};
 
 // Lấy danh sách nhân viên (có lọc và tìm kiếm)
 const getAllStaff = async (req, res) => {
@@ -102,6 +117,9 @@ const createStaff = async (req, res) => {
             // Không fail nếu tạo quyền lỗi, vẫn trả về success
         }
         
+        // Trigger face training
+        triggerFaceTraining();
+        
         res.json({ 
             success: true, 
             message: 'Thêm nhân viên thành công!',
@@ -140,6 +158,9 @@ const updateStaff = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên!' });
         }
         
+        // Trigger face training
+        triggerFaceTraining();
+
         res.json({ success: true, message: 'Cập nhật thành công!' });
     } catch (error) {
         console.error('Error updating staff:', error);
@@ -177,6 +198,9 @@ const deleteStaff = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên!' });
         }
         
+        // Trigger face training
+        triggerFaceTraining();
+
         res.json({ success: true, message: 'Xóa nhân viên thành công (Soft deleted)!' });
     } catch (error) {
         console.error('Error deleting staff:', error);

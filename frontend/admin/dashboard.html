@@ -16,25 +16,6 @@
             background: #f0f4f8;
         }
 
-        .sidebar {
-            background: linear-gradient(180deg, #1e3a5f 0%, #0f2744 100%);
-        }
-
-        .sidebar-item {
-            color: #94a3b8;
-            transition: all 0.2s;
-        }
-
-        .sidebar-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .sidebar-item.active {
-            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #fff;
-        }
-
         .kpi-card {
             background: #fff;
             border-radius: 16px;
@@ -54,7 +35,7 @@
         .kpi-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #5c3f30;
         }
 
         .kpi-label {
@@ -86,7 +67,7 @@
         .chart-title {
             font-size: 1rem;
             font-weight: 600;
-            color: #1e3a5f;
+            color: #5c3f30;
             margin-bottom: 20px;
         }
 
@@ -104,28 +85,25 @@
         .filter-label {
             font-size: 0.75rem;
             font-weight: 600;
-            color: #1e3a5f;
+            color: #5c3f30;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .filter-btn { padding: 8px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; }
-        .filter-btn.active { background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); color: #fff; border-color: transparent; }
+        .filter-btn.active { background: #c69362; color: #fff; border-color: transparent; }
         .filter-btn:not(.active) { background: #f8fafc; color: #475569; }
-        .filter-btn:hover:not(.active) { background: #e2e8f0; }
-        .header-bar { background: linear-gradient(90deg, #1e3a5f 0%, #2d4a6f 100%); color: #fff; padding: 16px 28px; }
         .product-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
         .product-row:last-child { border-bottom: none; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #64748b; }
         .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
-        .admin-card { background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); border-radius: 12px; padding: 16px; }
         .daily-filter-btn {
             padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
-            cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: #f8fafc; color: #3b82f6;
+            cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: #f8fafc; color: #c69362;
         }
-        .daily-filter-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-        .daily-filter-btn:hover:not(.active) { background: #e0f2fe; }
+        .daily-filter-btn.active { background: #c69362; color: #fff; border-color: #c69362; }
+        .daily-filter-btn:hover:not(.active) { background: #ebe0d2; }
         #daily-revenue-change.up { background: #dcfce7; color: #16a34a; }
         #daily-revenue-change.down { background: #fee2e2; color: #dc2626; }
         

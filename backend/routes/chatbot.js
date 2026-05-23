@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const OpenAI = require('openai');
 const { analyzeUserIntent, extractFoodSearchTerms, getCartByUserId } = require('../graphql');
+const axios = require('axios');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
@@ -62,7 +63,6 @@ async function getRestaurantSettings() {
 }
 
 // ==================== GRAPHQL-POWERED CONTEXT ====================
-
 async function getChatbotContextForMessage(message) {
     const intent = analyzeUserIntent(message);
     const context = {
@@ -74,15 +74,29 @@ async function getChatbotContextForMessage(message) {
         compact_menu: ''
     };
 
+    // Helper mapper hỗ trợ giá khuyến mãi (sale price)
+    function mapDish(d) {
+        const finalPrice = (d.gia_khuyen_mai !== null && d.gia_khuyen_mai !== undefined && parseFloat(d.gia_khuyen_mai) > 0 && parseFloat(d.gia_khuyen_mai) < parseFloat(d.gia_tien))
+            ? parseFloat(d.gia_khuyen_mai)
+            : parseFloat(d.gia_tien);
+        return {
+            ...d,
+            diem_danh_gia: parseFloat(d.diem_danh_gia) || 0,
+            luot_danh_gia: parseInt(d.luot_danh_gia) || 0,
+            gia_goc: d.gia_tien,
+            gia_tien: finalPrice
+        };
+    }
+
     try {
-        // 1. Há»i vá» mÃ³n Äƒn cá»¥ thá»ƒ
+        // 1. Hỏi về món ăn cụ thể
         if (intent.hoi_mon_an || intent.hoi_thuc_don || intent.hoi_danh_muc || intent.hoi_gia) {
             const searchTerms = extractFoodSearchTerms(message);
             
             if (searchTerms.length > 0) {
                 for (const term of searchTerms) {
                     const [dishes] = await db.query(`
-                        SELECT m.ma_mon, m.ten_mon, m.mo_ta_chi_tiet, m.gia_tien, m.don_vi_tinh, 
+                        SELECT m.ma_mon, m.ten_mon, m.mo_ta_chi_tiet, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, 
                                m.anh_mon, d.ten_danh_muc,
                                COALESCE(AVG(dg.so_sao), 0) as diem_danh_gia,
                                COUNT(DISTINCT dg.ma_danh_gia) as luot_danh_gia
@@ -100,18 +114,15 @@ async function getChatbotContextForMessage(message) {
                     `, [`%${term}%`, `%${term}%`, `${term}%`, `%${term}%`]);
                     
                     dishes.forEach(d => {
-                        if (!context.mon_an_lien_quan.find(e => e.ma_mon === d.ma_mon)) {
-                            context.mon_an_lien_quan.push({
-                                ...d,
-                                diem_danh_gia: parseFloat(d.diem_danh_gia) || 0,
-                                luot_danh_gia: parseInt(d.luot_danh_gia) || 0
-                            });
+                        const mapped = mapDish(d);
+                        if (!context.mon_an_lien_quan.find(e => e.ma_mon === mapped.ma_mon)) {
+                            context.mon_an_lien_quan.push(mapped);
                         }
                     });
                 }
             }
 
-            // TÃ¬m theo danh má»¥c
+            // Tìm theo danh mục
             if (intent.hoi_danh_muc && intent.tu_khoa_danh_muc.length > 0) {
                 for (const catKw of intent.tu_khoa_danh_muc) {
                     const [cats] = await db.query(
@@ -120,15 +131,16 @@ async function getChatbotContextForMessage(message) {
                     );
                     for (const cat of cats) {
                         const [catDishes] = await db.query(`
-                            SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.don_vi_tinh, m.anh_mon, m.mo_ta_chi_tiet,
+                            SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, m.anh_mon, m.mo_ta_chi_tiet,
                                    d.ten_danh_muc
                             FROM mon_an m LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
                             WHERE m.trang_thai = 1 AND m.ma_danh_muc = ?
                             LIMIT 8
                         `, [cat.ma_danh_muc]);
                         
-                        context.danh_muc_lien_quan.push({ ...cat, mon_an: catDishes });
-                        catDishes.forEach(d => {
+                        const mappedCatDishes = catDishes.map(mapDish);
+                        context.danh_muc_lien_quan.push({ ...cat, mon_an: mappedCatDishes });
+                        mappedCatDishes.forEach(d => {
                             if (!context.mon_an_lien_quan.find(e => e.ma_mon === d.ma_mon)) {
                                 context.mon_an_lien_quan.push(d);
                             }
@@ -137,42 +149,48 @@ async function getChatbotContextForMessage(message) {
                 }
             }
 
-            // Thá»±c Ä‘Æ¡n tá»•ng quÃ¡t
+            // Thực đơn tổng quát
             if (intent.hoi_thuc_don && context.mon_an_lien_quan.length === 0) {
                 const [allCats] = await db.query('SELECT * FROM danh_muc WHERE trang_thai = 1');
                 for (const cat of allCats) {
                     const [catDishes] = await db.query(`
-                        SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.don_vi_tinh, m.anh_mon, d.ten_danh_muc
+                        SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, m.anh_mon, d.ten_danh_muc
                         FROM mon_an m LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
                         WHERE m.trang_thai = 1 AND m.ma_danh_muc = ?
                         ORDER BY RAND() LIMIT 3
                     `, [cat.ma_danh_muc]);
-                    context.danh_muc_lien_quan.push({ ...cat, mon_an: catDishes });
-                    catDishes.forEach(d => context.mon_an_lien_quan.push(d));
+                    const mappedCatDishes = catDishes.map(mapDish);
+                    context.danh_muc_lien_quan.push({ ...cat, mon_an: mappedCatDishes });
+                    mappedCatDishes.forEach(d => {
+                        if (!context.mon_an_lien_quan.find(e => e.ma_mon === d.ma_mon)) {
+                            context.mon_an_lien_quan.push(d);
+                        }
+                    });
                 }
             }
         }
 
-        // 2. Khoáº£ng giÃ¡
+        // 2. Khoảng giá
         if (intent.khoang_gia) {
             const [priceFiltered] = await db.query(`
-                SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.don_vi_tinh, m.anh_mon, m.mo_ta_chi_tiet, d.ten_danh_muc
+                SELECT m.ma_mon, m.ten_mon, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, m.anh_mon, m.mo_ta_chi_tiet, d.ten_danh_muc
                 FROM mon_an m LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
                 WHERE m.trang_thai = 1 AND m.gia_tien BETWEEN ? AND ?
                 ORDER BY m.gia_tien ASC LIMIT 8
             `, [intent.khoang_gia.min, intent.khoang_gia.max]);
             
             priceFiltered.forEach(d => {
-                if (!context.mon_an_lien_quan.find(e => e.ma_mon === d.ma_mon)) {
-                    context.mon_an_lien_quan.push(d);
+                const mapped = mapDish(d);
+                if (!context.mon_an_lien_quan.find(e => e.ma_mon === mapped.ma_mon)) {
+                    context.mon_an_lien_quan.push(mapped);
                 }
             });
         }
 
-        // 3. Top bÃ¡n cháº¡y / Gá»£i Ã½
+        // 3. Top bán chạy / Gợi ý
         if (intent.hoi_top_ban_chay || intent.hoi_goi_y) {
             const [topDishes] = await db.query(`
-                SELECT m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.don_vi_tinh, m.mo_ta_chi_tiet,
+                SELECT m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, m.mo_ta_chi_tiet,
                        d.ten_danh_muc, SUM(ct.so_luong) as so_luong_ban
                 FROM chi_tiet_don_hang ct
                 JOIN mon_an m ON ct.ma_mon = m.ma_mon
@@ -182,15 +200,74 @@ async function getChatbotContextForMessage(message) {
                 GROUP BY m.ma_mon
                 ORDER BY so_luong_ban DESC LIMIT 6
             `);
-            context.top_ban_chay = topDishes;
-            topDishes.forEach(d => {
+            const mappedTopDishes = topDishes.map(mapDish);
+            context.top_ban_chay = mappedTopDishes;
+            mappedTopDishes.forEach(d => {
                 if (!context.mon_an_lien_quan.find(e => e.ma_mon === d.ma_mon)) {
                     context.mon_an_lien_quan.push(d);
                 }
             });
         }
 
-        // Giá»›i háº¡n
+        // 4. Món giảm giá
+        if (intent.hoi_mon_giam_gia) {
+            const [dishes] = await db.query(`
+                SELECT m.ma_mon, m.ten_mon, m.mo_ta_chi_tiet, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, 
+                       m.anh_mon, d.ten_danh_muc,
+                       COALESCE(AVG(dg.so_sao), 0) as diem_danh_gia,
+                       COUNT(DISTINCT dg.ma_danh_gia) as luot_danh_gia
+                FROM mon_an m
+                LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+                LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
+                WHERE m.trang_thai = 1 AND m.gia_khuyen_mai IS NOT NULL AND m.gia_khuyen_mai > 0 AND m.gia_khuyen_mai < m.gia_tien
+                GROUP BY m.ma_mon
+                ORDER BY (m.gia_tien - m.gia_khuyen_mai) DESC
+                LIMIT 6
+            `);
+            context.mon_giam_gia = dishes;
+            dishes.forEach(d => {
+                const mappedDish = mapDish(d);
+                if (!context.mon_an_lien_quan.find(e => e.ma_mon === mappedDish.ma_mon)) {
+                    context.mon_an_lien_quan.push(mappedDish);
+                }
+            });
+        }
+
+        // 5. Món ăn mới
+        if (intent.hoi_mon_moi) {
+            const [dishes] = await db.query(`
+                SELECT m.ma_mon, m.ten_mon, m.mo_ta_chi_tiet, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, 
+                       m.anh_mon, d.ten_danh_muc,
+                       COALESCE(AVG(dg.so_sao), 0) as diem_danh_gia,
+                       COUNT(DISTINCT dg.ma_danh_gia) as luot_danh_gia
+                FROM mon_an m
+                LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+                LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
+                WHERE m.trang_thai = 1
+                GROUP BY m.ma_mon
+                ORDER BY m.ma_mon DESC
+                LIMIT 6
+            `);
+            context.mon_moi = dishes;
+            dishes.forEach(d => {
+                const mappedDish = mapDish(d);
+                if (!context.mon_an_lien_quan.find(e => e.ma_mon === mappedDish.ma_mon)) {
+                    context.mon_an_lien_quan.push(mappedDish);
+                }
+            });
+        }
+
+        // 6. Bàn trống
+        if (intent.hoi_ban_trong) {
+            const [rowsTrong] = await db.query("SELECT COUNT(*) as count FROM ban WHERE trang_thai = 'trong'");
+            const [rowsTong] = await db.query("SELECT COUNT(*) as count FROM ban");
+            const [details] = await db.query("SELECT vi_tri, COUNT(*) as count FROM ban WHERE trang_thai = 'trong' GROUP BY vi_tri");
+            context.so_ban_trong = rowsTrong[0]?.count || 0;
+            context.tong_so_ban = rowsTong[0]?.count || 0;
+            context.chi_tiet_ban_trong = details;
+        }
+
+        // Giới hạn
         context.mon_an_lien_quan = context.mon_an_lien_quan.slice(0, 8);
         context.has_food_data = context.mon_an_lien_quan.length > 0;
 
@@ -239,44 +316,101 @@ async function getCompactMenu() {
 
 // ==================== CHATBOT ORDER AUTOMATION (GraphQL) ====================
 
-// Táº¡o system prompt chuáº©n cho AI
-function systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) {
-    return 'Báº N LÃ€ TRÃ€ MY - trá»£ lÃ½ áº£o thÃ´ng minh cá»§a ' + tenNhaHang + '.\n\n'
-        + '=== DANH TÃNH ===\n'
-        + '- TÃªn: TRÃ€ MY - tiáº¿p viÃªn áº£o dá»… thÆ°Æ¡ng, ngá»t ngÃ o\n'
-        + '- XÆ°ng "em", gá»i khÃ¡ch lÃ  "anh/chá»‹"\n'
-        + '- NÃ³i ngáº¯n gá»n (2-4 cÃ¢u), trá»ng tÃ¢m, chÃ­nh xÃ¡c\n'
-        + '- Emoji: ðŸŒ¸ ðŸ’• ðŸ˜Š ðŸœ âœ¨ ðŸ›’\n\n'
-        + '=== THÃ”NG TIN NHÃ€ HÃ€NG ===\n'
-        + 'ðŸ“ ' + tenNhaHang + ' - "PHÆ¯Æ NG NAM â€“ NGON NHÆ¯ Máº¸ Náº¤U"\n'
-        + 'ðŸ“ Äá»‹a chá»‰: ' + diaChi + '\n'
-        + 'ðŸ“ Hotline: ' + soDienThoai + ' | Email: ' + email + ' | Web: ' + website + '\n'
-        + 'ðŸ“ Giá» má»Ÿ cá»­a: T2-T6: ' + gioMoCuaT2T6 + ' | T7-CN: ' + gioMoCuaT7CN + '\n'
-        + 'ðŸ“ Giao hÃ ng: ' + new Intl.NumberFormat('vi-VN').format(phiGiaoHang) + 'Ä‘ | Miá»…n phÃ­ tá»« ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'Ä‘\n'
-        + 'ðŸ“ Miá»…n phÃ­ giao hÃ ng cho Ä‘Æ¡n tá»« ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'Ä‘\n\n'
-        + '=== CHá»¨C NÄ‚NG Äáº¶T HÃ€NG ===\n'
-        + 'Báº¡n cÃ³ thá»ƒ giÃºp khÃ¡ch: thÃªm mÃ³n vÃ o giá» hÃ ng, xem giá» hÃ ng, Ä‘áº·t hÃ ng, xem Ä‘Æ¡n hÃ ng.\n'
-        + 'Khi khÃ¡ch muá»‘n Ä‘áº·t mÃ³n, hÃ£y xÃ¡c nháº­n láº¡i mÃ³n vÃ  sá»‘ lÆ°á»£ng, rá»“i thÃªm vÃ o giá» hÃ ng.\n'
-        + 'HÆ°á»›ng dáº«n khÃ¡ch: "Chá»‰ cáº§n nÃ³i: Ä‘áº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m"\n\n'
-        + '=== Äá»˜I NGÅ¨ ===\n'
-        + 'ðŸ‘©â€ðŸ’¼ Chá»§: HoÃ ng Thá»¥c Linh (10 nÄƒm KN)\n'
-        + 'ðŸ‘¨â€ðŸ³ Báº¿p trÆ°á»Ÿng: Nguyá»…n Nháº­t TrÆ°á»ng (20 nÄƒm KN)\n'
-        + 'ðŸ‘¨â€ðŸ³ PhÃ³ báº¿p: Nguyá»…n Huá»³nh Ká»³ Thuáº­t (12 nÄƒm KN)\n'
-        + 'ðŸ‘©â€ðŸ’¼ Quáº£n lÃ½: Há»©a Thá»‹ Tháº£o Vy (8 nÄƒm KN)\n\n'
-        + '=== QUY Táº®C (Báº®T BUá»˜C) ===\n'
-        + '1. NGáº®N Gá»ŒN, TRá»ŒNG TÃ‚M (2-4 cÃ¢u), khÃ´ng lan man\n'
-        + '2. Há»i mÃ³n Äƒn -> DÃ™NG tÃªn vÃ  giÃ¡ tá»« dá»¯ liá»‡u\n'
-        + '3. ChÃ o/há»i tÃªn -> "Em lÃ  TrÃ  My, trá»£ lÃ½ áº£o cá»§a ' + tenNhaHang + '"\n'
-        + '4. "TrÃ  My" lÃ  TÃŠN Báº N, KHÃ”NG pháº£i Ä‘á»“ uá»‘ng\n'
-        + '5. Há»i Ä‘á»™i ngÅ© -> DÃ™NG tÃªn, chá»©c vá»¥\n'
-        + '6. Há»i liÃªn há»‡ -> DÃ™NG SDT, Ä‘á»‹a chá»‰, giá»\n'
-        + '7. KhÃ´ng biáº¿t -> Gá»i hotline ' + soDienThoai + '\n'
-        + '8. KHÃ”NG bá»‹a Ä‘áº·t. Liá»‡t kÃª mÃ³n: TÃªn - GiÃ¡ rÃµ rÃ ng\n'
-        + '9. Khi khÃ¡ch Ä‘áº·t hÃ ng -> xÃ¡c nháº­n mÃ³n, sá»‘ lÆ°á»£ng, tá»•ng tiá»n\n'
-        + '10. Sau khi thÃªm giá» hÃ ng -> há»i muá»‘n Ä‘áº·t thÃªm hay thanh toÃ¡n\n'; 
+// ==================== RAG KNOWLEDGE RETRIEVAL ====================
+async function getRagContext(message) {
+    try {
+        console.log(`🔍 Querying Python RAG service for: "${message}"`);
+        const response = await axios.post('http://localhost:5000/api/ml/chatbot/retrieve', {
+            question: message,
+            top_n: 2,
+            threshold: 0.05
+        }, { timeout: 3000 });
+
+        if (response.data && response.data.success && Array.isArray(response.data.data)) {
+            const docs = response.data.data;
+            if (docs.length > 0) {
+                console.log(`✅ RAG retrieved ${docs.length} documents from Python service.`);
+                return docs.map(doc => `[TRI THỨC] ${doc.tieu_de}: ${doc.noi_dung}`).join('\n\n');
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Python RAG service error or timeout, calling local DB fallback search:', error.message);
+    }
+
+    // Fallback: local SQL search over chatbot_tri_thuc table
+    try {
+        console.log('🔍 Executing local fallback search on database...');
+        const [rows] = await db.query('SELECT tieu_de, noi_dung FROM chatbot_tri_thuc');
+        if (rows.length === 0) return '';
+
+        const cleanMsg = message.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+        const terms = cleanMsg.split(/\s+/).filter(t => t.length > 2);
+
+        const scoredDocs = rows.map(doc => {
+            const combined = `${doc.tieu_de} ${doc.noi_dung}`.toLowerCase();
+            let score = 0;
+            terms.forEach(term => {
+                if (combined.includes(term)) {
+                    score += 1;
+                }
+            });
+            if (doc.tieu_de.toLowerCase().split(/\s+/).some(w => terms.includes(w))) {
+                score += 2;
+            }
+            return { doc, score };
+        });
+
+        const matches = scoredDocs
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 2);
+
+        if (matches.length > 0) {
+            console.log(`✅ Local fallback retrieved ${matches.length} matching documents.`);
+            return matches.map(item => `[TRI THỨC] ${item.doc.tieu_de}: ${item.doc.noi_dung}`).join('\n\n');
+        }
+        console.log('⚠️ Local fallback found no matching documents.');
+    } catch (dbError) {
+        console.error('❌ Error in local fallback search:', dbError.message);
+    }
+
+    return '';
 }
 
-// Xá»­ lÃ½ thÃªm mÃ³n vÃ o giá» hÃ ng qua chatbot
+// Tạo system prompt chuẩn cho AI
+function systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext = '') {
+    let prompt = 'BẠN LÀ TRÀ MY - trợ lý ảo thông minh của ' + tenNhaHang + '.\n\n'
+        + '=== DANH TÍNH ===\n'
+        + '- Tên: TRÀ MY - tiếp viên ảo dễ thương, ngọt ngào\n'
+        + '- Xưng "em", gọi khách là "anh/chị"\n'
+        + '- Nói ngắn gọn (2-4 câu), trọng tâm, chính xác\n'
+        + '- Emoji: 🌸 💕 😊 🍲 ✨ 🛒\n\n'
+        + '=== THÔNG TIN NHÀ HÀNG ===\n'
+        + '🍲 ' + tenNhaHang + ' - "PHƯƠNG NAM – NGON NHƯ MẸ NẤU"\n'
+        + '📍 Địa chỉ: ' + diaChi + '\n'
+        + '📞 Hotline: ' + soDienThoai + ' | Email: ' + email + ' | Web: ' + website + '\n'
+        + '🕐 Giờ mở cửa: T2-T6: ' + gioMoCuaT2T6 + ' | T7-CN: ' + gioMoCuaT7CN + '\n'
+        + '🛵 Giao hàng: ' + new Intl.NumberFormat('vi-VN').format(phiGiaoHang) + 'đ | Miễn phí từ ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'đ\n'
+        + '🛵 Miễn phí giao hàng cho đơn từ ' + new Intl.NumberFormat('vi-VN').format(mienPhiGiaoHangTu) + 'đ\n\n';
+
+    if (ragContext && ragContext.trim()) {
+        prompt += '=== NGỮ CẢNH TRI THỨC BỔ SUNG (RAG) ===\n'
+            + 'Sử dụng thông tin dưới đây để trả lời các câu hỏi về nhà hàng, chủ nhà hàng, nhân sự, chính sách, hoặc quy định (nếu khách hỏi):\n'
+            + ragContext + '\n\n';
+    }
+
+    prompt += '=== CHỨC NĂNG ĐẶT HÀNG ===\n'
+        + 'Bạn có thể giúp khách: thêm món vào giỏ hàng, xem giỏ hàng, đặt hàng, xem đơn hàng.\n'
+        + 'Khi khách muốn đặt món, hãy xác nhận lại món và số lượng, rồi thêm vào giỏ hàng.\n'
+        + 'Hướng dẫn khách: "Chỉ cần nói: đặt 2 phần phở bò, 1 cơm tấm"\n\n'
+        + '=== QUY TẮC (BẮT BUỘC) ===\n'
+        + '1. NGẮN GỌN, TRỌNG TÂM (2-4 câu), không lan man. Tuyệt đối không tự bịa đặt thông tin nằm ngoài ngữ cảnh.\n'
+        + '2. Hỏi món ăn -> DÙNG tên và giá từ dữ liệu thực tế.\n'
+        + '3. Chào/hỏi tên -> "Em là Trà My, em có thể giúp gì cho anh chị ạ?"\n';
+
+    return prompt;
+}
+
 async function chatbotAddToCart(ma_nguoi_dung, items) {
     const results = { added: [], errors: [], gio_hang: null };
 
@@ -285,10 +419,10 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
             let ma_mon = null;
             let dish = null;
 
-            // TÃ¬m mÃ³n theo tÃªn
+            // Tìm món theo tên
             if (item.ten_mon) {
                 const [found] = await db.query(`
-                    SELECT ma_mon, ten_mon, gia_tien, so_luong_ton, anh_mon, don_vi_tinh
+                    SELECT ma_mon, ten_mon, gia_tien, gia_khuyen_mai, so_luong_ton, anh_mon, don_vi_tinh
                     FROM mon_an WHERE trang_thai = 1 AND ten_mon LIKE ?
                     ORDER BY CASE WHEN ten_mon LIKE ? THEN 1 WHEN ten_mon LIKE ? THEN 2 ELSE 3 END
                     LIMIT 1
@@ -298,16 +432,16 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
                     dish = found[0];
                     ma_mon = dish.ma_mon;
                 } else {
-                    results.errors.push(`KhÃ´ng tÃ¬m tháº¥y "${item.ten_mon}"`);
+                    results.errors.push(`Không tìm thấy "${item.ten_mon}"`);
                     continue;
                 }
             } else if (item.ma_mon) {
-                const [found] = await db.query('SELECT * FROM mon_an WHERE ma_mon = ? AND trang_thai = 1', [item.ma_mon]);
+                const [found] = await db.query('SELECT ma_mon, ten_mon, gia_tien, gia_khuyen_mai, so_luong_ton, anh_mon, don_vi_tinh FROM mon_an WHERE ma_mon = ? AND trang_thai = 1', [item.ma_mon]);
                 if (found.length > 0) {
                     dish = found[0];
                     ma_mon = dish.ma_mon;
                 } else {
-                    results.errors.push(`MÃ³n #${item.ma_mon} khÃ´ng tá»“n táº¡i`);
+                    results.errors.push(`Món #${item.ma_mon} không tồn tại`);
                     continue;
                 }
             }
@@ -316,11 +450,16 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
 
             const soLuong = item.so_luong || 1;
             if (dish.so_luong_ton < soLuong) {
-                results.errors.push(`"${dish.ten_mon}" háº¿t hÃ ng`);
+                results.errors.push(`"${dish.ten_mon}" hết hàng`);
                 continue;
             }
 
-            // Láº¥y/táº¡o giá» hÃ ng
+            // Tính toán giá thực tế khi bán (ưu tiên giá khuyến mãi nếu hợp lệ)
+            const finalPrice = (dish.gia_khuyen_mai !== null && dish.gia_khuyen_mai !== undefined && parseFloat(dish.gia_khuyen_mai) > 0 && parseFloat(dish.gia_khuyen_mai) < parseFloat(dish.gia_tien))
+                ? parseFloat(dish.gia_khuyen_mai)
+                : parseFloat(dish.gia_tien);
+
+            // Lấy/tạo giỏ hàng
             let [cartRows] = await db.query('SELECT * FROM gio_hang WHERE ma_nguoi_dung = ? AND trang_thai = "active"', [ma_nguoi_dung]);
             let ma_gio_hang;
             if (cartRows.length === 0) {
@@ -330,27 +469,27 @@ async function chatbotAddToCart(ma_nguoi_dung, items) {
                 ma_gio_hang = cartRows[0].ma_gio_hang;
             }
 
-            // Kiá»ƒm tra Ä‘Ã£ cÃ³ trong giá» chÆ°a
+            // Kiểm tra đã có trong giỏ chưa
             const [existing] = await db.query('SELECT * FROM chi_tiet_gio_hang WHERE ma_gio_hang = ? AND ma_mon = ?', [ma_gio_hang, ma_mon]);
             if (existing.length > 0) {
                 const newQty = Math.min(existing[0].so_luong + soLuong, 10);
-                await db.query('UPDATE chi_tiet_gio_hang SET so_luong = ? WHERE ma_chi_tiet = ?', [newQty, existing[0].ma_chi_tiet]);
+                await db.query('UPDATE chi_tiet_gio_hang SET so_luong = ?, gia_tai_thoi_diem = ? WHERE ma_chi_tiet = ?', [newQty, finalPrice, existing[0].ma_chi_tiet]);
             } else {
                 await db.query(
                     'INSERT INTO chi_tiet_gio_hang (ma_gio_hang, ma_mon, so_luong, gia_tai_thoi_diem) VALUES (?, ?, ?, ?)',
-                    [ma_gio_hang, ma_mon, Math.min(soLuong, 10), dish.gia_tien]
+                    [ma_gio_hang, ma_mon, Math.min(soLuong, 10), finalPrice]
                 );
             }
 
-            const price = new Intl.NumberFormat('vi-VN').format(dish.gia_tien);
-            results.added.push({ ten_mon: dish.ten_mon, so_luong: soLuong, gia_tien: dish.gia_tien, price_formatted: price, anh_mon: dish.anh_mon, ma_mon: dish.ma_mon });
+            const price = new Intl.NumberFormat('vi-VN').format(finalPrice);
+            results.added.push({ ten_mon: dish.ten_mon, so_luong: soLuong, gia_tien: finalPrice, price_formatted: price, anh_mon: dish.anh_mon, ma_mon: dish.ma_mon });
         } catch (error) {
             console.error('chatbotAddToCart item error:', error.message);
-            results.errors.push(`Lá»—i thÃªm "${item.ten_mon || item.ma_mon}"`);
+            results.errors.push(`Lỗi thêm "${item.ten_mon || item.ma_mon}"`);
         }
     }
 
-    // Láº¥y giá» hÃ ng cáº­p nháº­t
+    // Lấy giỏ hàng cập nhật
     results.gio_hang = await getCartByUserId(ma_nguoi_dung);
     return results;
 }
@@ -541,8 +680,14 @@ async function generateLocalFallbackResponse(graphqlContext, message, settings, 
             `Anh/chị chỉ cần chọn món và điền địa chỉ giao hàng lúc thanh toán nhé! 💕`;
     }
 
-    // 8. Hỏi đặt bàn
-    if (intent.hoi_dat_ban) {
+    // 8. Hỏi đặt bàn / bàn trống
+    if (intent.hoi_ban_trong || intent.hoi_dat_ban) {
+        if (intent.hoi_ban_trong) {
+            const detailStr = (graphqlContext.chi_tiet_ban_trong || [])
+                .map(d => `- Khu vực ${d.vi_tri}: còn ${d.count} bàn trống`)
+                .join(', ');
+            return `Dạ hiện tại nhà hàng còn ${graphqlContext.so_ban_trong}/${graphqlContext.tong_so_ban} bàn trống ạ. ${detailStr ? `Chi tiết: ${detailStr}.` : ''} Anh/chị có muốn đặt bàn trước không ạ? Liên hệ hotline ${soDienThoai} hoặc điền form Đặt Bàn trên web nhé! 💕`;
+        }
         return `Dạ để đặt bàn trước tại nhà hàng, anh/chị vui lòng nhấn vào mục **Đặt Bàn** trên thanh menu hoặc gọi trực tiếp đến Hotline: **${soDienThoai}** để bên em chuẩn bị chỗ ngồi đẹp nhất cho mình ạ! 📞 Cảm ơn anh/chị rất nhiều! 💕`;
     }
 
@@ -576,6 +721,12 @@ async function generateLocalFallbackResponse(graphqlContext, message, settings, 
         }
         response += `\n\nAnh/chị có thể xem thực đơn đầy đủ trên trang web hoặc gõ tên món để em tìm kiếm và đặt món giúp mình nhé! 💕🌸`;
         return response;
+    }
+
+    // 11.5. Thử tìm tri thức từ RAG/Database
+    const localRag = await getRagContext(message);
+    if (localRag) {
+        return `Dạ em xin gửi anh/chị thông tin tìm được từ hệ thống tri thức nhà hàng ạ:\n\n${localRag}\n\nHy vọng thông tin này giúp ích cho anh/chị! Nếu cần thêm thông tin gì khác, anh/chị cứ hỏi em nhé! 💕🌸`;
     }
 
     // 12. Fallback mặc định
@@ -613,6 +764,9 @@ router.post('/chat', async (req, res) => {
         console.log('GraphQL: Analyzing message...');
         graphqlContext = await getChatbotContextForMessage(message);
         settings = await getRestaurantSettings();
+        
+        // Fetch RAG context
+        const ragContext = await getRagContext(message);
 
         const tenNhaHang = settings.ten_nha_hang || 'Nha hang Am thuc Phuong Nam';
         const diaChi = settings.dia_chi || '123 Duong ABC, Phuong 1, TP. Vinh Long';
@@ -651,7 +805,7 @@ router.post('/chat', async (req, res) => {
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
                 messages: [
-                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + cartPrompt },
+                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + cartPrompt },
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
@@ -683,7 +837,7 @@ router.post('/chat', async (req, res) => {
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
                 messages: [
-                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + orderPrompt },
+                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + orderPrompt },
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
@@ -729,7 +883,7 @@ router.post('/chat', async (req, res) => {
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
                 messages: [
-                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + actionPrompt },
+                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + actionPrompt },
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
@@ -787,7 +941,7 @@ router.post('/chat', async (req, res) => {
             const completion = await groq.chat.completions.create({
                 model: 'llama-3.1-8b-instant',
                 messages: [
-                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + suggestPrompt },
+                    { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + suggestPrompt },
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
@@ -829,7 +983,22 @@ router.post('/chat', async (req, res) => {
             topDishesPrompt = '\n=== TOP BÃN CHáº Y ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'Ä‘ (' + p.so_luong_ban + ' pháº§n)').join('\n') + '\n';
         }
 
-        const systemPrompt = systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu) + foodContextPrompt + topDishesPrompt;
+        let tableContextPrompt = '';
+        if (graphqlContext.intent.hoi_ban_trong) {
+            const detailStr = (graphqlContext.chi_tiet_ban_trong || [])
+                .map(d => `- Khu vực ${d.vi_tri}: còn ${d.count} bàn trống`)
+                .join('\n');
+            tableContextPrompt = `\n=== THÔNG TIN BÀN TRỐNG THỰC TẾ (REAL-TIME DB) ===\n`
+                + `- Tổng số bàn của nhà hàng: ${graphqlContext.tong_so_ban} bàn\n`
+                + `- Số bàn trống hiện tại: ${graphqlContext.so_ban_trong} bàn\n`
+                + `Chi tiết bàn trống theo vị trí:\n${detailStr || 'Không có bàn trống nào'}\n\n`
+                + `QUAN TRỌNG: Trả lời dựa trên tình trạng bàn trống thực tế từ DB này để thông báo cho khách. Nếu còn bàn, hãy mời khách đặt bàn.\n`;
+        }
+
+        const systemPrompt = systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) 
+            + foodContextPrompt 
+            + topDishesPrompt
+            + tableContextPrompt;
 
         // Goi Groq AI
         const completion = await groq.chat.completions.create({

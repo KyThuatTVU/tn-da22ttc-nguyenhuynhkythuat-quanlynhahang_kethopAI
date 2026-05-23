@@ -693,3 +693,159 @@ router.get('/financial-day-details', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+
+// =============================================
+// API MỚI: BÁO CÁO DOANH THU (CHỈ DOANH THU)
+// =============================================
+router.get('/revenue-summary', requireAdmin, async (req, res) => {
+    try {
+        const { year, month } = req.query;
+        const targetYear = parseInt(year) || new Date().getFullYear();
+        const targetMonth = parseInt(month) || (new Date().getMonth() + 1);
+
+        // 1. Lấy doanh thu hàng ngày từ đơn hàng
+        const [orderRevenue] = await db.query(`
+            SELECT DATE(thoi_gian_thanh_toan) as ngay, SUM(so_tien) as doanh_thu
+            FROM thanh_toan
+            WHERE trang_thai = 'success'
+              AND MONTH(thoi_gian_thanh_toan) = ?
+              AND YEAR(thoi_gian_thanh_toan) = ?
+            GROUP BY DATE(thoi_gian_thanh_toan)
+            ORDER BY ngay ASC
+        `, [targetMonth, targetYear]);
+
+        // 2. Lấy doanh thu hàng ngày từ đặt bàn
+        const [reservationRevenue] = await db.query(`
+            SELECT DATE(thoi_gian_thanh_toan) as ngay, SUM(so_tien) as doanh_thu
+            FROM thanh_toan_dat_ban
+            WHERE trang_thai = 'paid'
+              AND MONTH(thoi_gian_thanh_toan) = ?
+              AND YEAR(thoi_gian_thanh_toan) = ?
+            GROUP BY DATE(thoi_gian_thanh_toan)
+            ORDER BY ngay ASC
+        `, [targetMonth, targetYear]);
+
+        // 3. Kết hợp dữ liệu theo ngày
+        const dailyStats = {};
+        
+        // Khởi tạo các ngày trong tháng
+        const daysInMonth = new Date(targetYear, targetMonth, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dateStr = `${targetYear}-${targetMonth.toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+            dailyStats[dateStr] = { 
+                date: dateStr, 
+                orderRevenue: 0, 
+                reservationRevenue: 0, 
+                revenue: 0 
+            };
+        }
+
+        // Thêm doanh thu đơn hàng
+        orderRevenue.forEach(r => {
+            const d = new Date(r.ngay).toISOString().split('T')[0];
+            if (dailyStats[d]) {
+                dailyStats[d].orderRevenue = parseFloat(r.doanh_thu) || 0;
+            }
+        });
+
+        // Thêm doanh thu đặt bàn
+        reservationRevenue.forEach(r => {
+            const d = new Date(r.ngay).toISOString().split('T')[0];
+            if (dailyStats[d]) {
+                dailyStats[d].reservationRevenue = parseFloat(r.doanh_thu) || 0;
+            }
+        });
+
+        // Tính tổng doanh thu
+        const result = Object.values(dailyStats).map(day => ({
+            ...day,
+            revenue: day.orderRevenue + day.reservationRevenue
+        }));
+
+        // Tính tổng
+        const totalOrderRevenue = result.reduce((sum, d) => sum + d.orderRevenue, 0);
+        const totalReservationRevenue = result.reduce((sum, d) => sum + d.reservationRevenue, 0);
+
+        res.json({
+            success: true,
+            data: result,
+            summary: {
+                totalRevenue: totalOrderRevenue + totalReservationRevenue,
+                orderRevenue: totalOrderRevenue,
+                reservationRevenue: totalReservationRevenue
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching revenue summary:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ' });
+    }
+});
+
+// API lấy chi tiết doanh thu theo ngày cụ thể
+router.get('/revenue-detail', requireAdmin, async (req, res) => {
+    try {
+        const { date } = req.query;
+        
+        if (!date) {
+            return res.status(400).json({ success: false, message: 'Thiếu tham số ngày' });
+        }
+
+        // 1. Lấy chi tiết doanh thu từ đơn hàng
+        const [orderRevenue] = await db.query(`
+            SELECT 
+                tp.so_tien,
+                tp.phuong_thuc,
+                tp.thoi_gian_thanh_toan,
+                dh.ma_don_hang,
+                CASE 
+                    WHEN dh.ma_nguoi_dung IS NOT NULL THEN CONCAT('Đơn online #', dh.ma_don_hang)
+                    WHEN dh.ten_khach_vang_lai IS NOT NULL THEN CONCAT('Bán tại quầy #', dh.ma_don_hang)
+                    ELSE CONCAT('Đơn hàng #', dh.ma_don_hang)
+                END as mo_ta
+            FROM thanh_toan tp
+            JOIN don_hang dh ON tp.ma_don_hang = dh.ma_don_hang
+            WHERE DATE(tp.thoi_gian_thanh_toan) = ?
+              AND tp.trang_thai = 'success'
+            ORDER BY tp.thoi_gian_thanh_toan DESC
+        `, [date]);
+        
+        // 2. Lấy chi tiết doanh thu từ đặt bàn
+        const [reservationRevenue] = await db.query(`
+            SELECT 
+                ttdb.so_tien,
+                'Chuyển khoản' as phuong_thuc,
+                ttdb.thoi_gian_thanh_toan,
+                db.ma_dat_ban,
+                CONCAT('Đặt bàn #', db.ma_dat_ban, ' - ', db.ten_nguoi_dat) as mo_ta
+            FROM thanh_toan_dat_ban ttdb
+            JOIN dat_ban db ON ttdb.ma_dat_ban = db.ma_dat_ban
+            WHERE DATE(ttdb.thoi_gian_thanh_toan) = ?
+              AND ttdb.trang_thai = 'paid'
+            ORDER BY ttdb.thoi_gian_thanh_toan DESC
+        `, [date]);
+
+        // Tính tổng
+        const totalOrderRevenue = orderRevenue.reduce((sum, r) => sum + parseFloat(r.so_tien), 0);
+        const totalReservationRevenue = reservationRevenue.reduce((sum, r) => sum + parseFloat(r.so_tien), 0);
+
+        res.json({
+            success: true,
+            data: {
+                date,
+                orders: orderRevenue,
+                reservations: reservationRevenue,
+                summary: {
+                    orderRevenue: totalOrderRevenue,
+                    reservationRevenue: totalReservationRevenue,
+                    totalRevenue: totalOrderRevenue + totalReservationRevenue
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching revenue detail:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ' });
+    }
+});

@@ -28,6 +28,11 @@ function analyzeUserIntent(message) {
         tu_khoa_mon_an: [],
         tu_khoa_danh_muc: [],
         khoang_gia: null,
+        // === MỚI: Nhà hàng chi tiết ===
+        hoi_chu_cua_hang: false,
+        hoi_mon_giam_gia: false,
+        hoi_mon_moi: false,
+        hoi_ban_trong: false
     };
 
     // Detect hỏi về món ăn cụ thể
@@ -136,6 +141,35 @@ function analyzeUserIntent(message) {
     if (msg.includes('khuyen mai') || msg.includes('giam gia') || msg.includes('uu dai') || msg.includes('voucher')
         || msg.includes('sale') || msg.includes('promotion') || msg.includes('combo')) {
         intent.hoi_khuyen_mai = true;
+    }
+
+    // Detect hỏi về chủ cửa hàng
+    if (msg.includes('chu cua hang') || msg.includes('chu nha hang') || msg.includes('chu tiem') 
+        || msg.includes('chu quan') || msg.includes('ai lam chu') || msg.includes('chu la ai') 
+        || msg.includes('hoang thuc linh') || msg.includes('chu cua quan') || msg.includes('chu cua tiem')) {
+        intent.hoi_chu_cua_hang = true;
+    }
+
+    // Detect hỏi món giảm giá
+    if (msg.includes('mon giam gia') || msg.includes('mon an giam gia') || msg.includes('mon nao giam gia') 
+        || msg.includes('mon nao dang giam gia') || msg.includes('mon sale') || msg.includes('mon dang sale') 
+        || msg.includes('thuc don giam gia') || msg.includes('do an giam gia') || msg.includes('giam gia mon')
+        || (msg.includes('giam gia') && (msg.includes('mon') || msg.includes('an') || msg.includes('do')))) {
+        intent.hoi_mon_giam_gia = true;
+    }
+
+    // Detect hỏi món mới
+    if (msg.includes('mon moi') || msg.includes('mon an moi') || msg.includes('co mon gi moi') 
+        || msg.includes('mon moi ra') || msg.includes('mon moi nhat') || msg.includes('thuc don moi')
+        || msg.includes('new dishes') || msg.includes('mon moi them')) {
+        intent.hoi_mon_moi = true;
+    }
+
+    // Detect hỏi còn bàn trống / đặt bàn trống hay không
+    if (msg.includes('con ban') || msg.includes('ban trong') || msg.includes('con cho') 
+        || msg.includes('ban con trong') || msg.includes('nha hang con cho') || msg.includes('nha hang con ban') 
+        || msg.includes('con cho ngoi') || msg.includes('con ban dat') || msg.includes('ban dat con')) {
+        intent.hoi_ban_trong = true;
     }
 
     // ==================== DETECT ĐẶT HÀNG / GIỎ HÀNG ====================

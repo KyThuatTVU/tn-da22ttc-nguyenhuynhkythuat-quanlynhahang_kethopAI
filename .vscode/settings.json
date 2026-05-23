@@ -1,2 +1,10 @@
 {
+    "liveServer.settings.ignoreFiles": [
+        "**/backend/uploads/**",
+        "**/backend/images/**",
+        "**/uploads/**",
+        "**/ai_service/models/**",
+        "**/ai_service/__pycache__/**",
+        "**/.git/**"
+    ]
 }

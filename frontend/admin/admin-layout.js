@@ -5,12 +5,12 @@ const API_URL = 'http://localhost:3000/api';
 const SIDEBAR_TEMPLATE = `
 <aside id="sidebar" class="sidebar w-72 flex-shrink-0 transition-transform -translate-x-full lg:translate-x-0 fixed lg:relative z-50 h-full">
     <div class="h-full flex flex-col">
-        <div class="p-5 border-b border-white/10">
+        <div class="p-5 border-b border-amber-900/10">
             <div class="flex items-center space-x-3">
-                <img src="../images/Green Simple Clean Vegan Food Logo.png" alt="Logo" class="w-11 h-11 rounded-xl object-contain bg-white p-1">
+                <img src="../images/Green Simple Clean Vegan Food Logo.png" alt="Logo" class="w-11 h-11 rounded-xl object-contain bg-white p-1 border border-amber-900/10">
                 <div>
-                    <h1 class="font-bold text-white text-lg">Phương Nam</h1>
-                    <p class="text-xs text-blue-300">Hệ thống quản trị</p>
+                    <h1 class="font-bold text-amber-950 text-lg">Phương Nam</h1>
+                    <p class="text-xs text-amber-800">Hệ thống quản trị</p>
                 </div>
             </div>
         </div>
@@ -22,7 +22,10 @@ const SIDEBAR_TEMPLATE = `
                     <i class="fas fa-chart-pie w-5"></i><span class="text-sm">Tổng quan</span>
                 </a>
                 <a href="doanh-thu.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
-                    <i class="fas fa-wallet w-5"></i><span class="text-sm">Báo cáo Tài chính</span>
+                    <i class="fas fa-dollar-sign w-5"></i><span class="text-sm">Báo cáo Doanh thu</span>
+                </a>
+                <a href="loi-nhuan.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                    <i class="fas fa-chart-line w-5"></i><span class="text-sm">Báo cáo Lợi nhuận</span>
                 </a>
                 <a href="chi-phi-hang-ngay.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-money-bill-wave w-5"></i><span class="text-sm">Chi phí hàng ngày</span>
@@ -95,7 +98,7 @@ const SIDEBAR_TEMPLATE = `
                     <i class="fas fa-camera w-5"></i><span class="text-sm font-bold">📸 Chấm Công Ngay</span>
                 </a>
                 <a href="admins.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl sidebar-admin-only">
-                    <i class="fas fa-user-shield w-5 text-blue-400"></i><span class="text-sm text-blue-100 font-medium">Tài khoản Admin</span>
+                    <i class="fas fa-user-shield w-5 text-amber-600"></i><span class="text-sm text-amber-900 font-medium">Tài khoản Admin</span>
                 </a>
                 <a href="staff.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-user-tie w-5"></i><span class="text-sm">Nhân viên</span>
@@ -135,6 +138,9 @@ const SIDEBAR_TEMPLATE = `
                 <a href="chatbot-history.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-robot w-5"></i><span class="text-sm">Lịch sử Chatbot</span>
                 </a>
+                <a href="chatbot-knowledge.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                    <i class="fas fa-brain w-5"></i><span class="text-sm">Tri thức Chatbot</span>
+                </a>
             </div>
 
             <!-- 6. Nội dung & Hệ thống -->
@@ -154,18 +160,18 @@ const SIDEBAR_TEMPLATE = `
                 </a>
             </div>
         </nav>
-        <div class="p-4 border-t border-white/10">
+        <div class="p-4 border-t border-amber-900/10">
             <div class="admin-card">
                 <div class="flex items-center space-x-3">
-                    <img id="admin-avatar" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" alt="Admin" class="w-12 h-12 rounded-full border-2 border-blue-400">
+                    <img id="admin-avatar" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=Admin&background=8c6239&color=fff" alt="Admin" class="w-12 h-12 rounded-full border-2 border-amber-200">
                     <div class="flex-1 min-w-0">
                         <p id="admin-name" class="font-semibold text-sm text-white truncate">Admin</p>
-                        <p id="admin-email" class="text-xs text-blue-300 truncate">admin@example.com</p>
+                        <p id="admin-email" class="text-xs text-amber-100 truncate">admin@example.com</p>
                     </div>
                 </div>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
-                    <span id="login-type-badge" class="text-xs text-blue-300"><i class="fab fa-google mr-1"></i>Google</span>
-                    <button onclick="if(typeof logoutAdmin !== 'undefined') logoutAdmin(); else alert('Hàm đăng xuất chưa sẵn sàng!');" class="text-xs text-red-400 hover:text-red-300 transition-colors cursor-pointer relative z-50">
+                <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/15">
+                    <span id="login-type-badge" class="text-xs text-amber-200"><i class="fab fa-google mr-1"></i>Google</span>
+                    <button onclick="if(typeof logoutAdmin !== 'undefined') logoutAdmin(); else alert('Hàm đăng xuất chưa sẵn sàng!');" class="text-xs text-red-300 hover:text-red-200 transition-colors cursor-pointer relative z-50">
                         <i class="fas fa-sign-out-alt mr-1"></i>Đăng xuất
                     </button>
                 </div>
@@ -179,21 +185,21 @@ const SIDEBAR_TEMPLATE = `
 const HEADER_TEMPLATE = `
 <header class="header-bar flex items-center justify-between">
     <div class="flex items-center space-x-3 sm:space-x-4">
-        <button onclick="toggleSidebar()" class="mobile-menu-btn lg:hidden text-white cursor-pointer"><i class="fas fa-bars text-xl"></i></button>
+        <button onclick="toggleSidebar()" class="mobile-menu-btn lg:hidden text-amber-950 cursor-pointer"><i class="fas fa-bars text-xl"></i></button>
         <div>
             <h2 id="header-page-title" class="text-base sm:text-xl font-bold">Quản trị</h2>
-            <p id="header-page-desc" class="text-xs sm:text-sm text-blue-200 hidden sm:block">Nhà hàng Ẩm thực Phương Nam</p>
+            <p id="header-page-desc" class="text-xs sm:text-sm text-amber-800 hidden sm:block">Nhà hàng Ẩm thực Phương Nam</p>
         </div>
     </div>
     <div class="flex items-center space-x-4">
         <!-- Reload Permissions Button (chỉ hiện cho Staff) -->
-        <button id="reload-permissions-btn" onclick="reloadPermissions()" class="hidden text-white hover:text-blue-200 transition cursor-pointer" title="Kiểm tra quyền mới">
+        <button id="reload-permissions-btn" onclick="reloadPermissions()" class="hidden text-amber-900 hover:text-amber-700 transition cursor-pointer" title="Kiểm tra quyền mới">
             <i class="fas fa-sync-alt text-lg"></i>
         </button>
         
         <!-- Admin Notification Bell -->
         <div id="admin-notification-container" class="relative">
-            <button id="admin-notification-btn" class="relative text-white hover:text-blue-200 transition cursor-pointer">
+            <button id="admin-notification-btn" class="relative text-amber-900 hover:text-amber-700 transition cursor-pointer">
                 <i class="fas fa-bell text-lg"></i>
                 <span id="admin-notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
             </button>
@@ -211,14 +217,14 @@ const HEADER_TEMPLATE = `
             </div>
         </div>
         
-        <a href="../index.html" target="_blank" class="text-white hover:text-blue-200 transition" title="Xem website">
+        <a href="../index.html" target="_blank" class="text-amber-900 hover:text-amber-700 transition" title="Xem website">
             <i class="fas fa-external-link-alt text-lg"></i>
         </a>
-        <div class="hidden md:flex items-center space-x-3 pl-4 border-l border-white/20">
-            <img id="admin-avatar-header" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" alt="Admin" class="w-10 h-10 rounded-full border-2 border-blue-400">
+        <div class="hidden md:flex items-center space-x-3 pl-4 border-l border-amber-900/15">
+            <img id="admin-avatar-header" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=Admin&background=8c6239&color=fff" alt="Admin" class="w-10 h-10 rounded-full border-2 border-amber-600">
             <div>
-                <p id="admin-name-header" class="font-semibold text-sm text-white">Admin</p>
-                <p id="user-role-badge" class="text-xs text-blue-200 uppercase tracking-tighter font-bold">Quản trị viên</p>
+                <p id="admin-name-header" class="font-semibold text-sm text-amber-950">Admin</p>
+                <p id="user-role-badge" class="text-xs text-amber-700 uppercase tracking-tighter font-bold">Quản trị viên</p>
             </div>
         </div>
     </div>
@@ -287,7 +293,7 @@ async function loadAdminInfo() {
                 isAdmin = true;
                 const admin = result.data;
                 const adminName = admin.ten_hien_thi || admin.tai_khoan || admin.email?.split('@')[0] || 'Admin';
-                const adminAvatar = admin.anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=3b82f6&color=fff`;
+                const adminAvatar = admin.anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=8c6239&color=fff`;
 
                 console.log('✅ Admin đăng nhập qua Google:', adminName);
                 
@@ -328,7 +334,7 @@ function updateAdminElements(identifier, value, isImage = false) {
         if (isImage) {
             el.setAttribute('referrerpolicy', 'no-referrer');
             el.src = value;
-            el.onerror = () => el.src = 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
+            el.onerror = () => el.src = 'https://ui-avatars.com/api/?name=User&background=8c6239&color=fff';
         } else {
             el.textContent = value;
         }
@@ -490,6 +496,7 @@ async function applyRBAC(userData) {
         // Tổng quan
         'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
         'doanh-thu.html': ['xem_doanh_thu'],
+        'loi-nhuan.html': ['xem_doanh_thu'],
         'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
         'loai-chi-phi.html': ['xem_doanh_thu'],
         // Bán hàng
@@ -522,6 +529,7 @@ async function applyRBAC(userData) {
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
         'chatbot-history.html': ['xem_khach_hang'],
+        'chatbot-knowledge.html': ['xem_khach_hang'],
         // Hệ thống
         'news.html': ['xem_cai_dat'],
         'quan-ly-binh-luan.html': ['xem_cai_dat'],
@@ -652,6 +660,7 @@ function redirectToDefaultPage(vai_tro) {
     const permissionMenuMap = {
         'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
         'doanh-thu.html': ['xem_doanh_thu'],
+        'loi-nhuan.html': ['xem_doanh_thu'],
         'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
         'loai-chi-phi.html': ['xem_doanh_thu'],
         'admin-pos-new.html': ['xem_pos', 'tao_don_pos'],
@@ -679,6 +688,7 @@ function redirectToDefaultPage(vai_tro) {
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
         'chatbot-history.html': ['xem_khach_hang'],
+        'chatbot-knowledge.html': ['xem_khach_hang'],
         'news.html': ['xem_cai_dat'],
         'quan-ly-binh-luan.html': ['xem_cai_dat'],
         'albums.html': ['xem_cai_dat'],
@@ -806,6 +816,7 @@ function addMenuDataAttributes() {
         'customer-preferences.html': 'customer-preferences',
         'promotions.html': 'promotions', 'reviews.html': 'reviews',
         'contacts.html': 'contacts', 'chatbot-history.html': 'chatbot-history',
+        'chatbot-knowledge.html': 'chatbot-knowledge',
         'news.html': 'news', 'quan-ly-binh-luan.html': 'quan-ly-binh-luan',
         'quan-ly-danh-gia-tin-tuc.html': 'quan-ly-danh-gia-tin-tuc',
         'albums.html': 'albums', 'settings.html': 'settings'

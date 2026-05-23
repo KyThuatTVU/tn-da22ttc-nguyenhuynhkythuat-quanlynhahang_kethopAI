@@ -3,14 +3,109 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo cáo Tài chính - Admin</title>
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Doanh thu - Admin</title>
     <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ApexCharts - Thư viện biểu đồ chuyên nghiệp -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="admin-responsive.css">
+    <style>
+        /* Custom styles cho biểu đồ đẹp như chứng khoán */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        /* Hiệu ứng cho stats cards */
+        .stats-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .stats-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Animation cho số */
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats-card h3 {
+            animation: countUp 0.6s ease-out;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Pulse animation cho legend */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #2563eb, #1e40af);
+        }
+    </style>
 </head>
 
 <body class="bg-slate-50">
@@ -27,8 +122,8 @@
                 <!-- Page Title -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-800">Báo cáo Tài chính</h1>
-                        <p class="text-slate-500 text-sm">Theo dõi doanh thu, chi phí và lợi nhuận định kỳ</p>
+                        <h1 class="text-2xl font-bold text-slate-800">Báo cáo Doanh thu</h1>
+                        <p class="text-slate-500 text-sm">Theo dõi doanh thu từ bán hàng và đặt bàn</p>
                     </div>
                     
                     <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
@@ -46,7 +141,7 @@
                             <option value="2025">2025</option>
                             <option value="2026" selected>2026</option>
                         </select>
-                        <button onclick="loadFinanceData()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-xl transition-all shadow-lg shadow-blue-200">
+                        <button onclick="loadRevenueData()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-xl transition-all shadow-lg shadow-blue-200">
                             <i class="fas fa-sync-alt px-1"></i>
                         </button>
                     </div>
@@ -54,58 +149,63 @@
 
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                    <div class="stats-card bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
                         <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
                         <div class="relative">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tổng Thu (Doanh thu)</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tổng Doanh thu</p>
                             <h3 id="total-revenue" class="text-3xl font-black text-slate-800">0đ</h3>
+                            <div class="mt-4 flex items-center text-xs text-blue-600 font-bold bg-blue-50 w-fit px-2 py-1 rounded-lg">
+                                <i class="fas fa-chart-line mr-1 text-[10px]"></i> Tiền bán hàng
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
+                        <div class="relative">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Doanh thu Đơn hàng</p>
+                            <h3 id="order-revenue" class="text-3xl font-black text-slate-800">0đ</h3>
                             <div class="mt-4 flex items-center text-xs text-emerald-600 font-bold bg-emerald-50 w-fit px-2 py-1 rounded-lg">
-                                <i class="fas fa-arrow-up mr-1 text-[10px]"></i> Tiền mặt & Online
+                                <i class="fas fa-shopping-cart mr-1 text-[10px]"></i> Online & POS
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
-                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
+                    <div class="stats-card bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-50 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
                         <div class="relative">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tổng Chi (Gốc hàng)</p>
-                            <h3 id="total-expenses" class="text-3xl font-black text-slate-800">0đ</h3>
-                            <div class="mt-4 flex items-center text-xs text-rose-600 font-bold bg-rose-50 w-fit px-2 py-1 rounded-lg">
-                                <i class="fas fa-arrow-down mr-1 text-[10px]"></i> Nhập nguyên liệu
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="profit-card" class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group">
-                        <div id="profit-bg" class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
-                        <div class="relative">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Lợi Nhuận Dự Tính</p>
-                            <h3 id="net-profit" class="text-3xl font-black text-slate-800">0đ</h3>
-                            <div id="profit-status" class="mt-4 flex items-center text-xs text-emerald-600 font-bold bg-emerald-50 w-fit px-2 py-1 rounded-lg">
-                                <i class="fas fa-chart-line mr-1 text-[10px]"></i> Đang có lời
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Doanh thu Đặt bàn</p>
+                            <h3 id="reservation-revenue" class="text-3xl font-black text-slate-800">0đ</h3>
+                            <div class="mt-4 flex items-center text-xs text-purple-600 font-bold bg-purple-50 w-fit px-2 py-1 rounded-lg">
+                                <i class="fas fa-calendar-check mr-1 text-[10px]"></i> Đặt bàn
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Charts Section -->
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 overflow-hidden">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                             <i class="fas fa-chart-area text-blue-600"></i>
-                             Biến động Thu - Chi hàng ngày
-                        </h3>
-                        <div class="flex items-center gap-4 text-[10px] md:text-xs font-bold">
-                            <div class="flex items-center gap-2 text-blue-600">
-                                <span class="w-2 h-2 rounded-full bg-blue-600"></span> Doanh thu
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 overflow-hidden relative">
+                    <!-- Hiệu ứng nền gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/30 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-1">
+                                     <i class="fas fa-chart-area text-blue-600"></i>
+                                     Biến động Doanh thu hàng ngày
+                                </h3>
+                                <p class="text-xs text-slate-500 ml-7">Theo dõi xu hướng doanh thu theo thời gian</p>
                             </div>
-                            <div class="flex items-center gap-2 text-rose-500">
-                                <span class="w-2 h-2 rounded-full bg-rose-500"></span> Chi phí
+                            <div class="flex items-center gap-3 text-[10px] md:text-xs font-bold">
+                                <div class="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
+                                    <span class="w-3 h-3 rounded-full bg-blue-600 shadow-lg shadow-blue-300 animate-pulse"></span> Doanh thu
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="h-80 w-full">
-                        <canvas id="financeChart"></canvas>
+                        <div class="h-80 w-full relative">
+                            <div id="revenueChart"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -113,7 +213,7 @@
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-12">
                     <div class="p-6 border-b flex items-center justify-between bg-slate-50/50">
                         <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-slate-800"><i class="fas fa-table mr-2 text-indigo-500"></i>Bảng chi tiết hàng ngày</h3>
+                            <h3 class="font-bold text-slate-800"><i class="fas fa-table mr-2 text-indigo-500"></i>Bảng chi tiết doanh thu hàng ngày</h3>
                             <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold">NHẤN VÀO DÒNG ĐỂ XEM CHI TIẾT</span>
                         </div>
                         <button onclick="window.print()" class="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
@@ -125,10 +225,9 @@
                             <thead class="bg-slate-50/80">
                                 <tr>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Ngày</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Doanh thu (Thu)</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Chi phí (Chi)</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Lợi nhuận</th>
-                                    <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Trạng thái</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Doanh thu Đơn hàng</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Doanh thu Đặt bàn</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest leading-4">Tổng Doanh thu</th>
                                 </tr>
                             </thead>
                             <tbody id="daily-table-body" class="divide-y divide-slate-100 font-medium whitespace-no-wrap">
@@ -146,7 +245,7 @@
         <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b flex items-center justify-between bg-slate-50/50">
                 <div>
-                    <h3 id="modal-title" class="font-bold text-xl text-slate-800">Chi tiết Thu - Chi</h3>
+                    <h3 id="modal-title" class="font-bold text-xl text-slate-800">Chi tiết Doanh thu</h3>
                     <p id="modal-date" class="text-sm text-slate-500 font-medium"></p>
                 </div>
                 <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
@@ -155,25 +254,25 @@
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 md:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <!-- Thu (Income) -->
+                <div class="space-y-8">
+                    <!-- Doanh thu từ Đơn hàng -->
                     <div>
                         <div class="flex items-center gap-2 mb-6">
-                            <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
-                            <h4 class="font-black text-slate-800 uppercase tracking-widest text-sm">Khoản Thu (Doanh thu)</h4>
+                            <div class="w-2 h-6 bg-emerald-600 rounded-full"></div>
+                            <h4 class="font-black text-slate-800 uppercase tracking-widest text-sm">Doanh thu từ Đơn hàng</h4>
                         </div>
-                        <div id="income-list" class="space-y-3">
+                        <div id="order-revenue-list" class="space-y-3">
                             <!-- Items -->
                         </div>
                     </div>
 
-                    <!-- Chi (Expenses) -->
+                    <!-- Doanh thu từ Đặt bàn -->
                     <div>
                         <div class="flex items-center gap-2 mb-6">
-                            <div class="w-2 h-6 bg-rose-600 rounded-full"></div>
-                            <h4 class="font-black text-slate-800 uppercase tracking-widest text-sm">Khoản Chi (Tất cả chi phí)</h4>
+                            <div class="w-2 h-6 bg-purple-600 rounded-full"></div>
+                            <h4 class="font-black text-slate-800 uppercase tracking-widest text-sm">Doanh thu từ Đặt bàn</h4>
                         </div>
-                        <div id="expense-list" class="space-y-3">
+                        <div id="reservation-revenue-list" class="space-y-3">
                             <!-- Items -->
                         </div>
                     </div>
@@ -183,18 +282,18 @@
             <div class="p-6 bg-slate-50 border-t flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex gap-4">
                     <div class="text-center md:text-left">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng Thu Ngày</p>
-                        <p id="modal-total-thu" class="text-xl font-black text-blue-600">0đ</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Đơn hàng</p>
+                        <p id="modal-order-revenue" class="text-xl font-black text-emerald-600">0đ</p>
                     </div>
                     <div class="w-px h-10 bg-slate-200"></div>
                     <div class="text-center md:text-left">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng Chi Ngày</p>
-                        <p id="modal-total-chi" class="text-xl font-black text-rose-600">0đ</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Đặt bàn</p>
+                        <p id="modal-reservation-revenue" class="text-xl font-black text-purple-600">0đ</p>
                     </div>
                 </div>
                 <div class="bg-white px-6 py-3 rounded-2xl border border-slate-200">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Lợi Nhuận Ròng</p>
-                    <p id="modal-net" class="text-2xl font-black text-slate-800">0đ</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng Doanh thu</p>
+                    <p id="modal-total-revenue" class="text-2xl font-black text-blue-600">0đ</p>
                 </div>
             </div>
         </div>
@@ -203,21 +302,21 @@
     <!-- Scripts -->
     <script src="admin-layout.js"></script>
     <script>
-        let financeChart = null;
+        let revenueChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             document.getElementById('select-month').value = today.getMonth() + 1;
             document.getElementById('select-year').value = today.getFullYear();
-            loadFinanceData();
+            loadRevenueData();
         });
 
-        async function loadFinanceData() {
+        async function loadRevenueData() {
             const month = document.getElementById('select-month').value;
             const year = document.getElementById('select-year').value;
             
             try {
-                const res = await fetch(`${API_URL}/stats/financial-summary?month=${month}&year=${year}`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/stats/revenue-summary?month=${month}&year=${year}`, { credentials: 'include' });
                 const result = await res.json();
                 
                 if (result.success) {
@@ -235,205 +334,309 @@
 
         function updateUI(summary) {
             document.getElementById('total-revenue').textContent = (summary.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('total-expenses').textContent = (summary.totalExpenses || 0).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('net-profit').textContent = (summary.netProfit || 0).toLocaleString('vi-VN') + 'đ';
-            
-            const statusDiv = document.getElementById('profit-status');
-            const bgDiv = document.getElementById('profit-bg');
-            if (summary.netProfit >= 0) {
-                statusDiv.innerHTML = '<i class="fas fa-chart-line mr-1 text-[10px]"></i> Đang có lời';
-                statusDiv.className = 'mt-4 flex items-center text-xs text-emerald-600 font-bold bg-emerald-50 w-fit px-2 py-1 rounded-lg';
-                bgDiv.className = 'absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500';
-            } else {
-                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-1 text-[10px]"></i> Đang thua lỗ';
-                statusDiv.className = 'mt-4 flex items-center text-xs text-rose-600 font-bold bg-rose-50 w-fit px-2 py-1 rounded-lg';
-                bgDiv.className = 'absolute -right-4 -top-4 w-24 h-24 bg-rose-50 rounded-full group-hover:scale-125 transition-transform duration-500';
-            }
+            document.getElementById('order-revenue').textContent = (summary.orderRevenue || 0).toLocaleString('vi-VN') + 'đ';
+            document.getElementById('reservation-revenue').textContent = (summary.reservationRevenue || 0).toLocaleString('vi-VN') + 'đ';
         }
 
         function renderChart(data) {
-            const ctx = document.getElementById('financeChart').getContext('2d');
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
             
-            if (financeChart) financeChart.destroy();
+            // Chuẩn bị dữ liệu
+            const categories = data.map(d => {
+                const date = new Date(d.date);
+                return date.getDate() + '/' + (date.getMonth() + 1);
+            });
             
-            financeChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => d.date.split('-')[2]),
-                    datasets: [
-                        {
-                            label: 'Doanh thu',
-                            data: data.map(d => d.thu),
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#fff',
-                            pointBorderColor: '#2563eb'
+            const revenueData = data.map(d => d.revenue);
+            
+            // Tính % thay đổi so với ngày trước
+            const changes = revenueData.map((val, idx) => {
+                if (idx === 0) return 0;
+                const prev = revenueData[idx - 1];
+                if (prev === 0) return 0;
+                return ((val - prev) / prev * 100).toFixed(2);
+            });
+            
+            // Cấu hình biểu đồ ApexCharts - Style TradingView
+            const options = {
+                series: [{
+                    name: 'Doanh thu',
+                    data: revenueData
+                }],
+                chart: {
+                    height: 320,
+                    type: 'area',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: true,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
                         },
-                        {
-                            label: 'Chi phí',
-                            data: data.map(d => d.chi),
-                            borderColor: '#e11d48',
-                            backgroundColor: 'transparent',
-                            fill: false,
-                            tension: 0.4,
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1E293B',
-                            padding: 12,
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 },
-                            callbacks: {
-                                label: (context) => {
-                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
-                                }
-                            }
+                        autoSelected: 'zoom'
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
                         }
                     },
-                    scales: {
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: '#f1f5f9' },
-                            ticks: { 
-                                callback: val => (val / 1000).toLocaleString('vi-VN') + 'k',
-                                font: { size: 10, weight: 'bold' },
-                                color: '#64748b'
-                            }
+                    background: 'transparent',
+                    dropShadow: {
+                        enabled: true,
+                        top: 3,
+                        left: 0,
+                        blur: 10,
+                        opacity: 0.15
+                    }
+                },
+                colors: ['#3b82f6'],
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#93c5fd'],
+                        inverseColors: false,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.1,
+                        stops: [0, 100]
+                    }
+                },
+                markers: {
+                    size: 5,
+                    colors: ['#fff'],
+                    strokeColors: '#3b82f6',
+                    strokeWidth: 3,
+                    hover: {
+                        size: 8,
+                        sizeOffset: 3
+                    }
+                },
+                xaxis: {
+                    categories: categories,
+                    labels: {
+                        style: {
+                            colors: '#64748b',
+                            fontSize: '11px',
+                            fontWeight: 600
                         },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { font: { size: 10, weight: 'bold' }, color: '#64748b' }
+                        rotate: 0
+                    },
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    crosshairs: {
+                        show: true,
+                        width: 1,
+                        stroke: {
+                            color: '#94a3b8',
+                            width: 1,
+                            dashArray: 4
                         }
                     }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: '#64748b',
+                            fontSize: '11px',
+                            fontWeight: 600
+                        },
+                        formatter: function(val) {
+                            if (val >= 1000000) {
+                                return (val / 1000000).toFixed(1) + 'M';
+                            } else if (val >= 1000) {
+                                return (val / 1000).toFixed(0) + 'K';
+                            }
+                            return val;
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 3,
+                    xaxis: {
+                        lines: {
+                            show: false
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    padding: {
+                        top: 0,
+                        right: 20,
+                        bottom: 0,
+                        left: 10
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    shared: true,
+                    intersect: false,
+                    theme: 'dark',
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Inter, system-ui, sans-serif'
+                    },
+                    custom: function({series, seriesIndex, dataPointIndex, w}) {
+                        const value = series[seriesIndex][dataPointIndex];
+                        const change = changes[dataPointIndex];
+                        const arrow = change > 0 ? '↑' : change < 0 ? '↓' : '→';
+                        const color = change > 0 ? '#10b981' : change < 0 ? '#ef4444' : '#94a3b8';
+                        const emoji = change > 0 ? '🟢' : change < 0 ? '🔴' : '⚪';
+                        
+                        return `
+                            <div class="apexcharts-tooltip-custom" style="background: rgba(15, 23, 42, 0.95); padding: 16px; border-radius: 12px; border: 2px solid #3b82f6; box-shadow: 0 10px 25px rgba(0,0,0,0.3); min-width: 220px;">
+                                <div style="font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                                    📅 Ngày ${categories[dataPointIndex]}
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                    <span style="color: #cbd5e1; font-weight: 600; font-size: 13px;">Doanh thu:</span>
+                                    <span style="color: #3b82f6; font-weight: 700; font-size: 16px;">${value.toLocaleString('vi-VN')} đ</span>
+                                </div>
+                                ${dataPointIndex > 0 ? `
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">So với hôm trước:</span>
+                                        <span style="color: ${color}; font-weight: 700; font-size: 14px;">
+                                            ${emoji} ${arrow} ${Math.abs(change)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
                 }
-            });
+            };
+
+            revenueChart = new ApexCharts(document.querySelector("#revenueChart"), options);
+            revenueChart.render();
         }
 
         function renderTable(data) {
             const body = document.getElementById('daily-table-body');
             body.innerHTML = '';
             
-            const filteredData = data.filter(day => day.thu > 0 || day.chi > 0);
+            const filteredData = data.filter(day => day.revenue > 0);
             
             filteredData.forEach(day => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-50 transition-all cursor-pointer group';
                 row.onclick = () => showDayDetail(day.date);
-                
-                const profitClass = day.net >= 0 ? 'text-emerald-600' : 'text-rose-600';
-                const statusBadge = day.net >= 0 
-                    ? '<span class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold">LỜI</span>' 
-                    : '<span class="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-bold">LỖ</span>';
 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">${new Date(day.date).toLocaleDateString('vi-VN')}</td>
-                    <td class="px-6 py-4 text-right text-sm text-blue-600 font-bold">${day.thu.toLocaleString('vi-VN')}đ</td>
-                    <td class="px-6 py-4 text-right text-sm text-slate-500">${day.chi.toLocaleString('vi-VN')}đ</td>
-                    <td class="px-6 py-4 text-right text-sm ${profitClass} font-black">${day.net.toLocaleString('vi-VN')}đ</td>
-                    <td class="px-6 py-4 text-center">${statusBadge}</td>
+                    <td class="px-6 py-4 text-right text-sm text-emerald-600 font-bold">${(day.orderRevenue || 0).toLocaleString('vi-VN')}đ</td>
+                    <td class="px-6 py-4 text-right text-sm text-purple-600 font-bold">${(day.reservationRevenue || 0).toLocaleString('vi-VN')}đ</td>
+                    <td class="px-6 py-4 text-right text-sm text-blue-600 font-black">${day.revenue.toLocaleString('vi-VN')}đ</td>
                 `;
                 body.appendChild(row);
             });
             
             if (filteredData.length === 0) {
-                body.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-slate-400 italic">Không có dữ liệu thu chi trong tháng này</td></tr>';
+                body.innerHTML = '<tr><td colspan="4" class="py-12 text-center text-slate-400 italic">Không có dữ liệu doanh thu trong tháng này</td></tr>';
             }
         }
 
         async function showDayDetail(date) {
             const modal = document.getElementById('detail-modal');
             const dateText = document.getElementById('modal-date');
-            const incomeList = document.getElementById('income-list');
-            const expenseList = document.getElementById('expense-list');
+            const orderList = document.getElementById('order-revenue-list');
+            const reservationList = document.getElementById('reservation-revenue-list');
             
             dateText.textContent = 'Ngày ' + new Date(date).toLocaleDateString('vi-VN');
-            incomeList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-slate-300"></i></div>';
-            expenseList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-slate-300"></i></div>';
+            orderList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-slate-300"></i></div>';
+            reservationList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-slate-300"></i></div>';
             
             modal.classList.remove('invisible', 'opacity-0');
             
             try {
-                const res = await fetch(`${API_URL}/stats/daily-detail?date=${date}`, { credentials: 'include' });
+                const res = await fetch(`${API_URL}/stats/revenue-detail?date=${date}`, { credentials: 'include' });
                 const result = await res.json();
                 
                 if (result.success) {
-                    renderDetailLists(result.data.revenue, result.data.expenses);
+                    renderDetailLists(result.data.orders, result.data.reservations);
                     updateModalSummary(result.data.summary);
                 } else {
-                    incomeList.innerHTML = '<p class="text-center py-8 text-red-400">Lỗi: ' + result.message + '</p>';
-                    expenseList.innerHTML = '<p class="text-center py-8 text-red-400">Lỗi: ' + result.message + '</p>';
+                    orderList.innerHTML = '<p class="text-center py-8 text-red-400">Lỗi: ' + result.message + '</p>';
+                    reservationList.innerHTML = '<p class="text-center py-8 text-red-400">Lỗi: ' + result.message + '</p>';
                 }
             } catch (err) {
                 console.error(err);
-                incomeList.innerHTML = '<p class="text-center py-8 text-red-400">Không thể kết nối máy chủ</p>';
-                expenseList.innerHTML = '<p class="text-center py-8 text-red-400">Không thể kết nối máy chủ</p>';
+                orderList.innerHTML = '<p class="text-center py-8 text-red-400">Không thể kết nối máy chủ</p>';
+                reservationList.innerHTML = '<p class="text-center py-8 text-red-400">Không thể kết nối máy chủ</p>';
             }
         }
 
-        function renderDetailLists(revenue, expenses) {
-            const incomeList = document.getElementById('income-list');
-            const expenseList = document.getElementById('expense-list');
+        function renderDetailLists(orders, reservations) {
+            const orderList = document.getElementById('order-revenue-list');
+            const reservationList = document.getElementById('reservation-revenue-list');
             
-            // Render Revenue (Thu)
-            if (revenue.length === 0) {
-                incomeList.innerHTML = '<p class="text-center py-8 text-slate-400 italic text-xs">Không có khoản thu</p>';
+            // Render Orders
+            if (orders.length === 0) {
+                orderList.innerHTML = '<p class="text-center py-8 text-slate-400 italic text-xs">Không có đơn hàng</p>';
             } else {
-                incomeList.innerHTML = revenue.map(item => `
-                    <div class="bg-slate-50 p-4 rounded-2xl flex items-center justify-between hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100">
+                orderList.innerHTML = orders.map(item => `
+                    <div class="bg-slate-50 p-4 rounded-2xl flex items-center justify-between hover:bg-emerald-50 transition-colors border border-transparent hover:border-emerald-100">
                         <div>
                             <p class="text-xs font-bold text-slate-800">${item.mo_ta}</p>
                             <p class="text-[10px] text-slate-400 font-medium">${new Date(item.thoi_gian_thanh_toan).toLocaleTimeString('vi-VN')} • ${item.phuong_thuc}</p>
                         </div>
-                        <p class="font-black text-blue-600">${parseFloat(item.so_tien || 0).toLocaleString('vi-VN')}đ</p>
+                        <p class="font-black text-emerald-600">${parseFloat(item.so_tien || 0).toLocaleString('vi-VN')}đ</p>
                     </div>
                 `).join('');
             }
             
-            // Render Expenses (Chi)
-            if (expenses.length === 0) {
-                expenseList.innerHTML = '<p class="text-center py-8 text-slate-400 italic text-xs">Không có khoản chi</p>';
+            // Render Reservations
+            if (reservations.length === 0) {
+                reservationList.innerHTML = '<p class="text-center py-8 text-slate-400 italic text-xs">Không có đặt bàn</p>';
             } else {
-                expenseList.innerHTML = expenses.map(item => {
-                    const time = item.thoi_gian_nhap ? new Date(item.thoi_gian_nhap).toLocaleTimeString('vi-VN') : 'N/A';
-                    const nguon = item.nguon || 'Không xác định';
-                    const phuongThuc = item.phuong_thuc_thanh_toan || 'N/A';
-                    
-                    return `
-                        <div class="bg-slate-50 p-4 rounded-2xl flex items-center justify-between hover:bg-rose-50 transition-colors border border-transparent hover:border-rose-100">
-                            <div class="flex-1">
-                                <p class="text-xs font-bold text-slate-800">${item.mo_ta}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[10px] text-slate-400 font-medium">${time}</span>
-                                    <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold">${nguon}</span>
-                                    ${item.nguoi_nhan ? `<span class="text-[10px] text-slate-400">• ${item.nguoi_nhan}</span>` : ''}
-                                </div>
-                                ${item.loai_chi_phi ? `<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold mt-1 inline-block">${item.loai_chi_phi}</span>` : ''}
-                            </div>
-                            <p class="font-black text-rose-600 ml-4">${parseFloat(item.so_tien || 0).toLocaleString('vi-VN')}đ</p>
+                reservationList.innerHTML = reservations.map(item => `
+                    <div class="bg-slate-50 p-4 rounded-2xl flex items-center justify-between hover:bg-purple-50 transition-colors border border-transparent hover:border-purple-100">
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">${item.mo_ta}</p>
+                            <p class="text-[10px] text-slate-400 font-medium">${new Date(item.thoi_gian_thanh_toan).toLocaleTimeString('vi-VN')} • ${item.phuong_thuc}</p>
                         </div>
-                    `;
-                }).join('');
+                        <p class="font-black text-purple-600">${parseFloat(item.so_tien || 0).toLocaleString('vi-VN')}đ</p>
+                    </div>
+                `).join('');
             }
         }
 
         function updateModalSummary(summary) {
-            document.getElementById('modal-total-thu').textContent = (summary.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('modal-total-chi').textContent = (summary.totalExpenses || 0).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('modal-net').textContent = (summary.netProfit || 0).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('modal-net').className = `text-2xl font-black ${summary.netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`;
+            document.getElementById('modal-order-revenue').textContent = (summary.orderRevenue || 0).toLocaleString('vi-VN') + 'đ';
+            document.getElementById('modal-reservation-revenue').textContent = (summary.reservationRevenue || 0).toLocaleString('vi-VN') + 'đ';
+            document.getElementById('modal-total-revenue').textContent = (summary.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
         }
 
         function closeModal() {

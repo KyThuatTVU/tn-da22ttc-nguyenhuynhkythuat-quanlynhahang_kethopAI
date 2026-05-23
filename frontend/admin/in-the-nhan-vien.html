@@ -217,8 +217,10 @@
             setTimeout(() => {
                 const element = document.getElementById(`qr-${code}`);
                 if (element && element.innerHTML === '') {
+                    const origin = window.location.origin;
+                    const url = `${origin}/cham-cong-guong-mat.html?code=${code}`;
                     new QRCode(element, {
-                        text: code,
+                        text: url,
                         width: 80,
                         height: 80,
                         colorDark: "#000000",

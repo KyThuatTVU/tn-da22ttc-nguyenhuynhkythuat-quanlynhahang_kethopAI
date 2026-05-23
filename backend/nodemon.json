@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    "uploads/*",
+    "images/*",
+    "node_modules/*",
+    "query_db_temp.js"
+  ],
+  "delay": "1000"
+}

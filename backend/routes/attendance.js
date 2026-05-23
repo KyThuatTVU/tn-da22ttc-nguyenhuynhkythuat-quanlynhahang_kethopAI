@@ -15,6 +15,8 @@ router.post('/checkin', attendanceController.upload.single('image'), attendanceC
 // Chấm công tự động (Public - không cần auth)
 router.post('/check-in', attendanceController.autoCheckIn);
 router.post('/check-out', attendanceController.autoCheckOut);
+router.post('/face-checkin', attendanceController.upload.single('image'), attendanceController.faceCheckIn);
+router.post('/face-checkout', attendanceController.upload.single('image'), attendanceController.faceCheckOut);
 router.get('/today/:ma_nv_code', attendanceController.getTodayAttendance);
 
 module.exports = router;

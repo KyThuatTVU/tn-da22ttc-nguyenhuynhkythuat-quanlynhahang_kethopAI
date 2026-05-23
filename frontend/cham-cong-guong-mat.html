@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công Khuôn Mặt - Nhà hàng Phương Nam</title>
+    <link rel="icon" type="image/png" href="images/Green Simple Clean Vegan Food Logo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-glow-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-glow-green:hover:not(:disabled) {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow-red {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-glow-red:hover:not(:disabled) {
+            box-shadow: 0 0 30px rgba(244, 63, 94, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Camera scan effect */
+        .camera-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+            transition: border-color 0.5s ease;
+        }
+
+        .camera-container.scanning {
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        .camera-container.success {
+            border-color: #10b981;
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .camera-container.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.4);
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.8), transparent);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+        }
+
+        .camera-container.scanning .scan-line {
+            display: block;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        @keyframes loading-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Clock typography */
+        .clock-time {
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col justify-between">
+    <div class="animated-bg"></div>
+
+    <!-- Header Section -->
+    <header class="max-w-7xl mx-auto w-full flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <img src="images/Green Simple Clean Vegan Food Logo.png" alt="Logo" class="w-12 h-12 rounded-full border-2 border-indigo-500 shadow-md">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Phương Nam Restaurant</h1>
+                <p class="text-xs text-slate-400">Hệ Thống Điểm Danh Sinh Trắc Học</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="header-clock" class="text-lg font-bold clock-time text-indigo-400">00:00:00</div>
+            <div id="header-date" class="text-xs text-slate-400">Thứ Sáu, 22/05/2026</div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto">
+        
+        <!-- Left Column: Staff Info & History -->
+        <div class="lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1">
+            
+            <!-- Staff Card / Verification target -->
+            <div id="staff-card-section" class="glass-card rounded-3xl p-6 relative overflow-hidden">
+                <!-- Decorative background elements -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-indigo-400"></i> Nhân Viên Xác Minh
+                </h2>
+
+                <!-- State 1: Loading Skeleton -->
+                <div id="staff-loading" class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full shimmer bg-slate-800"></div>
+                        <div class="space-y-2 flex-1">
+                            <div class="h-4 w-1/2 shimmer rounded bg-slate-800"></div>
+                            <div class="h-3 w-1/3 shimmer rounded bg-slate-800"></div>
+                        </div>
+                    </div>
+                    <div class="h-10 w-full shimmer rounded bg-slate-800 mt-2"></div>
+                </div>
+
+                <!-- State 2: Staff Details -->
+                <div id="staff-details" class="hidden flex flex-col gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <img id="staff-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/50 bg-slate-800 shadow-lg">
+                            <span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center text-[10px] text-white">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h3 id="staff-name" class="text-xl font-bold text-white">Nguyễn Văn A</h3>
+                            <p id="staff-role" class="text-sm text-indigo-300">Phục vụ bàn</p>
+                            <span id="staff-code-badge" class="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">NV001</span>
+                        </div>
+                    </div>
+
+                    <!-- Shift Info Dynamic Alert (Optional/Placeholder based on API results later) -->
+                    <div class="p-3.5 bg-slate-800/40 rounded-2xl border border-white/5 text-sm text-slate-300 flex items-start gap-2.5">
+                        <i class="fa-solid fa-clock text-indigo-400 mt-0.5"></i>
+                        <div>
+                            <p class="font-medium text-slate-200">Ca làm việc hôm nay</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Hệ thống sẽ tự động đối chiếu thời gian điểm danh của bạn với ca trực đã phân công.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State 3: Standby / Ready for Facial Recognition -->
+                <div id="staff-standby" class="hidden flex flex-col items-center justify-center text-center py-6 px-4 space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 animate-pulse">
+                        <i class="fa-solid fa-face-viewfinder text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-200">Sẵn Sàng Nhận Diện</h3>
+                        <p class="text-xs text-slate-400 mt-1 max-w-[280px] mx-auto">Vui lòng hướng khuôn mặt vào camera và chọn "VÀO CA" hoặc "TAN CA" để chấm công tự động.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Geolocation Validation Status Card -->
+            <div class="glass-card rounded-3xl p-6">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-indigo-400"></i> Định Vị Toàn Cầu (GPS)
+                </h2>
+                <div id="gps-box" class="p-4 bg-slate-800/20 border border-white/5 rounded-2xl flex items-center gap-3">
+                    <div id="gps-icon-container" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-800 text-slate-400">
+                        <i id="gps-icon" class="fa-solid fa-location-dot animate-pulse text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center">
+                            <span id="gps-status" class="text-sm font-bold text-slate-300">Đang tìm tín hiệu...</span>
+                            <span id="gps-distance" class="text-xs font-semibold text-slate-400">-- m</span>
+                        </div>
+                        <p id="gps-desc" class="text-xs text-slate-400 mt-0.5 truncate">Đang dò tìm tọa độ thiết bị của bạn...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History List Card -->
+            <div class="glass-card rounded-3xl p-6 flex-1 flex flex-col min-h-[220px]">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Nhật Ký Hôm Nay
+                </h2>
+                <div id="attendance-history-list" class="space-y-3 overflow-y-auto max-h-[250px] flex-1 pr-1">
+                    <div class="text-center py-8 text-slate-500 text-sm flex flex-col items-center gap-2">
+                        <i class="fa-regular fa-folder-open text-2xl"></i>
+                        Chưa có lịch sử chấm công hôm nay
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Live Camera feed & Authentication triggers -->
+        <div class="lg:col-span-7 flex flex-col gap-6 order-1 lg:order-2">
+            
+            <!-- Camera View Container -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col items-center">
+                
+                <!-- High tech viewport wrapper -->
+                <div id="viewport-wrapper" class="camera-container scanning w-full aspect-[4/3] max-w-[560px] bg-slate-950 flex items-center justify-center">
+                    
+                    <!-- Scanline laser animation -->
+                    <div class="scan-line"></div>
+
+                    <!-- HTML5 Video element -->
+                    <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover rounded-[18px] transform -scale-x-100" style="display: none;"></video>
+                    
+                    <!-- Fallback loader/instructions -->
+                    <div id="camera-placeholder" class="text-center p-6 text-slate-400 space-y-4">
+                        <div class="w-20 h-20 rounded-full border border-dashed border-slate-700 flex items-center justify-center mx-auto bg-slate-900/50">
+                            <i class="fa-solid fa-video-slash text-3xl text-slate-500 animate-pulse"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-300">Đang chuẩn bị Camera...</p>
+                            <p class="text-xs text-slate-500 mt-1">Cấp quyền truy cập webcam nếu có yêu cầu từ trình duyệt</p>
+                        </div>
+                    </div>
+
+                    <!-- Canvas for frame grabbing -->
+                    <canvas id="snapshot-canvas" class="hidden"></canvas>
+
+                    <!-- Realtime Processing Overlay -->
+                    <div id="processing-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex-col items-center justify-center gap-4 z-20 rounded-[18px]">
+                        <div class="relative w-20 h-20 flex items-center justify-center">
+                            <!-- High-tech circular scanner spinner -->
+                            <div class="absolute inset-0 rounded-full border-4 border-t-indigo-500 border-indigo-500/20 animate-spin"></div>
+                            <i class="fa-solid fa-face-recognition text-indigo-400 text-3xl animate-pulse"></i>
+                        </div>
+                        <div class="text-center">
+                            <h4 class="text-lg font-bold text-white">Đang Xác Minh Khuôn Mặt</h4>
+                            <p class="text-xs text-slate-400 mt-1">Vui lòng giữ nguyên khuôn mặt trước camera...</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating result modal overlay inside camera container -->
+                    <div id="result-overlay" class="absolute inset-x-4 bottom-4 p-4 rounded-2xl glass-card border-l-4 border-l-emerald-500 hidden z-30 transition-all transform translate-y-2 opacity-0">
+                        <div class="flex items-center gap-3">
+                            <div id="result-status-icon" class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i class="fa-solid fa-circle-check text-lg"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 id="result-status-title" class="text-sm font-bold text-white">Điểm danh thành công!</h4>
+                                <p id="result-status-desc" class="text-xs text-slate-300 mt-0.5 truncate">Chúc bạn một ngày làm việc hiệu quả.</p>
+                            </div>
+                            <button onclick="hideResultOverlay()" class="text-slate-400 hover:text-white p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Camera Switcher / Toggle Tools -->
+                <div class="w-full max-w-[560px] flex justify-between items-center mt-4 px-2 text-xs text-slate-400">
+                    <span id="camera-status-text"><i class="fa-solid fa-circle text-[8px] text-yellow-500 mr-1 animate-pulse"></i> Khởi động máy ảnh...</span>
+                    <button onclick="toggleCameraMirror()" class="hover:text-white transition flex items-center gap-1.5 bg-slate-800/40 hover:bg-slate-800 px-2.5 py-1 rounded-lg border border-white/5">
+                        <i class="fa-solid fa-arrows-left-right"></i> Đối xứng
+                    </button>
+                </div>
+
+                <!-- Major Check-in / Check-out actions -->
+                <div class="w-full max-w-[560px] mt-6 grid grid-cols-2 gap-4">
+                    <button id="btn-checkin" onclick="performFaceAttendance('checkin')" disabled
+                            class="btn-glow-green text-white py-4 px-6 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fa-solid fa-door-open text-xl"></i>
+                        <span>VÀO CA</span>
+                    </button>
+                    <button id="btn-checkout" onclick="performFaceAttendance('checkout')" disabled
+                            class="btn-glow-red text-white py-4 px-6 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fa-solid fa-door-closed text-xl"></i>
+                        <span>TAN CA</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="max-w-7xl mx-auto w-full text-center text-xs text-slate-500 mt-10 pt-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <p>&copy; 2026 Nhà hàng Ẩm thực Phương Nam. Bảo lưu mọi quyền.</p>
+        <p class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">AI SFace Offline</span>
+            <span>| Trí Tuệ Nhân Tạo offline</span>
+        </p>
+    </footer>
+
+    <!-- Audio Effects for Biometrics Feedback -->
+    <audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/active_storage/sfx/950/950-84.wav" preload="auto"></audio>
+
+    <script>
+        // Ngăn chặn Live Server tự động reload trang khi lưu ảnh chấm công
+        (function() {
+            const OriginalWebSocket = window.WebSocket;
+            if (!OriginalWebSocket) return;
+            window.WebSocket = function(url, protocols) {
+                const ws = new OriginalWebSocket(url, protocols);
+                let customOnMessage = null;
+                Object.defineProperty(ws, 'onmessage', {
+                    get: () => customOnMessage,
+                    set: (fn) => {
+                        customOnMessage = fn;
+                        ws.addEventListener('message', (event) => {
+                            if (event.data === 'reload') {
+                                console.warn('⚠️ [Live Server] Đã chặn reload trang tự động để giữ thông báo chấm công.');
+                                return;
+                            }
+                            if (customOnMessage) customOnMessage.call(ws, event);
+                        });
+                    },
+                    configurable: true
+                });
+                return ws;
+            };
+            window.WebSocket.prototype = OriginalWebSocket.prototype;
+        })();
+
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Geolocation restaurant definition (Đại học Trà Vinh)
+        let RESTAURANT_LOCATION = {
+            lat: 9.9234,
+            lng: 106.3465,
+            radius: 500 // meters (bán kính rộng hơn do khuôn viên đại học lớn)
+        };
+
+        // Load GPS Config from API
+        async function loadGPSConfig() {
+            try {
+                const response = await fetch(`${API_BASE}/settings`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const settings = result.data;
+                    if (settings.latitude && settings.longitude) {
+                        RESTAURANT_LOCATION.lat = parseFloat(settings.latitude);
+                        RESTAURANT_LOCATION.lng = parseFloat(settings.longitude);
+                    }
+                    if (settings.radius) {
+                        RESTAURANT_LOCATION.radius = parseInt(settings.radius);
+                    }
+                    console.log('✅ GPS Config loaded from database:', RESTAURANT_LOCATION);
+                }
+            } catch (error) {
+                console.warn('⚠️ Could not load GPS config from API, using default:', error.message);
+            }
+        }
+
+        // State variables
+        let employeeCode = null;
+        let employeeInfo = null;
+        let userLocation = null;
+        let isCameraMirror = true;
+        let stream = null;
+        let videoEl = document.getElementById('webcam');
+        let placeholderEl = document.getElementById('camera-placeholder');
+        let overlayEl = document.getElementById('result-overlay');
+        let soundSuccess = document.getElementById('sound-success');
+        let soundError = document.getElementById('sound-error');
+        let resultTimeout = null;
+
+        // Initialize clock
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('vi-VN', { hour12: false });
+            const date = now.toLocaleDateString('vi-VN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit' 
+            });
+            document.getElementById('header-clock').textContent = time;
+            document.getElementById('header-date').textContent = date;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 1. Get query param code
+        function getQueryCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('code')?.trim().toUpperCase() || null;
+        }
+
+        // 2. Load staff info and check in-out logs
+        async function loadStaffProfile(code) {
+            employeeCode = code;
+            
+            // Switch views
+            document.getElementById('staff-loading').classList.remove('hidden');
+            document.getElementById('staff-details').classList.add('hidden');
+            document.getElementById('staff-standby').classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/attendance/today/${code}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    employeeInfo = data.staff;
+                    
+                    // Show staff details
+                    document.getElementById('staff-loading').classList.add('hidden');
+                    const detailsEl = document.getElementById('staff-details');
+                    detailsEl.classList.remove('hidden');
+                    
+                    document.getElementById('staff-name').textContent = employeeInfo.ten_nhan_vien;
+                    document.getElementById('staff-role').textContent = getRoleName(employeeInfo.vai_tro);
+                    document.getElementById('staff-code-badge').textContent = employeeInfo.ma_nv_code;
+                    
+                    // Avatar construction
+                    const avatarImg = document.getElementById('staff-avatar');
+                    if (employeeInfo.anh_dai_dien) {
+                        const avatarPath = employeeInfo.anh_dai_dien.startsWith('/') 
+                            ? employeeInfo.anh_dai_dien 
+                            : '/' + employeeInfo.anh_dai_dien;
+                        avatarImg.src = `http://localhost:3000${avatarPath}`;
+                    } else {
+                        avatarImg.src = 'https://www.w3schools.com/howto/img_avatar.png'; // default fallback
+                    }
+
+                    // Render today's history
+                    renderHistory(data.data);
+
+                    // Enable attendance buttons since employee is verified
+                    enableAttendanceButtons(true);
+                    
+                    // Initialize webcam
+                    initWebcam();
+                    
+                } else {
+                    showErrorState('Không thể tải hồ sơ nhân viên này.');
+                }
+            } catch (error) {
+                console.error('Load staff profile error:', error);
+                showErrorState('Không thể kết nối tới server. Vui lòng thử lại!');
+            }
+        }
+
+        function showErrorState(msg) {
+            document.getElementById('staff-loading').classList.add('hidden');
+            document.getElementById('staff-details').classList.add('hidden');
+            
+            const standbyEl = document.getElementById('staff-standby');
+            standbyEl.classList.remove('hidden');
+            
+            // Set error banner
+            alert(msg);
+        }
+
+        // Render today's attendance log
+        function renderHistory(records) {
+            const listEl = document.getElementById('attendance-history-list');
+            if (!records || records.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 text-sm flex flex-col items-center gap-2">
+                        <i class="fa-regular fa-folder-open text-2xl"></i>
+                        Chưa có lịch sử chấm công hôm nay
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = records.map(rec => {
+                const statusInfo = getStatusTextAndClass(rec.trang_thai);
+                return `
+                    <div class="p-3.5 bg-slate-800/40 border border-white/5 hover:border-indigo-500/30 rounded-2xl transition flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-slate-200">Ca trực: ${rec.ghi_chu ? rec.ghi_chu.split('|')[0].trim() : 'Chấm công khuôn mặt'}</p>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400"></i> ${rec.gio_vao || '--'} 
+                                <span class="text-slate-600">|</span> 
+                                <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> ${rec.gio_ra || '--'}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusInfo.badgeClass}">
+                                ${statusInfo.text}
+                            </span>
+                            <p class="text-xs text-slate-400 mt-1">${rec.so_gio_lam ? rec.so_gio_lam + ' giờ' : '-- giờ'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusTextAndClass(status) {
+            // Match backend status names ('dung_gio', 'di_muon', 've_som', 'ngoai_ca')
+            switch(status) {
+                case 'dung_gio':
+                    return { text: 'Đúng giờ', badgeClass: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' };
+                case 'di_muon':
+                    return { text: 'Đi muộn', badgeClass: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' };
+                case 've_som':
+                    return { text: 'Về sớm', badgeClass: 'bg-rose-500/10 text-rose-400 border border-rose-500/20' };
+                case 'ngoai_ca':
+                    return { text: 'Ngoài ca', badgeClass: 'bg-slate-500/10 text-slate-400 border border-slate-500/20' };
+                default:
+                    return { text: status || 'Không rõ', badgeClass: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' };
+            }
+        }
+
+        function getRoleName(role) {
+            const roles = {
+                'admin': 'Quản trị',
+                'manager': 'Quản lý',
+                'cashier': 'Thu ngân',
+                'waiter': 'Phục vụ bàn',
+                'chef': 'Đầu bếp',
+                'kitchen': 'Phụ bếp',
+                'cleaner': 'Tạp vụ'
+            };
+            return roles[role] || role;
+        }
+
+        // Enable / Disable attendance actions
+        function enableAttendanceButtons(enabled) {
+            document.getElementById('btn-checkin').disabled = !enabled;
+            document.getElementById('btn-checkout').disabled = !enabled;
+        }
+
+        // 3. Geolocation checking
+        function initGeolocation() {
+            const statusEl = document.getElementById('gps-status');
+            const descEl = document.getElementById('gps-desc');
+            const distanceEl = document.getElementById('gps-distance');
+            const boxEl = document.getElementById('gps-box');
+            const iconContainer = document.getElementById('gps-icon-container');
+            const iconEl = document.getElementById('gps-icon');
+
+            if (!navigator.geolocation) {
+                statusEl.textContent = 'Thiếu định vị';
+                descEl.textContent = 'Trình duyệt không hỗ trợ GPS.';
+                boxEl.className = 'p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3';
+                iconContainer.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-400';
+                iconEl.className = 'fa-solid fa-triangle-exclamation text-lg';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+
+                    // Compute distance
+                    const distance = calculateDistance(
+                        userLocation.lat, userLocation.lng,
+                        RESTAURANT_LOCATION.lat, RESTAURANT_LOCATION.lng
+                    );
+
+                    distanceEl.textContent = `${Math.round(distance)} m`;
+
+                    const inRadius = distance <= RESTAURANT_LOCATION.radius;
+                    if (inRadius) {
+                        statusEl.textContent = 'Hợp Lệ';
+                        statusEl.className = 'text-sm font-bold text-emerald-400';
+                        descEl.textContent = 'Bạn đang trong khu vực nhà hàng.';
+                        boxEl.className = 'p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3';
+                        iconContainer.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-400';
+                        iconEl.className = 'fa-solid fa-circle-check text-lg';
+                    } else {
+                        statusEl.textContent = 'Ngoài Vùng Phủ';
+                        statusEl.className = 'text-sm font-bold text-amber-400';
+                        descEl.textContent = `Cách nhà hàng khoảng ${Math.round(distance)}m.`;
+                        boxEl.className = 'p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3';
+                        iconContainer.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-amber-500/20 text-amber-400';
+                        iconEl.className = 'fa-solid fa-location-crosshairs text-lg animate-pulse';
+                    }
+                },
+                (error) => {
+                    console.error('GPS tracking error:', error);
+                    statusEl.textContent = 'Lỗi Định Vị';
+                    statusEl.className = 'text-sm font-bold text-rose-400';
+                    descEl.textContent = 'Hãy cấp quyền truy cập vị trí trên trình duyệt.';
+                    boxEl.className = 'p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3';
+                    iconContainer.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-rose-500/20 text-rose-400';
+                    iconEl.className = 'fa-solid fa-xmark text-lg';
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        // Calculate distance in meters using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth radius in meters
+            const phi1 = lat1 * Math.PI / 180;
+            const phi2 = lat2 * Math.PI / 180;
+            const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+            const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                      Math.cos(phi1) * Math.cos(phi2) *
+                      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c;
+        }
+
+        // 4. Webcam control
+        async function initWebcam() {
+            // Reset state
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            const camStatusEl = document.getElementById('camera-status-text');
+            const wrapperEl = document.getElementById('viewport-wrapper');
+            
+            camStatusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px] text-yellow-500 mr-1 animate-pulse"></i> Đang kết nối camera...';
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+
+                videoEl.srcObject = stream;
+                videoEl.style.display = 'block';
+                placeholderEl.style.display = 'none';
+                camStatusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1 animate-pulse"></i> Camera Sẵn Sàng';
+                
+                // Add scanning state class
+                wrapperEl.classList.add('scanning');
+                
+                // Enable attendance buttons since webcam is ready
+                enableAttendanceButtons(true);
+            } catch (err) {
+                console.error('Webcam initialization error:', err);
+                camStatusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px] text-rose-500 mr-1"></i> Lỗi Camera';
+                alert('Không thể mở webcam. Vui lòng đảm bảo bạn đã cấp quyền sử dụng camera cho trang này!');
+            }
+        }
+
+        function toggleCameraMirror() {
+            isCameraMirror = !isCameraMirror;
+            if (isCameraMirror) {
+                videoEl.classList.add('transform', '-scale-x-100');
+            } else {
+                videoEl.classList.remove('transform', '-scale-x-100');
+            }
+        }
+
+        // 5. Capture canvas image to Blob
+        function captureFrameBlob() {
+            return new Promise((resolve) => {
+                const canvas = document.getElementById('snapshot-canvas');
+                canvas.width = videoEl.videoWidth || 640;
+                canvas.height = videoEl.videoHeight || 480;
+                
+                const ctx = canvas.getContext('2d');
+                
+                // If mirrored, flip context
+                if (isCameraMirror) {
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                }
+
+                ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+                
+                // Reset transform if mirrored, so that text is not drawn backwards
+                if (isCameraMirror) {
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                }
+
+                // Draw dark bottom overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+                ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+
+                // Set font style for text
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textBaseline = 'middle';
+                
+                // 1. Draw Title and Date/Time
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'left';
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('vi-VN') + ' ' + now.toLocaleDateString('vi-VN');
+                ctx.fillText('MINH CHỨNG CHẤM CÔNG - ' + timeStr, 15, canvas.height - 45);
+
+                // 2. Draw GPS coords if available
+                ctx.font = '12px Arial';
+                if (userLocation && userLocation.lat && userLocation.lng) {
+                    ctx.fillStyle = '#E5E7EB';
+                    ctx.fillText(`GPS: ${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`, 15, canvas.height - 20);
+                } else {
+                    ctx.fillStyle = '#FCA5A5';
+                    ctx.fillText('Không có GPS định vị', 15, canvas.height - 20);
+                }
+
+                // 3. Draw Brand logo right-aligned
+                ctx.fillStyle = '#FBBF24'; // Amber-400
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText('Ẩm thực Phương Nam', canvas.width - 15, canvas.height - 35);
+                
+                // Convert to blob jpeg
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 0.95);
+            });
+        }
+
+        // 6. Action implementation
+        async function performFaceAttendance(type) {
+            if (!stream) {
+                alert('Vui lòng đợi camera sẵn sàng!');
+                return;
+            }
+
+            // Check location with prompt if outside
+            if (userLocation) {
+                const distance = calculateDistance(
+                    userLocation.lat, userLocation.lng,
+                    RESTAURANT_LOCATION.lat, RESTAURANT_LOCATION.lng
+                );
+                
+                if (distance > RESTAURANT_LOCATION.radius) {
+                    const confirmLeave = confirm(`Bạn đang ở cách xa nhà hàng (${Math.round(distance)}m). Bạn có chắc chắn muốn tiếp tục chấm công?`);
+                    if (!confirmLeave) return;
+                }
+            } else {
+                const confirmNoGPS = confirm('Không phát hiện thấy tọa độ GPS của bạn. Tiếp tục chấm công không định vị?');
+                if (!confirmNoGPS) return;
+            }
+
+            // Disable buttons & show loading spinner
+            enableAttendanceButtons(false);
+            const overlay = document.getElementById('processing-overlay');
+            overlay.classList.remove('hidden');
+
+            const viewport = document.getElementById('viewport-wrapper');
+            viewport.classList.remove('success', 'error');
+            viewport.classList.add('scanning');
+
+            try {
+                // Grabbing frame
+                const imageBlob = await captureFrameBlob();
+                const formData = new FormData();
+                if (employeeCode) {
+                    formData.append('ma_nv_code', employeeCode);
+                }
+                formData.append('image', imageBlob, 'capture.jpg');
+                
+                if (userLocation) {
+                    formData.append('latitude', userLocation.lat);
+                    formData.append('longitude', userLocation.lng);
+                    formData.append('accuracy', userLocation.accuracy || 0);
+                }
+
+                const endpoint = type === 'checkin' ? 'face-checkin' : 'face-checkout';
+                const response = await fetch(`${API_BASE}/attendance/${endpoint}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                // Stop loading state
+                overlay.classList.add('hidden');
+
+                if (result.success) {
+                    // Success styling
+                    viewport.classList.remove('scanning');
+                    viewport.classList.add('success');
+                    
+                    // Audio beep
+                    try { soundSuccess.play(); } catch(e) {}
+
+                    // Show success banner
+                    showResultOverlay(true, result.message, result.data?.ghi_chu || '');
+
+                    // Reload historical table & update profile using the matched code
+                    const matchedCode = result.data?.ma_nv_code || employeeCode;
+                    if (matchedCode) {
+                        loadStaffProfile(matchedCode);
+                    }
+                } else {
+                    // Fail styling
+                    viewport.classList.remove('scanning');
+                    viewport.classList.add('error');
+                    
+                    // Audio error beep
+                    try { soundError.play(); } catch(e) {}
+
+                    // Show fail banner
+                    let errorTitle = result.message || 'Xác nhận khuôn mặt không khớp.';
+                    let errorDesc = 'Vui lòng chỉnh lại góc mặt và thử lại.';
+                    if (result.message && result.message.includes('ca trực')) {
+                        errorDesc = 'Vui lòng liên hệ quản lý để được phân ca làm việc.';
+                    }
+                    showResultOverlay(false, errorTitle, errorDesc);
+                    
+                    // Re-enable buttons
+                    enableAttendanceButtons(true);
+                }
+            } catch (error) {
+                console.error('Face verification error:', error);
+                overlay.classList.add('hidden');
+                viewport.classList.remove('scanning');
+                viewport.classList.add('error');
+                
+                try { soundError.play(); } catch(e) {}
+                showResultOverlay(false, 'Lỗi kết nối server!', 'Đã xảy ra lỗi khi gửi yêu cầu nhận diện khuôn mặt.');
+                
+                enableAttendanceButtons(true);
+            }
+        }
+
+        // Float notification overlay helper
+        function showResultOverlay(isSuccess, title, desc) {
+            if (resultTimeout) clearTimeout(resultTimeout);
+
+            const iconContainer = document.getElementById('result-status-icon');
+            const titleEl = document.getElementById('result-status-title');
+            const descEl = document.getElementById('result-status-desc');
+            
+            if (isSuccess) {
+                overlayEl.classList.remove('border-l-rose-500');
+                overlayEl.classList.add('border-l-emerald-500');
+                iconContainer.className = 'w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400';
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i>';
+            } else {
+                overlayEl.classList.remove('border-l-emerald-500');
+                overlayEl.classList.add('border-l-rose-500');
+                iconContainer.className = 'w-10 h-10 rounded-full bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400';
+                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg"></i>';
+            }
+
+            titleEl.textContent = title;
+            descEl.textContent = desc;
+
+            overlayEl.classList.remove('hidden');
+            setTimeout(() => {
+                overlayEl.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            // Auto hide after 6 seconds for success, 25 seconds for errors
+            resultTimeout = setTimeout(() => {
+                hideResultOverlay();
+            }, isSuccess ? 6000 : 25000);
+        }
+
+        function hideResultOverlay() {
+            overlayEl.classList.add('translate-y-2', 'opacity-0');
+            setTimeout(() => {
+                overlayEl.classList.add('hidden');
+            }, 300);
+        }
+
+        // Main init entry
+        window.addEventListener('DOMContentLoaded', () => {
+            const code = getQueryCode();
+            
+            // Trigger GPS immediately
+            loadGPSConfig().then(() => {
+                initGeolocation();
+            });
+            
+            // Auto refresh GPS location
+            setInterval(initGeolocation, 15000);
+
+            // Always initialize camera on load
+            initWebcam();
+
+            if (code) {
+                loadStaffProfile(code);
+            } else {
+                // Show standby status
+                document.getElementById('staff-loading').classList.add('hidden');
+                document.getElementById('staff-standby').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

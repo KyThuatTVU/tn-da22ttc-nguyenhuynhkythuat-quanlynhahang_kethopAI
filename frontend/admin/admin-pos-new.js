@@ -527,7 +527,7 @@ function showBill(method) {
             <img src="../images/Green Simple Clean Vegan Food Logo.png"
                  style="width:52px; height:52px; object-fit:contain; border-radius:12px; background:#f0f9f0; padding:4px; flex-shrink:0;">
             <div>
-                <div style="font-size:15px; font-weight:800; color:#1e3a5f;">ẨM THỰC PHƯƠNG NAM</div>
+                <div style="font-size:15px; font-weight:800; color:#8c6239;">ẨM THỰC PHƯƠNG NAM</div>
                 <div style="font-size:10px; color:#64748b;">Hương vị miền Tây sông nước</div>
                 <div style="font-size:10px; color:#94a3b8;">📍 Long Đức, Tp. Vĩnh Long &nbsp;|&nbsp; 📞 0123.456.789</div>
             </div>
@@ -542,11 +542,11 @@ function showBill(method) {
         <!-- Danh sách món -->
         <table style="width:100%; font-size:11px; border-collapse:collapse;">
             <thead>
-                <tr style="border-bottom:2px solid #1e3a5f;">
-                    <th style="text-align:left; padding:5px 0; color:#1e3a5f;">Món ăn</th>
-                    <th style="text-align:center; padding:5px 3px; color:#1e3a5f;">SL</th>
-                    <th style="text-align:right; padding:5px 0; color:#1e3a5f;">Đ.Giá</th>
-                    <th style="text-align:right; padding:5px 0; color:#1e3a5f;">T.Tiền</th>
+                <tr style="border-bottom:2px solid #8c6239;">
+                    <th style="text-align:left; padding:5px 0; color:#8c6239;">Món ăn</th>
+                    <th style="text-align:center; padding:5px 3px; color:#8c6239;">SL</th>
+                    <th style="text-align:right; padding:5px 0; color:#8c6239;">Đ.Giá</th>
+                    <th style="text-align:right; padding:5px 0; color:#8c6239;">T.Tiền</th>
                 </tr>
             </thead>
             <tbody>
@@ -562,19 +562,19 @@ function showBill(method) {
         </table>
 
         <!-- Tổng + Phương thức (2 cột) -->
-        <div style="margin-top:10px; padding:10px 12px; background:#1e3a5f; border-radius:10px; display:flex; justify-content:space-between; align-items:center; color:white;">
+        <div style="margin-top:10px; padding:10px 12px; background:#8c6239; border-radius:10px; display:flex; justify-content:space-between; align-items:center; color:white;">
             <span style="font-size:12px; font-weight:600;">TỔNG CỘNG</span>
             <span style="font-size:18px; font-weight:800;">${formatCurrency(total)}</span>
         </div>
         <div style="text-align:center; margin-top:6px; font-size:10px; color:#64748b;">Phương thức: <b>${methodText}</b></div>
 
         <!-- QR + Thông tin TK (2 cột cạnh nhau) -->
-        <div style="margin-top:10px; border:2px dashed #93c5fd; border-radius:12px; padding:10px; background:#eff6ff; display:flex; align-items:center; gap:12px;">
-            <img src="${qrUrl}" alt="QR" style="width:120px; height:120px; border-radius:8px; border:2px solid #bfdbfe; flex-shrink:0;">
+        <div style="margin-top:10px; border:2px dashed #8c6239; border-radius:12px; padding:10px; background:#fdfaf7; display:flex; align-items:center; gap:12px;">
+            <img src="${qrUrl}" alt="QR" style="width:120px; height:120px; border-radius:8px; border:2px solid #dcd1c4; flex-shrink:0;">
             <div style="flex:1;">
-                <div style="font-size:10px; font-weight:700; color:#1e40af; margin-bottom:4px;">QUÉT MÃ CHUYỂN KHOẢN</div>
-                <div style="font-size:11px; font-weight:700; color:#1e40af;">🏦 Vietcombank</div>
-                <div style="font-size:14px; font-weight:800; color:#1e3a5f; letter-spacing:1px;">1052053578</div>
+                <div style="font-size:10px; font-weight:700; color:#8c6239; margin-bottom:4px;">QUÉT MÃ CHUYỂN KHOẢN</div>
+                <div style="font-size:11px; font-weight:700; color:#8c6239;">🏦 Vietcombank</div>
+                <div style="font-size:14px; font-weight:800; color:#8c6239; letter-spacing:1px;">1052053578</div>
                 <div style="font-size:10px; color:#64748b;">NGUYEN HUYNH KY THUAT</div>
                 <div style="font-size:9px; color:#94a3b8; margin-top:3px; font-style:italic;">Số tiền: ${formatCurrency(total)}</div>
             </div>

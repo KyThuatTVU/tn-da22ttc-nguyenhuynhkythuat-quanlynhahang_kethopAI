@@ -33,7 +33,25 @@ const calculateDailySalary = async (ma_nhan_vien, ngay) => {
 
         const soGioLam = parseFloat(attendance.tong_gio || 0);
         const luongTheoGio = parseFloat(staff.luong_theo_gio || 0);
-        const luongNgay = soGioLam * luongTheoGio;
+        const luongCoBan = parseFloat(staff.luong_co_ban || 0);
+
+        // Xác định số ngày của tháng để chia lương cơ bản
+        const dateObj = new Date(ngay);
+        const y = dateObj.getFullYear();
+        const m = dateObj.getMonth() + 1;
+        const soNgayTrongThang = new Date(y, m, 0).getDate();
+
+        let luongNgay = 0;
+        if (luongTheoGio > 0 && luongCoBan > 0) {
+            // Kết hợp cả hai: lương theo giờ + lương cơ bản chia theo ngày trong tháng
+            luongNgay = (soGioLam * luongTheoGio) + (luongCoBan / soNgayTrongThang);
+        } else if (luongCoBan > 0) {
+            // Lương cứng cố định: lương cơ bản chia theo ngày trong tháng
+            luongNgay = luongCoBan / soNgayTrongThang;
+        } else {
+            // Trả theo giờ: số giờ làm * lương theo giờ
+            luongNgay = soGioLam * luongTheoGio;
+        }
 
         // 3. Lưu hoặc cập nhật lương tạm tính
         await db.query(`
@@ -295,7 +313,7 @@ const generateMonthlyFromDaily = async (req, res) => {
 
             const thuong = existing.length > 0 ? existing[0].thuong : 0;
             const phat = existing.length > 0 ? existing[0].phat : 0;
-            const tongLuong = (luongCoBan + tongLuongGio + parseFloat(thuong) - parseFloat(phat)).toFixed(2);
+            const tongLuong = (luongCoBan + (tongGio * luongTheoGio) + parseFloat(thuong) - parseFloat(phat)).toFixed(2);
 
             if (existing.length > 0) {
                 await db.query(`

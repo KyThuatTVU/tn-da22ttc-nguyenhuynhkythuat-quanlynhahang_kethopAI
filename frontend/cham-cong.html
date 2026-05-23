@@ -158,12 +158,33 @@
         let userLocation = null;
         let capturedPhoto = null;
 
-        // Restaurant location (Vĩnh Long)
-        const RESTAURANT_LOCATION = {
-            lat: 10.2396,  // Tọa độ Vĩnh Long (thay đổi theo vị trí thực tế)
-            lng: 105.9571,
-            radius: 100 // 100 mét
+        // Geolocation restaurant definition (Đại học Trà Vinh)
+        let RESTAURANT_LOCATION = {
+            lat: 9.9234,
+            lng: 106.3465,
+            radius: 500 // meters (bán kính rộng hơn do khuôn viên đại học lớn)
         };
+
+        // Load GPS Config from API
+        async function loadGPSConfig() {
+            try {
+                const response = await fetch(`${API_BASE}/settings`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const settings = result.data;
+                    if (settings.latitude && settings.longitude) {
+                        RESTAURANT_LOCATION.lat = parseFloat(settings.latitude);
+                        RESTAURANT_LOCATION.lng = parseFloat(settings.longitude);
+                    }
+                    if (settings.radius) {
+                        RESTAURANT_LOCATION.radius = parseInt(settings.radius);
+                    }
+                    console.log('✅ GPS Config loaded from database:', RESTAURANT_LOCATION);
+                }
+            } catch (error) {
+                console.warn('⚠️ Could not load GPS config from API, using default:', error.message);
+            }
+        }
 
         // Update clock
         function updateClock() {
@@ -291,10 +312,44 @@
 
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
+            
+            // Draw original video frame
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Draw dark bottom overlay
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+            ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+
+            // Set font style for text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textBaseline = 'middle';
+            
+            // 1. Draw Title and Date/Time
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'left';
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN') + ' ' + now.toLocaleDateString('vi-VN');
+            ctx.fillText('MINH CHỨNG CHẤM CÔNG - ' + timeStr, 15, canvas.height - 45);
+
+            // 2. Draw GPS coords if available
+            ctx.font = '12px Arial';
+            if (userLocation && userLocation.lat && userLocation.lng) {
+                ctx.fillStyle = '#E5E7EB';
+                ctx.fillText(`GPS: ${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`, 15, canvas.height - 20);
+            } else {
+                ctx.fillStyle = '#FCA5A5';
+                ctx.fillText('Không có GPS định vị', 15, canvas.height - 20);
+            }
+
+            // 3. Draw Brand logo right-aligned
+            ctx.fillStyle = '#FBBF24'; // Amber-400
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText('Ẩm thực Phương Nam', canvas.width - 15, canvas.height - 35);
+
             return canvas.toDataURL('image/jpeg', 0.8);
         }
 
@@ -470,7 +525,9 @@
         }
 
         // Initialize
-        getUserLocation();
+        loadGPSConfig().then(() => {
+            getUserLocation();
+        });
         
         // Auto-refresh location every 30 seconds
         setInterval(getUserLocation, 30000);

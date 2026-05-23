@@ -6,6 +6,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 
 // Đảm bảo thư mục uploads/staff tồn tại
 const uploadDir = path.join(__dirname, '../uploads/staff');
@@ -50,6 +51,58 @@ router.post('/staff', upload.single('image'), (req, res) => {
         // Trả về đường dẫn có thể truy cập từ frontend
         const url = `/uploads/staff/${req.file.filename}`;
         res.json({ success: true, url, filename: req.file.filename });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// POST /api/upload/crop-face - Upload ảnh và trích chọn khuôn mặt chuẩn làm avatar
+router.post('/crop-face', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'Không có file nào được tải lên!' });
+        }
+
+        const imagePath = req.file.path;
+
+        // Gọi Python AI Service để trích chọn & căn chỉnh khuôn mặt
+        try {
+            const aiResponse = await axios.post('http://localhost:5000/api/ml/face/crop', {
+                image_path: imagePath
+            });
+
+            // Xóa file ảnh gốc tạm thời sau khi trích chọn xong
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+
+            if (aiResponse.data.success) {
+                res.json({
+                    success: true,
+                    url: aiResponse.data.url,
+                    message: aiResponse.data.message
+                });
+            } else {
+                res.status(400).json({
+                    success: false,
+                    message: aiResponse.data.message || 'Không thể trích chọn khuôn mặt!'
+                });
+            }
+        } catch (error) {
+            console.error('Call AI face crop error:', error.message);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+
+            const msg = error.response && error.response.data && error.response.data.message
+                ? error.response.data.message
+                : 'Lỗi kết nối đến dịch vụ AI trích xuất khuôn mặt!';
+
+            res.status(500).json({
+                success: false,
+                message: msg
+            });
+        }
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
