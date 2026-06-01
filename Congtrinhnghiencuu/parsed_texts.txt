@@ -1,0 +1,723 @@
+--- 
+File: 17_BuiThiHang_CT1102.pdf
+ 
+ 1 
+MỤC LỤC  
+ 
+MỤC LỤC  ................................ ................................ ................................ ........................  1 
+DANH M ỤC H ÌNH V Ẽ ................................ ................................ ................................ .... 3 
+DANH M ỤC BẢNG BI ỂU ................................ ................................ ...............................  5 
+DANH M ỤC CHỮ VIẾT TẮT  ................................ ................................ .........................  6 
+LỜI C ẢM ƠN  ................................ ................................ ................................ ...................  7 
+TÓM T ẮT ĐỒ ÁN  ................................ ................................ ................................ ............  8 
+MỞ ĐẦU  ................................ ................................ ................................ ..........................  9 
+Chương 1: L Ý THUY ẾT PHÂN TÍCH THIẾT KẾ  ................................ .........................  10 
+HỆ THỐNG THÔNG TIN QUẢN LÝ  ................................ ................................ ............  10 
+1.1. Đ ịnh nghĩa hệ thống thông tin quản lý  ................................ ................................ .. 10 
+1.2. Quá trình phát tri ển của một hệ thống thông tin  ................................ .....................  10 
+1.3.Phương pháp hư ớng đối t ượng ................................ ................................ ...............  12 
+1.4.UML ................................ ................................ ................................ ......................  12 
+1.5. UML trong phân tích thi ết kế hệ thống  ................................ ................................ .. 13 
+1.6.UML và các giai đo ạn của chu tr ình phát tri ển phần mềm  ................................ ...... 14 
+1.6.1.Giai đo ạn nghi ên cứu sơ bộ ................................ ................................ .............  14 
+1.6.2.Giai đo ạn phân tích  ................................ ................................ .........................  14 
+1.6.3. Giai đo ạn thiết kế  ................................ ................................ ...........................  14 
+1.6.4.Giai đo ạn xây dựng  ................................ ................................ .........................  15 
+1.6.5.Th ử nghiệm  ................................ ................................ ................................ .... 15 
+1.7. Ph ần mềm Rotional Rose - Công c ụ hỗ trợ cho UML[1]  ................................ ....... 15 
+Chương 2: MÔ T Ả BÀI TOÁN VÀ CÁCH GI ẢI QUYẾT VẤN ĐỀ  ..............................  16 
+2.1. T ổ chức hoạt động  ................................ ................................ ................................  16 
+2.2. Quy trình nghi ệp vụ  ................................ ................................ ..............................  16 
+2.3. Mô t ả bài toán  ................................ ................................ ................................ ....... 17 
+2.4. Yêu c ầu chức năng v à phi ch ức năng  ................................ ................................ .... 17 
+2.4.1. Yêu c ầu chức năng  ................................ ................................ .........................  17 
+2.4.2. Yêu c ầu phi chức năng  ................................ ................................ ...................  18 
+2.5. Phương pháp ti ếp cận giải quyết vấn đề  ................................ ................................  18 
+Chương 3: PHÂN TÍCH BÀI TOÁN  ................................ ................................ ...............  19 
+3.1.Mô hình mi ền lĩnh vực  ................................ ................................ ...........................  19 
+3.2. Nh ận diện các tác nhân, mục ti êu của từng tác nhân  ................................ ..............  20 
+3.3. Mô hình ca s ử dụng  ................................ ................................ ..............................  21 
+3.4. Mô t ả các Ca sử dụng ................................ ................................ ............................  22 
+3.4.1. Đăng nh ập hệ thống  ................................ ................................ .......................  22 
+3.4.2. L ập hóa đ ơn ................................ ................................ ................................ ... 23 
+3.4.4. Tra c ứu thông tin nhân vi ên theo h ọ tên nhân viên ................................ ..........  25 
+3.4.6. Qu ản lý nhân vi ên ................................ ................................ ..........................  27 
+3.4.7. Q uản lý thực đ ơn................................ ................................ ............................  33 
+3.4.8. Phân công nhân viên  ................................ ................................ ......................  38 
+3.4.9. Qu ản lý hóa đ ơn ................................ ................................ .............................  39 
+Chương 4 :PHÂN TÍCH VÀ THI ẾT KẾ HỆ THỐNG  ................................ .....................  42 
+4.1. Phân tích h ệ thống  ................................ ................................ ................................  42 
+4.1.1. Phân tích gói ca s ử dụng Đăng nhập  ................................ ...............................  42 
+4.1.2. Phân tích gói ca s ử dụng Lập hóa đ ơn ................................ ............................  43 
+4.1.3. Phân tích gói ca s ử dụng Tra cứu thực đ ơn ................................ .....................  44 
+4.1.4. Phân tích gói ca s ử dụng Tra cứu nhân vi ên................................ ....................  45 
+4.1.5. Phân tích gói ca s ử dụng Thống k ê doanh thu  ................................ .................  46 
+ 
+ 2 
+4.1.6. Phân tích gói ca s ử dụng Th êm nhân viên ................................ .......................  47 
+4.1.7. Phân tích gói ca s ử dụng Cập nhật nhân vi ên ................................ ..................  48 
+4.1.8. Phân tích gói ca s ử dụng Xóa nhân vi ên ................................ .........................  49 
+4.1.9. Phân tích gói ca s ử dụng Th êm th ực đơn ................................ ........................  50 
+4.1.10. Phân tích gói ca s ử dụng Cập nhật thực đ ơn ................................ .................  51 
+4.1.11. Phân tích gói ca s ử dụng Xóa thực đ ơn ................................ .........................  52 
+4.1.12. Phân tích gói ca s ử dụng  Phân công nhân viên  ................................ .............  53 
+4.1.13. Phân tích gói ca s ử dụng Xóa phân công  ................................ ......................  54 
+4.1.14. Phân tích gói ca s ử dụng In hóa đ ơn ................................ .............................  55 
+4.1.15. Phân tích gói ca s ử dụng Xóa hóa đ ơn ................................ ..........................  56 
+4.2. Thi ết kế c ơ sở dữ liệu ................................ ................................ ............................  57 
+4.2.1. Sơ đ ồ lớp  ................................ ................................ ................................ ...........  57 
+4.2.2.1. L ớp NhanVien  ................................ ................................ ............................  57 
+4.2.2.2. L ớp BanAn  ................................ ................................ ................................ . 58 
+4.2.2.3. L ớp PhanCong  ................................ ................................ ............................  58 
+4.2.2.4. L ớp LoaiThucDon  ................................ ................................ .......................  58 
+4.2.2.5. L ớp ThucDon  ................................ ................................ ..............................  58 
+4.2.2.6. L ớp Gia  ................................ ................................ ................................ ....... 58 
+4.2.2.7. L ớp HoaDon  ................................ ................................ ...............................  59 
+4.2.2.8. L ớp ChiTietHD  ................................ ................................ ...........................  59 
+4.3. S ự tương thích gi ữa UML v à mô hình EER  ................................ .......................  59 
+4.3.1 Chuy ển đổi từ UML sang mô h ình EER  ................................ ..........................  60 
+4.3.1.1Các bư ớc chuyển từ UML sang EER  ................................ .........................  60 
+4.3.1.2.Chuy ển đổi từ UML sang EER  ................................ ................................ . 61 
+4.3.1.3.Bi ểu đồ c ơ sở dữ liệu quan hệ  ................................ ................................ ... 63 
+4.4. Mô t ả các bảng dữ liệu  ................................ ................................ ..........................  64 
+4.4.1. B ảng LoaiThucDon  ................................ ................................ ........................  64 
+4.4.2. B ảng ThucDon  ................................ ................................ ...............................  64 
+4.4.3 B ảng G ia ................................ ................................ ................................ .........  64 
+4.3.4. B ảng NhanVien ................................ ................................ ..............................  64 
+4.3.5. B ảng BanAn  ................................ ................................ ................................ .. 65 
+4.3.6. B ảng PhanCong  ................................ ................................ .............................  65 
+4.3.7. B ảng HoaDon  ................................ ................................ ................................  65 
+4.3.8. B ảng ChiTietHD  ................................ ................................ ............................  65 
+Chương 5 :  CÀI Đ ẶT CH ƯƠNG TR ÌNH TH Ử NGHIỆM  ................................ ..............  66 
+5.1. Môi trư ờng c ài đặt ................................ ................................ ................................  66 
+5.2.1.Giao di ện giới thiệu ch ương tr ình ................................ ................................ .... 70 
+5.2.2.Giao di ện chức năng gọi món  ................................ ................................ ..........  71 
+5.2.3.Giao di ện chức năng cập nhật gọi món  ................................ ............................  72 
+5.2.4.Giao di ện chức năng lập hóa đ ơn ................................ ................................ .... 73 
+5.2.5.Giao di ện mẫu hóa đ ơn ................................ ................................ ...................  74 
+5.2.6.Giao di ện chức năng quản lý hóa đ ơn ................................ ..............................  75 
+5.2.7.Giao di ện chức năng quản lý nhân vi ên ................................ ...........................  76 
+5.2.8.Giao di ện chức năng quản lý phân công  ................................ ..........................  77 
+5.2.9.Giao di ện chức năng quản lý thực đ ơn ................................ ............................  78 
+5.2.10.Giao di ện chức năng thống k ê doanh thu  ................................ .......................  79 
+KẾT LUẬN ................................ ................................ ................................ .....................  80 
+TÀI LI ỆU THAM KHẢO  ................................ ................................ ...............................  81 
+ 
+  
+ 
+ 3 
+DANH M ỤC H ÌNH V Ẽ 
+STT TÊN HÌNH  MÔ T Ả 
+1 Hình 1.1  Sơ đồ tổng quát các giai đoạn phát triển hệ thống thống tin  
+2 Hình 3.1  Mô hình  miền lĩnh vực hệ thống quản lý nh à hàng coffee sen  
+3 Hình 3.2  Mô hình ca s ử dụng mức tổng quát Hệ thống Quản lý Nh à hàng 
+Cooffee Sen  
+4 Hình 3.3  Mô hình ca s ử dụng Đăng nh ập hệ thống  
+5 Hình 3. 4 Mô hình ca s ử dụng Lập hóa đ ơn 
+6 Hình 3. 5 Mô hình ca s ử dụng Tra cứu Thực Đ ơn 
+7 Hình 3. 6 Mô hình ca s ử dụng Tra cứu Nhân Viên  
+8 Hình 3. 7 Mô hình ca s ử dụng Thống k ê doanh thu  
+9 Hình 3. 8 Mô hình ca s ử dụng Quản lý Nhân Viên  
+10 Hình 3. 9 Mô hình ca s ử dụng Thêm Nhân Viên  
+11 Hình 3 .10 Mô hình ca s ử dụng Cập nhật Nhân Vi ên 
+12 Hình 3. 11 Mô hình ca s ử dụng Xóa Nhân Viên  
+13 Hình 3. 12 Mô hình ca s ử dụng Quản lý Thực Đ ơn 
+14 Hình 3.13  Mô hình ca s ử dụng Th êm Th ực Đ ơn 
+15 Hình  3.14 Mô hình ca s ử dụng Cập nhật Thực Đ ơn 
+16 Hình 3.15  Mô hình ca s ử dụng Xóa Thực Đ ơn 
+17 Hình 3.16  Mô hình ca s ử dụng Phân công Nhân Vi ên 
+18 Hình 3.17  Mô hình ca s ử dụng Quản lý Hóa Đ ơn 
+19 Hình 3.18  Mô hình ca s ử dụng In Hóa Đ ơn 
+20 Hình 3.19  Mô hình  ca sử dụng Xóa Hóa Đ ơn 
+21 Hình 4.1  Biểu đồ tuần tự thực thi ca sử dụng  Đăng nh ập 
+22 Hình 4.2  Biểu đồ cộng tác thực thi ca sử dụng  Đăng nhập  
+23 Hình 4.3  Biểu đồ tuần tự thực thi Chức năng lập hóa đ ơn. 
+24 Hình 4.4  Biểu đồ cộng tác thực thi ca sử dụng  Chức năng lập hóa đ ơn 
+25 Hình 4.5  Biểu đồ tuần tự thực thi Tra c ứu thực đ ơn 
+26 Hình 4.6  Biểu đồ cộng tác thực thi ca sử dụng  Tra cứu thực đ ơn 
+27 Hình 4.7  Biểu đồ tuần tự thực thi Tra c ứu nhân vi ên 
+28 Hình 4.8  Biểu đồ cộng tác thực thi ca sử dụng  Tra  cứu nhân vi ên 
+29 Hình 4.9  Biểu đồ tuần tự thực thi Thống k ê doanh thu  
+30 Hình 4.10  Biểu đồ cộng tác thực thi ca sử dụng  Thống k ê doanh thu  
+31 Hình 4.11  Biểu đồ tuần tự thực thi Thêm nhân viên  
+32 Hình 4.12  Biểu đồ cộng tác thực thi ca sử dụng  Th êm nhân viên  
+33 Hình 4.13  Biểu đồ tuần tự thực thi Cập nhật nhân vi ên 
+34 Hình 4.14  Biểu đồ cộng tác thực thi ca sử dụng  Cập nhật nhân vi ên 
+35 Hình  4.15 Biểu đồ tuần tự thực thi Xóa nhân viên  
+36 Hình 4.16  Biểu đồ cộng tác thực thi ca sử dụng  Xóa nhân viên 
+37 Hình 4.17  Biểu đồ tuần tự thực thi Thêm th ực đơn 
+38 Hình 4.18  Biểu đồ cộng tác thực thi ca sử dụng  Th êm th ực đơn 
+39 Hình 4.19  Biểu đồ tuần tự thực thi Cập nhật thực đ ơn 
+40 Hình 4.20  Biểu đồ cộng tác thực thi ca sử dụng  Cập nhật thực đ ơn 
+41 Hình 4.21  Biểu đồ tuần tự thực thi Xóa th ực đơn 
+42 Hình 4.22  Biểu đồ cộng tác thực thi ca sử dụng  Xóa thực đ ơn 
+43 Hình 4.23  Biểu đồ tuần tự thực thi Phân công nhân viên  
+44 Hình 4.24  Biểu đồ cộng tác thực thi ca sử dụng  Phân công nhân vi ên 
+ 
+ 4 
+45 Hình 4.25 Biểu đồ tuần tự thực thi Xóa phân công  
+46 Hình 4.26  Biểu đồ cộng tác thực thi ca sử dụng  Xóa phân công  
+47 Hình 4.27  Biểu đồ tuần tự thực thi In hóa đơn  
+48 Hình 4. 28 Biểu đồ cộng tác thực thi ca sử dụng  In hóa đ ơn 
+49 Hình 4.29  Biểu đồ tuần tự thực thi Xóa hóa đơn  
+50 Hình 4. 30 Biểu đồ cộng tác thực thi ca sử dụng  Xóa hóa đ ơn 
+51 Hình 4. 31 Sơ đồ tương thích gi ữa UML v à EE R 
+52 Hình 4. 32 Biểu đồ lớp Hệ thống Quản lý Nh à hang Coffee Sen  
+53 Hình 4. 33 Biểu đồ EER Hệ thống Quản lý Nhà hang Coffee Sen  
+54 Hình 4. 34 Sơ đồ cơ sở dữ liệu quan hệ  
+55 Hình 5.1  Màn hình giao di ện gọi món  
+56 Hình 5.2  Giao di ện cập nhật gọi món  
+57 Hình 5.3  Giao di ện lập hóa đ ơn 
+58 Hình 5.4  Mẫu hóa đ ơn. 
+59 Hình 5.5  Giao di ện quản lý hóa đ ơn 
+60 Hình 5.6  Giao di ện quản lý nhân vi ên 
+61 Hình 5.7  Giao di ện quản lý phân công  
+62 Hình 5.8  Giao di ện quản lý thực đ ơn 
+63 Hình 5.9  Giao di ện quản lý thống k ê doanh thu  
+64 Hình 5.10  Giao di ện giới thiệu ch ương tr ình. 
+ 
+  
+ 
+ 5 
+DANH M ỤC BẢNG BIỂU  
+STT  TÊN B ẢNG  MÔ T Ả 
+1 Bảng 3.1  Nhận diện  các tác nhân,m ục tiêu 
+2 Bảng 3. 2 Lớp Nhân Vi ên 
+3 Bảng 3.3  Lớp B àn Ăn  
+4 Bảng 3.4  Lớp Phân Công  
+5 Bảng 3.5  Lớp Loại Thực Đ ơn 
+6 Bảng 3.6  Lớp Thực Đ ơn 
+7 Bảng 3.7  Lớp Giá  
+8 Bảng 3.8  Lớp Hóa Đ ơn 
+9 Bảng 3.9  Lớp Chi Tiết Hóa Đ ơn 
+10 Bảng 4.1 Loại Thực Đ ơn 
+11 Bảng 4.2  Thực Đ ơn 
+12 Bảng 4.3  Giá 
+13 Bảng 4.4  Nhân Viên  
+14 Bảng 4.5  Bàn Ăn  
+15 Bảng 4.6  Phân Công  
+16 Bảng 4.7  Hóa Đơn  
+17 Bảng 4.8  Chi Ti ết Hóa Đ ơn 
+ 
+  
+--- (Skipping middle pages) ---
+ 
+ 81 
+TÀI LI ỆU THAM KHẢO  
+ 
+[1] Đặng V ăn Đức, Phân tích thi ết kế h ướng đối tượng bằng UML (Thực h ành v ới 
+Rational Rose) , NXB Khoa h ọc và Kỹ thuật, 2002  
+[2] http://msdn.microsoft.com  
+[3] http://dot.net.vn  
+   
+  
+ 
+ 
+ 
+
+==================================================
+--- 
+File: 5_NguyenMinhHoang_CT1201.pdf
+ 
+Bé gi¸o dôc vµ ®µo t¹o  
+Tr­êng ®¹i häc d©n lËp h¶i phßng  
+------- o0o-------  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+®å ¸n tèt nghiÖp  
+Ngµnh c«ng nghÖ th«ng tin  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+H¶i Phßng 2013
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 1 Bé gi¸o dôc vµ ®µo t¹o  
+Tr­êng ®¹i häc d©n lËp h¶i phßng  
+------- o0o-------  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+X©y dùng website qu¶n lý nhµ hµng  
+ 
+ 
+ 
+ 
+ 
+ 
+2 ®å ¸n tèt nghiÖp  ®¹i häc hÖ chÝnh quy  
+3 Ngµnh: C«ng nghÖ Th«ng tin  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+4 H¶i Phßng - 2013 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 6 Bé gi¸o dôc vµ ®µo t¹o  
+Tr­êng ®¹i häc d©n lËp h¶i phßng  
+------- o0o-------  
+ 
+ 
+ 
+ 
+ 
+X©y dùng website qu¶n lý nhµ hµng  
+ 
+ 
+ 
+7 ®å ¸n tèt nghiÖp ®¹i häc hÖ chÝnh quy  
+8 Ngµnh: C«ng nghÖ Th«ng tin  
+ 
+ 
+ 
+ 
+Sinh viªn thùc hiÖn:    NguyÔn Minh Hoµng  
+Gi¸o viªn h­íng dÉn: ThS Vò Anh Hïng  
+M· sè sinh viªn:         121428  
+ 
+ 
+ 
+H¶i Phßng - 2013  
+ 
+ 
+    
+bé gi¸o dôc vµ ®µo t¹o  céng hoµ x· héi chñ nghÜa viÖt Nam 
+tr­êng ®¹i häc d©n lËp h¶i phßng         
+ ------- o0o-------  
+                                                    
+    §éc lËp - Tù do - H¹nh phóc  
+------- o0o-------  
+ 
+ 
+ 
+nhiÖm vô thiÕt kÕ tèt nghiÖp  
+ 
+ 
+Sinh viªn  :   NguyÔn Minh Hoµng       
+M· sè:        121428  
+Líp:           CT1201     Ngµnh: C«ng nghÖ Th«ng tin  
+Tªn ®Ò tµi:  
+X©y dùng website qu¶n lý nhµ hµng . 
+  
+ 
+ nhiÖm vô ®Ò tµi  
+1. Néi dung vµ c¸c yªu cÇu cÇn gi¶i quyÕt trong nhiÖm vô ®Ò tµi tèt nghiÖp  
+a. Néi dung:  
+- Ph©n tÝch thiÕt kÕ theo h­íng cÊu tróc  cho bµi to¸n qu¶n lý nhµ hµng Rõng 
+Trong Phè.  
+- Sö dông hÖ qu¶n t rÞ c¬ së d÷ liÖu Sql Server2008 /MySql  ®Ó t¹o, l­u tr÷ d÷ 
+liÖu, vµ x©y dùn g website b»ng n g«n ng÷  ASP.NET /PHP.  
+b. C¸c yªu cÇu cÇn gi¶i quyÕt  
+- T×m hiÓu nghiÖp vô bµi to¸n, thu thËp hå s¬ tµi liÖu liªn quan.  
+- Ph©n tÝch thiÕt kÕ hÖ thèng theo h­íng cÊu tróc.  
+- ThiÕt kÕ CSDL quan hÖ ®Ó l­u tr÷ d÷ liÖu.  
+- Cµi ®Æt ch­¬ng tr×nh thö nghiÖm: Sö dông Sql Server2008/MySql ®Ó t¹o c¬ 
+së d÷ liÖu, vµ ng«n ng÷ ASP.NET / PHP ®Ó lËp tr×nh x©y dùng ch­¬ng tr×nh 
+d­íi d¹ng website.  
+2. C¸c sè liÖu c Çn thiÕt ®Ó thiÕt kÕ, tÝnh to¸n  
+..................................................................................... .................................................................  
+............................................................................................................................. .........................  
+....................................... ...............................................................................................................  
+............................................................................................................................. ................... ...... 
+3. §Þa ®iÓm thùc tËp  
+C¤NG TY CPN H¶I PHßNG  
+Sè 7, Lª hång phong, ng« quyÒn, h¶I phßng
+--- (Skipping middle pages) ---
+ 
+ 
+ 
+Đồ án tốt nghi ệp              Trường ĐHDL  Hải Phòng  
+   
+Sinh viên : Nguy ễn Minh Hoàng – CT1201  Trang 82 
+  
+Báo cáo bán hàng  
+
+
+==================================================
+--- 
+File: 96_DiepHuuDung_CT1001.pdf
+MỤC LỤC  
+ 
+CHƢƠNG 1:  CƠ SỞ LÝ THUYẾT   ................................ ................................ ...........  1 
+1.1.PHÂN TÍCH THIẾT KẾ HỆ THỐNG HƢỚNG CẤU TRÚC.  .....................   1 
+1.1.1 Các khái niệm về hệ thống thông tin  ................................ ..............................  1 
+1.1.2 Tiếp cận phát triển hệ thống thông tin định hướng cấu trúc  ..........................   1 
+1.2. THIẾT KẾ CƠ SỞ DỮ LIỆU QUAN HỆ   ................................ .......................  2 
+1.2.1. Cơ sở dữ liệu và hệ quản trị cơ sở dữ liệu   ................................ ....................  2 
+1.2.2. Chuẩn hóa cơ sở dữ liệu   ................................ ................................ ................  2 
+1.2.3. Mô hình liên kết thực thể E -R ................................ ................................ .......  3 
+1.2.4. Mô hình cơ sở dữ liệu quan hệ   ................................ ................................ ...... 3 
+CHƢƠNG 2: MÔ TẢ BÀI TOÁN VÀ GIẢI PHÁP  ................................ .................   5 
+2.1 GIỚI THIỆU VỀ NHÀ HÀNG HỮU HẠNH  ................................ ..................   5 
+2.1.1.Vài nét về nhà hàng Hữu Hạnh   ................................ ................................ ...... 5 
+2.1.2.Cơ cấu của nhà hàng Hữu Hạnh  ................................ ................................ ..... 5 
+2.2.MÔ TẢ HOẠT ĐỘNG CỦA NHÀ HÀNG  ................................ .......................  6 
+2.2.1 Mô tả bằng lời hoạt động của nhà hàng   ................................ .........................  6 
+2.2.2.Sơ đồ tiến trình nghiệp vụ   ................................ ................................ ..............  7 
+2.3.G IẢI PHÁP   ................................ ................................ ................................ ..........  9 
+CHƢƠNG 3: PHÂN TÍCH VÀ THIẾT KẾ  HỆ THỐNG   ................................ ..... 10 
+3.1 MÔ HÌNH NGHIỆP VỤ   ................................ ................................ ..................  10 
+3.1.1.Bảng phân tích xác định các chức năng ,tác nhân và hồ sơ  .........................   10 
+3.1.2.Biểu đồ ngữ cảnh   ................................ ................................ .........................  11 
+3.1.3. Xây dựng sơ đồ phân rã chức năng   ................................ .............................  12 
+3.1.4. Danh sách các hồ sơ dữ liệu  ................................ ................................ ........   13 
+3.1.5. Ma trận thực thể chức năng  ................................ ................................ .........   14 
+3.2. SƠ ĐỒ LUỒNG DỮ L IỆU ................................ ................................ ..............  15 
+3.2.1.Sơ đồ luồng dữ liệu mức 0  ................................ ................................ ...........   15 
+3.2.1.Sơ đồ luồng dữ liệu mức 1   ................................ ................................ ...........  16 
+3.3.THIẾT KẾ CƠ SỞ DỮ LIỆU  ................................ ................................ ..........   18 
+3.3.1.Mô hình liên kết thực thể (ER)   ................................ ................................ .... 18 
+3.3.2.Mô hình quan hệ  ................................ ................................ ...........................  19 
+3.3.3.Các bảng dữ liệu vật lý   ................................ ................................ .................  23 
+3.4.THIẾT KẾ KIẾN TRÚC CHƢƠNG TRÌNH   ................................ ................  26 
+3.4.1.Xây dựng biểu  đồ luồng hệ thống   ................................ ................................  26 
+3.4.2.Xây dựng cây phân rã chức năng cho chương trình  ................................ ....  29 
+3.5.THIẾT KẾ GIAO DIỆN   ................................ ................................ ..................  30 
+3.5.1.Giao diện chính  ................................ ................................ ............................   30 
+3.5.2.Giao diện đăng nhập hệ thống   ................................ ................................ ...... 30 
+3.5.3.Giao diện cập nhật dữ l iệu ................................ ................................ ...........   31 
+3.5.4.Giao diện xử lý dữ liệu  ................................ ................................ .................   33 
+3.5.5.Giao diện báo cáo  ................................ ................................ .........................   33 
+CHƢƠNG 4: CÀI ĐẶT CHƢƠNG TRÌNH  ................................ ............................   34 
+4.1. CÔNG CỤ ĐỂ CÀI ĐẶT CHƢƠNG TRÌNH   ................................ ...............  36 
+4.1.1. Hệ QTCSDL SQL SERVER   ................................ ................................ ....... 36 
+4.1.2. Ngôn ngữ VISUAL BASIC   ................................ ................................ ........  37 
+4.2. MỘT SỐ GIAO DIỆN CHÍNH  ................................ ................................ ......  38 
+4.2.1.Giao diện chính   ................................ ................................ ............................  38 
+4.2.2.Giao diện cập nhật dữ liệu   ................................ ................................ ...........  39 
+4.2.3.Giao diện xử lý dữ liệu   ................................ ................................ .................  42 
+4.2.4.Một số báo cáo   ................................ ................................ .............................  44 
+KẾT LUẬN   ................................ ................................ ................................ .................  46 
+TÀI LIỆU THAM KHẢO   ................................ ................................ ..........................  47 
+DANH MỤC CÁ C HỒ SƠ DỮ LIỆU  
+LỜI CẢM ƠN  
+ 
+Trước hết em xin bày tỏ tình cảm và l òng biết ơn đối với Th.S Nguyễn Thị 
+Thanh Thoan  – Bộ môn Công nghệ thông tin – Trường Đại học Dân Lập Hải 
+Phòng,người đã dành cho em rất nhiều thời gian quý báu,trực tiếp hướng dẫn tận tìn h 
+giúp đỡ,chỉ bảo em trong suất quá trình làm đồ án tốt nghiệp.  
+Em xin chân thành cảm ơn tất cả các thầy cô giáo trong Bộ môn công nghệ 
+thông tin – Trường ĐHDL Hải Phòng,chân thành cảm ơn các thầy giáo,cô giáo tham 
+gia giảng dạy và truyền đạt những kiến th ức quý báu trong su ốt thời gian em học tập 
+tại trường.  
+Em xin cảm ơn GS.TS.NSƯT Trần Hữu Nghị Hiệu trưởng Trường ĐHDL Hải 
+Phòng,Ban giám hiệu nhà trường,Bộ môn tin học,các phòng ban nhà trường đã tạo 
+điều kiện tốt nhất trong suốt thời gian học tập và làm t ốt nghiệp.  
+Tuy có nhiều cố gắng trong quá trình học tập,trong thời gian học tập cũng như 
+trong quá trình làm đồ án nhưng không thể tránh được những thiếu sót ,em rất mong 
+được sự góp ý quý báu của tất cả các thầy giáo,cô giáo cũng như tất cả các bạn để kết  
+quả của em được hoàn thiện hơn.  
+Em xin chân thành cảm ơn!  
+     
+    Hải phòng,ngày 23 tháng 10 năm 2010  
+                                 Sinh viên  
+   
+ 
+                                                             Diệp Hữu Dũng  
+ 
+Đồ án tốt nghiệp:Quản lý nhà hàng Hữu Hạnh  
+Sinh viên:Diệp Hữu Dũng  -  Khóa 10,Ngành công nghệ thông tin   
+1 CHƢƠNG 1:  CƠ SỞ LÝ THUYẾT  
+ 
+1.1.PHÂN TÍCH THIẾT KẾ HỆ THỐNG HƢỚNG CẤU TRÚC.  
+1.1.1 Các khái niệm về hệ thống thông tin  
+-Có nhiều định nghĩa về hệ thống thông  tin khác nhau và các khái niệm liên 
+quan. Về mặt kỹ thuật,HTTT được xác định như một tập hợp các thành phần được  tổ 
+chức để thu  thập xử lý,lưu trữ,phân phối và biểu diễn thông tin,trợ giúp việc ra quyết 
+định và kiểm soát hoạt động trong một tổ chức.  
+-Dữ liệu  (data ) là những mô tả về sự vật,con người và sự kiện trong thế giới 
+mà chúng ta gặp bằng nhiều cách thể hiện khác nhau,như bằng ký tự,chữ viết,biểu 
+tượng,hình ảnh,âm thanh,tiếng nói…  
+-Thông tin  (information) là dữ liệu được đặt vào một ngữ cảnh với một hình 
+thức thích hợp và có lợi cho người sử dụng cuối.  
+-Các hoạt động thông tin  (information activities) là các hoạt động xảy r a trong 
+một hệ thống thông tin ,bao gồm việc nắm bắt,xử lý,phân phối,lưu trữ,trình diễn dữ 
+liệu và kiểm tra các hoạt động trong hệ thống thông tin.  
+-Xử lý  (processing) dữ liệu được hiểu là các hoạt động tác động lên dữ liệu như 
+tính toán,so sánh,sắp xếp…là m cho thay đổi về nội dung,vị trí hay cách thể hiện.  
+-Giao diện  (interface) là chỗ mà tại đó hệ thống trao đổi dữ liệu với hệ thống 
+khác hay môi trường  
+-Môi trường  (enviroment) là phần của thế giới không thuộc hệ thống mà còn 
+tương tác với hệ thống thông q ua các giao diện của nó.  
+1.1.2 Tiếp cận phát triển hệ thống thông tin định hƣớng cấu trúc  
+-Tiếp cận định hướng cấu trúc hướng vào việc cải tiến cấu trúc các chương trình 
+dựa trên cơ sở môđun hóa để theo dõi,quản lý và bảo trì.Phát triển hướng cấu trúc đề 
+cập đến quá trình sử dụng một cách có hệ thống và tích hợp các công cụ kỹ thuật để 
+trợ giúp thiết kế và phân tích HTTT theo hướng môđun hóa.  
+-Các phương pháp luận hướng cấu trúc sử dụng một hay một số công cụ để xác 
+định luồng thông tin và các quá trình xử lý.Việc xác định và chi tiết hóa các luồng dữ 
+liệu và các tiến trình là ý tưởng cơ bản của phương pháp luận từ trên xuống (TOP -
+down)  
+Đồ án tốt nghiệp:Quản lý nhà hàng Hữu Hạnh  
+Sinh viên:Diệp Hữu Dũng  -  Khóa 10,Ngành công nghệ thông tin   
+2 -Phát triển có cấu trúc đã cung cấp một tập hợp đầy đủ các đặc tả hệ thống 
+không dư thừa được phát triển theo quá trình log ic và lặp lại.Nó cho ta nhiều lợi ích so 
+với cách tiếp cận trước đó:  
++ Làm giảm sự phức tạp (nhờ chia nhỏ môđun hóa)  
++Tập trung vào ý tưởng(vào logic,kiến trúc trước khi thiết kế)  
++Chuẩn mực hóa(theo phương pháp công cụ đã cho)  
++Hướng về tương lai(kiến trú c tốt môđun hóa dễ bảo trì)  
++Giảm bớt tính nghệ thuật trong thiết kế  
+1.2. THIẾT KẾ CƠ SỞ DỮ LIỆU QUAN HỆ  
+1.2.1. Cơ sở dữ liệu và hệ quản trị cơ sở dữ liệu  
+Cơ sở dữ liệu là mô hình thực thể phản ánh thế giới thực được đề cập đến. Cơ 
+sở dữ liệu là nguồn cung  cấp dữ liệu của hệ thống thông tin, những dữ liệu này được 
+lưu trữ một cách có cấu trúc dựa trên một quy định nào đó nhằm giảm sự dư thừa và 
+đảm bảo tính thống nhất (toàn vẹn dữ liệu).  
+Hệ quản trị cơ sở dữ liệu là một hệ thống chương trình có thể quản lý , tổ chức 
+lưu trữ, tìm kiếm thay đổi, thêm bớt dữ liệu trong CSDL.  
+1.2.2. Chuẩn hóa cơ sở dữ liệu  
+Dạng chuẩn 1  
+Một lược đồ quan hệ được gọi là thuộc dạng chuẩn 1 (First Normal Form hay 
+1NF) nếu tên miền của mỗi thuộc tính là kiểu nguyên tố chứ không phải là một tập 
+hợp hay một kiểu có cấu trúc phức hợp.  
+Dạng chuẩn 2  
+Lược đồ quan hệ ER được gọi là dạng chuẩn thứ 2 (2NF) nếu nó thuộc dạng 
+chuẩn thứ nhất và mọi thuộc tính không khóa đều phụ thuộc hàm đầy đủ vào khóa.  
+Dạng chuẩn 3   
+Lược đồ quan hệ được gọi là thuộc dạng chuẩn 3 (3NF) nếu nó thuộc dạng chuẩn 
+thứ 2 và mọi thuộc tính không khóa đều không phụ thuộc hàm bắc cầu vào khóa chính . 
+Dạng chuẩn Boyce -Codd  
+Lược đồ quan hệ R chuẩn hóa với tập phụ thuộc hàm F được gọi là thuộc dạng chuẩn 
+Boyce -Codd (BCNF) nếu  có X -> A đúng trên lược đồ R và A €  X thì X chứa một khóa của 
+R (X là siêu khóa).  
+--- (Skipping middle pages) ---
+ 
+c,Phiếu giao hàng  
+ 
+ 
+  
+ 
+ 
+
+==================================================
+--- 
+File: Hoang-Viet-Trung-CT2601.pdf
+ 
+  BỘ GIÁO D ỤC VÀ ĐÀO T ẠO 
+TRƯ ỜNG Đ ẠI HỌC QU ẢN LÝ VÀ CÔNG NGH Ệ HẢI PHÒNG  
+--------------------------------------  
+ 
+ 
+ 
+ 
+ 
+ 
+ĐỒ ÁN T ỐT NGHI ỆP  
+NGÀNH  CÔNG  NGH Ệ THÔNG  TIN 
+ 
+ 
+ 
+ 
+                       Sinh viên  :  Hoàng Vi ệt Trung  
+                       Giảng viên hư ớng dẫn :  Ths. Vũ Ph ạm Minh Hi ển 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HẢI PHÒNG – 2025  
+ 
+
+ 
+  
+BỘ GIÁO D ỤC VÀ ĐÀO T ẠO 
+TRƯ ỜNG Đ ẠI HỌC QU ẢN LÝ VÀ CÔNG NGH Ệ HẢI PHÒNG  
+--------------------------------------  
+ 
+ 
+ 
+ 
+ 
+XÂY D ỰNG TRANG Đ ẶT ĐỒ ĂN TR ỰC TUY ẾN 
+ 
+ĐỒ ÁN T ỐT NGHI ỆP ĐẠI HỌC HỆ CHÍNH QUY  
+NGÀNH CÔNG NG HỆ THÔNG TIN  
+ 
+ 
+ 
+ 
+ 
+Sinh viên :  Hoàng Vi ệt Trung     
+Giảng viên hư ớng dẫn:  Ths. Vũ Ph ạm Minh Hi ển 
+ 
+ 
+ 
+ 
+ 
+ 
+HẢI PHÒNG – 2025  
+ 
+ BỘ GIÁO D ỤC VÀ ĐÀO T ẠO 
+TRƯ ỜNG ĐẠI HỌC QUẢN LÝ  VÀ CÔNG  NGH Ệ HẢI PHÒNG  
+----------------------------------------------  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+NHI ỆM VỤ ĐỀ TÀI TỐT NGHI ỆP 
+ 
+ 
+ 
+ 
+ 
+ 
+Sinh  viên :  Hoàng Việt Trung     - Mã SV: 2212102021  
+Lớp          :       CT2601  
+Ngành      :       Công ngh ệ thông tin    
+Tên đề tài:       Xây dựn g trang Đặt đồ ăn trực tuyến  
+  
+ 
+ NHI ỆM VỤ ĐỀ TÀI 
+1. Nội dung và các yêu c ầu cần giải quy ết trong nhi ệm vụ đề tài tốt nghi ệp 
+a. Mô t ả tóm t ắt đề tài 
+- - Đề tài tập trung vào vi ệc xây d ựng Xây d ựng trang Đ ặt đồ ăn trực tuy ến với ba vai 
+trò ngư ời dùng chính: khách hàng , chủ nhà hàng  và quản trị viên. 
+b. Nội dung hư ớng dẫn 
+- Khảo sát và Phân tích yêu c ầu: 
+- Xây d ựng m ột hệ thống website h ỗ trợ nhiều nhà hàng ho ạt động cùng lúc, cho phép 
+người dùng đ ặt món ăn tr ực tuy ến. 
+- Thiết kế giao di ện thân thi ện, hiện đại và d ễ sử dụng cho c ả người dùng, ch ủ nhà 
+hàng và qu ản trị viên. 
+- Cung c ấp đầy đủ các ch ức năng: qu ản lý tài kho ản, giỏ hàng, đơn hàng, món ăn, 
+thống kê và phê duy ệt đăng ký nhà hàng . 
+- Đảm bảo tính b ảo mật thông tin, toàn v ẹn dữ liệu và kh ả năng m ở rộng trong tương 
+lai. 
+- Thiết kế hệ thống: 
+• Thiết kế kiến trúc t ổng th ể cho website.  
+• Thiết kế cơ sở dữ liệu 
+• Thiết kế giao di ện ngư ời dùng cho các trang ch ức năng chính.  
+c. Kết quả cần đạt được 
+- Nắm đư ợc kiến thức về xây d ựng website cũng như ngôn ng ữ lập trình web.  
+- Xây d ựng m ột trang web mang l ại thuận tiện cho ngư ời dùng, ti ết kiệm thời gian cũng 
+như công s ức. 
+2. Địa điểm th ực tập tốt nghi ệp 
+- Công ty TNHH máy tính Đông Phong  
+  
+ 
+ CÁN B Ộ HƯỚNG D ẪN ĐỀ TÀI T ỐT NGHI ỆP 
+ 
+Họ và tên                 : Ths. Vũ Ph ạm Minh Hi ển 
+Học hàm,h ọc vị       : Thạc sĩ 
+Cơ quan công tác    :  Khoa Công ngh ệ thông tin - Trường Đ ại học Qu ản Lý và Công 
+Nghệ Hải Phòng  
+Nội dung hư ớng dẫn:  
+- Ngôn ngữ lập trình  
+- Platform  
+- Các use case  
+Đề tài tốt nghiệp  được  giao ngày  06 tháng  10 năm 202 5 
+Yêu cầu phải  hoàn thành  xong trước  ngày  27 tháng  12 năm 202 5 
+ Đã nh ận nhi ệm vụ ĐTTN  Đã giao nhi ệm vụ ĐTTN  
+ Sinh viên  Giảng viên hư ớng dẫn 
+ 
+ 
+  Ths. Vũ Ph ạm Minh Hi ển 
+ 
+ 
+Hải Phòng, ngày ….. tháng 12 năm 2025  
+TRƯỞNG KHOA  
+ 
+  
+--- (Skipping middle pages) ---
+107 TÀI LI ỆU THAM KH ẢO 
+[1]  Mozilla Developer Network (MDN). Client –Server overview . 
+https://developer.mozilla.org/en -US/docs/Learn/Server -side/First_steps/Client -
+Server_overview  
+[2]  React Official Documentation – https://react.dev  
+[3]  Vite Official Documentation – https://vitejs.dev  
+[4]  React Router – Official Documentation: https://reactrouter.com  
+[5]  Nguy ễn Thanh Hưng (2023). Ứng dụng SCSS và CSS Modules trong phát tri ển 
+giao di ện React , Trư ờng Đ ại học Công ngh ệ Thông tin TP.HCM.  
+[6]  MDN Web Docs – React Context API Overview : https://developer.mozilla.org/  
+[7]  Node.js Official Website – https://nodejs.org/en  
+[8]  Express.js Official Website – https://expressjs.com/  
+[9]  Express.js Official Website – https://expressjs.com/  
+[10]  Phạm Quang Huy (2022). Ứng dụng ki ến trúc MVC trong phát tri ển web v ới Node.js 
+và Express , Trư ờng Đ ại học FPT TP.HCM.  
+[11]  Trần Đức Tài (2023). Sử dụng Middleware trong Express.js đ ể bảo vệ Website  API, 
+Đại học Công ngh ệ Thông tin - ĐHQG TP.HCM.  
+[12]  Nguy ễn Văn Minh (2022). Xây d ựng và k ết nối frontend -backend trong ứng dụng 
+thương m ại điện tử, Trư ờng Đ ại học Bách Khoa Hà N ội. 
+[13]  W3Schools – MySQL Tutorial:  
+https://www.w3schools.com/mysql/  
+ 
+
+==================================================

@@ -1,0 +1,1797 @@
+ĐẠI HỌC TRÀ VINH
+
+TRƯỜNG KỸ THUẬT VÀ CÔNG NGHỆ
+
+
+
+
+
+
+
+
+
+ĐỒ ÁN TỐT NGHIỆP
+
+
+
+XÂY DỰNG HỆ THỐNG QUẢN LÝ NHÀ HÀNG KẾT HỢP GỢI Ý SẢN PHẨM
+
+THEO CÁ NHÂN HÓA NGƯỜI DÙNG
+
+
+
+
+
+
+
+Giảng viên hướng dẫn: ThS. PHẠM MINH ĐƯƠNG
+
+Sinh viên thực hiện: NGUYỄN HUỲNH KỸ THUẬT
+
+Mã số sinh viên: 110122175
+
+Lớp: DA22TTC
+
+Khoá: 2022
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vĩnh Long, tháng   năm 2026
+
+
+
+  ĐẠI HỌC TRÀ VINH
+
+TRƯỜNG KỸ THUẬT VÀ CÔNG NGHỆ
+
+
+
+
+
+
+
+
+
+ ĐỒ ÁN TỐT NGHIỆP
+
+
+
+XÂY DỰNG HỆ THỐNG QUẢN LÝ NHÀ HÀNG KẾT HỢP GỢI Ý SẢN PHẨM
+
+ THEO CÁ NHÂN HÓA NGƯỜI DÙNG
+
+
+
+
+
+
+
+
+
+Giảng viên hướng dẫn: ThS. PHẠM MINH ĐƯƠNG
+
+Sinh viên thực hiện: NGUYỄN HUỲNH KỸ THUẬT
+
+Mã số sinh viên: 110122175
+
+Lớp:DA22TTC
+
+Khoá:2022
+
+
+
+
+
+
+
+
+
+Vĩnh Long, tháng   năm 2026
+
+MỤC LỤC
+
+	LỜI MỞ ĐẦU	1
+
+	LỜI CẢM ƠN	2
+
+	CHƯƠNG 1. ĐẶT VẤN ĐỀ	14
+
+	1.1. Lý do chọn đề tài	14
+
+	1.2. Mục tiêu nghiên cứu	14
+
+	1.3. Nội dung nghiên cứu	14
+
+	1.4. Đối tượng và phạm vi nghiên cứu	15
+
+	1.5. Phương pháp thực hiện	15
+
+	CHƯƠNG 2. CƠ SỞ LÝ THUYẾT	17
+
+	2.1. Tổng quan hệ thống quản lý nhà hàng	17
+
+	2.2. Các kỹ thuật phân tích dữ liệu chính cho thương mại điện tử	17
+
+	2.3. Giới thiệu sơ lược về các phương pháp lọc được sử dụng trong đồ án	18
+
+	2.3.1. Lọc dựa trên nội dung	19
+
+	2.3.2. Lọc cộng tác	19
+
+	2.3.3. Gợi ý dựa trên độ phổ biến	20
+
+	2.3.4. Phương pháp kết hợp	20
+
+	2.4. Khai phá luật kết hợp	21
+
+	2.4.1. Thuật toán Apriori trong hệ thống nhà hàng	21
+
+	2.4.2. Ứng dụng trong hệ thống nhà hàng	23
+
+	2.4.3. Các chỉ số quan trọng	23
+
+	2.5. Bài toán minh họa áp dụng thuật toán Apriori trong hệ thống nhà hàng	23
+
+	2.6. NodeJS	25
+
+	2.6.1. Khái niệm về NodeJS	25
+
+	2.6.2. Đặc điểm chính	25
+
+	2.6.3. Hạn chế	26
+
+	2.7. Express.Js Framework	27
+
+	2.8. Python	27
+
+	2.8.1. Khái niệm về ngôn ngữ Python	27
+
+	2.8.2. Ứng dụng Python trong dự án	28
+
+	2.9. Thuật toán được sử dụng trong lọc cộng tác	29
+
+	2.9.1. Thuật toán SVD	29
+
+	2.9.2. Bài toán thực tế ứng dụng thuật toán SVD vào	30
+
+	2.9.3. Các thuật toán học máy dựa trên Implicit Feedback - Phản hồi ngầm	31
+
+	2.10. Thuật toán được sử dụng trong lọc nội dung	32
+
+	2.11. Thuật toán trong Lọc theo độ phổ biến	32
+
+	2.12. Phương pháp kết hợp yếu tố	33
+
+	2.13. Ứng dụng RAG trong dự án	33
+
+	2.13.1. Khái niệm về RAG	33
+
+	2.14. Lý do áp dụng RAG và Chatbot Nhà hàng	34
+
+	2.14.1. Ứng dụng RAG vào chatbot tư vấn khách hàng trong đồ án	35
+
+	2.15. Ứng dụng GraphQL vào trong đồ án	35
+
+	2.15.1. Khái niệm	35
+
+	2.15.2. Lý do chọn GraphQL vào trong đồ án	35
+
+	2.15.3. Ứng dụng trực tiếp vào đồ án qua các chức năng	36
+
+	2.16. RESTful API	37
+
+	2.16.1. Khái niệm	37
+
+	2.16.2. Ứng dụng của RESTful vào trong đồ án	38
+
+	2.17. Thuật toán gợi ý	39
+
+	2.18. Các nghiệp vụ liên quan	40
+
+	2.19. Các công trình nghiên cứu liên quan	42
+
+	CHƯƠNG 3. HIỆN THỰC HÓA NGHIÊN CỨU	45
+
+	3.1. Mô tả hệ thống	45
+
+	3.2. Chức năng của hệ thống	45
+
+	3.3. Kiến trúc hệ thống	46
+
+	3.4. Thiết kế dữ liệu	47
+
+	3.4.1. Mô HÌNH thực thể kết hợp ERD	47
+
+	3.4.2. Sơ đồ lớp	48
+
+	3.5. Thiết kế xử lý	49
+
+	3.5.1. Sơ đồ Usecase	49
+
+	3.5.2. Sơ đồ hoạt động	50
+
+	3.5.2.1 Sơ đồ hoạt động luồng đăng ký	50
+
+	3.5.2.2 Sơ đồ hoạt động luồng đăng nhập	50
+
+	3.5.2.3 Sơ đồ hoạt động luồng đặt bàn online	51
+
+	3.5.2.4 Sơ đồ hoạt động luồng đặt hàng online	51
+
+	3.5.2.5 Sơ đồ hoạt động luồng gợi ý món ăn	52
+
+	3.5.2.6 Sơ đồ hoạt động luồng quản lý kho	53
+
+	3.5.2.7 Sơ đồ hoạt động luồng quản đơn hàng	53
+
+	3.5.2.8 Sơ đồ hoạt động luồng thanh toán bằng MoMo	54
+
+	3.5.3. Sơ đồ tuần tự	55
+
+	3.5.3.1 Sơ đồ tuần tự chấm công và tính lương cho nhân viên	55
+
+	3.5.3.2 Sơ đồ tuần tự chatbot tư vấn khách hàng	56
+
+	3.5.3.3 Sơ đồ tuần tự oder cho bếp	57
+
+	3.5.3.4 Sơ đồ tuần tự quản lý kho	58
+
+	CHƯƠNG 4. CHƯƠNG 4: KẾT QUẢ NGHIÊN CỨU	59
+
+	CHƯƠNG 5. KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN	60
+
+	TÀI LIỆU THAM KHẢO	61
+
+
+
+
+
+LỜI MỞ ĐẦU
+
+Trong bối cảnh công nghệ thông tin ngày càng phát triển mạnh mẽ, việc ứng dụng các hệ thống phần mềm vào quản lý kinh doanh đã trở thành xu hướng tất yếu, đặc biệt trong lĩnh vực nhà hàng. Các phương pháp quản lý truyền thống không còn đáp ứng hiệu quả trong việc xử lý dữ liệu lớn, theo dõi hoạt động kinh doanh và nâng cao trải nghiệm khách hàng. Xuất phát từ thực tế đó, đề tài “Xây dựng hệ thống quản lý nhà hàng kết hợp gợi ý sản phẩm theo cá nhân hóa người dùng” được thực hiện nhằm xây dựng một hệ thống hỗ trợ quản lý toàn diện, bao gồm quản lý thực đơn, đơn hàng, khách hàng và thống kê doanh thu. Bên cạnh đó, hệ thống còn tích hợp chức năng gợi ý sản phẩm dựa trên hành vi và sở thích của người dùng, góp phần nâng cao trải nghiệm và tăng hiệu quả kinh doanh.Thông qua đề tài này, tôi hướng đến việc áp dụng các kiến thức về phát triển web, cơ sở dữ liệu và Machine Learning vào thực tiễn, từ đó xây dựng một giải pháp có tính ứng dụng cao, phù hợp với nhu cầu hiện nay.
+
+
+
+LỜI CẢM ƠN
+
+Tôi xin gửi lời cảm ơn sâu sắc đến Thầy, Cô đã hướng dẫn tôi trong quá trình thực hiện và hoàn thành báo cáo Đồ án tốt nghiệp. Trong thời gian qua, tôi đã tiếp thu được nhiều kiến thức mới và bổ ích trong lĩnh vực Công nghệ thông tin, từ quá trình nghiên cứu cho đến khi hoàn thành đề tài. Thông qua bài báo cáo này, tôi xin chân thành cảm ơn Thầy Phạm Minh Đương, giảng viên Khoa Công nghệ Thông tin, đã tận tình hướng dẫn, hỗ trợ và truyền đạt những kiến thức quý báu, giúp tôi hoàn thành đề tài với chủ đề: “Xây dựng hệ thống quản lý nhà hàng kết hợp gợi ý sản phẩm theo cá nhân hóa người dùng”. Tôi cũng xin gửi lời cảm ơn đến Trường Đại học Trà Vinh, Trường Kỹ thuật và Công nghệ, cùng Khoa Công nghệ Thông tin đã tạo điều kiện thuận lợi, cung cấp kiến thức và tài liệu cần thiết để tôi có thể hoàn thành đồ án. Trong quá trình thực hiện, do còn hạn chế về kiến thức và kinh nghiệm, báo cáo không tránh khỏi những thiếu sót. Tôi rất mong nhận được sự góp ý, đánh giá từ Thầy, Cô để có thể khắc phục và hoàn thiện hơn.
+
+Tôi xin chân thành cảm ơn!
+
+
+
+      Vĩnh Long, ngày  tháng  năm 2026	
+
+Sinh viên thực hiện	
+
+(Ký và ghi rõ họ tên)
+
+								
+
+Nguyễn Huỳnh Kỹ Thuật
+
+
+
+
+
+
+NHẬN XÉT
+
+(Của giảng viên hướng dẫn trong đồ án, khóa luận của sinh viên)
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+
+
+Giảng viên hướng dẫn
+
+                                                                                                                               (ký và ghi rõ họ tên)
+
+
+
+
+
+
+		UBND TỈNH VĨNH LONG	CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM
+
+	  ĐẠI HỌC TRÀ VINH   	Độc lập – Tự do – Hạnh Phúc
+
+		
+
+	BẢN NHẬN XÉT ĐỒ ÁN, KHÓA LUẬN TỐT NGHIỆP
+
+	(Của giảng viên hướng dẫn)
+
+	
+
+		Họ và tên sinh viên: Nguyễn Huỳnh Kỹ Thuật                 MSSV: 110122175
+
+		Ngành: Công nghệ thông tin                                              Khóa: 2022
+
+	Tên đề tài: Xây dựng hệ thống quản lý nhà hàng kết hợp gợi ý sản phẩm theo hướng cá nhân hóa người dùng
+
+	Họ và tên Giáo viên hướng dẫn: Phạm Minh Đương
+
+		Chức danh:  Giảng viên                                                       Học vị: Thạc sĩ
+
+	NHẬN XÉT
+
+			Nội dung đề tài:
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+		Ưu điểm:
+
+		
+
+		
+
+		
+
+		
+
+		Khuyết điểm:
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		Điểm mới đề tài:
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		Giá trị thực trên đề tài:
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+		7. Đề nghị sửa chữa bổ sung:
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+		8. Đánh giá:
+
+			
+
+			
+
+			
+
+			
+
+		Vĩnh Long, ngày        tháng      năm 20…
+
+		Giảng viên hướng dẫn 
+
+		(Ký & ghi rõ họ tên)
+
+
+
+
+NHẬN XÉT
+
+(Của giảng viên chấm trong đồ án, khóa luận của sinh viên)
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+
+
+
+Giảng viên chấm
+
+(ký và ghi rõ họ tên)
+
+
+
+
+
+
+		UBND TỈNH VĨNH LONG 	CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM
+
+	    ĐẠI HỌC TRÀ VINH 	Độc lập - Tự do - Hạnh phúc
+
+		
+
+	BẢN NHẬN XÉT ĐỒ ÁN, KHÓA LUẬN TỐT NGHIỆP
+
+(Của cán bộ chấm đồ án, khóa luận)
+
+	Họ và tên người nhận xét: 	
+
+		Chức danh: 	 Học vị: 	  
+
+	Chuyên ngành: 	
+
+	Cơ quan công tác: 	 
+
+	Tên sinh viên: 	
+
+	Tên đề tài đồ án, khóa luận tốt nghiệp: 	
+
+		
+
+		
+
+	I. Ý KIẾN NHẬN XÉT
+
+	1. Nội dung: 
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+	2. Điểm mới các kết quả của đồ án, khóa luận:
+
+		
+
+		
+
+		
+
+	3. Ứng dụng thực tế:
+
+		
+
+		
+
+		
+
+		
+
+		
+
+	
+
+
+
+
+	II. CÁC VẤN ĐỀ CẦN LÀM RÕ
+
+	(Các câu hỏi của giáo viên phản biện)
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+		
+
+	III. KẾT LUẬN
+
+	(Ghi rõ đồng ý hay không đồng ý cho bảo vệ đồ án khóa luận tốt nghiệp)
+
+		
+
+		
+
+		
+
+		
+
+		
+
+……………, ngày …… tháng …… năm 20…
+
+		Người nhận xét
+
+		(Ký & ghi rõ họ tên)
+
+	
+
+	
+
+DANH MỤC HÌNH ẢNH
+
+	HÌNH 2.1: Cấu trúc thư mục ai_service trong dự án	28
+
+	HÌNH 2.2: Ma trận biểu diễn dưới dạng tổ hợp	30
+
+	HÌNH 2.3: Cách hoạt động của RAG	34
+
+	HÌNH 2.4: Các phương thức RESTful API	38
+
+	HÌNH 2.5: Sơ đồ các công nghệ được sử dụng cho thuật toán gợi ý	39
+
+	HÌNH 3.1 Kiến trúc hệ thống trong đồ án	46
+
+	HÌNH 3.2: Mô hình thực thể kết hợp ERD	47
+
+	HÌNH 3.2.1: Sơ đồ lớp	48
+
+	HÌNH 3.3: Sơ đồ Usecase	49
+
+	HÌNH 3.4: Sơ đồ hoạt động luồng đăng ký	50
+
+	HÌNH 3.5: Sơ đồ hoạt động luồng đăng nhập	50
+
+	HÌNH 3.6: Sơ đồ hoạt động luồng đặt bàn online	51
+
+	HÌNH 3.7: Sơ đồ hoạt động luồng đặt hàng online	51
+
+	HÌNH 3.8: Sơ đồ hoạt động luồng gợi ý món ăn	52
+
+	HÌNH 3.8: Sơ đồ hoạt động luồng quản lý kho	53
+
+	HÌNH 3.9 Sơ đồ hoạt động luồng quản lý đơn hàng	53
+
+	HÌNH 3.10: Sơ đồ hoạt động luồng thanh toán bằng MoMo	54
+
+	HÌNH 3.11: Sơ đồ tuần tự chấm công và tính lương cho nhân viên	55
+
+	HÌNH 3.12: Sơ đồ tuần tự chatbot tư vấn khách hàng	56
+
+	HÌNH 3.13: Sơ đồ tuần tự Oder về bếp chế biến	57
+
+	HÌNH 3.14: Sơ đồ tuần tự quản lý kho	58
+
+
+
+
+
+
+
+
+
+DANH MỤC BẢNG BIỂU
+
+	BẢNG 2.1: Ví dụ cho phương pháp Gợi ý dựa trên độ phổ biến	20
+
+	BẢNG 2.2: Ví dụ cho Phương pháp kết hợp	21
+
+	BẢNG 2.3: Ví dụ cho thuật toán Apiori về mức độ tin cậy 0.8+	22
+
+	BẢNG 2.4: Ví dụ tập dữ liệu đơn hàng	24
+
+	BẢNG 2.7: Dữ liệu sở thích món ăn của người dùng	30
+
+
+
+
+KÍ HIỆU CÁC CỤM TỪ VIẾT TẮT
+
+
+
+
+ ĐẶT VẤN ĐỀ
+
+ Lý do chọn đề tài
+
+Trong bối cảnh công nghệ thông tin phát triển mạnh mẽ và xu hướng chuyển đổi số diễn ra trên nhiều lĩnh vực, ngành dịch vụ ăn uống, đặc biệt là nhà hàng, đang dần ứng dụng các hệ thống phần mềm nhằm nâng cao hiệu quả quản lý và chất lượng phục vụ khách hàng. Tuy nhiên, trên thực tế, nhiều nhà hàng vẫn sử dụng phương pháp quản lý thủ công hoặc các hệ thống rời rạc, dẫn đến việc xử lý thông tin chậm, dễ sai sót và khó kiểm soát dữ liệu. Bên cạnh đó, sự cạnh tranh ngày càng cao trong lĩnh vực kinh doanh nhà hàng đòi hỏi các doanh nghiệp không chỉ dừng lại ở việc cung cấp sản phẩm mà còn phải chú trọng đến trải nghiệm cá nhân hóa cho khách hàng. Việc hiểu rõ hành vi, sở thích của người dùng để đưa ra các gợi ý phù hợp sẽ góp phần nâng cao sự hài lòng và gia tăng doanh thu. Xuất phát từ những yêu cầu thực tiễn trên, đề tài “Xây dựng hệ thống quản lý nhà hàng kết hợp gợi ý sản phẩm theo cá nhân hóa người dùng” được lựa chọn nhằm xây dựng một hệ thống quản lý hiệu quả, đồng thời tích hợp các phương pháp gợi ý thông minh để nâng cao trải nghiệm người dùng và hỗ trợ hoạt động kinh doanh.
+
+ Mục tiêu nghiên cứu
+
+Xây dựng một hệ thống quản lý nhà hàng trên nền tảng web có khả năng quản lý toàn diện các hoạt động kinh doanh, đồng thời tích hợp chức năng gợi ý sản phẩm dựa trên hành vi người dùng nhằm nâng cao trải nghiệm và hiệu quả hoạt động.
+
+  Nội dung nghiên cứu
+
+Đề tài tập trung xây dựng hệ thống với các chức năng quản lý chính bao gồm món ăn, đơn hàng và khách hàng, đồng thời thiết kế giao diện người dùng thân thiện và tích hợp chức năng tìm kiếm, lọc sản phẩm nhằm đáp ứng nhu cầu sử dụng thực tế. Bên cạnh đó, nghiên cứu và triển khai chức năng gợi ý sản phẩm dựa trên các phương pháp như lọc cộng tác và lọc dựa trên nội dung, từ đó xây dựng thuật toán đề xuất phù hợp với dữ liệu thực tế của hệ thống.
+
+ Đối tượng và phạm vi nghiên cứu
+
+Đối tượng nghiên cứu: 
+
+Đối tượng nghiên cứu của đề tài là hệ thống quản lý nhà hàng trên nền tảng web, bao gồm các thành phần chính như người dùng hệ thống khách hàng, nhân viên, bếp, quản lý, khách vãn lai và quản trị viên cùng với các dữ liệu liên quan như món ăn, đơn hàng và hành vi người dùng. Những yếu tố này đóng vai trò quan trọng trong việc xây dựng và vận hành hệ thống, đồng thời là cơ sở để triển khai các chức năng quản lý và gợi ý sản phẩm.
+
+Phạm vi nghiên cứu: 
+
+Đề tài tập trung xây dựng hệ thống trong phạm vi một website quản lý nhà hàng quy mô nhỏ đến trung bình, phù hợp với điều kiện thực hiện của đồ án. Chức năng gợi ý sản phẩm được triển khai ở mức cơ bản, không yêu cầu dữ liệu lớn hay các kỹ thuật phức tạp. 
+
+ Phương pháp thực hiện
+
+Phương pháp nghiên cứu lý thuyết: Thu thập, tổng hợp và phân tích các tài liệu, công trình nghiên cứu liên quan đến quy trình nghiệp vụ quản lý nhà hàng, cơ sở dữ liệu, và đặc biệt là các hệ thống gợi trong Machine Learning. Bên cạnh đó, nghiên cứu các thuật toán lọc cộng tác, lọc dựa trên nội dung  và phương pháp gợi ý lai ghép nhằm xây dựng cơ sở lý thuyết vững chắc để giải quyết bài toán gợi ý món ăn theo cá nhân hóa người dùng. 
+
+Phương pháp thực nghiệm: Xây dựng và chạy thử nghiệm hệ thống phần mềm với hai phân hệ chính: phân hệ quản lý nhà hàng (quản lý thực đơn, đơn hàng, người dùng) và phân hệ AI Tiến hành thu thập dữ liệu người dùng (lịch sử nhấp chuột, tìm kiếm, đánh giá) trong quá trình sử dụng mô phỏng. Từ đó, thử nghiệm các thuật toán Machine Learning để tối ưu hóa mô hình gợi ý lai ghép, đánh giá độ chính xác của kết quả gợi ý và kiểm thử tính ổn định của các chức năng quản lý. Cuối cùng, so sánh và tinh chỉnh để chọn ra bộ trọng số phù hợp nhất cho hệ thống gợi ý.
+
+Phương pháp khảo sát: Tiến hành khảo sát thực tế và phân tích cách hoạt động của các phần mềm quản lý nhà hàng, ứng dụng đặt đồ ăn và các website ẩm thực hiện có trên thị trường. Tập trung tìm hiểu quy trình quản lý nghiệp vụ, giao diện người dùng, cũng như cách thức các nền tảng này áp dụng công nghệ để đề xuất món ăn cho thực khách. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CƠ SỞ LÝ THUYẾT
+
+Tổng quan hệ thống quản lý nhà hàng
+
+Hệ thống quản lý nhà hàng là website được xây dựng nhằm hỗ trợ các hoạt động trong nhà hàng như quản lý món ăn, đơn hàng, khách hàng và các hoạt động kinh doanh khác. Thay vì sử dụng cách quản lý thủ công như ghi chép sổ sách, hệ thống giúp lưu trữ và xử lý dữ liệu một cách nhanh chóng, chính xác và dễ dàng hơn, từ đó giảm sai sót và tiết kiệm thời gian. Trong hệ thống, các chức năng cơ bản bao gồm quản lý thực đơn, cho phép thêm, sửa, xóa và cập nhật thông tin món ăn như tên món, giá, hình ảnh và mô tả. Ngoài ra, hệ thống còn hỗ trợ quản lý đơn hàng từ khi khách đặt món đến khi hoàn thành, bao gồm các bước như tạo đơn, cập nhật trạng thái và thanh toán. Bên cạnh đó, chức năng quản lý khách hàng giúp lưu trữ thông tin và lịch sử mua hàng, từ đó hỗ trợ việc chăm sóc khách hàng tốt hơn. Hệ thống cũng cung cấp các chức năng hỗ trợ như tìm kiếm và lọc sản phẩm theo nhu cầu, giúp người dùng dễ dàng tìm được món ăn phù hợp. Đối với người quản trị, hệ thống giúp theo dõi doanh thu, quản lý hoạt động kinh doanh và xem các báo cáo thống kê như món ăn bán chạy hoặc số lượng đơn hàng theo thời gian. Ngoài các chức năng quản lý cơ bản, hệ thống có thể tích hợp thêm các tính năng nâng cao như gợi ý sản phẩm dựa trên hành vi và sở thích của người dùng. Thông qua việc phân tích dữ liệu, hệ thống có thể đề xuất các món ăn phù hợp, giúp nâng cao trải nghiệm khách hàng và tăng hiệu quả kinh doanh.
+
+Tóm lại, hệ thống quản lý nhà hàng giúp đơn giản hóa quy trình làm việc, giảm sai sót, tiết kiệm hời gian và hỗ trợ nhà hàng hoạt động hiệu quả hơn trong thực tế. 
+
+Các kỹ thuật phân tích dữ liệu chính cho thương mại điện tử
+
+Trong website Thương mại điện tử việc phân tích dữ liệu rất quan trọng phải nói đến là việc thu hút khách hàng, tạo lới thế cạnh tranh cho các chuỗi doanh nghiệp kinh doanh với nhau thông qua việc kết hợp nhuần nhuyễn các kỹ thuật phân tích dành riêng cho Thương mại điện tử. Dưới đây chúng ta sẽ làm rõ các kỹ thuật phân tích dữ liệu:
+
+Thứ nhất Kỹ thuật phân tích Web: đây là kỹ thuật chuyên về hành vi và số lượng truy cập website của người dùng. Phân tích dữ liệu này giúp xác định các khu vữ cần cải thiện website , hiểu rõ hành trình khách hàng và tối ưu hóa trải nghiệm người dùng để giảm tỉ lệ thoát trang. Được ứng dụng cho đồ án đó là phân tích dựa trên dữ liệu tìm kiếm và dữ liệu chatbot, khi khách hàng đăng nhập lần đầu vào web họ tìm kiếm hoặc chat với chatbot thì sẽ lưu lại những gì liên quan đến dữ liệu nhà hàng, từ đó suy luận ra họ thích gì và không thích gì. Đó là kỹ thuật xử lý ngôn ngữ tự nhiên. 
+
+Thứ hai kỹ thuật phân tích quản lý quan hệ khách hàng (CRM): Phân tích dữ liệu này cho hệ thống hiểu chi tiết về tương tác khách hàng, lịch sử mua hàng. Thông tin này có thể được sử dụng để phân loại phân khúc khách hàng, từ đó cá nhân hóa người dùng, và được ứng dụng trực tiếp vào đồ án đó là gửi những nội dung cụ thể như món ăn, sở thích ăn gì của khách hàng được ứng dụng vào đồ ám từ đó cải thiện chất lượng dịch vụ khách hàng.
+
+Thứ ba kỹ thuật phân tích giỏ hàng: Kỹ thuật này sử dụng các thuật toán để xác định các mối liên hệ giữa sản phẩm thường được mua cùng nhau trong một đơn hàng. Thuật toán được ứng dụng trong đồ án đó là Luật khai phá kết hợp Apiori. Với kỹ thuật này doanh nghiệp tạo ra các đề xuất sản phẩm, tối ưu hóa hiển thị danh mục và thúc đẩy các cơ hội bán chéo, hoặc bán thêm. 
+
+Thứ tư kỹ thuật phân tích cảm xúc: Kỹ thuật này phân tích thái độ, mức độ hài lòng của khách hàng thông qua các bình luận đánh giá bài đăng trên mạng xã hội. Bên cạnh đó còn dựa trên xử lý ngôn ngữ tự nhiên thông qua dữ liệu chatbot của người dùng. 
+
+Thứ năm kỹ thuật phân tích dự báo: Kỹ thuật này sử dụng dữ liệu lịch sử mua hàng để dự đoán các xu hướng mua hàng trong tương lai, nhu cầu sản phẩm theo mùa vụ hoặc khả năng rời bỏ của khách hàng. Ứng dụng trong đồ án là hỗ trợ chủ nhà hàng xem sản phẩm nào tồn kho và chủ động đưa ra các chương trình khuyến mãi. Bên cạnh đó phát triển hệ thống tích hợp trợ lý AI vào để dễ dàng quản lý thay vì phải kiểm tra thủ công dò tìm theo phương pháp truyền thống mất thời gian. 
+
+Các phương pháp trên đều được áp dụng vào trong đồ án tiếp theo ở các phần bên dưới sẽ làm rõ những kỹ thuật giải pháp được áp dụng vào. 
+
+Giới thiệu sơ lược về các phương pháp lọc được sử dụng trong đồ án
+
+Trong các hệ thống hiện nay, đặc biệt là website bán hàng hoặc nhà hàng, chức năng gợi ý sản phẩm đóng vai trò khá quan trọng. Thay vì để người dùng tự tìm kiếm thì hệ thống có thể chủ động đề xuất các món ăn phù hợp dựa trên dữ liệu đã có. Các phương pháp trong Machine Learning giúp thực hiện điều này một cách tự động và hiệu quả hơn. Trong dự án sử dụng các phương pháp máy học như: Lọc dựa nội dung,  Lọc cộng tác, Gợi ý dựa trên độ phổ biến, Phương pháp kết hợp. Đặt biệt ở đây Lọc cộng tác hệ thống sử dụng thuật toán SVD phân tích giá trị đơn, nhầm tối ưu hóa lại việc cá nhân hóa người dùng, được huấn luyện mô hình bằng ngôn ngữ Python. Tiếp theo bên dưới chúng ta sẽ phân tích kĩ từng phương pháp và thuật toán nêu trên. 
+
+Lọc dựa trên nội dung 
+
+Phương pháp này hoạt động dựa trên thông tin của sản phẩm và lịch sử của chính người dùng. Hệ thống sẽ phân tích các đặc điểm như loại món ăn, nguyên liệu, danh mục mà người dùng đã xem hoặc đã đặt, từ đó tìm các sản phẩm có đặc điểm tương tự để gợi ý.
+
+Cách này khá đơn giản và dễ triển khai vì không cần dữ liệu từ nhiều người dùng khác. Tuy nhiên, điểm hạn chế là gợi ý có thể bị lặp lại, thiếu sự đa dạng vì chỉ xoay quanh sở thích cũ của người dùng. 
+
+Lọc cộng tác
+
+Phương pháp này không tập trung vào nội dung sản phẩm mà dựa vào hành vi của nhiều người dùng. Hệ thống sẽ tìm những người có hành vi giống nhau (ví dụ cùng đặt một số món giống nhau), sau đó gợi ý các sản phẩm mà những người này đã chọn. Điểm mạnh của phương pháp này là có thể đưa ra các gợi ý đa dạng, đôi khi là những sản phẩm mà người dùng chưa từng nghĩ tới. Dễ hiểu hơn về phương pháp lọc này, ví dụ ta có 2 khách hàng có chung sở thích là món cay, dựa vào lịch sử mua hàng của người dùng 1 họ đã mua mỳ cay, lẩu thái, chân gà sốt thái, còn người dùng 2 họ mua mỳ cay, lẩu thái nhưng chân gà sốt thái chưa mua thì hệ thống sẽ hiểu hai người này có chung sở thích là món cay, lập tức hệ thống sẽ đẩy cho người dùng 2 món mà người dùng 1 đã mua và người dùng 2 chưa mua, và ngược lại cũng vậy sẽ gợi ý cho người dùng 1 những món người dùng 2 mua mà người dùng 1 chưa mua, đặc biệt những món nào mua rồi thì không hiển thị lại. Tuy nhiên, phương pháp này cần có dữ liệu đủ nhiều để hoạt động tốt. Bên dưới là một ví dụ đơn giản để ta hiểu về phương pháp lọc cộng tác này. 
+
+Gợi ý dựa trên độ phổ biến
+
+Phương pháp này không cần dữ liệu cá nhân nên rất dễ áp dụng, đặc biệt trong giai đoạn đầu khi hệ thống chưa có nhiều dữ liệu. Để dễ hình dung hơn cho phương pháp này đó là hệ thống sẽ trích xuất ra những món ăn bán chạy nhất sẽ lấy top 5 và hiện ra ở trang chủ cho người dùng thấy và nó sẽ dựa trên các tiêu chỉ như số sao người dùng chấm, món được mua nhiêu nhất. Tuy nhiên, điểm hạn chế là không cá nhân hóa, mọi người dùng đều nhận gợi ý giống nhau.
+
+Ví dụ thực tế:
+
+BẢNG 2.1: Ví dụ cho phương pháp Gợi ý dựa trên độ phổ biến
+
+(Nguồn từ tác giả)
+
+Món ăn
+
+Số lượng bán
+
+Lẩu cù lao
+
+150
+
+Khai vị 4 mùa
+
+120
+
+Bông mướp xào tép bạc đất
+
+100
+
+Phương pháp kết hợp 
+
+Phương pháp này kết hợp nhiều cách gợi ý lại với nhau, thường là giữa lọc cộng tác và lọc dựa trên nội dung. Mục đích là tận dụng ưu điểm của từng phương pháp để đưa ra kết quả tốt hơn. Thay vì hệ thống chỉ sử dụng một phương pháp để gợi ý là lọc cộng tác, thì phương pháp này sẽ kết hợp cả phương pháp lại để gợi ý một cách thông minh hơn, giúp cho người dùng dễ dàng nhìn thấy những món ăn mình thích, đúng với  nhu cầu sở thích của mình. 
+
+Nói dễ hiểu hơn là thay vì cứ cứng nhắc duy nhất một phương pháp gợi ý lọc cộng tác hay lọc nội dung, thì giờ đây nhiệm vụ của phương pháp kết hợp là đa dạng các phương pháp gợi ý kết hợp với nhau từ đó đề xuất cho người dùng được nhiều món ăn hơn, cái họ thấy sẽ nhiều hơn từ đó thúc đẩy doanh thu. Và để hiểu rõ hơn về phương pháp kết hợp thì bên dưới là ví dụ dễ hình dung.
+
+ Ví dụ, hệ thống có thể vừa dựa vào món ăn người dùng đã chọn, vừa dựa vào hành vi của những người dùng khác để đưa ra gợi ý chính xác hơn.
+
+BẢNG 2.2: Ví dụ cho Phương pháp kết hợp
+
+(Nguồn từ tác giả)
+
+Người dùng
+
+Sở thích
+
+Người giống
+
+Gợi ý
+
+Khách D
+
+Thích món cay
+
+Nhiều người giống thích lẩu
+
+Lẩu Thái, Mì cay
+
+Khách E
+
+Thích món thanh đạm
+
+Nhiều người giống thích rau xào
+
+Khổ qua xào, Bông mướp xào
+
+Khách F
+
+Thích món chiên
+
+Nhiều người giống thích cá chiên
+
+Bò viên chiên, Cánh gà chiên nước mắm
+
+Giải thích cho phương pháp lọc này: nhìn vào tập dữ liệu trên ta thấy cả 3 khách hàng đều có sở thích riêng, ví dụ D thích món cay và có nhiều người thích lẩu, hệ thống sẽ gợi ý cho khách hàng thấy món lẩu thái, động thời cũng có nhiều người thích cay nhưng khách D chưa có ăn mỳ cay lần nào thì hệ thống sẽ kết hợp thêm phương pháp lọc cộng tác sẽ gợi ý thêm món mỳ cay từ 1 khách hàng có sở thích chung. Tương tự khách E và F cũng vậy.  
+
+Khai phá luật kết hợp
+
+Thuật toán Apriori trong hệ thống nhà hàng
+
+Hiện nay thì việc đề xuất các sản phẩm cho khách hàng rất cần thiết cho các website thương mại điện tử cụ thể web nhà hàng ăn uống, vì khi họ mua một món món nào đó thì sẽ kèm theo gợi ý một món liên quan, thực tế bên ngoài với sự tiếp xúc của con người tư vấn cho khách hàng thì điều này khá dễ dàng thì con người sẽ hiểu con người nhưng trong máy móc đặc biệt các website không thể nào quản lý hoặc tư vấn hết khách hàng vì vậy bài toán thực tế ở đây ta cần 1 hệ thống đủ thông minh để hiểu được những hành vi của khách hàng nắm bắt xu hướng sở thích của khách vì vậy thuật toán Apiori được áp dụng vào đồ án để làm các công việc đó. Bên dưới ta sẽ tìm hiểu kĩ về thuật toán Apiori. 
+
+Thuật toán Apriori là một phương pháp trong khai phá dữ liệu dùng để phân tích dữ liệu giao dịch, còn gọi là phân tích giỏ hàng. Trong đồ án, thuật toán này giúp tìm ra các món ăn hoặc đồ uống thường được khách hàng gọi cùng nhau, từ đó xây dựng các luật kết hợp phục vụ cho việc gợi ý và kinh doanh. Thuật toán này được sử dụng phổ biến trong các website thương mại điện tử, ngưỡng confidence cao (0.8+) giúp tránh gợi ý sai (Zenoffi E-Learning Labb, 2025). Hay nói cách khác nếu độ tin cậy lớn hơn hoặc bằng 80% là tỉ lệ đáng tin cậy. Bên dưới là ví dụ dễ hình dung hơn: 
+
+BẢNG 2.3: Ví dụ cho thuật toán Apiori về mức độ tin cậy 0.8+
+
+(Nguồn từ tác giả)
+
+Mã đơn
+
+Các món khách gọi
+
+1
+
+Gà rán, Coca
+
+2
+
+Gà rán, Khoai tây, Coca
+
+3
+
+Gà rán, Coca
+
+4
+
+Pizza, Coca
+
+5
+
+Gà rán, Coca
+
+Dưới đây ta sẽ phân tích bài toán từ dữ liệu trên như sau: 
+
+Luật kết hợp
+
+Confidence
+
+Gà rán → Coca
+
+0.8 (80%)
+
+Pizza → Coca
+
+1.0 (100%)
+
+Công thức:
+
+
+
+Giải thích kĩ hơn về bài toán Apriori là nó dựa trên dữ liệu đơn hàng của người dùng và từ đó sẽ học ra được các sản phẩm nào sẽ đi cùng nhau, điều này không phải ngẫu nhiên mà có xác suất xuất hiện các dữ liệu nhiều lần. Cũng như dữ liệu phía trên xác suất xuất hiện món Gà rán và Coca xuất hiện trong các hóa đơn là 4 lần thì lạp tức nếu có một khách hàng nào mua Gà rán thì hệ thống sẽ đẩy Coca xuất hiện. Để hiểu rõ hơn về bài toán, bên dưới sẽ là bài toán thực tế được áp dụng và đồ án. 
+
+Ứng dụng trong hệ thống nhà hàng
+
+Thuật toán Apriori Algorithm được ứng dụng hệ thống nhà hàng. Với chức năng dựa vào dữ liệu các món khách hàng thường gọi cùng nhau, hệ thống có thể tạo ra các combo món ăn để tăng doanh thu. Khi khách hàng chọn một món ăn, hệ thống cũng có thể gợi ý thêm các món liên quan dựa trên các luật kết hợp đã tìm được. Ngoài ra, thuật toán còn giúp xác định những món ăn được gọi nhiều hoặc ít được kết hợp để điều chỉnh thực đơn phù hợp hơn. Bên cạnh đó, hệ thống còn có thể dự đoán nhu cầu nguyên vật liệu dựa trên mối liên hệ giữa các món ăn, giúp quản lý nguyên liệu hiệu quả hơn.
+
+Ví dụ: nếu khách hàng gọi món cánh gà chiên nước mắm, Tép rong cháy sả, Sụn gà cháy tỏi, hệ thống sẽ hiểu khách đang gọi các món nhậu sẽ gọi ý thêm bia. 
+
+Các chỉ số quan trọng
+
+Thuật toán Apriori sử dụng ba chỉ số chính:
+
+Support (Độ hỗ trợ): Tỉ lệ xuất hiện của tập món ăn trong toàn bộ dữ liệu. 
+
+Confidence (Độ tin cậy): Xác suất khách hàng chọn món B khi đã chọn món A. 
+
+Lift (Độ nâng): Đánh giá mức độ liên quan giữa hai món ăn. Nếu Lift > 1 thì mối quan hệ có ý nghĩa.
+
+Bài toán minh họa áp dụng thuật toán Apriori trong hệ thống nhà hàng
+
+Dưới đây ra sẽ làm rõ hơn về bài toán áp dụng thuật toán Apriori
+
+Giả sử hệ thống có dữ liệu 5 đơn hàng như sau:
+
+BẢNG 2.4: Ví dụ tập dữ liệu đơn hàng
+
+(Nguồn từ tác giả)
+
+Mã đơn
+
+Sản phẩm
+
+D1
+
+Trà sữa, Bánh ngọt
+
+D2
+
+Trà sữa, Khoai tây
+
+D3
+
+Trà sữa, Bánh ngọt, Khoai tây
+
+D4
+
+Bánh ngọt, Khoai tây
+
+D5
+
+Trà sữa, Bánh ngọt
+
+ Bước 1: Tìm tập mục phổ biến 
+
+ Tính Support cho từng sản phẩm
+
+Sản phẩm
+
+Số lần xuất hiện
+
+Support
+
+Trà sữa
+
+4
+
+4/5 = 0.8
+
+Bánh ngọt
+
+4
+
+4/5 = 0.8
+
+Khoai tây
+
+3
+
+3/5 = 0.6
+
+Tính Support cho các cặp sản phẩm
+
+Cặp sản phẩm
+
+Số lần xuất hiện
+
+Support
+
+Trà sữa + Bánh ngọt
+
+3
+
+3/5 = 0.6
+
+Trà sữa + Khoai tây
+
+2
+
+2/5 = 0.4
+
+Bánh ngọt + Khoai tây
+
+2
+
+2/5 = 0.4
+
+Bước 2: Sinh luật kết hợp
+
+Luật kết hợp
+
+Confidence
+
+Lift
+
+Nhận xét
+
+Trà sữa, Bánh ngọt
+
+3/4 = 0.75
+
+0.6 / (0.8 × 0.8) = 0.94
+
+Có thể dùng để gợi ý mua kèm
+
+Bánh ngọt , Trà sữa
+
+3/4 = 0.75
+
+0.94
+
+Mối liên hệ tương đối tốt
+
+Trà sữa, Khoai tây
+
+2/4 = 0.5
+
+0.4 / (0.8 × 0.6) ≈ 0.83
+
+Liên hệ chưa mạnh
+
+Nhận xét kết quả
+
+Thông qua kết quả trên ta thấy được món Trà sữa và Bánh ngọt có 0.94 Lift và món Bánh ngọt và Trà sữa cũng vậy nên hệ thống sẽ đề xuất nếu mua 1 trong 2 món sẽ gợi ý món còn lại. 
+
+Tóm lại, thuật toán Apriori Algorithm giúp hệ thống đưa ra gợi ý món ăn phù hợp dựa trên thói quen đặt món của khách hàng. Đồng thời, việc cập nhật dữ liệu và chạy lại thuật toán theo định kỳ giúp các gợi ý luôn phù hợp với xu hướng mới, góp phần nâng cao trải nghiệm khách hàng và hỗ trợ hoạt động kinh doanh hiệu quả hơn.
+
+NodeJS
+
+Khái niệm về NodeJS
+
+Để bắt đầu tìm hiểu về Express JS, chúng ta cần quay lại tìm hiểu nền tảng gốc rễ của nó là Node.js. Dễ hiểu hơn Node.js không phải là một ngôn ngữ lập trình mới, cũng không phải là framework, mà nó là một môi trường chạy mã đa nền tảng cho JavaScript. Trước đây, JavaScript chỉ sống trong trình duyệt web để tạo hiệu ứng cho frontend, nhưng sự ra đời của Node.js vào năm 2009 đã mang JavaScript ra khỏi trình duyệt để chạy trên máy chủ, cho phép lập trình viên dùng một ngôn ngữ duy nhất cho cả frontend và backend. 
+
+Đặc điểm chính
+
+Điểm mạnh nổi bật của Node.js nằm ở kiến trúc hướng sự kiện kết hợp với mô hình non-blocking I/O. Với cơ chế này, hệ thống không cần chờ một tác vụ tốn thời gian hoàn tất mới tiếp tục xử lý tác vụ khác. Thay vào đó, Node.js sẽ gửi yêu cầu đi xử lý và ngay lập tức tiếp nhận các yêu cầu mới. Nhờ vậy, Node.js có khả năng xử lý đồng thời nhiều kết nối với mức tiêu thụ tài nguyên thấp, đặc biệt phù hợp với các ứng dụng thời gian thực và hệ thống có lưu lượng truy cập lớn (Vinh Pt, 2025).
+
+Hạn chế
+
+Mặc dù mang lại hiệu năng cao, việc sử dụng Node.js thuần túy vẫn tồn tại một số hạn chế nhất định. Cụ thể, các tác vụ như: Định tuyến cho từng URL. Xử lý các phương thức HTTP (GET, POST, PUT, DELETE). Quản lý và phân phối tài nguyên tĩnh đều cần được xử lý thủ công thông qua các cấu trúc điều kiện phức tạp. 
+
+
+
+const http = require('http');
+
+// Tạo server
+
+const server = http.createServer((req, res) => {
+
+
+
+    // Thiết lập header
+
+res.writeHead(200,{'Content-Type':               'text/plain'});
+
+
+
+    // Trả dữ liệu về trình duyệt
+
+    res.end('Hello, Node.js!');
+
+});
+
+
+
+// Chạy server tại cổng 3000
+
+server.listen(3000, () => {
+
+    console.log('Serverrunningat http://localhost:3000/');
+
+});
+
+Express.Js Framework
+
+Express.js là một Framework mã nguồn mở miễn phí phổ biến trên nền tảng Node.JS để xây dựng và phát triển các ứng dụng web và API dễ dàng và nhanh chóng. Nền tảng này cung cấp một bộ công cụ tiện lợi và mạnh mẽ để xử lý các yêu cầu HTTP, quản lý định tuyến,…giúp các lập trình viên xây dựng các ứng dụng hiệu quả và có khả năng mở rộng.
+
+Một số tính năng của Express.Js: định tuyến, Middleware, xử lý yêu cầu HTTP, hỗ trợ Template Engines, Quản lý tệp và dữ liệu tĩnh, Hỗ trợ xây dựng RESTful API.
+
+Về ưu điểm: là một framework mã nguồn mở miễn phí, giúp tiết kiện chi phí ọc tập và phát triển ứng dụng. Có cấu trúc linh hoạt nhẹ nhàng phù hợp với các dự án nhỏ như đồ án môn học, khóa luận tốt nghiệp. Nếu đã quen với cách làm việc của JavaScript và Node.Js thì rất dễ dàng sử dụng nó. Đặt biệt có hỗ trợ phát triển ứng dụng theo mô hình MVC, giúp việc phát triển ứng dụng được tổ chức và dễ bảo trì hơn. Linh hoạt và dễ dàng tùy chỉnh theo nhu cầu khi cung cấp một module phần mềm trung gian linh hoạt và hữu ích để thực hiện các tác vụ bổ sung theo phản hồi và yêu cầu.
+
+Về hạn chế: Express.js không có cấu trúc mặc định cụ thể nào, có thể gây khó khăn cho người mới. Việc quản lý chuỗi middleware có thể phức tạp và dễ gây lỗi khi số lượng middleware tăng lên. Express.js không cung cấp các tính năng bảo mật tích hợp mạnh mẽ. Hiệu năng thấp hơn so với các framework. Express thiếu hỗ trợ chính thức cho các dự án lớn (LANIT JSC, 2024). 
+
+Python
+
+Khái niệm về ngôn ngữ Python
+
+Python là ngôn ngữ lập trình bậc cao, được thiết kế với mục tiêu là đơn giản hóa cú pháp cho lập trình viên và dễ học với người học lần đâu. Python được phát triển bởi Guido van Rossum và được ra đời lần đầu tiên vào năm 1991 (MindX Technology School, 2024). Python còn nổi bật với hệ sinh thái thư viện phong phú, hỗ trợ mạnh mẽ cho nhiều lĩnh vực khác nhau như: Phát triển web  Khoa học dữ liệu và trí tuệ nhân tạo. Tự động hóa. Xử lý ảnh, xử lý ngôn ngữ tự nhiên. Python được sử dụng như: Phát triển web phía máy chủ. Tự động hóa bằng các tập lệnh Python, Khoa học dữ liệu và máy học, Phát triển phần mềm, Tự động hóa kiểm thử phần mềm. 
+
+Ứng dụng Python trong dự án
+
+Python được ứng dụng rộng rãi trong dự án về các chức năng sau:
+
+Huấn luyện mô hình SVD và thuật toán Apiori cho phần cá nhân hóa người dùng. Trong dự án có sử dụng chatbot, cụ thể chatbot trong admin để quản lý doanh thu, báo cáo tình hình của nhà hàng. Được huấn luyện để phục vụ cho các chức năng trên. Thư mục ai_service được tách biệt riêng để quản lý các mô hình đã được huấn luyện, cũng như các thuật toán. Nhầm mục đích dễ bảo trì, hạn chế được lỗi. 
+
+
+
+HÌNH 2.1: Cấu trúc thư mục ai_service trong dự án
+
+(Nguồn từ tác giả)
+
+Thuật toán được sử dụng trong lọc cộng tác
+
+Thuật toán SVD
+
+Khái niệm: 
+
+Hầu hết mọi thông tin dưới dạng số liệu, hình ảnh hay văn bản, đều được biểu diễn dưới dạng ma trận. Trong học máy và khoa học dữ liệu, các mô hình được xây dựng bằng cách sử dụng dữ liệu được chuyển đổi từ nhiều đầu vào có cấu trúc và không có cấu trúc khác nhau. Ngay cả trong lĩnh vực trí tuệ nhân tạo, ma trận cũng là những khối xây dựng và ngôn ngữ của cấu trúc. Bài toán thực tế, xây dựng ứng dụng AI bằng cách sử dụng dữ liệu thô có thể cực kỳ phức tạp và gặp nhiều khó khăn. Một giải pháp tốt nhất được đề xuất là phân tích giá trị lớn SVD một kỹ thuật giúp đơn giản hóa biến ma trận phức tạp thành các phần nhỏ. Với phương pháp này giúp cải thện hiệu quả lưu trữ, tăng tốc quá trình huấn luyện mô hình và nang cao khả năng giải thích, biến SVD trở thành mộnt trong những công cụ quản lý mạnh mẽ sự phức tạp trong các hệ thống trí tuệ nhân tạo. Phân tích giá trị đơn là một phương pháp phân tách ma trận phức tạp được ứng dụng bởi đại số tuyến tính, từ một thành phần phức tạp thành các thành phần đơn giản dễ hiểu hơn (IBM, 2025). Tương tự PCS, SVD cho phép chia nhỏ các ma trận lớn thành các ma trận nhỏ, nắm bắt được các mẫu, hướng và độ mạnh của mối quan hệ mà nó mã hóa mà không thu thập thêm nhiễu. Về mặt bản chất đại số và hình học ma trận lại mạnh mẽ vì: chúng là sự giao thoa giữa biểu diễn dữ liệu và biến đổi dữ liệu. 
+
+Ví dụ dễ hiểu, trong một mạng nơ-ron sâu, mỗi lớp là một chuỗi các phép nhân ma trận, học các ánh xạ đầu vào thành đầu ra thông qua việc tính toán liên tiếp các tổ hợp tuyến tính của đặc trưng. Về mặt toán học, công thức của thuật toán SVD được biễu diễn dưới dạng ma trân trân A bất kỳ như sau: 
+
+
+
+Trong đó: 
+
+ : ma trận ban đầu 
+
+: ma trận trực chuẩn bên trái 
+
+: ma trận đường chéo chứa các singular values 
+
+: ma trận chuyển vị của 
+
+
+
+HÌNH 2.2: Ma trận biểu diễn dưới dạng tổ hợp
+
+                       (Nguồn từ: https://base.vn/blog/rag-la-gi/)
+
+Bài toán thực tế ứng dụng thuật toán SVD vào 
+
+BẢNG 2.7: Dữ liệu sở thích món ăn của người dùng
+
+(Nguồn từ tác giả)
+
+User
+
+Mì xào
+
+Bún chả
+
+Cơm chiên bò
+
+Chả giò
+
+User 1
+
+5
+
+4
+
+1
+
+0
+
+User 2
+
+4
+
+5
+
+1
+
+1
+
+User 3
+
+1
+
+0
+
+5
+
+4
+
+Giải thích cho bảng số liệu trên: đầu tiên ta phân tích về user 1 và user 2 trước ta thấy điểm chung của họ đều chấm điểm cao ở Mì xào và Bún chả đều này hệ thống sẽ kết luận rằng 2 người này giống nhau. Một điều quan trọng khi ứng dụng SVD vào lọc cộng tác cho bộ dữ liệu này là ta thấy user 2 chấm điểm chả giò là 1 và user 1 chưa ăn Chả giò, điều kì diệu ở đây hệ thống sẽ kết luận rằng user 1 sẽ cũng không thích Chả giò nên sẽ không gợi ý cho user 1 về Chả giò. Còn lại user khác biệt hoàn toàn với 2 user trên nên ta không tác động nhiều thêm, chỉ chờ có user nào đó khác giống user 3 và hệ thống sẽ tiếp tục thực hiện lại chức năng trên như 2 user 1 và 2. 
+
+Về mặt toán học SVD phân tách ma trận thành 3 phần: 
+
+Chúng ta sẽ bốc tách cách SVD hoạt động dựa trên bộ dữ liệu theo chiều hướng toán học. 
+
+Bước 1: Ma trận U là ma trận  mô tả sở thích của người dùng. Mỗi cột đại diện cho một kiểu sở thích như xem phim tình cảm, hành động và hài. Đảm bảo rằng các cột này độc lập với nhau không bị trung lặp thông tin. Ví dụ: có 3 cột Mì xào, Bún chả, Cơm chiên bò. Dựa vào U, hệ thống sẽ nhận diện người nào thích món nào nhiều nhất. 
+
+Bước 2: Với  cho ta biết đặc trưng sở thích của người nào quan trọng nhất trong dữ liệu. Giá trị càng lớn thì đặc trưng đó càng ảnh hưởng mạnh đến sở thích món ăn của người dùng. Giá trị nhỏ thường ít quan trọng hơn.  Ví dụ: nếu Mì xào có giá trị lớn nhất thì điều đó cho thấy đây là yếu tố ảnh hưởng nhiều nhất đến việc người dùng chọn món. 
+
+Bước 3: Ma trận  dùng để mô tả đặc điểm của các món ăn.Ví dụ: Món Mì xào thuộc nhóm món chiên xào. Bên cạnh thuật toán SVD đồ án còn áp dụng thêm 3 phương pháp gợi ý bên dưới (IBM, 2025). 
+
+Các thuật toán học máy dựa trên Implicit Feedback - Phản hồi ngầm
+
+Trong bối cảnh hệ thống thực tế thì không phải ai cũng tự chủ động đánh giá món ăn để hệ thống hiểu họ thích gì và không thích gì. Để giải quyết cho việc cần dữ liệu đầy đủ để lọc cộng tác thì hệ thống đã được xây dựng chức năng hành vi tương tác ngầm cụ thể cú nhấp chuột. Với nhiệm vụ thu thập lịch sử tương tác để tạo Lưới phân tích cho thuật toán Lọc cộng tác SVD. Và thuật toán trên được áp dụng ở áp dụng cục bộ trên tất cả các trang có chứa thẻ món ăn như Trang xem chi tiết món ăn, Trang thực đơn, Trang chủ. Khi khách hàng đăng nhập nhấp xem món ăn, hệ thống sẽ tự động ghi nhận hành vi và gửi dữ liệu về Backend thông qua API. Các thao tác như xem món, thêm vào giỏ hàng hay thanh toán sẽ được quy đổi thành điểm quan tâm và lưu vào cơ sở dữ liệu. Sau một thời gian, thuật toán Truncated SVD sẽ phân tích dữ liệu để tìm ra những người dùng có sở thích tương tự, từ đó đề xuất món ăn phù hợp bằng hệ thống gợi ý lai Hybrid Recommendation. Bên dưới chúng ta sẽ làm rõ hơn về cách thức hoạt động của thuật toán này: 
+
+Thứ nhất quy tắc tính điểm tương tác: về quy tắc này sẽ ghi nhận lại cú nhấp chuột của người dùng, mỗi lần nhấp là sẽ tính 0,2 điểm. Điểm tối đa la 2.0 tương đương 10 lần tối đa được ghi nhận, điều này sẽ tránh việc vector bị bóp méo sở thích, nếu có người nào cố tình nhấp đi nhấp lại trên 10 lần. 
+
+Thứ hai ngưỡng học khẩu vị: về nguyên tắc này để dễ hình dung, chúng ta hiểu rằng sau khi nhấp chuột đến lần thứ 5 thì cơ chế sẽ được kích hoạt được cho là thích món ăn này. 
+
+Thuật toán được sử dụng trong lọc nội dung
+
+Phương pháp lọc theo nội dung đề xuất món ăn cho người dùng dựa trên việc so sánh những món họ quan tâm với đặc trưng của các món ăn khác có trong thực đơn. Hệ thống ứng dụng kỹ thuật TF-IDF kết hợp cùng Độ tương đồng Cosine. Bên dưới chúng ta sẽ nói chi tiết hơn về 2 thuật toán này: 
+
+Thuật toán TF-IDF: đây là một kỹ thuật trọng số dùng để đánh giá mức độ quan trọng của từ khóa bên trong tập văn bản mô tả món ăn. Nói một cách đơn giản kỹ thuật này chỉ tập trung vào các từ khóa liên quan đến món ăn, các từ khóa không liên quan hoặc vô nghĩa sẽ được lọc bỏ và tập trung vào những từ khóa mang tính đặc trưng nổi bậc như hải sản, cay nồng, nướng. 
+
+Độ tương đồng Cosine: đây là kỹ thuật dựa trên không gian vector sinh ra từ TF-IDF, thuật toán Cosine Similarity sẽ đo góc giữa vector đại diện cho từ khóa khách hàng tìm kiếm và vector của từng món ăn trong cơ sở dữ liệu. Góc giữa hai vector càng nhỏ, chứng tỏ độ trùng khớp và mức độ liên quan về mặt nội dung giữa chúng càng cao. Kết quả tính toán này được dùng làm thang điểm để sắp xếp và đưa ra món gợi ý
+
+Thuật toán trong Lọc theo độ phổ biến
+
+Lọc theo độ phổ biến là phương pháp gợi ý dựa trên mức độ yêu thích của nhiều khách hàng đối với các món ăn trong nhà hàng. Hệ thống sử dụng số lượt đánh giá, số lượng đặt món và điểm đánh giá trung bình để xác định những món ăn được ưa chuộng nhất. Các món ăn có điểm đánh giá cao hoặc được nhiều khách hàng lựa chọn sẽ được ưu tiên đưa vào danh sách gợi ý. Phương pháp này không phụ thuộc vào sở thích cá nhân của người dùng mà dựa trên xu hướng chung của đa số khách hàng. Trong hệ thống, thuật toán này được sử dụng để giải quyết bài toán người dùng mới. Khi khách hàng chưa có lịch sử tìm kiếm hoặc đặt món, hệ thống sẽ đề xuất những món ăn phổ biến và được đánh giá cao. Điều này giúp người dùng nhanh chóng tiếp cận các món ăn chất lượng và tăng hiệu quả gợi ý ngay từ lần sử dụng đầu tiên.
+
+Phương pháp kết hợp yếu tố 
+
+Thay vì sử dụng một mô hình gợi ý duy nhất, hệ thống áp dụng phương pháp Hybrid Recommendation nhằm kết hợp nhiều mô hình khác nhau để nâng cao độ chính xác và khắc phục hạn chế của từng phương pháp. Cụ thể, hệ thống kết hợp bốn yếu tố gồm: mô hình Lọc cộng tác SVD, mô hình Lọc theo nội dung, mức độ phổ biến của món ăn và ngữ cảnh hành vi người dùng. Mỗi mô hình sẽ tính toán một điểm đánh giá riêng cho món ăn. Ưu điểm của phương pháp này là giúp hệ thống hoạt động ổn định trong nhiều trường hợp khác nhau. Khi một mô hình không có đủ dữ liệu hoặc không thể đưa ra kết quả chính xác, các mô hình còn lại vẫn có thể đóng góp vào quá trình tính toán. Nhờ đó, hệ thống duy trì được độ tin cậy, tính liên tục và khả năng cá nhân hóa trong việc gợi ý món ăn cho người dùng.
+
+Ứng dụng RAG trong dự án
+
+Khái niệm về RAG
+
+Retrieval-Augmented Generation (RAG) là một phương pháp kết hợp giữa hai khả năng sau: Tìm kiếm và truy xuất thông tin từ các nguồn dữ liệu có sẽ như cơ sở tri thức, tài liệu lưu trữ, PDF, internet. Tạo sinh câu trả lời thông qua các mô hình ngôn ngữ lớn LLM.  Nhờ cách phối hợp này, RAG giúp hệ thống AI khai thác tối đa hiệu quả các kiến thức mới nhất, đưa ra các câu trả lời mạch lạc, và hiểu được ngữ cảnh của người dùng. Hai thành phần chính cốt lõi của RAG đó là Khối truy xuất và Khối tạo sinh (Lê Hữu Khôi, 2025). Cơ chế của RAG tiếp nhận truy vấn từ người dùng, truy xuất dữ liệu liên quan, bổ sung thông tin vào yêu cầu cho LLM, tạo nội dung có dẫn chứng. 
+
+
+
+HÌNH 2.3: Cách hoạt động của RAG 
+
+                        (Nguồn từ: https://base.vn/blog/rag-la-gi/)
+
+Lý do áp dụng RAG và Chatbot Nhà hàng
+
+Hiện nay thì mô hình RAG khá phổ biến trong việc xây dựng chatbot, dưới đây là những lú do sử dụng RAG cho đồ án:
+
+Thứ nhất là RAG trả lời dựa trên ngữ cảnh thực tế được cung cấp, thay vì ta phải huấn luyện mô hình và soạn thảo câu hỏi cho nó học từng câu thì giờ đây RAG chỉ cần người dùng đưa tài liệu cho nó đọc còn lại hệ thống sẽ tự tìm câu hỏi và đưa ra câu trả lời dựa trên ngữu cảnh của người dùng. Cách này hoạt động giống như ChatGPT, 2 người dùng đều hỏi nội dung trả lời giống nhưng ngữu cảnh trả lời. 
+
+Thứ hai khắc phục được hạn chế của việc Prompt cứng, tránh việc viết các thông tin của nhà hàng trực tiếp các thông tin tĩnh như tên chủ nhà hàng, địa chỉ..
+
+Thứ ba là cập nhật tri thức thời gian thực điều này cho phép quản trị viên thay đổi chính sách nhà hàng thông qua giao diện Admin. Hệ thống tự động cập nhật câu trả lời của chatbot ngay lập tức mà không cần khởi động máy chủ hoặc sửa các thông tin vào mã nguồn. 
+
+Thứ tư phân tách Tĩnh và Động:
+
+Dữ liệu tĩnh (chính sách đặt bàn, giới thiệu nhân sự, giờ mở cửa) lưu trữ trong bảng tri thức và truy xuất qua mô hình RAG.
+
+Dữ liệu động (món ăn hiện có, giá khuyến mãi, số bàn trống thời gian thực) truy vấn trực tiếp bằng ngôn ngữ SQL từ cơ sở dữ liệu MySQL.
+
+Ứng dụng RAG vào chatbot tư vấn khách hàng trong đồ án
+
+Trong đồ án việc xây dựng chatbot bằng phương pháp RAG nhầm mục đích giúp cho chatbot truy xuất được thông tin mới nhất, trả lời người dùng một cách nhanh chóng hiệu quả nhất cụ thể kể đến việc như món ăn còn hay không, còn bao nhiêu phần, bàn còn trống không, chính sách của nhà hàng, các thông tin như số điện thoại, quy trình đổi trả, tình trạng đơn hàng. Một điều quan trọng ở RAG nữa đó là ngữ cảnh và ngữ nghĩa của người dùng, vô vàng các câu hỏi ngữ cảnh khác nhau, việc tìm kiếm và hiểu đối với phương pháp thông thường rất khó khăn nên RAG là một trong những giải pháp rất tốt để xây dựng chatbot. 
+
+Ví dụ: 
+
+Người dùng hỏi: Nhà hàng còn bàn cho 4 người tối nay không?
+  Chatbot sẽ truy xuất dữ liệu đặt bàn hiện tại để trả lời số lượng bàn còn trống.
+
+Ứng dụng GraphQL vào trong đồ án
+
+Khái niệm
+
+GraphQL là một ngôn ngữ truy vấn dữ liệu cho các API và là một runtime phía máy chủ nhằm xử lý các truy vấn đó bằng dữ liệu hiện có. Thay vì cấu trúc theo nhiều endpoint như REST API truyền thống, GraphQL cho phép Client yêu cầu chính xác những dữ liệu mà nó cần thông qua một Endpoint duy nhất (Hoang Minh Dai, 2024).
+
+Lý do chọn GraphQL vào trong đồ án
+
+Về lý do mà đồ án sử dụng GraphQL là nó giúp cho lấy đúng dữ liệu cần thiết tránh việc trả về cùng lúc các trường dữ liệu không cần thiết gây nặng cơ sở dữ liệu. Một phần nữa giúp cho triệt để băng thông và tốc độ tải trang. Một ví dụ cụ thể như trang chủ thì khi hiển thị món ăn nào đos thì nó chỉ hiển thị đúng hình ành, tên món thay vì hiển thị toàn bộ dữ liệu, nếu hệ thống mà có 1000 món ăn thì lúc này nếu hiển thị toàn bộ trường dữ liệu thì gây khó khăn cho việc dữ liệu đổ toàn bộ món lên trang, nên GraphQL được áp dụng vào để lấy đúng trường dữ liệu cần hiển thị chúng. 
+
+Ví dụ: Ở trang chủ chỉ cần hiển thị Tên món ăn và Giá, GraphQL sẽ chỉ trả về 2 trường này, bỏ qua Mô tả, Thành phần
+
+Ứng dụng trực tiếp vào đồ án qua các chức năng 
+
+1. Ứng dụng trong việc hiển thị Thực đơn (Menu/Sản phẩm):
+
+Vấn đề: Ở trang chủ, Frontend chỉ cần hiển thị hình ảnh, Tên món, Giá. Nhưng ở trang chi tiết món ăn, lại cần thêm Mô tả, Thành phần, Lượt đánh giá.
+
+Áp dụng GraphQL: Thay vì viết 2 API REST khác nhau, hệ thống chỉ dùng 1 query gửi lên endpoint chung. Trang chủ sẽ gọi query yêu cầu đúng 3 trường dữ liệu, giúp rút ngắn thời gian tải trang. Giao diện chi tiết gọi query mở rộng để lấy thêm mô tả.
+
+2. Ứng dụng tải thông tin phức hợp cho Frontend (Trang Admin & Trang cá nhân):
+
+Vấn đề: Trang Đơn hàng của tôi hay Dashboard Admin yêu cầu dữ liệu chéo từ nhiều bảng, bảng Người dùng, bảng Hóa đơn, bảng Chi tiết món ăn, bảng Trạng thái thanh toán. Nếu dùng RESTful, frontend có thể phải gọi 3-4 lần API liên tục.
+
+Áp dụng GraphQL: Frontend chỉ cần gửi duy nhất 1 câu Query lồng ghép. GraphQL Resolver phía dưới Backend sẽ tự động lấy và tổng hợp dữ liệu từ SQL, trả về đúng một khối JSON hoàn chỉnh, giải quyết bài toán xử lý bất đồng bộ mệt mỏi ở phía Client.
+
+3. Chuẩn hóa luồng trao đổi dữ liệu Giao tiếp Frontend - Backend:
+
+Toàn bộ cấu trúc truy vấn được định nghĩa rõ ràng trong thư mục graphql. Nhờ Schema chặt chẽ của GraphQL, bất kỳ khi nào Frontend gửi sai kiểu dữ liệu ví dụ: số điện thoại truyền vào chữ, hệ thống GraphQL sẽ tự động chặn và báo lỗi ngay lập tức mã lỗi đặc trưng mà không cần Backend phải viết rườm rà các hàm if / else kiểm tra validate ở mọi nơi.
+
+RESTful API
+
+Khái niệm
+
+RESTful API là một tiêu chuẩn dùng trong việc thiết kế API cho các ứng dụng web để tiện cho việc quản lý các resource. Nó chú trọng vào tài nguyên hệ thống, bao gồm các trạng thái tài nguyên được định dạng và được truyền tải qua HTTP. Hiểu một cách đơn giản RESTful API là bao gồm các phương thức như GET, POST, PUT, DELETE. Và cách định dạng các URL cho các ứng dụng web để quản lý mã nguồn. Điểm đặt biệt ở đây RESTful không quy định logic code ứng dụng và không giới hạn ngôn ngữ lập trình, mọi ngôn ngữ có thể sử dụng 4 phương thức của RESTful (TopDev, 2024). 
+
+RESTful chủ yếu hoạt động dự trên giao thức HTTP. Và sử dụng những phương thức HTTP riêng. Dưới đây sẽ giải thích rõ về 4 phương thức GET, POST, PUT, DELETE:
+
+GET (SELECT / READ): Phương thức GET được sử dụng để lấy dữ liệu từ hệ thống. GET có thể trả về một tài nguyên cụ thể hoặc danh sách tài nguyên. Ví dụ trong website nhà hàng, API GET /api/foods dùng để lấy danh sách món ăn, còn GET /api/foods/1 dùng để lấy thông tin chi tiết món ăn có ID là 1. 
+
+  POST (CREATE): Phương thức POST được sử dụng để tạo mới dữ liệu trong hệ thống. Khi người dùng thêm món ăn mới hoặc tạo đơn đặt bàn, hệ thống sẽ gửi request POST đến server. Ví dụ: POST /api/orders dùng để tạo đơn hàng mới. 
+
+PUT (UPDATE): Phương thức PUT được dùng để cập nhật hoặc chỉnh sửa dữ liệu đã tồn tại. Ví dụ, quản trị viên muốn cập nhật giá món ăn hoặc thay đổi trạng thái đơn hàng thì hệ thống sẽ sử dụng PUT như PUT /api/foods/1. 
+
+DELETE (DELETE): Phương thức DELETE được sử dụng để xóa dữ liệu khỏi hệ thống. Ví dụ: DELETE /api/foods/1 dùng để xóa món ăn có ID là 1 khỏi cơ sở dữ liệu.
+
+Qua đó ta thấy được RESTful API là một tiêu chuẩn quan tọng trong phát triển ứng dụng web hiện nay. Giúp cho hệ thống dễ dàng quản lý tài nguyên, mà còn trao đổi dữ liệu thông qua giao thức HTTP và hỗ trợ nhiều ngôn ngữ lập trình khác nhau như C#, PhP, NodeJs. Nhờ đó ta có thể thực hiện các phương thức thêm, sửa, xóa và truy xuất dữ liệu trở nên rõ ràng, thuận tiện và hiệu quả hơn. 
+
+
+
+HÌNH 2.4: Các phương thức RESTful API
+
+(Nguồn từ tác giả)
+
+Ứng dụng của RESTful vào trong đồ án
+
+Hầu hết các website chuyên về thương mại điện tử đều sử dụng RESTful vào để dễ quản lý, với 4 phương thức của RESTful thì giúp cho người dùng dễ dàng các thao tác quản lý. Vì vậy đồ án cũng đã áp dụng nó vào cho phần quản lý trong admin cụ thể quản lý nhân viên, bán hàng, món ăn. Về phía người dùng cũng áp dụng nó vào khi bạn thêm một món ăn nào đó vào giỏ hàng đều có thể thực hiện thêm, xóa, sửa, xem. Nó giúp cho frontend giao tiếp được với backend thông qua 4 phương thức. 
+
+Thuật toán gợi ý 
+
+Hệ thống sử dụng những thuật toán gợi ý nhầm mục đích các nhân hóa người dùng. Phát hiện được sở thích của người dùng trong hệ thống. Thu hút được khách hàng, hiểu được khách hàng, từ đó có thể tăng doanh thu của nhà hàng, nhiều người biết đến và để thực hiện được các công việc trên thì hệ thống đã sử dụng được các thuật toán sau để phát triển. Dựa vào tri thức, Nhận biết ngữ cảnh, Quy tắc kết hợp, Lọc cộng tác, Học tăng cường, Lai ghép, Học sâu, Phân rã ma trận, Lọc dựa trên nội dung. Tất các các thuật toán trên được áp dụng vào phần gợi ý cho người dùng. Bên cạnh đó ngoài việc gợi ý, hệ thống còn học ngầm các hoạt động của người dùng, ví dụ cú nhấp chuột, lịch sử mua hàng của khách hàng, bình luận họ để lại, số sao họ chấm cho món ăn đó, những đoạn chat với chatbot, từ khóa tìm kiếm món ăn đó. Tất cả đều được áp dụng vào hệ thống với mục đích chung. Là mỗi bước đi của khách hàng đều được hệ thống hiểu rõ. 
+
+
+
+HÌNH 2.5: Sơ đồ các công nghệ được sử dụng cho thuật toán gợi ý
+
+(Nguồn từ tác giả)
+
+Các nghiệp vụ liên quan
+
+1. Tổng quan hệ thống
+
+Hệ thống quản lý nhà hàng Ẩm Thực Phương Nam là một giải pháp toàn diện giúp tự động hóa và tối ưu hóa các quy trình vận hành nhà hàng. Hệ thống được xây dựng trên nền tảng web với kiến trúc client-server, sử dụng công nghệ Node.js cho backend, MySQL cho cơ sở dữ liệu, và HTML/CSS/JavaScript cho frontend. Hệ thống tích hợp AI chatbot, thanh toán điện tử MoMo, và xác thực Google OAuth để nâng cao trải nghiệm người dùng.
+
+2. Quản lý nhân sự và phân quyền
+
+Hệ thống quản lý toàn bộ thông tin nhân viên từ hồ sơ cá nhân, ảnh đại diện, CCCD đến thông tin liên hệ. Mỗi nhân viên được phân vai trò cụ thể như quản trị viên, quản lý, thu ngân, phục vụ, hoặc đầu bếp. Hệ thống hỗ trợ nhiều hình thức trả lương linh hoạt bao gồm lương theo giờ, lương cố định tháng, hoặc kết hợp cả hai. Mỗi vai trò có quyền truy cập khác nhau vào các chức năng của hệ thống, đảm bảo bảo mật và phân quyền rõ ràng. Nhân viên có thể được kích hoạt hoặc tạm khóa tài khoản tùy theo tình trạng làm việc.
+
+3. Quản lý ca làm việc và chấm công
+
+Hệ thống cho phép cấu hình các khung ca làm việc với thời gian bắt đầu, kết thúc và hệ số lương tương ứng. Hệ số lương có thể điều chỉnh theo loại ca như ca thường (1.0), ca tăng ca (1.5), hoặc ca ngày lễ (2.0). Quản lý có thể phân bổ nhân sự vào các ca làm việc theo ngày, hệ thống tự động kiểm tra và cảnh báo nếu có xung đột lịch làm việc. Nhân viên chấm công vào đầu và cuối ca, dữ liệu chấm công được sử dụng để tính toán lương tự động. Hệ thống theo dõi trạng thái ca làm việc từ đã phân lịch, đang thực hiện, hoàn thành đến đã hủy.
+
+4. Quản lý thực đơn và nguyên liệu
+
+Hệ thống quản lý danh mục món ăn với đầy đủ thông tin tên món, giá bán, hình ảnh, mô tả và phân loại theo danh mục. Mỗi món ăn có công thức chi tiết liệt kê các nguyên liệu cần thiết và định lượng. Hệ thống quản lý kho nguyên liệu với nhiều đơn vị đo lường, theo dõi số lượng tồn kho, hạn sử dụng và batch nhập hàng. Khi tạo đơn hàng, hệ thống tự động trừ nguyên liệu theo công thức món ăn. Nhà hàng có thể ghi nhận hao hụt nguyên liệu do hỏng, hết hạn hoặc các lý do khác kèm ảnh minh chứng.
+
+5. Quản lý đơn hàng và bán hàng
+
+Hệ thống POS cho phép nhân viên tạo đơn hàng nhanh chóng, chọn món từ thực đơn, điều chỉnh số lượng và ghi chú đặc biệt. Đơn hàng có nhiều trạng thái từ chờ xác nhận, đã xác nhận, đang chuẩn bị, hoàn thành đến đã hủy. Mỗi thay đổi trạng thái được ghi nhận lịch sử để theo dõi. Hệ thống tự động tạo phiếu bếp gửi đến bộ phận chế biến khi đơn hàng được xác nhận. Khách hàng có thể thanh toán bằng tiền mặt hoặc qua cổng thanh toán MoMo. Hệ thống cũng hỗ trợ đặt bàn trước với tính năng đặt cọc và gán nhân viên phụ trách.
+
+6. Quản lý chi phí và báo cáo
+
+Hệ thống ghi nhận tất cả các khoản chi phí phát sinh hàng ngày như mua nguyên liệu, điện nước, sửa chữa và các chi phí khác. Mỗi khoản chi được phân loại theo danh mục để dễ dàng thống kê và phân tích. Hệ thống tự động tính toán doanh thu từ đơn hàng, chi phí nguyên liệu, chi phí nhân sự và các chi phí khác để đưa ra báo cáo tài chính tổng hợp. Quản lý có thể xem báo cáo theo ngày, tuần, tháng hoặc khoảng thời gian tùy chỉnh. Các chỉ số quan trọng như doanh thu, lợi nhuận, món bán chạy, và hiệu suất nhân viên được hiển thị trực quan qua biểu đồ.
+
+7. Tính năng AI và tương tác khách hàng
+
+Hệ thống tích hợp chatbot AI sử dụng Groq API để tư vấn và hỗ trợ khách hàng 24/7. Chatbot có thể trả lời câu hỏi về thực đơn, giá cả, giờ mở cửa và nhận đặt bàn. Hệ thống sử dụng thuật toán Collaborative Filtering (SVD) để gợi ý món ăn phù hợp dựa trên lịch sử đặt hàng của khách. Thuật toán Apriori phân tích mối quan hệ giữa các món ăn để đề xuất combo hoặc món ăn kèm. Khách hàng có thể đánh giá món ăn, viết bình luận và upload ảnh. Nhà hàng có thể phản hồi đánh giá để tương tác với khách hàng. Hệ thống cũng quản lý tin tức, sự kiện và khuyến mãi của nhà hàng.
+
+Các công trình nghiên cứu liên quan
+
+Dưới đây là các công trình nghiên cứu liên quan: 
+
+Thứ nhất, công trình nghiên cứu “Xây dựng website quản lý nhà hàng” được thực hiện bởi Nguyễn Minh Hoàng năm 2013 tại Trường Đại học Dân lập Hải Phòng. Đề tài tập trung phân tích và thiết kế hệ thống theo hướng cấu trúc cho bài toán quản lý nhà hàng Rừng Trong Phố. Hệ thống có các nghiệp vụ chính như nhập thực phẩm, đặt món ăn, thanh toán và ghi phản hồi, báo cáo, đồng thời còn có các phần quản lý danh mục thực phẩm, nhân viên, món ăn, loại món ăn, khuyến mại, gọi món và báo cáo bán hàng. Về công nghệ, đề tài sử dụng MySQL để lưu trữ dữ liệu, PHP để lập trình website, CSS để trang trí giao diện, jQuery để tạo hiệu ứng và Ajax để load trang. Điểm mạnh của công trình là đã phân tích bài toán khá đầy đủ, có thiết kế cơ sở dữ liệu quan hệ và có các giao diện, báo cáo rõ ràng. Điểm yếu là hệ thống mới chỉ đáp ứng các chức năng chính, giao diện còn đơn giản và chưa có thêm các chức năng tiện dụng như đặt món qua mạng hay thanh toán trực tuyến (Nguyễn Minh Hoàng, 2013). 
+
+Thứ hai, công trình nghiên cứu “Xây Dựng Chương Trình Quản Lý Nhà Hàng Coffee SEN” được thực hiện bởi Bùi Thị Hằng năm 2011 tại Trường Đại học Dân lập Hải Phòng. Đề tài tập trung xây dựng chương trình quản lý cho nhà hàng Coffee Sen với các nghiệp vụ như quản lý nhân viên, quản lý món ăn, thức uống, quản lý hóa đơn thanh toán, gọi món, cập nhật gọi món, in hóa đơn, phân công nhân viên và thống kê doanh thu. Phần thống kê còn có các mục như doanh thu theo ngày, theo tháng năm, theo khoảng ngày, tổng số khách đến, món ăn và nước uống bán nhiều nhất. Về công nghệ, trong phần kết luận đồ án nêu rõ hệ thống đã dùng Visual Studio 2005, SQL Express 2005 và kiến thức nghiệp vụ quản lý nhà hàng; trong phần lý thuyết cũng có đề cập công cụ Rational Rose hỗ trợ UML. Điểm mạnh của công trình là có đủ các chức năng quản lý cơ bản cho một nhà hàng nhỏ, cách phân tích bài toán rõ ràng và phần thống kê khá đầy đủ. Điểm yếu là hệ thống còn là phần mềm chạy trên máy tính, chưa có chức năng trực tuyến, chưa hỗ trợ quản lý từ xa và chưa có tính năng thông minh hơn cho người dùng (Bùi Thị Hằng, 2011). 
+
+Thứ ba, công trình nghiên cứu “Xây dựng chương trình quản lý Nhà hàng Hữu Hạnh” được thực hiện bởi Diệp Hữu Dũng năm 2010 tại Trường Đại học Dân lập Hải Phòng. Đề tài tập trung vào việc phân tích thiết kế hệ thống quản lý nhà hàng theo hướng cấu trúc. Nội dung chính của hệ thống xoay quanh các phần như quản lý hồ sơ, quản lý thanh toán, báo cáo bán hàng và các nghiệp vụ quản lý nhà hàng nói chung. Về công nghệ, phần kết luận của đồ án cho biết hệ thống được cài đặt thử nghiệm bằng Visual Basic 6.0 và sử dụng SQL Server để lưu trữ dữ liệu. Điểm mạnh của công trình là đã áp dụng đúng phương pháp phân tích thiết kế hướng cấu trúc, có thiết kế cơ sở dữ liệu quan hệ và có cài đặt thử nghiệm được chương trình. Điểm yếu là giao diện chưa thật sự thân thiện và hệ thống mới chỉ đáp ứng một số chức năng cơ bản (Diệp Hữu Dũng, 2010). 
+
+Thứ tư, công trình nghiên cứu “Xây dựng trang Đặt đồ ăn trực tuyến” được thực hiện bởi Hoàng Việt Trung năm 2025 tại Trường Đại học Quản lý và Công nghệ Hải Phòng. Đề tài tập trung xây dựng website đặt đồ ăn trực tuyến với ba vai trò chính là khách hàng, chủ nhà hàng và quản trị viên. Các nghiệp vụ chính gồm đăng ký, đăng nhập, tìm kiếm nhà hàng, xem thực đơn, quản lý giỏ hàng, đặt hàng, xem và hủy đơn hàng, cập nhật thông tin tài khoản, đăng ký làm nhà hàng, quản lý thực đơn, quản lý đơn hàng, kiểm duyệt món ăn, quản lý người dùng và phê duyệt nhà hàng. Về công nghệ, phần lý thuyết và phần triển khai cho biết hệ thống sử dụng ReactJS cho frontend, NodeJS và ExpressJS cho backend, MySQL/MariaDB để lưu trữ dữ liệu, cùng với JWT, RESTful API, MVC, UML và mô hình Client–Server. Điểm mạnh của công trình là hệ thống khá hiện đại, có đầy đủ các chức năng chính cho mô hình đặt đồ ăn nhiều nhà hàng và có phân tích, thiết kế, kiểm thử khá rõ ràng. Điểm yếu là chức năng thanh toán còn đơn giản, mới hỗ trợ COD, chưa có thanh toán trực tuyến, chưa có đánh giá/bình luận, tìm kiếm còn cơ bản và chưa có theo dõi đơn hàng (Hoàng Việt Trung, 2025). 
+
+Qua những công trình nghiên cứu trên ta thấy được hầu hết các dự án chưa áp dụng rỗng rãi về phương thức thanh toán trực tuyến, vẫn còn dùng phương thức thanh toán COD, mặc hạn chế về phương thức COD này nếu như có người đặt món ăn và không nhận thì sẽ không tốt ảnh hưởng đến doanh thu của nhà hàng. Một phần  hạn chế nữa là chưa có quản lý tốt về mặt bên trong cụ thể quản lý tổng thể các mặt như doanh thu, nhân viên, chi tiết món, nguyên liệu điều này dẫn đến việc chưa hoàn toàn số hóa mọi mặt vẫn còn phụ thuộc vào giấy tờ thủ công. Một điều thiếu sót nữa là tất cả các công trình trên chưa có ứng dụng chatbot vào dự án đây là một điều thiếu sốt khá nghiệm trọng vì khi nhà hàng ngày càng phát triển việc tư vấn giữ chân khách là một điều rất quan trọng lúc này nhân viên tư vấn trực tuyến chatbot sẽ đảm nhiệm tư vấn khách hàng một cách chi tiết, mà không cần tiếp xúc của con người và điều này cũng đòi hỏi kỹ thuật chuyên môn cao. 
+
+Rút ra bài học từ các công trình trên thì đồ án cần có các chức năng quản lý đầy đủ, để toàn bộ số hóa quy trình, không còn dùng các phương pháp lưu trữ thủ công. Và phải theo xu hướng đặc biệt là các nhân hóa người dùng giữ chân được khách hàng, hiểu được họ thích gì và không thích gì. Và một phần quan trọng nữa đó là mặt giao diện, giao diện phải đẹp, khi người dùng họ truy cập vào website điều đầu tiên họ nhìn thấy đó là giao diện, và trài nghiệm của họ.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HIỆN THỰC HÓA NGHIÊN CỨU
+
+Mô tả hệ thống
+
+Hệ thống Quản lý nhà hàng Phương Nam là một website số hóa và tối ưu toàn bộ quy trình hoạt động của nhà hàng từ khâu quản lý người dùng, đến quản lý mọi thứ bên trong admin, bên cạnh đó còn nâng cao trải nghiệm của khách hàng. Hệ thống bao gồm các phân hệ chính: 
+
+Phân hệ dành cho khách hàng: đặt món, đặt bàn trực tuyến. 
+
+Phân hệ quản lý dành cho nhân viên/quản trị viên: Xử lý đơn hàng, quản lý nhân sự, thực đơn và hệ thống dịch vụ trí tuệ nhân tạo gợi ý món ăn thông minh, chatbot hỗ trợ. Hệ thống hướng đến mục tiêu tự động hóa quy trình phục vụ, quản lý tập trung và tăng doanh thu nhờ các thuật toán đề xuất tiên tiến cũng như tính năng thanh toán hiện đại. 
+
+Bên cạnh đó hệ thống còn phát triển tính năng cá nhân hóa người dùng. Nhầm thu hút khách hàng, hướng tới khách hàng, hiểu khách hàng muốn gì và không thích gì, với nhiều thuật toán được áp dụng vào đồ án cụ thể chức năng cá nhân hóa người dùng thì hệ thống tạo nên một nền tảng web thông minh, tích hợp AI vào. 
+
+Chức năng của hệ thống
+
+Hệ thống được chia thành các nhóm chức năng chính phục vụ cho từng đối tượng người dùng:
+
+Khách hàng: Đăng ký, đăng nhập, quản lý tài khoản, xem thực đơn, xem chi tiết món ăn, nhận gợi ý món ăn bằng AI, đặt món, đặt bàn, thanh toán MoMo, xem lịch sử đơn hàng và liên hệ nhà hàng.
+
+Nhân viên: Chấm công, xem lịch sử chấm công, tiếp nhận và xử lý đơn đặt món, đơn đặt bàn từ khách hàng.
+
+Quản trị viên: Quản lý thực đơn, danh mục món ăn, quản lý nhân viên và khách hàng, theo dõi doanh thu, phân tích dữ liệu, quản lý hệ thống và sử dụng bot trợ lý ảo hỗ trợ điều hành.
+
+Hệ thống AI: Gợi ý món ăn thông minh bằng thuật toán Apriori/Hybrid và hỗ trợ chatbot chăm sóc khách hàng, quản lý.
+
+Kiến trúc hệ thống
+
+Hiện tại trong hệ thống sử dụng kiến trúc Client-Server chia thành các dịch vụ để đảm bảo hiệu năng và dễ dàng mở rộng đảm bảo dễ dàng quản lý, bao gồm 4 tầng chính:
+
+1. Tầng Giao diện người dùng:
+
+Xây dựng đa dạng giao diện bằng HTML, CSS, JavaScript, TailwindCSS tương thích đa thiết bị. Chia làm 3 khu vực: Public, Admin Dashboard và Staff Portal.
+
+2. Tầng Xử lý nghiệp vụ:
+
+Nền tảng chính chạy bằng Node.js. Sử dụng API RESTful và GraphQL để giao tiếp nhanh chóng giữa Frontend và Backend. Tích hợp các Middleware như Passport.js, xử lý Upload files, và cấu hình email. Giao tiếp với bên thứ 3: Cổng thanh toán.
+
+3. Tầng Dịch vụ Trí tuệ nhân tạo:
+
+Được xây dựng độc lập bằng ngôn ngữ Python. Cung cấp các API AI chuyên sâu để backend chính gọi tới khi cần tính toán gợi ý món ăn hoặc xử lý logic học máy.
+
+4. Tầng Dữ liệu:
+
+Hệ quản trị CSDL quan hệ lưu trữ toàn bộ dữ liệu về người dùng, đơn hàng, thực đơn, chấm công. Kết nối trực tiếp thông qua config cấu hình kết nối tại Backend.
+
+
+
+HÌNH 3.1 Kiến trúc hệ thống trong đồ án
+
+(Nguồn từ tác giả)
+
+Thiết kế dữ liệu
+
+Mô HÌNH thực thể kết hợp ERD
+
+
+
+HÌNH 3.2: Mô hình thực thể kết hợp ERD
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Hệ thống cơ sở dữ liệu được thiết kế theo mô hình quan hệ nhằm quản lý toàn bộ hoạt động của nhà hàng. Các bảng dữ liệu được liên kết với nhau giúp lưu trữ thông tin đầy đủ, hạn chế trùng lặp và hỗ trợ truy vấn dễ dàng. Hệ thống gồm các nhóm dữ liệu chính như quản lý người dùng, nhân viên, món ăn, danh mục món ăn, đơn hàng, đặt bàn, hóa đơn, thanh toán, kho nguyên liệu và đánh giá khách hàng. Người dùng có thể đăng ký tài khoản, đặt món, đặt bàn và đánh giá dịch vụ. Nhân viên thực hiện chấm công, xử lý đơn hàng và quản lý nhập kho. Mỗi danh mục có thể chứa nhiều món ăn, mỗi người dùng có thể tạo nhiều đơn hàng và đặt bàn. Hệ thống cũng quản lý bàn ăn, nguyên liệu, nhà cung cấp và lịch sử chatbot AI để hỗ trợ chăm sóc khách hàng. Việc tách riêng đơn hàng online và order tại bàn giúp hệ thống xử lý linh hoạt hơn trong thực tế.
+
+Sơ đồ lớp
+
+
+
+HÌNH 3.2.1: Sơ đồ lớp
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là sơ đồ lớp mô tả cấu trúc và mối liên kết giữa các thành phần trong hệ thống quản lý nhà hàng. Sơ đồ gồm các lớp chính như người dùng, món ăn, đơn hàng, thanh toán, đặt bàn, nguyên liệu và phiếu nhập kho. Người dùng có thể đặt bàn, tạo đơn hàng và đánh giá món ăn. Mỗi đơn hàng sẽ gồm nhiều chi tiết món ăn và có thể đi kèm thanh toán. Món ăn thuộc một danh mục và được liên kết với công thức chế biến để quản lý nguyên liệu sử dụng. Hệ thống cũng quản lý bàn ăn, nhà cung cấp, nguyên liệu và phiếu nhập kho để hỗ trợ việc nhập hàng và kiểm soát tồn kho. Các lớp được liên kết với nhau giúp hệ thống hoạt động đồng bộ và dễ quản lý dữ liệu trong quá trình vận hành nhà hàng.
+
+Thiết kế xử lý
+
+Sơ đồ Usecase
+
+
+
+HÌNH 3.3: Sơ đồ Usecase
+
+(Nguồn từ tác giả)
+
+Mô tả:
+
+Đây là sơ đồ Use Case Diagram mô tả các chức năng chính của hệ thống quản lý nhà hàng và những người sử dụng hệ thống. Sơ đồ cho thấy mỗi đối tượng sẽ thực hiện những chức năng khác nhau trong quá trình hoạt động. Khách vãng lai có thể xem thông tin nhà hàng như trang chủ, giới thiệu và thực hiện đăng ký hoặc đăng nhập tài khoản. Khách hàng sau khi đăng nhập có thể đặt món, thanh toán, đặt bàn, quản lý tài khoản và xem lịch sử đơn hàng. Nhân viên phục vụ có nhiệm vụ tạo order tại bàn, gửi món xuống bếp và theo dõi trạng thái món ăn. Đầu bếp nhận thông tin món ăn để chuẩn bị và chế biến món theo order. Quản lý có quyền quản lý dữ liệu như thực đơn, kho và nhân viên. Quản trị viên là người quản lý toàn bộ hệ thống và các chức năng quản trị chung.
+
+Sơ đồ giúp thể hiện rõ chức năng của từng người dùng trong hệ thống nhà hàng.
+
+Sơ đồ hoạt động
+
+Sơ đồ hoạt động luồng đăng ký
+
+
+
+HÌNH 3.4: Sơ đồ hoạt động luồng đăng ký
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là luồng dành cho khách hàng lần đầu vào website chưa có tài khoản, sau khi nhập tất cả các trường đăng ký và mã OTP từ hệ thống gửi đến mail của người dùng để xem tài khoản có hoạt động tồn tại không, nếu có thì nhập OTP vào và kiểm tra mã có đúng và thời gian tồn tại mã, nếu mã tồn tại thì sẽ tạo tài khoản cho người mới và mã sẽ được xóa, tạo phiên đăng nhập, và trả về kết quả đăng ký thành cômg, nếu không thì có hai hướng một là hủy bỏ và quay lại nhập mail lại. 
+
+Sơ đồ hoạt động luồng đăng nhập
+
+
+
+HÌNH 3.5: Sơ đồ hoạt động luồng đăng nhập
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là sơ đồ hoạt động mô tả quy trình đăng nhập của người dùng vào hệ thống. Quá trình bắt đầu khi người dùng nhập email và mật khẩu. Hệ thống sẽ kiểm tra định dạng email và kiểm tra tài khoản có tồn tại hay không. Nếu tài khoản tồn tại, người dùng tiếp tục nhập mật khẩu và hệ thống sẽ kiểm tra mật khẩu có đúng hay không. Nếu đúng thì đăng nhập thành công và hệ thống tạo phiên làm việc cho người dùng. Nếu mật khẩu sai thì người dùng có thể nhập lại hoặc hủy thao tác. Nếu email không tồn tại trong hệ thống thì người dùng sẽ quay lại bước nhập email hoặc hủy đăng nhập. 
+
+Sơ đồ hoạt động luồng đặt bàn online
+
+
+
+HÌNH 3.6: Sơ đồ hoạt động luồng đặt bàn online
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là luồng dành cho khách hàng khi họ đặt bàn trực tuyến, đầu tiên vào trang đặt bàn sau đó nhập ngày giờ, số người, ghi chú (không bắt buộc), sau đó hệ thống sẽ kiểm tra xem bàn đó còn trống không nếu còn trống thì tạo chỗ đặt bàn, và gửi mã xác nhận mail (vì sợ spam hệ thống nên bắt buộc xác thực) sau khi xác thực thành công sẽ thông báo đặt bàn thành công và chờ chủ nhà hàng duyệt bên phía chủ. Và có hai hướng xử lý nếu không thành công một là hủy bỏ đặt bàn và nhập lại số bàn.
+
+Sơ đồ hoạt động luồng đặt hàng online 
+
+
+
+HÌNH 3.7: Sơ đồ hoạt động luồng đặt hàng online
+
+(Nguồn từ tác giả)
+
+Mô tả:
+
+Đây là luồng dành cho khách hàng khi họ có nhu cầu mua hàng online, sau khi chọn món thành công họ sẽ vào thanh toán chọn cổng MoMo và chọn phương thức thanh toán bằng thẻ ngân hàng, thanh toán thành công thì sẽ tạo đơn hàng, nhận đơn hàng và xác nhận đơn hàng, nếu không thành công sẽ có hai hướng hủy bỏ hoặc quay lại chọn cổng thanh toán lại. 
+
+Sơ đồ hoạt động luồng gợi ý món ăn 
+
+
+
+HÌNH 3.8: Sơ đồ hoạt động luồng gợi ý món ăn
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là luồng gợi ý từ hệ thống gợi ý món ăn cho khách, mỗi lần khách hàng đăng nhập thành công và hệ thống sẽ kiểm tra lịch sử đơn hàng của họ và truy vấn ra lịch sử và sở thích sau đó hệ thống sẽ phân tích độ phổ biến của ăn bạn thích sau đó áp dụng thuật toán  vào và hiển thị danh sách gợi ý, khách hàng sẽ xem danh sách gợi ý đúng món sẽ chọn thêm vào giỏ hàng, nếu không đúng thì chọn lại hoặc hủy bỏ và hệ thống sẽ lưu lại sở thích mới tiếp để lần sau tiếp tục. 
+
+Sơ đồ hoạt động luồng quản lý kho
+
+
+
+HÌNH 3.8: Sơ đồ hoạt động luồng quản lý kho
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là luồng dành cho Quản lý và Quản trị viên kiểm kê kho, đầu tiên sẽ truy vấn số lượng nguyên liệu và xem danh sách nguyên liệu xem nếu dưới mức tối thiểu thì tạo đơn đặt nguyên liệu về và cập nhật số lượng mới, nếu không thì có hai hướng kiểm tra lại hoặc hủy bỏ. 
+
+Sơ đồ hoạt động luồng quản đơn hàng
+
+
+
+HÌNH 3.9 Sơ đồ hoạt động luồng quản lý đơn hàng
+
+(Nguồn từ tác giả)
+
+
+
+Mô tả: 
+
+Đây là luồng hoạt động dành cho quản lý và quản họ có quyền vào quản lý đơn hàng, sau khi đăng nhập thành công thì chọn xem danh sách đơn hàng sau đó truy vấn những đơn hàng chờ xử lý, xem chi tiết đơn hàng nếu duyệt thì chuyển trạng thái đã duyệt, sau đó cập nhật hoàn thành. Nếu từ chối thì có hai hướng, hủy bỏ hoặc quay lại tiếp tục xem đơn hàng tiếp theo.  
+
+Sơ đồ hoạt động luồng thanh toán bằng MoMo
+
+
+
+HÌNH 3.10: Sơ đồ hoạt động luồng thanh toán bằng MoMo
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Đây là luồng hoạt động mô tả quy trình thanh toán bằng MoMo. Người dùng chọn thanh toán MoMo, hệ thống gửi yêu cầu thanh toán và xác nhận giao dịch. Nếu thanh toán thành công thì hệ thống cập nhật trạng thái đơn hàng và gửi thông báo kết quả. Nếu thất bại thì người dùng có thể hủy hoặc thực hiện lại giao dịch.
+
+Sơ đồ tuần tự
+
+Sơ đồ tuần tự chấm công và tính lương cho nhân viên
+
+
+
+HÌNH 3.11: Sơ đồ tuần tự chấm công và tính lương cho nhân viên
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Sơ đồ mô tả quy trình chấm công và tính lương đầu tiền quản lý sẽ đánh dấu những nhân viên vắng mặt, và gửi danh sách điểm danh đến hệ thống máy chủ, sau đó trang lưu trạng thái chấm công lại, và cơ sở dữ liệu xác nhận đã lưu, hiển thị kết quả báo cáo chấm công. 
+
+Tiếp theo, quản lý bấm yêu cầu tổng kết lương tháng. Trang quản trị gửi yêu cầu tính lương đến hệ thống. Hệ thống sẽ lấy các dữ liệu cần thiết như số ngày làm việc, chức vụ và tiền ứng trước từ cơ sở dữ liệu. Sau đó, hệ thống tiến hành tính lương dựa trên công thức gồm lương cơ bản, số ngày công và phụ cấp. Khi hoàn thành, hệ thống cập nhật và lưu bảng lương vào cơ sở dữ liệu. Cuối cùng, danh sách phiếu lương được hiển thị và phát cho nhân viên để kiểm tra mức lương của mình.
+
+Sơ đồ tuần tự chatbot tư vấn khách hàng
+
+
+
+HÌNH 3.12: Sơ đồ tuần tự chatbot tư vấn khách hàng
+
+(Nguồn từ tác giả)
+
+Mô tả:
+
+ Sơ đồ mô tả quy trình chatbot tư vấn phản hồi khách hàng Đầu tiên, khách hàng nhập câu hỏi như Quán có món gì ngon không? trên khung chat của website. Tin nhắn này được gửi đến hệ thống máy chủ để xử lý. Sau đó, hệ thống chuyển nội dung câu hỏi cho dịch vụ trí tuệ nhân tạo (AI). AI sẽ phân tích câu hỏi và tìm thông tin món ăn trong cơ sở dữ liệu. Dựa vào thông tin đó, AI soạn nội dung phản hồi phù hợp, ví dụ gợi ý món gà rán hoặc các món đặc trưng của quán. 
+
+Sơ đồ tuần tự oder cho bếp
+
+
+
+HÌNH 3.13: Sơ đồ tuần tự Oder về bếp chế biến
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Sơ đồ trên mô tả quy trình gửi món ăn từ nhân viên phục vụ đến bếp trong hệ thống nhà hàng. Đầu tiên, nhân viên phục vụ chọn bàn và nhập các món khách đã gọi trên máy tính tiền. Sau đó, danh sách món ăn được gửi đến hệ thống máy chủ để xử lý. Hệ thống sẽ lưu hóa đơn và chi tiết món ăn vào cơ sở dữ liệu, đồng thời tạo phiếu báo bếp với trạng thái Đang chờ. 
+
+Khi lưu thành công, hệ thống gửi thông báo xác nhận và hiển thị thông tin Có món mới cần chế biến trên màn hình bếp để đầu bếp bắt đầu chuẩn bị món ăn. Trong lúc chế biến, phía nhân viên phục vụ có thể thấy trạng thái món là Đang chế biến. Sau khi hoàn thành món ăn, đầu bếp bấm nút Xong trên màn hình bếp. Thông tin này được gửi về hệ thống để cập nhật trạng thái món ăn trong cơ sở dữ liệu. Cuối cùng, hệ thống gửi thông báo cho nhân viên phục vụ biết món của bàn đã hoàn thành để mang ra cho khách.
+
+Sơ đồ tuần tự quản lý kho 
+
+
+
+HÌNH 3.14: Sơ đồ tuần tự quản lý kho
+
+(Nguồn từ tác giả)
+
+Mô tả: 
+
+Sơ đồ này mô tả quy trình quản lý kho, quản lý lập bảng kiểm kê sau đó gửi thông tin phiếu nhập, kiểm tra nhà cung cấp, nếu nhà cung cấp hợp lệ thì lưu phiếu nhập, sau đó công dồn số liệu và phản hồi nhập kho thành công. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHƯƠNG 4: KẾT QUẢ NGHIÊN CƯU
+
+
+
+
+KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+
+
+
+
+TÀI LIỆU THAM KHẢO
+
+
+
+Bùi Thị Hằng. (2011). Xây dựng chương trình quản lý nhà hàng Coffee SEN. Hải Phòng: Trường Đại học Dân lập Hải Phòng.
+
+Diệp Hữu Dũng. (2010). Xây dựng chương trình quản lý nhà hàng Hữu Hạnh. Hải Phòng: Trường Đại học Dân lập Hải Phòng.
+
+Hoang Minh Dai. (2024, 11 19). API GraphQL: Kiến thức đầy đủ và chi tiết. Retrieved from Viblo: https://viblo.asia/p/api-graphql-kien-thuc-day-du-va-chi-tiet-3kY4gM2qLAe
+
+Hoàng Việt Trung. (2025). Xây dựng trang đặt đồ ăn trực tuyến. Hải Phòng: Trường Đại học Quản lý và Công nghệ Hải Phòng.
+
+IBM. (2025, 9 24). What Is Singular Value Decomposition (SVD)? Retrieved from IBM Think: https://www.ibm.com/think/topics/singular-value-decomposition
+
+LANIT JSC. (2024, 11 22). ExpressJS là gì? Tính năng và Lợi ích của Framework Express.js. Retrieved from LANIT: https://lanit.com.vn/expressjs-la-gi.html
+
+Lê Hữu Khôi. (2025, 8 18). RAG là gì? Tìm hiểu mô hình Retrieval-Augmented Generation trong AI. Retrieved from Base.vn: https://base.vn/blog/rag-la-gi/
+
+MindX Technology School. (2024, 6 5). Khám phá Python cơ bản - những điều cha mẹ nên biết để giúp trẻ học ngôn ngữ lập trình. Retrieved from MindX: https://mindx.edu.vn/blog/kham-pha-python-co-ban-nhung-dieu-cha-me-nen-biet-de-giup-tre-hoc-ngon-ngu-lap-trinh
+
+Nguyễn Minh Hoàng. (2013). Xây dựng website quản lý nhà hàng. Hải Phòng: Trường Đại học Dân lập Hải Phòng.
+
+TopDev. (2024). RESTful API là gì? Retrieved from TopDev: https://topdev.vn/blog/restful-api-la-gi/
+
+Vinh Pt. (2025, 1). Giới thiệu về Node.js Cơ sở và Ứng dụng. Retrieved from Studocu: https://www.studocu.vn/vn/document/truong-cao-dang-thuc-hanh-fpt/data-structures-and-algorithms/gioi-thieu-ve-nodejs-va-expressjs-co-so-va-ung-dung/148573758
+
+Zenoffi E-Learning Labb. (2025, 2 28). What Apriori Algorithm in Data Mining? Examples With Solution. Retrieved from LinkedIn: https://vn.linkedin.com/pulse/what-apriori-algorithm-data-mining-examples-solution-learning-labb-e2xcf?tl=vi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+1
+
+
+
+
+
+1
+
+1
+
+
+
+
+
+3
+
+3
+
+
+
+6
+
+6
+
+
+
+15
+
+15GVHD: ThS Phạm Minh Đương 		                  SVTH: Nguyễn Huỳnh Kỹ Thuật
+
+ 
+
+
+
+
+
+2
+
+2

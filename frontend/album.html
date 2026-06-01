@@ -12,25 +12,431 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/loading.css">
     <style>
+        /* Bento Box / Collage Grid Layout */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 220px;
+            gap: 1.25rem;
+            padding: 0;
+            grid-auto-flow: dense;
+        }
+
+        @media (max-width: 1024px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                grid-auto-rows: 180px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: repeat(1, 1fr);
+                gap: 0.75rem;
+                grid-auto-rows: auto;
+            }
+        }
+
         .gallery-item {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0;
             cursor: pointer;
+            border-radius: 1rem;
+        }
+        
+        /* Dynamic Spanning creating Collage Layout */
+        .gallery-item:nth-child(10n + 1) {
+            grid-column: span 2;
+            grid-row: span 3;
+        }
+        .gallery-item:nth-child(10n + 2) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+        .gallery-item:nth-child(10n + 3), 
+        .gallery-item:nth-child(10n + 4) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        .gallery-item:nth-child(10n + 5),
+        .gallery-item:nth-child(10n + 6) {
+            grid-column: span 1;
+            grid-row: span 2;
+        }
+        .gallery-item:nth-child(10n + 7) {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+        .gallery-item:nth-child(10n + 8),
+        .gallery-item:nth-child(10n + 9),
+        .gallery-item:nth-child(10n + 10) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        /* Adjust spans for smaller screens */
+        @media (max-width: 1024px) {
+            .gallery-item:nth-child(n) {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+            .gallery-item:nth-child(5n + 1) {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+            .gallery-item:nth-child(5n + 4) {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .gallery-item:nth-child(n) {
+                grid-column: span 1 !important;
+                grid-row: span 1 !important;
+                height: 280px;
+            }
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-item:hover {
+                transform: translateY(-4px) scale(1.01);
+            }
+        }
+
+        .gallery-item-inner {
+            position: relative;
+            border-radius: 1rem;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-item:hover .gallery-item-inner {
+            box-shadow: 0 20px 60px rgba(251, 146, 60, 0.3),
+                        0 0 40px rgba(251, 146, 60, 0.1);
+        }
+
+        .gallery-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+            flex: 1; /* Stretch to fill space above info block */
+            height: 100%;
         }
 
         .gallery-item img {
-            transition: transform 0.3s;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: brightness(1) contrast(1);
         }
 
         .gallery-item:hover img {
-            transform: scale(1.1);
+            transform: scale(1.08);
+            filter: brightness(1.1) contrast(1.05);
         }
-        
-        /* Mobile gallery improvements */
-        @media (max-width: 639px) {
-            .gallery-item {
+
+        /* 3D Overlay Effect */
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                rgba(251, 146, 60, 0.9) 0%,
+                rgba(239, 68, 68, 0.9) 100%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            transform: translateZ(20px);
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-overlay {
+                padding: 1rem;
+            }
+        }
+
+        .gallery-overlay-content {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+        }
+
+        .gallery-item:hover .gallery-overlay-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .gallery-info {
+            padding: 1.25rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 640px) {
+            .gallery-info {
+                padding: 1rem;
+            }
+        }
+
+        .gallery-item:hover .gallery-info {
+            background: linear-gradient(to bottom, white, #fff7ed);
+        }
+
+        /* Category Badge */
+        .category-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            color: white;
+            box-shadow: 0 2px 8px rgba(251, 146, 60, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .category-badge {
+                padding: 0.25rem 0.625rem;
+                font-size: 0.625rem;
+            }
+        }
+
+        /* View Button */
+        .view-btn {
+            background: white;
+            color: #f97316;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .view-btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        .view-btn:hover {
+            background: #f97316;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Enhanced Lightbox */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @media (max-width: 640px) {
+            .lightbox {
+                padding: 1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: zoomIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 1rem;
+            box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 640px) {
+            .lightbox img {
+                max-height: 70vh;
                 border-radius: 0.5rem;
             }
         }
+
+        .lightbox-close {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 640px) {
+            .lightbox-close {
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        }
+
+        .lightbox-close:hover {
+            background: rgba(249, 115, 22, 0.9);
+            transform: rotate(90deg);
+        }
+
+        .lightbox-info {
+            position: absolute;
+            bottom: -4rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .lightbox-info {
+                bottom: -3rem;
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Filter Buttons Enhanced */
+        .filter-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        .filter-btn.active::before,
+        .filter-btn:hover::before {
+            opacity: 1;
+        }
+
+        .filter-btn span {
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .filter-btn.active span,
+        .filter-btn:hover span {
+            color: white;
+        }
+
+        /* Loading Animation */
+        .loading-shimmer {
+            background: linear-gradient(90deg,
+                #f0f0f0 25%,
+                #e0e0e0 50%,
+                #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Scroll Reveal Animation */
+        .gallery-item {
+            opacity: 0;
+            animation: revealItem 0.6s ease forwards;
+        }
+
+        @keyframes revealItem {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gallery-item:nth-child(1) { animation-delay: 0.05s; }
+        .gallery-item:nth-child(2) { animation-delay: 0.1s; }
+        .gallery-item:nth-child(3) { animation-delay: 0.15s; }
+        .gallery-item:nth-child(4) { animation-delay: 0.2s; }
+        .gallery-item:nth-child(5) { animation-delay: 0.25s; }
+        .gallery-item:nth-child(6) { animation-delay: 0.3s; }
+        .gallery-item:nth-child(n+7) { animation-delay: 0.35s; }
     </style>
 </head>
 
@@ -49,20 +455,20 @@
     <section class="py-8 bg-white shadow-sm sticky top-16 z-40">
         <div class="container mx-auto px-4">
             <div class="flex flex-wrap justify-center gap-4">
-                <button class="filter-btn active px-6 py-2 rounded-full font-medium transition" data-filter="all">
-                    Tất cả
+                <button class="filter-btn active px-6 py-2 rounded-full font-medium transition border-2 border-orange-600" data-filter="all">
+                    <span>Tất cả</span>
                 </button>
-                <button class="filter-btn px-6 py-2 rounded-full font-medium transition" data-filter="dishes">
-                    Món ăn
+                <button class="filter-btn px-6 py-2 rounded-full font-medium transition border-2 border-gray-300" data-filter="dishes">
+                    <span>Món ăn</span>
                 </button>
-                <button class="filter-btn px-6 py-2 rounded-full font-medium transition" data-filter="restaurant">
-                    Nhà hàng
+                <button class="filter-btn px-6 py-2 rounded-full font-medium transition border-2 border-gray-300" data-filter="restaurant">
+                    <span>Nhà hàng</span>
                 </button>
-                <button class="filter-btn px-6 py-2 rounded-full font-medium transition" data-filter="events">
-                    Sự kiện
+                <button class="filter-btn px-6 py-2 rounded-full font-medium transition border-2 border-gray-300" data-filter="events">
+                    <span>Sự kiện</span>
                 </button>
-                <button class="filter-btn px-6 py-2 rounded-full font-medium transition" data-filter="customers">
-                    Khách hàng
+                <button class="filter-btn px-6 py-2 rounded-full font-medium transition border-2 border-gray-300" data-filter="customers">
+                    <span>Khách hàng</span>
                 </button>
             </div>
         </div>
@@ -71,104 +477,11 @@
     <!-- Gallery -->
     <section class="py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery">
+            <div class="gallery-grid" id="gallery">
                 <!-- Loading state -->
                 <div class="col-span-full text-center py-12">
                     <i class="fas fa-spinner fa-spin text-4xl text-orange-600"></i>
                     <p class="mt-4 text-gray-600">Đang tải album...</p>
-                </div>
-                <!-- Dishes (Old static content - will be replaced by JS) -->
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm hidden" data-category="dishes">
-                    <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?w=600" alt="Cá lóc nướng"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Cá Lóc Nướng Trui</h3>
-                        <p class="text-gray-600 text-sm">Món ăn đặc sản</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="dishes">
-                    <img src="https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?w=600" alt="Lẩu mắm"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Lẩu Mắm Miền Tây</h3>
-                        <p class="text-gray-600 text-sm">Món ăn truyền thống</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="dishes">
-                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600" alt="Bánh xèo"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Bánh Xèo</h3>
-                        <p class="text-gray-600 text-sm">Món ăn truyền thống</p>
-                    </div>
-                </div>
-
-                <!-- Restaurant -->
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="restaurant">
-                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600"
-                        alt="Không gian nhà hàng" class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Không Gian Sang Trọng</h3>
-                        <p class="text-gray-600 text-sm">Khu vực trong nhà</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="restaurant">
-                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600" alt="Phòng VIP"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Phòng VIP</h3>
-                        <p class="text-gray-600 text-sm">Dành cho sự kiện</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="restaurant">
-                    <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600" alt="Sân vườn"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Khu Vực Sân Vườn</h3>
-                        <p class="text-gray-600 text-sm">Không gian thoáng mát</p>
-                    </div>
-                </div>
-
-                <!-- Events -->
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="events">
-                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600" alt="Sự kiện"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Tiệc Cưới</h3>
-                        <p class="text-gray-600 text-sm">Tổ chức sự kiện</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="events">
-                    <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="Sinh nhật"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Tiệc Sinh Nhật</h3>
-                        <p class="text-gray-600 text-sm">Tổ chức sinh nhật</p>
-                    </div>
-                </div>
-
-                <!-- Customers -->
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="customers">
-                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600" alt="Khách hàng"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Khách Hàng Hài Lòng</h3>
-                        <p class="text-gray-600 text-sm">Gia đình sum vầy</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item rounded-xl overflow-hidden shadow-sm" data-category="customers">
-                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600" alt="Khách hàng"
-                        class="w-full h-64 object-cover">
-                    <div class="p-4 bg-white">
-                        <h3 class="font-medium text-lg">Trải Nghiệm Tuyệt Vời</h3>
-                        <p class="text-gray-600 text-sm">Khách hàng thân thiết</p>
-                    </div>
                 </div>
             </div>
         </div>

@@ -77,7 +77,7 @@ function displayAlbums(albums) {
 
     if (!albums || albums.length === 0) {
         galleryContainer.innerHTML = `
-            <div class="col-span-full text-center py-12">
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem 0;">
                 <i class="fas fa-images text-4xl text-gray-400"></i>
                 <p class="mt-4 text-gray-600">Chưa có ảnh trong album này</p>
             </div>
@@ -85,9 +85,15 @@ function displayAlbums(albums) {
         return;
     }
 
-    const categoryName = getCategoryName(currentFilter);
-    
-    galleryContainer.innerHTML = albums.map(album => {
+    const categoryNames = {
+        'mon_an': 'Món ăn',
+        'khong_gian': 'Không gian',
+        'su_kien': 'Sự kiện',
+        'khach_hang': 'Khách hàng',
+        'khac': 'Khác'
+    };
+
+    galleryContainer.innerHTML = albums.map((album, index) => {
         // Xử lý đường dẫn ảnh - ảnh được lưu trong /images/ không phải /images/albums/
         let imagePath;
         if (album.duong_dan_anh.startsWith('http')) {
@@ -98,31 +104,41 @@ function displayAlbums(albums) {
             // Chỉ có tên file
             imagePath = `http://localhost:3000/images/${album.duong_dan_anh}`;
         }
-        
+
         const category = CATEGORY_MAP[album.loai_anh] || 'all';
-        
+        const categoryName = categoryNames[album.loai_anh] || 'Khác';
+
         return `
-            <div class="gallery-item rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300" 
+            <div class="gallery-item"
                  data-category="${category}"
-                 data-id="${album.ma_album}">
-                <div class="relative overflow-hidden">
-                    <img src="${imagePath}" 
-                         alt="${album.mo_ta || 'Album ảnh'}"
-                         class="w-full h-64 object-cover"
-                         onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600'">
-                    <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                        <button onclick="viewFullImage('${imagePath}', '${album.mo_ta || 'Album ảnh'}')" 
-                                class="bg-white text-orange-600 px-4 py-2 rounded-full font-medium hover:bg-orange-600 hover:text-white transition">
-                            <i class="fas fa-search-plus mr-2"></i>Xem chi tiết
-                        </button>
+                 data-id="${album.ma_album}"
+                 style="animation-delay: ${index * 0.05}s">
+                <div class="gallery-item-inner">
+                    <div class="gallery-image-wrapper">
+                        <img src="${imagePath}"
+                             alt="${album.mo_ta || 'Album ảnh'}"
+                             loading="lazy"
+                             onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'">
+                        <div class="gallery-overlay">
+                            <div class="gallery-overlay-content">
+                                <button onclick="viewFullImage('${imagePath.replace(/'/g, "\\'")}', '${(album.mo_ta || 'Album ảnh').replace(/'/g, "\\'")}', '${categoryName}')"
+                                        class="view-btn">
+                                    <i class="fas fa-search-plus"></i>
+                                    <span>Xem chi tiết</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="p-4 bg-white">
-                    <h3 class="font-medium text-lg line-clamp-1">${album.mo_ta || 'Ảnh album'}</h3>
-                    <p class="text-gray-600 text-sm mt-1">
-                        <i class="far fa-calendar mr-1"></i>
-                        ${formatDate(album.ngay_tao)}
-                    </p>
+                    <div class="gallery-info">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="category-badge">${categoryName}</span>
+                            <span class="text-xs text-gray-500">
+                                <i class="far fa-calendar mr-1"></i>
+                                ${formatDate(album.ngay_tao)}
+                            </span>
+                        </div>
+                        <h3 class="font-semibold text-gray-800 line-clamp-2">${album.mo_ta || 'Ảnh album'}</h3>
+                    </div>
                 </div>
             </div>
         `;
@@ -180,32 +196,39 @@ function changePage(page) {
 }
 
 // View full image in modal
-function viewFullImage(imageSrc, description) {
+function viewFullImage(imageSrc, description, category) {
     const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
+    modal.className = 'lightbox';
     modal.innerHTML = `
-        <div class="relative max-w-5xl w-full">
-            <button onclick="this.closest('.fixed').remove()" 
-                    class="absolute top-4 right-4 text-white text-3xl hover:text-orange-400 transition z-10">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="this.closest('.lightbox').remove()">
                 <i class="fas fa-times"></i>
             </button>
-            <img src="${imageSrc}" alt="${description}" class="w-full h-auto max-h-[90vh] object-contain rounded-lg">
-            ${description ? `
-                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 rounded-b-lg">
-                    <p class="text-white text-lg">${description}</p>
-                </div>
-            ` : ''}
+            <img src="${imageSrc}" alt="${description}">
+            <div class="lightbox-info">
+                ${category ? `<span class="inline-block px-3 py-1 bg-orange-600 text-white text-xs font-semibold rounded-full mb-2">${category}</span>` : ''}
+                <p class="text-lg font-medium">${description}</p>
+            </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     // Close on click outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.remove();
         }
     });
+
+    // Close on ESC key
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escHandler);
+        }
+    };
+    document.addEventListener('keydown', escHandler);
 }
 
 // Get category name in Vietnamese
@@ -244,16 +267,18 @@ function formatDate(dateString) {
 // Setup filter buttons
 function setupFilterButtons() {
     const filterBtns = document.querySelectorAll('.filter-btn');
-    
+
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             // Update active button
             filterBtns.forEach(b => {
-                b.classList.remove('active', 'bg-orange-600', 'text-white');
-                b.classList.add('bg-gray-100', 'text-gray-700');
+                b.classList.remove('active');
+                b.classList.remove('border-orange-600');
+                b.classList.add('border-gray-300');
             });
-            btn.classList.add('active', 'bg-orange-600', 'text-white');
-            btn.classList.remove('bg-gray-100', 'text-gray-700');
+            btn.classList.add('active');
+            btn.classList.add('border-orange-600');
+            btn.classList.remove('border-gray-300');
 
             // Load filtered albums
             const filter = btn.getAttribute('data-filter');
@@ -261,19 +286,6 @@ function setupFilterButtons() {
             currentPage = 1;
             loadAlbums(filter, 1);
         });
-    });
-
-    // Set initial active state
-    const activeBtn = document.querySelector('.filter-btn.active');
-    if (activeBtn) {
-        activeBtn.classList.add('bg-orange-600', 'text-white');
-        activeBtn.classList.remove('bg-gray-100', 'text-gray-700');
-    }
-    
-    filterBtns.forEach(btn => {
-        if (!btn.classList.contains('active')) {
-            btn.classList.add('bg-gray-100', 'text-gray-700');
-        }
     });
 }
 
