@@ -118,7 +118,8 @@ async function initSettingsTable() {
                 ['hieu_ung_tuyet', '0', 'Bật/tắt hiệu ứng tuyết rơi (1=bật, 0=tắt)'],
                 ['hieu_ung_hoa_mai', '0', 'Bật/tắt hiệu ứng hoa mai (1=bật, 0=tắt)'],
                 ['hieu_ung_intro_tet', '0', 'Bật/tắt intro chào mừng Tết (1=bật, 0=tắt)'],
-                ['hieu_ung_intro_giang_sinh', '0', 'Bật/tắt intro Giáng sinh (1=bật, 0=tắt)']
+                ['hieu_ung_intro_giang_sinh', '0', 'Bật/tắt intro Giáng sinh (1=bật, 0=tắt)'],
+                ['hieu_ung_hoa_osaka_admin', '1', 'Bật/tắt hiệu ứng hoa Osaka vàng rơi ở trang Admin (1=bật, 0=tắt)']
             ];
 
             for (const [key, value, desc] of defaultSettings) {
@@ -136,7 +137,8 @@ async function initSettingsTable() {
                 ['hieu_ung_tuyet', '0', 'Bật/tắt hiệu ứng tuyết rơi (1=bật, 0=tắt)'],
                 ['hieu_ung_hoa_mai', '0', 'Bật/tắt hiệu ứng hoa mai (1=bật, 0=tắt)'],
                 ['hieu_ung_intro_tet', '0', 'Bật/tắt intro chào mừng Tết (1=bật, 0=tắt)'],
-                ['hieu_ung_intro_giang_sinh', '0', 'Bật/tắt intro Giáng sinh (1=bật, 0=tắt)']
+                ['hieu_ung_intro_giang_sinh', '0', 'Bật/tắt intro Giáng sinh (1=bật, 0=tắt)'],
+                ['hieu_ung_hoa_osaka_admin', '1', 'Bật/tắt hiệu ứng hoa Osaka vàng rơi ở trang Admin (1=bật, 0=tắt)']
             ];
             
             for (const [key, value, desc] of newSettings) {

@@ -837,6 +837,14 @@ async function initAdminLayout() {
     }
 
     injectLayout();
+
+    // Tải hiệu ứng hoa Osaka Vàng rơi cho trang Admin
+    if (!document.getElementById('summer-flower-effect-script')) {
+        const s = document.createElement('script');
+        s.id = 'summer-flower-effect-script';
+        s.src = 'js/summer-flower-effect.js';
+        document.head.appendChild(s);
+    }
     const userData = await loadAdminInfo();
     
     if (userData) {

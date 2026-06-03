@@ -10,6 +10,55 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/modern-style.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Pacifico&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Lời nhắn từ Chủ nhà hàng - Chị Hoàng Thục Linh ===== */
+        /* Tone TRẦM, DỊU MẮT - không dùng cam/đỏ/vàng rực */
+        .linh-quote-box {
+            background: #fdfcfa;
+            border: 1px solid #e5e0d6;
+            box-shadow:
+                0 2px 4px rgba(50, 40, 30, 0.06),
+                0 8px 24px -6px rgba(60, 50, 40, 0.12);
+            position: relative;
+        }
+        /* Chữ chính: NÂU ĐEN trung tính - dễ đọc lâu */
+        .linh-quote-text {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: #2a2520;
+            letter-spacing: 0.2px;
+        }
+        /* Tên "Phương Nam": NÂU SOCOLA đơn sắc, chỉ nhấn bằng font + cỡ chữ */
+        .linh-quote-text .highlight-pn {
+            font-family: 'Pacifico', cursive;
+            font-style: normal;
+            font-size: 1.15em;
+            color: #3e2723;
+            padding: 0 4px;
+        }
+        /* Chữ ký: NÂU ĐEN đơn sắc với shadow xám trung tính tạo độ nổi nhẹ */
+        .linh-signature {
+            font-family: 'Great Vibes', 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            line-height: 1;
+            color: #2a1d15;
+            text-shadow:
+                1px 1px 0 rgba(220, 215, 205, 0.9),
+                2px 2px 0 rgba(160, 150, 140, 0.4),
+                3px 3px 4px rgba(60, 50, 40, 0.25);
+            transform: rotate(-3deg);
+            display: inline-block;
+            transition: transform 0.4s ease;
+        }
+        .linh-signature:hover {
+            transform: rotate(-3deg) scale(1.06) translateY(-2px);
+        }
+    </style>
 
 </head>
 
@@ -132,6 +181,34 @@
                             cúng,
                             gần gũi – nơi mỗi bữa ăn đều là một trải nghiệm đáng nhớ, trọn vị và đậm tình quê hương.
                         </p>
+
+                        <!-- Lời nhắn từ Chủ nhà hàng - Font chữ 3D -->
+                        <div class="linh-quote-box mt-6 sm:mt-8 relative backdrop-blur-sm rounded-2xl p-5 sm:p-7">
+                            <i class="fas fa-quote-left absolute -top-4 left-4 text-4xl sm:text-5xl"
+                                style="color: #8B4513; text-shadow: 2px 2px 0 #f5e6d3, 3px 3px 6px rgba(92, 44, 12, 0.45);"></i>
+                            <i class="fas fa-quote-right absolute -bottom-3 right-4 text-3xl sm:text-4xl opacity-70"
+                                style="color: #6B4423; text-shadow: 1px 1px 0 #fef3c7, 2px 2px 4px rgba(107, 68, 35, 0.4);"></i>
+                            <div class="flex items-start gap-4 pt-3">
+                                <img src="images/HTL.png" alt="Chủ nhà hàng Hoàng Thục Linh"
+                                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover flex-shrink-0"
+                                    style="border: 3px solid #D4AF37; box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4), inset 0 0 0 2px rgba(255,255,255,0.6);">
+                                <div class="flex-1 min-w-0">
+                                    <p class="linh-quote-text text-sm sm:text-base mb-4">
+                                        Linh xin gửi lời chào thân thương nhất đến quý khách đã dành thời gian ghé thăm
+                                        <span class="highlight-pn">Ẩm thực Phương Nam</span>.
+                                        Mỗi món ăn nơi đây đều được Linh và các cô chú đầu bếp chuẩn bị bằng tất cả tấm lòng –
+                                        từ con cá tươi ngoài chợ sớm, nắm rau xanh hái tay, cho đến hạt cơm dẻo thơm vừa nấu.
+                                        Linh mong quý khách sẽ tìm thấy ở đây không chỉ một bữa cơm ngon,
+                                        mà còn là cảm giác bình yên, ấm cúng tựa như được trở về với mâm cơm mẹ nấu năm nào.
+                                        Cảm ơn quý khách đã thương Phương Nam – căn nhà nhỏ của chúng tôi luôn rộng cửa chờ đón!
+                                    </p>
+                                    <div class="flex items-center gap-3 flex-wrap pt-2" style="border-top: 1px solid rgba(212, 175, 55, 0.4);">
+                                        <span class="linh-signature">Hoàng Thục Linh</span>
+                                        <span class="text-xs sm:text-sm italic" style="color: #6B4423;">— Chủ nhà hàng Phương Nam</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

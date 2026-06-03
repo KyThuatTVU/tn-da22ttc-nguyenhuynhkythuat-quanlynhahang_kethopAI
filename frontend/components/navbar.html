@@ -3,24 +3,189 @@
     /* Active nav link styles */
     .nav-link.active,
     .nav-link-mobile.active {
-        color: #fef3c7 !important;
+        color: #c2410c !important;
         position: relative;
+    }
+
+    .nav-link.active {
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
     }
     
     .nav-link.active::after {
         content: '';
         position: absolute;
-        bottom: -8px;
+        bottom: -10px;
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, #fde68a, #fef3c7);
+        background: linear-gradient(90deg, #f97316, #f59e0b);
         border-radius: 2px;
+        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.28);
     }
     
     .nav-link-mobile.active {
-        background-color: #a0714f !important;
-        border-left: 4px solid #fde68a;
+        background-color: #ffedd5 !important;
+        border-left: 4px solid #f97316;
+        box-shadow: inset 4px 0 10px rgba(249, 115, 22, 0.14);
+    }
+
+    .navbar-3d {
+        background: linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(255, 255, 255, 0.99) 48%, rgba(255, 251, 235, 0.98) 100%) !important;
+        border-bottom: 1px solid rgba(217, 119, 6, 0.24);
+        box-shadow:
+            0 16px 34px rgba(120, 53, 15, 0.16),
+            0 6px 16px rgba(15, 23, 42, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95),
+            inset 0 -1px 0 rgba(180, 83, 9, 0.08);
+        backdrop-filter: blur(14px);
+        transform-style: preserve-3d;
+    }
+
+    .navbar-3d::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -7px;
+        height: 7px;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(146, 64, 14, 0.16), rgba(146, 64, 14, 0));
+    }
+
+    .nav-link,
+    .nav-action-3d,
+    .nav-link-mobile {
+        color: #3f2a1d;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .nav-link {
+        display: inline-flex;
+        align-items: center;
+        isolation: isolate;
+        padding: 0.35rem 0.5rem;
+        border-radius: 999px;
+        position: relative;
+        transform-style: preserve-3d;
+    }
+
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        inset: -0.12rem -0.28rem;
+        z-index: -1;
+        opacity: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(249, 115, 22, 0.32);
+        background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 46%, #fb923c 100%);
+        box-shadow:
+            0 12px 22px rgba(234, 88, 12, 0.24),
+            0 4px 8px rgba(120, 53, 15, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.72),
+            inset 0 -2px 4px rgba(194, 65, 12, 0.2);
+        transform: perspective(520px) rotateX(18deg) translateY(5px) scale(0.96);
+        transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .nav-link:hover::before,
+    .nav-link.active::before {
+        opacity: 1;
+        transform: perspective(520px) rotateX(0deg) translateY(0) scale(1);
+    }
+
+    #navbar .font-dancing {
+        color: #4a2f1d;
+    }
+
+    #navbar .tracking-wide {
+        color: #b45309;
+    }
+
+    .nav-link,
+    .nav-action-3d {
+        transition: color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    }
+
+    #user-menu-container > .relative > button {
+        color: #3f2a1d !important;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+        transition: color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .nav-link:hover,
+    .nav-action-3d:hover,
+    #user-menu-container > .relative > button:hover {
+        color: #9a3412 !important;
+        transform: translateY(-2px);
+        filter: drop-shadow(0 4px 6px rgba(234, 88, 12, 0.18));
+    }
+
+    .nav-link-mobile {
+        border-radius: 0.75rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-link-mobile:hover:not(.nav-cta-3d) {
+        color: #9a3412 !important;
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 58%, #fed7aa 100%) !important;
+        box-shadow:
+            0 10px 18px rgba(234, 88, 12, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.72),
+            inset 0 -2px 4px rgba(194, 65, 12, 0.12);
+        transform: translateX(4px) translateY(-1px);
+    }
+
+    .nav-cta-3d {
+        color: #ffffff !important;
+        text-shadow: 0 1px 1px rgba(127, 29, 29, 0.28);
+        box-shadow:
+            0 10px 18px rgba(234, 88, 12, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.36);
+    }
+
+    .nav-cta-3d:hover {
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow:
+            0 14px 24px rgba(234, 88, 12, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.44);
+    }
+
+    .nav-link-mobile.nav-cta-3d.active {
+        color: #ffffff !important;
+        background: linear-gradient(90deg, #f97316, #ef4444) !important;
+        border-left: 0;
+        box-shadow:
+            0 12px 22px rgba(234, 88, 12, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nav-link,
+        .nav-action-3d,
+        .nav-cta-3d,
+        #user-menu-container > .relative > button {
+            transition: none;
+        }
+
+        .nav-link:hover,
+        .nav-action-3d:hover,
+        .nav-cta-3d:hover,
+        #user-menu-container > .relative > button:hover {
+            transform: none;
+        }
+
+        .nav-link::before {
+            transition: none;
+            transform: none;
+        }
+
+        .nav-link-mobile:hover:not(.nav-cta-3d) {
+            transform: none;
+        }
     }
 
     /* Notification styles */
@@ -73,7 +238,7 @@
     }
 </style>
 
-<nav id="navbar" class="fixed w-full top-0 z-50 bg-gradient-to-r from-[#8b5a2b] via-[#a0714f] to-[#8b5a2b] shadow-lg transition-all duration-300">
+<nav id="navbar" class="navbar-3d fixed w-full top-0 z-50 bg-gradient-to-r from-[#fff7ed] via-white to-[#fffbeb] shadow-xl transition-all duration-300">
     <div class="container mx-auto px-3 sm:px-4">
         <div class="flex items-center justify-between h-16 sm:h-18 md:h-20">
             <!-- Logo - Responsive Design -->
@@ -84,11 +249,11 @@
 
                 <!-- Logo Text -->
                 <div class="flex flex-col min-w-0">
-                    <h1 class="font-dancing font-bold text-white group-hover:text-orange-200 transition-colors leading-tight whitespace-nowrap"
+                    <h1 class="font-dancing font-bold text-[#4a2f1d] group-hover:text-orange-600 transition-colors leading-tight whitespace-nowrap"
                         style="font-size: clamp(0.875rem, 4vw, 1.875rem);">
                          Ẩm thực Phương Nam
                     </h1>
-                    <p class="text-xs sm:text-sm text-orange-200 tracking-wide hidden sm:block whitespace-nowrap">Hương vị Vĩnh Long</p>
+                    <p class="text-xs sm:text-sm text-[#b45309] tracking-wide hidden sm:block whitespace-nowrap">Hương vị Vĩnh Long</p>
                 </div>
             </a>
 
@@ -96,25 +261,25 @@
 
             <!-- Desktop Menu -->
             <div class="hidden lg:flex items-center space-x-8">
-                <a href="index.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="index">
+                <a href="index.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="index">
                     <i class="fas fa-home mr-1"></i> Trang chủ
                 </a>
-                <a href="gioi-thieu.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="gioi-thieu">
+                <a href="gioi-thieu.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="gioi-thieu">
                     <i class="fas fa-info-circle mr-1"></i> Giới thiệu
                 </a>
-                <a href="tin-tuc.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="tin-tuc">
+                <a href="tin-tuc.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="tin-tuc">
                     <i class="fas fa-newspaper mr-1"></i> Tin tức
                 </a>
-                <a href="album.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="album">
+                <a href="album.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="album">
                     <i class="fas fa-images mr-1"></i> Album ảnh
                 </a>
-                <a href="thuc-don.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="thuc-don">
+                <a href="thuc-don.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="thuc-don">
                     <i class="fas fa-book-open mr-1"></i> Thực đơn
                 </a>
-                <a href="dat-ban.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="dat-ban">
+                <a href="dat-ban.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="dat-ban">
                     <i class="fas fa-calendar-check mr-1"></i> Đặt bàn
                 </a>
-                <a href="lien-he.html" class="nav-link text-white hover:text-yellow-100 transition font-medium" data-page="lien-he">
+                <a href="lien-he.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="lien-he">
                     <i class="fas fa-phone mr-1"></i> Liên hệ
                 </a>
             </div>
@@ -122,13 +287,13 @@
             <!-- Right Side Actions -->
             <div class="hidden lg:flex items-center space-x-4">
                 <!-- Search -->
-                <button class="text-white hover:text-yellow-100 transition">
+                <button class="nav-action-3d text-[#3f2a1d] hover:text-orange-600 transition">
                     <i class="fas fa-search text-xl"></i>
                 </button>
 
                 <!-- Notification Bell -->
                 <div id="notification-container" class="relative hidden" style="z-index: 9999;">
-                    <button id="notification-btn" class="text-white hover:text-yellow-100 transition relative cursor-pointer">
+                    <button id="notification-btn" class="nav-action-3d text-[#3f2a1d] hover:text-orange-600 transition relative cursor-pointer">
                         <i class="fas fa-bell text-xl"></i>
                         <span id="notification-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
                     </button>
@@ -151,7 +316,7 @@
                 </div>
 
                 <!-- Cart -->
-                <a href="gio-hang.html" class="relative text-white hover:text-yellow-100 transition">
+                <a href="gio-hang.html" class="nav-action-3d relative text-[#3f2a1d] hover:text-orange-600 transition">
                     <i class="fas fa-shopping-cart text-xl"></i>
                     <span id="cart-badge"
                         class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -160,7 +325,7 @@
                 <!-- User Menu - Dynamic Container (sẽ được JS thay thế) -->
                 <div id="user-menu-container" class="relative" style="z-index: 9999;">
                     <!-- Loading placeholder - sẽ được thay thế bởi JavaScript -->
-                    <button class="text-white hover:text-yellow-100 transition">
+                    <button class="nav-action-3d text-[#3f2a1d] hover:text-orange-600 transition">
                         <i class="fas fa-user text-xl"></i>
                     </button>
                 </div>
@@ -169,13 +334,13 @@
             <!-- Mobile Actions (Cart + Menu) -->
             <div class="lg:hidden flex items-center gap-2 sm:gap-3">
                 <!-- Notification Bell Mobile -->
-                <button id="notification-btn-mobile" class="relative text-white hover:text-yellow-100 transition hidden cursor-pointer flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11" style="z-index: 9999;">
+                <button id="notification-btn-mobile" class="nav-action-3d relative text-[#3f2a1d] hover:text-orange-600 transition hidden cursor-pointer flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11" style="z-index: 9999;">
                     <i class="fas fa-bell text-xl sm:text-2xl"></i>
                     <span id="notification-badge-mobile" class="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
                 </button>
 
                 <!-- Cart Icon for Mobile -->
-                <a href="gio-hang.html" class="relative text-white hover:text-yellow-100 transition flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11">
+                <a href="gio-hang.html" class="nav-action-3d relative text-[#3f2a1d] hover:text-orange-600 transition flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11">
                     <i class="fas fa-shopping-cart text-xl sm:text-2xl"></i>
                     <span id="cart-badge-mobile"
                         class="absolute top-0 right-0 bg-orange-500 text-white text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold">0</span>
@@ -183,59 +348,59 @@
 
                 <!-- Mobile Menu Button -->
                 <button id="mobile-menu-btn"
-                    class="text-white hover:text-yellow-100 transition flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11">
+                    class="nav-action-3d text-[#3f2a1d] hover:text-orange-600 transition flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11">
                     <i class="fas fa-bars text-xl sm:text-2xl"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="lg:hidden hidden bg-[#8b5a2b] border-t border-[#6b4423] shadow-md rounded-b-lg pb-4">
+        <div id="mobile-menu" class="lg:hidden hidden bg-[#fffaf0] border-t border-orange-100 shadow-xl rounded-b-lg pb-4">
             <a href="index.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="index">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="index">
                 <i class="fas fa-home mr-2"></i> Trang chủ
             </a>
             <a href="gioi-thieu.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="gioi-thieu">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="gioi-thieu">
                 <i class="fas fa-info-circle mr-2"></i> Giới thiệu
             </a>
             <a href="tin-tuc.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="tin-tuc">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="tin-tuc">
                 <i class="fas fa-newspaper mr-2"></i> Tin tức
             </a>
             <a href="album.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="album">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="album">
                 <i class="fas fa-images mr-2"></i> Album
             </a>
             <a href="thuc-don.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="thuc-don">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="thuc-don">
                 <i class="fas fa-book-open mr-2"></i> Thực đơn
             </a>
             <a href="dat-ban.html"
-                class="nav-link-mobile block py-3 px-4 text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition font-bold rounded-lg my-2 mx-4 text-center shadow-md" data-page="dat-ban">
+                class="nav-link-mobile nav-cta-3d block py-3 px-4 text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transition font-bold rounded-lg my-2 mx-4 text-center shadow-md" data-page="dat-ban">
                 <i class="fas fa-calendar-check mr-2"></i> Đặt bàn
             </a>
             <a href="lien-he.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="lien-he">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="lien-he">
                 <i class="fas fa-envelope mr-2"></i> Liên hệ
             </a>
             <a href="gio-hang.html"
-                class="nav-link-mobile block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="gio-hang">
+                class="nav-link-mobile block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="gio-hang">
                 <i class="fas fa-shopping-cart mr-2"></i> Giỏ hàng
             </a>
             <a href="don-hang-cua-toi.html" id="my-orders-link-mobile"
-                class="nav-link-mobile hidden py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium" data-page="don-hang-cua-toi">
+                class="nav-link-mobile hidden py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium" data-page="don-hang-cua-toi">
                 <i class="fas fa-shopping-bag mr-2"></i> Đơn hàng của tôi
             </a>
-            <hr class="my-2 border-[#6b4423]">
+            <hr class="my-2 border-orange-100">
             <!-- Mobile User Menu - Dynamic -->
             <div id="mobile-user-menu">
                 <a href="dang-nhap.html"
-                    class="block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium">
+                    class="block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                     <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập
                 </a>
                 <a href="dang-ky.html"
-                    class="block py-3 px-4 text-white hover:text-yellow-100 hover:bg-[#a0714f] transition font-medium">
+                    class="block py-3 px-4 text-[#3f2a1d] hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                     <i class="fas fa-user-plus mr-2"></i> Đăng ký
                 </a>
             </div>

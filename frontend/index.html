@@ -13,7 +13,134 @@
     <link rel="stylesheet" href="css/loading.css">
     <link rel="stylesheet" href="css/christmas-intro.css">
     <link rel="stylesheet" href="css/tet-intro.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Pacifico&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
     <style>
+        /* ===== Lời nhắn từ Chủ nhà hàng - Chị Hoàng Thục Linh ===== */
+        /* Tone trầm, dịu mắt cho lời nhắn chủ nhà hàng */
+        .linh-quote-box {
+            background: linear-gradient(145deg, #fffefa 0%, #f8f3eb 58%, #efe6d8 100%);
+            border: 1px solid rgba(151, 130, 104, 0.42);
+            box-shadow:
+                0 18px 36px rgba(56, 43, 31, 0.12),
+                0 5px 12px rgba(60, 50, 40, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.82),
+                inset 0 -1px 0 rgba(122, 98, 73, 0.08);
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .linh-quote-box::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 6px;
+            background: linear-gradient(180deg, #7c6246 0%, #c9b48e 50%, #6f5840 100%);
+            box-shadow: 4px 0 18px rgba(124, 98, 70, 0.18);
+        }
+
+        .linh-quote-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 4% 0%, rgba(188, 163, 124, 0.18), transparent 34%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.62), transparent 50%);
+        }
+
+        .linh-quote-mark {
+            color: #7a6046 !important;
+            opacity: 0.5 !important;
+            text-shadow:
+                1px 1px 0 rgba(238, 228, 212, 0.95),
+                2px 2px 0 rgba(95, 73, 52, 0.18),
+                0 8px 18px rgba(58, 43, 30, 0.18);
+        }
+
+        .linh-owner-avatar {
+            border: 3px solid #c7ad7d !important;
+            box-shadow:
+                0 12px 24px rgba(62, 48, 34, 0.18),
+                0 0 0 5px rgba(255, 255, 255, 0.72),
+                inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        }
+
+        .linh-quote-kicker {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid rgba(128, 101, 68, 0.28);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 226, 211, 0.78));
+            color: #64513f;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow:
+                0 8px 18px rgba(86, 66, 46, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        }
+
+        .linh-quote-text {
+            font-family: 'Inter', 'Nunito', 'Segoe UI', sans-serif;
+            font-style: normal;
+            font-size: 1.02rem;
+            line-height: 1.8;
+            color: #37322d;
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .linh-quote-text .highlight-pn {
+            font-family: inherit;
+            font-style: normal;
+            font-size: 1em;
+            font-weight: 800;
+            color: #5a4634;
+            padding: 0 2px;
+            text-shadow:
+                1px 1px 0 rgba(235, 222, 200, 0.92),
+                2px 2px 0 rgba(99, 79, 55, 0.15),
+                0 6px 12px rgba(70, 52, 34, 0.12);
+        }
+
+        .linh-signature-row {
+            border-top: 1px solid rgba(157, 135, 105, 0.34);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(244, 237, 226, 0.5));
+            border-radius: 0.9rem;
+            padding: 0.8rem 0.9rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        }
+
+        .linh-signature {
+            font-family: 'Inter', 'Nunito', 'Segoe UI', sans-serif;
+            font-size: 1.15rem;
+            line-height: 1.4;
+            color: #44362a;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            text-shadow:
+                1px 1px 0 rgba(236, 225, 207, 0.9),
+                2px 2px 0 rgba(97, 76, 53, 0.16),
+                0 8px 14px rgba(62, 48, 34, 0.16);
+            display: inline-block;
+        }
+
+        .linh-owner-role {
+            color: #6f6256;
+            font-weight: 600;
+            letter-spacing: 0.015em;
+        }
+
+        .linh-signature:hover {
+            transform: none;
+        }
         .hero-section {
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
                 url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920') center/cover;
@@ -61,6 +188,34 @@
         .banner>.container {
             position: relative;
             z-index: 1;
+        }
+
+        .hero-title-3d {
+            color: #fff8e7 !important;
+            -webkit-text-stroke: 1px rgba(255, 223, 168, 0.55);
+            text-shadow:
+                1px 1px 0 #f6c453,
+                2px 2px 0 #d97706,
+                3px 3px 0 #9a3412,
+                4px 4px 0 #7c2d12,
+                5px 5px 0 rgba(67, 20, 7, 0.82),
+                9px 12px 18px rgba(0, 0, 0, 0.76),
+                0 0 28px rgba(255, 237, 213, 0.44) !important;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.42));
+            transform: perspective(760px) rotateX(5deg);
+            transform-origin: center;
+        }
+
+        .hero-title-3d:hover {
+            text-shadow:
+                1px 1px 0 #fde68a,
+                2px 2px 0 #f59e0b,
+                3px 3px 0 #ea580c,
+                4px 4px 0 #c2410c,
+                6px 6px 0 rgba(124, 45, 18, 0.9),
+                12px 16px 24px rgba(0, 0, 0, 0.82),
+                0 0 36px rgba(255, 247, 237, 0.6) !important;
+            filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.5));
         }
 
         /* Animation nhẹ nhàng */
@@ -125,10 +280,111 @@
                 line-height: 2rem !important;
             }
 
+            .hero-title-3d {
+                -webkit-text-stroke: 0.5px rgba(255, 223, 168, 0.5);
+                text-shadow:
+                    1px 1px 0 #f6c453,
+                    2px 2px 0 #d97706,
+                    3px 3px 0 #7c2d12,
+                    6px 8px 12px rgba(0, 0, 0, 0.74),
+                    0 0 20px rgba(255, 237, 213, 0.38) !important;
+            }
+
             .hero-description-mobile {
                 font-size: 0.875rem !important;
                 line-height: 1.5rem !important;
             }
+        }
+
+        /* ===== 3D Card Hover Styles ===== */
+        .card-3d-container {
+            perspective: 1200px;
+            will-change: transform;
+        }
+
+        .card-3d-inner {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .card-shine {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 20;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            mix-blend-mode: overlay;
+            border-radius: inherit;
+        }
+
+        .card-3d-container:hover .card-shine {
+            opacity: 1;
+        }
+
+        .card-3d-container:hover .card-3d-inner {
+            box-shadow: 0 15px 35px rgba(139, 69, 19, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Parallax layering */
+        .card-3d-inner img {
+            transition: transform 0.5s ease;
+            transform: translateZ(5px);
+        }
+
+        .card-3d-container:hover img {
+            transform: scale(1.05) translateZ(-5px);
+        }
+
+        .card-3d-inner .absolute-badge, 
+        .card-3d-inner span.absolute {
+            transform: translateZ(15px);
+            transition: transform 0.3s ease;
+        }
+
+        .card-3d-inner h3 {
+            transform: translateZ(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .card-3d-inner button {
+            transform: translateZ(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .card-3d-container:hover .absolute-badge,
+        .card-3d-container:hover span.absolute {
+            transform: translateZ(25px);
+        }
+
+        .card-3d-container:hover h3 {
+            transform: translateZ(15px);
+        }
+
+        .card-3d-container:hover button {
+            transform: scale(1.05) translateZ(30px);
+        }
+
+        /* ===== Moving Ambient Glows ===== */
+        .ambient-glow-1 {
+            animation: floatGlow1 12s ease-in-out infinite;
+        }
+
+        .ambient-glow-2 {
+            animation: floatGlow2 15s ease-in-out infinite;
+        }
+
+        @keyframes floatGlow1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.15); }
+        }
+
+        @keyframes floatGlow2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, -30px) scale(1.2); }
         }
     </style>
 </head>
@@ -159,7 +415,7 @@
     
     <div class="max-w-2xl">
         <!-- Title -->
-        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl
+        <h1 class="hero-title-3d text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl
             font-sans font-extrabold tracking-wide 
             text-white
             drop-shadow-[0_6px_12px_rgba(0,0,0,0.8)]
@@ -385,6 +641,32 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                             Với chủ đạo là gỗ, cây xanh và ánh sáng tự nhiên, chúng tôi mang lại một không gian ấm cúng,
                             gần gũi – nơi mỗi bữa ăn đều là một trải nghiệm đáng nhớ, trọn vị và đậm tình quê hương.
                         </p>
+
+                        <!-- Lời nhắn từ Chủ nhà hàng -->
+                        <div class="linh-quote-box mt-6 sm:mt-8 relative rounded-2xl p-5 sm:p-7">
+                            <i class="fas fa-quote-left absolute -top-3 left-4 text-3xl sm:text-4xl opacity-25"
+                                style="color: #8a7a68;"></i>
+                            <i class="fas fa-quote-right absolute -bottom-2 right-4 text-2xl sm:text-3xl opacity-20"
+                                style="color: #8a7a68;"></i>
+                            <div class="flex items-start gap-4 pt-3">
+                                <img src="images/HTL.png" alt="Chủ nhà hàng Hoàng Thục Linh"
+                                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover flex-shrink-0"
+                                    style="border: 2px solid #d4cec0; box-shadow: 0 3px 10px rgba(60, 50, 40, 0.18);">
+                                <div class="flex-1 min-w-0">
+                                    <p class="linh-quote-text text-sm sm:text-base mb-4">
+                                        Kính chào quý khách, cảm ơn quý khách đã tin tưởng lựa chọn
+                                        <span class="highlight-pn">Ẩm thực Phương Nam</span>.
+                                        Chúng tôi luôn gìn giữ tinh thần bữa cơm Việt bằng nguồn nguyên liệu tươi,
+                                        cách chế biến chỉn chu và hương vị gần gũi. Mỗi món ăn được chuẩn bị với sự tận tâm,
+                                        để quý khách có một bữa ăn ngon, ấm cúng và trọn vẹn bên gia đình, bạn bè.
+                                    </p>
+                                    <div class="flex items-center gap-3 flex-wrap pt-2" style="border-top: 1px solid #e5e0d6;">
+                                        <span class="linh-signature">Hoàng Thục Linh</span>
+                                        <span class="text-xs sm:text-sm" style="color: #6f6256;">— Chủ nhà hàng Phương Nam</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -665,44 +947,50 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                         const price = new Intl.NumberFormat('vi-VN').format(dish.gia_tien);
                         
                         return `
-                            <div class="card-hover bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
-                                <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
-                                    <div class="relative bg-gray-50">
-                                        <img src="${imageUrl}" alt="${dish.ten_mon}"
-                                            class="w-full h-48 sm:h-56 md:h-64 object-cover"
-                                            onerror="this.src='images/default-food.jpg'">
-                                        <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-medium">
-                                            <i class="fas fa-fire mr-1"></i>Bán chạy
-                                        </span>
-                                        <button onclick="event.preventDefault(); event.stopPropagation();"
-                                            class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition">
-                                            <i class="far fa-heart text-sm sm:text-base"></i>
-                                        </button>
-                                    </div>
-                                </a>
-                                <div class="p-3 sm:p-4">
-                                    <a href="chitietmonan.html?id=${dish.ma_mon}">
-                                        <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition">${dish.ten_mon}</h3>
+                            <div class="card-3d-container">
+                                <div class="card-3d-inner bg-white rounded-xl overflow-hidden shadow-sm">
+                                    <div class="card-shine"></div>
+                                    <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                                        <div class="relative bg-gray-50 overflow-hidden">
+                                            <img src="${imageUrl}" alt="${dish.ten_mon}"
+                                                class="w-full h-48 sm:h-56 md:h-64 object-cover"
+                                                onerror="this.src='images/default-food.jpg'">
+                                            <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-medium absolute-badge">
+                                                <i class="fas fa-fire mr-1"></i>Bán chạy
+                                            </span>
+                                            <button onclick="event.preventDefault(); event.stopPropagation();"
+                                                class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition">
+                                                <i class="far fa-heart text-sm sm:text-base"></i>
+                                            </button>
+                                        </div>
                                     </a>
-                                    <div class="flex items-center mb-2">
-                                        <div class="text-yellow-400 text-xs sm:text-sm">
-                                            ${renderStarsHome(Number(dish.avg_rating) || 0)}
+                                    <div class="p-3 sm:p-4">
+                                        <a href="chitietmonan.html?id=${dish.ma_mon}">
+                                            <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
+                                        </a>
+                                        <div class="flex items-center mb-2">
+                                            <div class="text-yellow-400 text-xs sm:text-sm">
+                                                ${renderStarsHome(Number(dish.avg_rating) || 0)}
+                                            </div>
+                                            <span class="text-gray-500 text-xs sm:text-sm ml-2">(${Number(dish.total_reviews) || 0} đánh giá)</span>
                                         </div>
-                                        <span class="text-gray-500 text-xs sm:text-sm ml-2">(${Number(dish.total_reviews) || 0} đánh giá)</span>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <span class="text-orange-600 font-bold text-lg sm:text-xl">${price}đ</span>
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <span class="text-orange-600 font-bold text-lg sm:text-xl">${price}đ</span>
+                                            </div>
+                                            <button onclick="addToCartFromFeatured(${dish.ma_mon}, '${dish.ten_mon.replace(/'/g, "\\'")}', ${dish.gia_tien}, '${imageUrl}')"
+                                                class="bg-orange-500 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-orange-600 transition flex items-center justify-center">
+                                                <i class="fas fa-plus text-sm sm:text-base"></i>
+                                            </button>
                                         </div>
-                                        <button onclick="addToCartFromFeatured(${dish.ma_mon}, '${dish.ten_mon.replace(/'/g, "\\'")}', ${dish.gia_tien}, '${imageUrl}')"
-                                            class="bg-orange-500 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-orange-600 transition">
-                                            <i class="fas fa-plus text-sm sm:text-base"></i>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
                         `;
                     }).join('');
+                    if (window.initHome3DTiltEffects) {
+                        window.initHome3DTiltEffects();
+                    }
                 } else {
                     container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Chưa có dữ liệu món ăn bán chạy</p>';
                 }
@@ -810,39 +1098,48 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                         }
                         
                         return `
-                            <div class="card-hover bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
-                                <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
-                                    <div class="relative bg-gray-50">
-                                        <img src="${imageUrl}" alt="${dish.ten_mon}"
-                                            class="w-full h-48 sm:h-56 md:h-64 object-cover"
-                                            onerror="this.src='images/default-food.jpg'">
-                                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4 opacity-0 hover:opacity-100 transition-opacity flex justify-center items-end">
-                                            <p class="text-white text-xs sm:text-sm text-center truncate">${dish.reason || 'Món ngon dành cho bạn'}</p>
+                            <div class="card-3d-container">
+                                <div class="card-3d-inner bg-white rounded-xl overflow-hidden shadow-sm">
+                                    <div class="card-shine"></div>
+                                    <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                                        <div class="relative bg-gray-50 overflow-hidden">
+                                            <img src="${imageUrl}" alt="${dish.ten_mon}"
+                                                class="w-full h-48 sm:h-56 md:h-64 object-cover"
+                                                onerror="this.src='images/default-food.jpg'">
+                                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4 opacity-0 hover:opacity-100 transition-opacity flex justify-center items-end">
+                                                <p class="text-white text-xs sm:text-sm text-center truncate">${dish.reason || 'Món ngon dành cho bạn'}</p>
+                                            </div>
+                                            <span class="absolute top-2 left-2 sm:top-3 sm:left-3 ${badgeColor} text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-medium absolute-badge">
+                                                <i class="fas ${badgeIcon} mr-1"></i>${badgeText}
+                                            </span>
                                         </div>
-                                    </div>
-                                </a>
-                                <div class="p-3 sm:p-4">
-                                    <a href="chitietmonan.html?id=${dish.ma_mon}">
-                                        <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
                                     </a>
-                                    <div class="flex items-center mb-2">
-                                        <div class="text-yellow-400 text-xs sm:text-sm">
-                                            ${renderStarsHome(Number(dish.avg_rating) || 5)}
+                                    <div class="p-3 sm:p-4">
+                                        <a href="chitietmonan.html?id=${dish.ma_mon}">
+                                            <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
+                                        </a>
+                                        <div class="flex items-center mb-2">
+                                            <div class="text-yellow-400 text-xs sm:text-sm">
+                                                ${renderStarsHome(Number(dish.avg_rating) || 5)}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <span class="text-orange-600 font-bold text-lg sm:text-xl">${price}đ</span>
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <span class="text-orange-600 font-bold text-lg sm:text-xl">${price}đ</span>
+                                            </div>
+                                            <button onclick="addToCartFromFeatured(${dish.ma_mon}, '${dish.ten_mon.replace(/'/g, "\\'")}', ${dish.gia_tien}, '${imageUrl}')"
+                                                class="bg-orange-500 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-orange-600 transition shadow-sm hover:shadow-md flex items-center justify-center">
+                                                <i class="fas fa-plus text-sm sm:text-base"></i>
+                                            </button>
                                         </div>
-                                        <button onclick="addToCartFromFeatured(${dish.ma_mon}, '${dish.ten_mon.replace(/'/g, "\\'")}', ${dish.gia_tien}, '${imageUrl}')"
-                                            class="bg-orange-500 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-orange-600 transition shadow-sm hover:shadow-md flex items-center justify-center">
-                                            <i class="fas fa-plus text-sm sm:text-base"></i>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
                         `;
                     }).join('');
+                    if (window.initHome3DTiltEffects) {
+                        window.initHome3DTiltEffects();
+                    }
                 } else {
                     container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Chưa có đủ dữ liệu để gợi ý. Hãy đặt món để chúng tôi hiểu bạn hơn!</p>';
                 }
@@ -869,12 +1166,12 @@ relative overflow-hidden">
     </div>
 
     <!-- Hiệu ứng ánh sáng 3D -->
-    <div class="absolute inset-0 pointer-events-none z-[1]">
-        <div class="absolute top-[-80px] left-[-80px] w-[350px] h-[350px] 
-        bg-white/30 blur-3xl rounded-full"></div>
+    <div class="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+        <div class="ambient-glow-1 absolute top-[-80px] left-[-80px] w-[350px] h-[350px] 
+        bg-white/35 blur-3xl rounded-full"></div>
 
-        <div class="absolute bottom-[-80px] right-[-80px] w-[350px] h-[350px] 
-        bg-orange-200/20 blur-3xl rounded-full"></div>
+        <div class="ambient-glow-2 absolute bottom-[-80px] right-[-80px] w-[350px] h-[350px] 
+        bg-orange-300/20 blur-3xl rounded-full"></div>
     </div>
 
     <div class="container mx-auto px-4 relative z-10">
@@ -897,12 +1194,10 @@ relative overflow-hidden">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
 
             <!-- CARD ITEM -->
-            <div class="flex flex-col items-center group">
+            <div class="flex flex-col items-center group card-3d-container">
 
-                <div class="relative w-full max-w-[280px] mb-6 
-                transform transition-all duration-300 
-                group-hover:-translate-y-3 group-hover:scale-105">
-
+                <div class="relative w-full max-w-[280px] mb-6 card-3d-inner">
+                    <div class="card-shine"></div>
                     <div class="relative bg-gradient-to-br from-[#8B4513] to-[#654321] p-3 
                     [clip-path:polygon(12%_0%,88%_0%,100%_12%,100%_88%,88%_100%,12%_100%,0%_88%,0%_12%)]
                     shadow-[0_15px_40px_rgba(0,0,0,0.4)]">
@@ -931,10 +1226,9 @@ relative overflow-hidden">
 
 
                 <!-- Món 2: Cà nướng Tây Bắc -->
-                <div class="flex flex-col items-center group">
-                    <div class="relative w-full max-w-[280px] mb-6 
-                    transform transition-all duration-300 
-                    group-hover:-translate-y-3 group-hover:scale-105">
+                <div class="flex flex-col items-center group card-3d-container">
+                    <div class="relative w-full max-w-[280px] mb-6 card-3d-inner">
+                        <div class="card-shine"></div>
                         <div class="relative bg-gradient-to-br from-[#8B4513] to-[#654321] p-3 
                                     [clip-path:polygon(12%_0%,88%_0%,100%_12%,100%_88%,88%_100%,12%_100%,0%_88%,0%_12%)]
                                     shadow-[0_15px_40px_rgba(0,0,0,0.4)]">
@@ -959,10 +1253,9 @@ relative overflow-hidden">
                 </div>
 
                 <!-- Món 3: Tôm càng sông sốt chanh dây -->
-                <div class="flex flex-col items-center group">
-                    <div class="relative w-full max-w-[280px] mb-6 
-                    transform transition-all duration-300 
-                    group-hover:-translate-y-3 group-hover:scale-105">
+                <div class="flex flex-col items-center group card-3d-container">
+                    <div class="relative w-full max-w-[280px] mb-6 card-3d-inner">
+                        <div class="card-shine"></div>
                         <div class="relative bg-gradient-to-br from-[#8B4513] to-[#654321] p-3 
                                     [clip-path:polygon(12%_0%,88%_0%,100%_12%,100%_88%,88%_100%,12%_100%,0%_88%,0%_12%)]
                                     shadow-[0_15px_40px_rgba(0,0,0,0.4)]">
@@ -986,10 +1279,9 @@ relative overflow-hidden">
                 </div>
 
                 <!-- Món 4: Lẩu thái đại dương -->
-                <div class="flex flex-col items-center group">
-                    <div class="relative w-full max-w-[280px] mb-6 
-                    transform transition-all duration-300 
-                    group-hover:-translate-y-3 group-hover:scale-105">
+                <div class="flex flex-col items-center group card-3d-container">
+                    <div class="relative w-full max-w-[280px] mb-6 card-3d-inner">
+                        <div class="card-shine"></div>
                         <div class="relative bg-gradient-to-br from-[#8B4513] to-[#654321] p-3 
                                     [clip-path:polygon(12%_0%,88%_0%,100%_12%,100%_88%,88%_100%,12%_100%,0%_88%,0%_12%)]
                                     shadow-[0_15px_40px_rgba(0,0,0,0.4)]">
@@ -1026,24 +1318,30 @@ relative overflow-hidden">
                 <!-- Ảnh dọc bên trái (chiếm 2 cột) -->
                 <div class="lg:col-span-2 order-2 lg:order-1 space-y-6">
                     <!-- Ảnh 1 -->
-                    <div class="relative max-w-sm mx-auto lg:mx-0">
-                        <div class="absolute -top-3 -left-3 w-full h-full bg-gradient-to-br from-orange-200 to-orange-300 rounded-2xl"></div>
-                        <img src="images/nv.jpg" alt="Đội ngũ nhà hàng Phương Nam" 
-                            class="relative w-full aspect-[3/4] object-cover rounded-2xl shadow-xl"
-                            onerror="this.src='images/gt1.jpg'">
-                        <div class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                            <p class="text-center text-sm font-medium text-gray-800">Giàn nhân viên trai xinh gái đẹp nhà Linh ạ</p>
+                    <div class="relative max-w-sm mx-auto lg:mx-0 card-3d-container">
+                        <div class="card-3d-inner">
+                            <div class="card-shine"></div>
+                            <div class="absolute -top-3 -left-3 w-full h-full bg-gradient-to-br from-orange-200 to-orange-300 rounded-2xl"></div>
+                            <img src="images/nv.jpg" alt="Đội ngũ nhà hàng Phương Nam" 
+                                class="relative w-full aspect-[3/4] object-cover rounded-2xl shadow-xl"
+                                onerror="this.src='images/gt1.jpg'">
+                            <div class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg absolute-badge">
+                                <p class="text-center text-sm font-medium text-gray-800">Giàn nhân viên trai xinh gái đẹp nhà Linh ạ</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Ảnh 2 -->
-                    <div class="relative max-w-sm mx-auto lg:mx-0">
-                        <div class="absolute -top-3 -left-3 w-full h-full bg-gradient-to-br from-orange-200 to-orange-300 rounded-2xl"></div>
-                        <img src="images/nv2.jpg" alt="Đội ngũ nhà hàng Phương Nam 2" 
-                            class="relative w-full aspect-[3/4] object-cover rounded-2xl shadow-xl"
-                            onerror="this.src='images/gt2.jpg'">
-                        <div class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                            <p class="text-center text-sm font-medium text-gray-800">Đội ngũ chuyên nghiệp và nhiệt tình</p>
+                    <div class="relative max-w-sm mx-auto lg:mx-0 card-3d-container">
+                        <div class="card-3d-inner">
+                            <div class="card-shine"></div>
+                            <div class="absolute -top-3 -left-3 w-full h-full bg-gradient-to-br from-orange-200 to-orange-300 rounded-2xl"></div>
+                            <img src="images/nv2.jpg" alt="Đội ngũ nhà hàng Phương Nam 2" 
+                                class="relative w-full aspect-[3/4] object-cover rounded-2xl shadow-xl"
+                                onerror="this.src='images/gt2.jpg'">
+                            <div class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg absolute-badge">
+                                <p class="text-center text-sm font-medium text-gray-800">Đội ngũ chuyên nghiệp và nhiệt tình</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1124,12 +1422,12 @@ relative overflow-hidden">
         </div>
 
         <!-- Hiệu ứng ánh sáng 3D -->
-        <div class="absolute inset-0 pointer-events-none z-[1]">
-            <div class="absolute top-[-80px] left-[-80px] w-[350px] h-[350px] 
-            bg-white/30 blur-3xl rounded-full"></div>
+        <div class="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+            <div class="ambient-glow-1 absolute top-[-80px] left-[-80px] w-[350px] h-[350px] 
+            bg-white/35 blur-3xl rounded-full"></div>
 
-            <div class="absolute bottom-[-80px] right-[-80px] w-[350px] h-[350px] 
-            bg-orange-200/20 blur-3xl rounded-full"></div>
+            <div class="ambient-glow-2 absolute bottom-[-80px] right-[-80px] w-[350px] h-[350px] 
+            bg-orange-300/20 blur-3xl rounded-full"></div>
         </div>
         
         <div class="container mx-auto px-4 relative z-10">
@@ -1268,43 +1566,46 @@ relative overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 max-w-7xl mx-auto mb-10 sm:mb-12">
 
                 <!-- Image 1 -->
-                <div class="group relative">
+                <div class="group relative card-3d-container">
                     <div
                         class="absolute -inset-2 bg-gradient-to-br from-orange-400 to-red-400 rounded-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-300">
                     </div>
-                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl transform group-hover:scale-105 transition-all duration-300"
+                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl card-3d-inner"
                         style="border: 8px solid #8B4513; border-style: double;">
+                        <div class="card-shine"></div>
                         <div class="aspect-[3/4] overflow-hidden">
                             <img src="images/kg1.jpg" alt="Không gian nhà hàng 1"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
 
                 <!-- Image 2 -->
-                <div class="group relative">
+                <div class="group relative card-3d-container">
                     <div
                         class="absolute -inset-2 bg-gradient-to-br from-orange-400 to-red-400 rounded-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-300">
                     </div>
-                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl transform group-hover:scale-105 transition-all duration-300"
+                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl card-3d-inner"
                         style="border: 8px solid #8B4513; border-style: double;">
+                        <div class="card-shine"></div>
                         <div class="aspect-[3/4] overflow-hidden">
                             <img src="images/kg2.jpg" alt="Không gian nhà hàng 2"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
 
                 <!-- Image 3 -->
-                <div class="group relative">
+                <div class="group relative card-3d-container">
                     <div
                         class="absolute -inset-2 bg-gradient-to-br from-orange-400 to-red-400 rounded-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-300">
                     </div>
-                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl transform group-hover:scale-105 transition-all duration-300"
+                    <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl card-3d-inner"
                         style="border: 8px solid #8B4513; border-style: double;">
+                        <div class="card-shine"></div>
                         <div class="aspect-[3/4] overflow-hidden">
                             <img src="images/kg3.jpg" alt="Không gian nhà hàng 3"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
@@ -2080,6 +2381,72 @@ relative overflow-hidden">
                 closePreferenceModal();
             }
         }
+    </script>
+
+    <script>
+        // 3D Card Tilt Interaction for Homepage
+        window.initHome3DTiltEffects = function() {
+            // Filter out touch devices
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouchDevice) return;
+
+            const containers = document.querySelectorAll('.card-3d-container');
+            containers.forEach(container => {
+                // Prevent duplicate listener binding
+                if (container.dataset.tiltInitialized) return;
+                container.dataset.tiltInitialized = "true";
+
+                const inner = container.querySelector('.card-3d-inner');
+                const shine = container.querySelector('.card-shine');
+                if (!inner) return;
+
+                let bounds;
+
+                container.addEventListener('mouseenter', () => {
+                    bounds = container.getBoundingClientRect();
+                    inner.style.transition = 'transform 0.1s ease-out, box-shadow 0.3s ease';
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!bounds) bounds = container.getBoundingClientRect();
+                    const mouseX = e.clientX;
+                    const mouseY = e.clientY;
+                    
+                    const leftX = mouseX - bounds.left;
+                    const topY = mouseY - bounds.top;
+                    
+                    const cardX = leftX - bounds.width / 2;
+                    const cardY = topY - bounds.height / 2;
+                    
+                    const maxTilt = 10; // Comfortable tilt angle
+                    
+                    const angleX = -(cardY / (bounds.height / 2)) * maxTilt;
+                    const angleY = (cardX / (bounds.width / 2)) * maxTilt;
+                    
+                    inner.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+                    
+                    if (shine) {
+                        const px = (leftX / bounds.width) * 100;
+                        const py = (topY / bounds.height) * 100;
+                        shine.style.setProperty('--x', `${px}%`);
+                        shine.style.setProperty('--y', `${py}%`);
+                    }
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    bounds = null;
+                    inner.style.transition = 'transform 0.5s ease-out, box-shadow 0.3s ease';
+                    inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                });
+            });
+        };
+
+        // Initialize on page load for static cards
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.initHome3DTiltEffects();
+            }, 500);
+        });
     </script>
 </body>
 

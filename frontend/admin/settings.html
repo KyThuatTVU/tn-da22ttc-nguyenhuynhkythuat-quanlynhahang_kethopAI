@@ -231,6 +231,10 @@
                                 <div class="flex items-center space-x-3"><span class="text-xl">🌸</span><div><p class="font-medium text-slate-700">Hoa Mai Rơi</p></div></div>
                                 <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="hieu_ung_hoa_mai" onchange="saveEffectSetting('hieu_ung_hoa_mai', this.checked)" class="sr-only peer"><div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label>
                             </div>
+                            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                <div class="flex items-center space-x-3"><span class="text-xl">🌼</span><div><p class="font-medium text-slate-700">Hoa Osaka Vàng Rơi (Hè Miền Tây)</p></div></div>
+                                <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="hieu_ung_hoa_osaka_admin" onchange="saveEffectSetting('hieu_ung_hoa_osaka_admin', this.checked)" class="sr-only peer"><div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label>
+                            </div>
                             <div class="flex flex-wrap gap-2 pt-2">
                                 <button onclick="previewChristmasIntro()" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">Xem intro Giáng sinh</button>
                                 <button onclick="previewTetIntro()" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium">Xem intro Tết</button>
@@ -439,6 +443,7 @@
                 document.getElementById('hieu_ung_intro_tet').checked = data.hieu_ung_intro_tet === '1';
                 document.getElementById('hieu_ung_tuyet').checked = data.hieu_ung_tuyet === '1';
                 document.getElementById('hieu_ung_hoa_mai').checked = data.hieu_ung_hoa_mai === '1';
+                document.getElementById('hieu_ung_hoa_osaka_admin').checked = data.hieu_ung_hoa_osaka_admin === '1';
             } catch (e) { console.error(e); }
         }
 
@@ -479,7 +484,12 @@
         async function saveBusinessHours() { const res = await saveBulk({ gio_mo_cua_t2_t6: `${document.getElementById('gio_mo_t2t6').value}-${document.getElementById('gio_dong_t2t6').value}`, gio_mo_cua_t7_cn: `${document.getElementById('gio_mo_t7cn').value}-${document.getElementById('gio_dong_t7cn').value}` }); alert(res.success ? 'Đã lưu' : 'Lỗi'); }
         async function saveDeliverySettings() { const res = await saveBulk({ cho_phep_giao_hang: document.getElementById('cho_phep_giao_hang').checked ? '1' : '0', phi_giao_hang: document.getElementById('phi_giao_hang').value, mien_phi_giao_hang_tu: document.getElementById('mien_phi_giao_hang_tu').value }); alert(res.success ? 'Đã lưu' : 'Lỗi'); }
         async function saveSocialMedia() { const res = await saveBulk({ facebook_url: document.getElementById('facebook_url').value, youtube_url: document.getElementById('youtube_url').value }); alert(res.success ? 'Đã lưu' : 'Lỗi'); }
-        async function saveEffectSetting(k, v) { await fetch(`${API_URL}/settings/${k}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ value: v ? '1' : '0' }), credentials: 'include' }); }
+        async function saveEffectSetting(k, v) {
+            await fetch(`${API_URL}/settings/${k}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ value: v ? '1' : '0' }), credentials: 'include' });
+            if (k === 'hieu_ung_hoa_osaka_admin' && window.OsakaFlowerEffect) {
+                window.OsakaFlowerEffect.refresh();
+            }
+        }
 
         function previewChristmasIntro() { if (!window.ChristmasIntro) { const s = document.createElement('script'); s.src = '../js/christmas-intro.js'; s.onload = () => window.ChristmasIntro.show(); document.head.appendChild(s); } else window.ChristmasIntro.show(); }
         function previewTetIntro() { if (!window.TetIntro) { const s = document.createElement('script'); s.src = '../js/tet-intro.js'; s.onload = () => window.TetIntro.show(); document.head.appendChild(s); } else window.TetIntro.show(); }

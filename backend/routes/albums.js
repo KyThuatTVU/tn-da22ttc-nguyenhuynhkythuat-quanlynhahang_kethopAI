@@ -196,46 +196,68 @@ const requireAdmin = (req, res, next) => {
     }
 };
 
-// Thêm ảnh vào album (Admin) - hỗ trợ upload nhiều ảnh
+// Thêm ảnh vào album (Admin) - hỗ trợ upload nhiều ảnh hoặc dán link
 router.post('/', requireAdmin, upload.array('images', 10), async (req, res) => {
     try {
-        const { loai_anh, mo_ta } = req.body;
+        const { loai_anh, mo_ta, upload_method, image_urls } = req.body;
         const files = req.files;
         
-        if (!files || files.length === 0) {
-            return res.status(400).json({ success: false, message: 'Vui lòng chọn ít nhất 1 ảnh' });
+        let urlsToSave = [];
+        
+        if (upload_method === 'link') {
+            if (!image_urls || image_urls.trim() === '') {
+                return res.status(400).json({ success: false, message: 'Vui lòng nhập ít nhất 1 link ảnh' });
+            }
+            urlsToSave = image_urls.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            if (urlsToSave.length === 0) {
+                return res.status(400).json({ success: false, message: 'Link ảnh không hợp lệ' });
+            }
+        } else {
+            if (!files || files.length === 0) {
+                return res.status(400).json({ success: false, message: 'Vui lòng chọn ít nhất 1 ảnh' });
+            }
+            urlsToSave = files.map(f => f.filename);
         }
         
         const insertedIds = [];
         
-        for (const file of files) {
+        for (const url of urlsToSave) {
             // Sử dụng NOW() của MySQL để lấy thời gian chính xác theo server
             const [result] = await db.query(
                 `INSERT INTO album_anh (duong_dan_anh, loai_anh, mo_ta, ngay_tao) 
                  VALUES (?, ?, ?, NOW())`,
-                [file.filename, loai_anh || 'khac', mo_ta || '']
+                [url, loai_anh || 'khac', mo_ta || '']
             );
             insertedIds.push(result.insertId);
         }
         
-        res.json({ success: true, message: `Thêm ${files.length} ảnh thành công`, ids: insertedIds });
+        res.json({ success: true, message: `Thêm ${urlsToSave.length} ảnh thành công`, ids: insertedIds });
     } catch (error) {
         console.error('Error adding album:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// Cập nhật thông tin ảnh (Admin) - hỗ trợ upload ảnh mới
+// Cập nhật thông tin ảnh (Admin) - hỗ trợ upload ảnh mới hoặc dán link
 router.put('/:id', requireAdmin, upload.single('image'), async (req, res) => {
     try {
-        const { loai_anh, mo_ta } = req.body;
+        const { loai_anh, mo_ta, edit_method, image_url } = req.body;
         const newImage = req.file ? req.file.filename : null;
         
+        let targetUrl = null;
+        
+        if (edit_method === 'link' && image_url && image_url.trim() !== '') {
+            targetUrl = image_url.trim();
+        } else if (newImage) {
+            targetUrl = newImage;
+        }
+        
         let query, params;
-        if (newImage) {
+        if (targetUrl) {
             // Có ảnh mới
             query = `UPDATE album_anh SET duong_dan_anh = ?, loai_anh = ?, mo_ta = ? WHERE ma_album = ?`;
-            params = [newImage, loai_anh, mo_ta || '', req.params.id];
+            params = [targetUrl, loai_anh, mo_ta || '', req.params.id];
         } else {
             // Không có ảnh mới
             query = `UPDATE album_anh SET loai_anh = ?, mo_ta = ? WHERE ma_album = ?`;

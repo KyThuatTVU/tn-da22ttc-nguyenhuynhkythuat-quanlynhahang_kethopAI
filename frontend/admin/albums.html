@@ -33,11 +33,12 @@
                 </div>
 
                 <!-- Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
                     <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Tổng ảnh</p><p id="stat-total" class="text-2xl font-bold text-slate-800">0</p></div><div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center"><i class="fas fa-images text-slate-600 text-xl"></i></div></div></div>
                     <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Món ăn</p><p id="stat-food" class="text-2xl font-bold text-amber-600">0</p></div><div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center"><i class="fas fa-utensils text-amber-600 text-xl"></i></div></div></div>
                     <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Không gian</p><p id="stat-space" class="text-2xl font-bold text-blue-600">0</p></div><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-store text-blue-600 text-xl"></i></div></div></div>
                     <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Sự kiện</p><p id="stat-event" class="text-2xl font-bold text-emerald-600">0</p></div><div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-alt text-emerald-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Khách hàng</p><p id="stat-customer" class="text-2xl font-bold text-purple-600">0</p></div><div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fas fa-users text-purple-600 text-xl"></i></div></div></div>
                 </div>
 
                 <!-- Filters -->
@@ -49,7 +50,7 @@
                             <option value="mon_an">Món ăn</option>
                             <option value="khong_gian">Không gian</option>
                             <option value="su_kien">Sự kiện</option>
-                            <option value="khac">Khác</option>
+                            <option value="khach_hang">Khách hàng</option>
                         </select>
                         <input type="date" id="date-filter" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
                         <button onclick="applyFilters()" class="bg-slate-800 text-white px-4 py-2.5 rounded-xl hover:bg-slate-900"><i class="fas fa-filter mr-2"></i>Lọc</button>
@@ -72,8 +73,32 @@
                 <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
             <form id="upload-form" class="p-6 space-y-4">
-                <div><label class="block text-sm font-medium text-slate-700 mb-2">Chọn ảnh *</label><input type="file" id="images" name="images" accept="image/*" multiple required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl"><p class="text-xs text-slate-500 mt-1">Có thể chọn nhiều ảnh</p></div>
-                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="">Chọn loại ảnh</option><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khac">Khác</option></select></div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Phương thức thêm ảnh *</label>
+                    <div class="flex space-x-4 mb-3">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="upload_method" value="file" checked class="form-radio text-blue-600" onchange="toggleUploadMethod('upload', 'file')">
+                            <span class="ml-2">Tải file từ máy</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="upload_method" value="link" class="form-radio text-blue-600" onchange="toggleUploadMethod('upload', 'link')">
+                            <span class="ml-2">Dán link ảnh</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="upload-file-group">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Chọn ảnh *</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-slate-500 mt-1">Có thể chọn nhiều ảnh</p>
+                </div>
+
+                <div id="upload-link-group" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Link ảnh *</label>
+                    <textarea id="image_urls" name="image_urls" rows="3" placeholder="Dán các link ảnh vào đây, mỗi link 1 dòng..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea>
+                    <p class="text-xs text-slate-500 mt-1">Hỗ trợ nhiều link ảnh, xuống dòng cho mỗi link</p>
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="">Chọn loại ảnh</option><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khach_hang">Khách hàng</option></select></div>
                 <div><label class="block text-sm font-medium text-slate-700 mb-2">Mô tả</label><textarea id="mo_ta" name="mo_ta" rows="3" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea></div>
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="closeModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
@@ -103,14 +128,32 @@
                 <input type="hidden" id="edit-id" name="id">
                 <div class="text-center mb-4">
                     <img id="edit-preview" src="" alt="" class="w-48 h-48 object-cover rounded-xl mx-auto border-2 border-slate-200">
-                    <label class="mt-3 inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl cursor-pointer hover:bg-blue-100 transition">
-                        <i class="fas fa-camera mr-2"></i>
-                        <span>Thay đổi ảnh</span>
-                        <input type="file" id="edit-image" name="image" accept="image/*" class="hidden" onchange="previewEditImage(this)">
-                    </label>
-                    <p class="text-xs text-slate-400 mt-1">Để trống nếu không muốn thay đổi ảnh</p>
+                    <p class="text-xs text-slate-400 mt-2 mb-3">Chỉ chọn nếu muốn thay đổi ảnh</p>
+
+                    <div class="flex justify-center space-x-4 mb-3">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="edit_method" value="file" checked class="form-radio text-blue-600" onchange="toggleUploadMethod('edit', 'file')">
+                            <span class="ml-2 text-sm">File từ máy</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="edit_method" value="link" class="form-radio text-blue-600" onchange="toggleUploadMethod('edit', 'link')">
+                            <span class="ml-2 text-sm">Dán link ảnh</span>
+                        </label>
+                    </div>
+
+                    <div id="edit-file-group">
+                        <label class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl cursor-pointer hover:bg-blue-100 transition">
+                            <i class="fas fa-camera mr-2"></i>
+                            <span>Chọn file ảnh</span>
+                            <input type="file" id="edit-image" name="image" accept="image/*" class="hidden" onchange="previewEditImage(this)">
+                        </label>
+                    </div>
+
+                    <div id="edit-link-group" class="hidden text-left mt-2 px-6">
+                        <input type="url" id="edit_image_url" name="image_url" placeholder="Dán link ảnh mới..." class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm" oninput="if(this.value) document.getElementById('edit-preview').src = this.value">
+                    </div>
                 </div>
-                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="edit-loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khac">Khác</option></select></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="edit-loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khach_hang">Khách hàng</option></select></div>
                 <div><label class="block text-sm font-medium text-slate-700 mb-2">Mô tả</label><textarea id="edit-mo_ta" name="mo_ta" rows="3" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea></div>
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
@@ -162,12 +205,13 @@
             document.getElementById('stat-food').textContent = albums.filter(a => a.loai_anh === 'mon_an').length;
             document.getElementById('stat-space').textContent = albums.filter(a => a.loai_anh === 'khong_gian').length;
             document.getElementById('stat-event').textContent = albums.filter(a => a.loai_anh === 'su_kien').length;
+            document.getElementById('stat-customer').textContent = albums.filter(a => a.loai_anh === 'khach_hang').length;
         }
 
         function renderAlbums(items) {
             const container = document.getElementById('albums-container');
             if (items.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-12">Chưa có ảnh</div>`; return; }
-            const typeName = { 'mon_an': 'Món ăn', 'khong_gian': 'Không gian', 'su_kien': 'Sự kiện', 'khac': 'Khác' };
+            const typeName = { 'mon_an': 'Món ăn', 'khong_gian': 'Không gian', 'su_kien': 'Sự kiện', 'khach_hang': 'Khách hàng', 'khac': 'Khác' };
             container.innerHTML = items.map(album => `
                 <div class="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition">
                     <div class="aspect-square"><img src="${getImageUrl(album.duong_dan_anh)}" class="w-full h-full object-cover cursor-pointer" onclick="previewImage(${album.ma_album})"></div>
@@ -185,7 +229,13 @@
                 </div>`).join('');
         }
 
-        function openUploadModal() { document.getElementById('upload-form').reset(); document.getElementById('upload-modal').classList.remove('hidden'); }
+        function openUploadModal() { 
+            const form = document.getElementById('upload-form');
+            form.reset(); 
+            document.querySelector('input[name="upload_method"][value="file"]').checked = true;
+            toggleUploadMethod('upload', 'file');
+            document.getElementById('upload-modal').classList.remove('hidden'); 
+        }
         function closeModal() { document.getElementById('upload-modal').classList.add('hidden'); }
         function closePreview() { document.getElementById('preview-modal').classList.add('hidden'); }
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
@@ -205,10 +255,35 @@
             document.getElementById('edit-loai_anh').value = a.loai_anh || 'khac';
             document.getElementById('edit-mo_ta').value = a.mo_ta || '';
             document.getElementById('edit-preview').src = getImageUrl(a.duong_dan_anh);
+            document.getElementById('edit_image_url').value = '';
+            document.getElementById('edit-image').value = '';
+            document.querySelector('input[name="edit_method"][value="file"]').checked = true;
+            toggleUploadMethod('edit', 'file');
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
         function previewEditImage(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = e => document.getElementById('edit-preview').src = e.target.result; r.readAsDataURL(input.files[0]); } }
+
+        function toggleUploadMethod(formName, method) {
+            if (formName === 'upload') {
+                if (method === 'link') {
+                    document.getElementById('upload-file-group').classList.add('hidden');
+                    document.getElementById('upload-link-group').classList.remove('hidden');
+                    document.getElementById('images').required = false;
+                } else {
+                    document.getElementById('upload-file-group').classList.remove('hidden');
+                    document.getElementById('upload-link-group').classList.add('hidden');
+                }
+            } else if (formName === 'edit') {
+                if (method === 'link') {
+                    document.getElementById('edit-file-group').classList.add('hidden');
+                    document.getElementById('edit-link-group').classList.remove('hidden');
+                } else {
+                    document.getElementById('edit-file-group').classList.remove('hidden');
+                    document.getElementById('edit-link-group').classList.add('hidden');
+                }
+            }
+        }
 
         async function deleteAlbum(id) {
             if (!confirm('Xóa ảnh này?')) return;
@@ -218,17 +293,34 @@
         document.getElementById('upload-form').addEventListener('submit', async e => {
             e.preventDefault();
             const fd = new FormData(e.target);
-            for (let f of document.getElementById('images').files) fd.append('images', f);
-            try { const res = await fetch(`${API_URL}/albums`, { method: 'POST', body: fd, credentials: 'include' }); if ((await res.json()).success) { closeModal(); loadAlbums(); } } catch (e) { console.error(e); }
+            // fd already captures "upload_method", "image_urls", "loai_anh", "mo_ta".
+            // file input "images" is also captured automatically.
+            try { 
+                const res = await fetch(`${API_URL}/albums`, { method: 'POST', body: fd, credentials: 'include' }); 
+                const data = await res.json();
+                if (data.success) { 
+                    closeModal(); 
+                    loadAlbums(); 
+                } else {
+                    alert(data.message || 'Lỗi khi tải lên');
+                }
+            } catch (err) { console.error(err); }
         });
 
         document.getElementById('edit-form').addEventListener('submit', async e => {
             e.preventDefault();
             const id = document.getElementById('edit-id').value;
             const fd = new FormData(e.target);
-            const f = document.getElementById('edit-image').files[0];
-            if (f) fd.append('image', f);
-            try { const res = await fetch(`${API_URL}/albums/${id}`, { method: 'PUT', body: fd, credentials: 'include' }); if ((await res.json()).success) { closeEditModal(); loadAlbums(); } } catch (e) { console.error(e); }
+            try { 
+                const res = await fetch(`${API_URL}/albums/${id}`, { method: 'PUT', body: fd, credentials: 'include' }); 
+                const data = await res.json();
+                if (data.success) { 
+                    closeEditModal(); 
+                    loadAlbums(); 
+                } else {
+                    alert(data.message || 'Lỗi khi cập nhật');
+                }
+            } catch (err) { console.error(err); }
         });
 
         function applyFilters() {
