@@ -40,6 +40,19 @@ async function saveChatHistory(ma_nguoi_dung, session_id, nguoi_gui, noi_dung) {
             `INSERT INTO lich_su_chatbot (ma_nguoi_dung, session_id, nguoi_gui, noi_dung) VALUES (?, ?, ?, ?)`,
             [ma_nguoi_dung, session_id, nguoi_gui, noi_dung]
         );
+        
+        // CẢI TIẾN: Phân tích sở thích từ tin nhắn user real-time
+        if (nguoi_gui === 'user' && ma_nguoi_dung && noi_dung) {
+            try {
+                const preferenceService = require('../services/preferenceService');
+                const insightCount = await preferenceService.processChatbotMessagePreference(ma_nguoi_dung, noi_dung, true);
+                if (insightCount > 0) {
+                    console.log(`🤖 [Chatbot Preference] Phát hiện ${insightCount} tín hiệu sở thích từ user ${ma_nguoi_dung}`);
+                }
+            } catch (prefErr) {
+                console.error('Error processing chatbot preference:', prefErr.message);
+            }
+        }
     } catch (error) {
         console.error('Error saving chat history:', error.message);
     }

@@ -20,13 +20,16 @@
         /* ===== Lời nhắn từ Chủ nhà hàng - Chị Hoàng Thục Linh ===== */
         /* Tone trầm, dịu mắt cho lời nhắn chủ nhà hàng */
         .linh-quote-box {
-            background: linear-gradient(145deg, #fffefa 0%, #f8f3eb 58%, #efe6d8 100%);
-            border: 1px solid rgba(151, 130, 104, 0.42);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 248, 240, 0.45) 100%);
+            backdrop-filter: blur(15px) saturate(130%);
+            -webkit-backdrop-filter: blur(15px) saturate(130%);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-bottom: 3.5px solid rgba(139, 69, 19, 0.28);
             box-shadow:
-                0 18px 36px rgba(56, 43, 31, 0.12),
-                0 5px 12px rgba(60, 50, 40, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.82),
-                inset 0 -1px 0 rgba(122, 98, 73, 0.08);
+                0 20px 40px rgba(92, 44, 12, 0.08),
+                0 5px 12px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.65);
             position: relative;
             overflow: hidden;
             isolation: isolate;
@@ -90,11 +93,12 @@
         .linh-quote-text {
             font-family: 'Inter', 'Nunito', 'Segoe UI', sans-serif;
             font-style: normal;
-            font-size: 1.02rem;
-            line-height: 1.8;
-            color: #37322d;
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #3f2a1d;
             font-weight: 500;
-            letter-spacing: 0;
+            letter-spacing: 0.1px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
         }
 
         .linh-quote-text .highlight-pn {
@@ -1027,7 +1031,6 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                 <h2 class="inline-block bg-gradient-to-r from-orange-200 via-orange-100 to-orange-200 text-orange-700 px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-full font-dancing text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold shadow-sm">
                     <span class="text-2xl mr-2">✨</span>Gợi Ý Dành Riêng Cho Bạn
                 </h2>
-                <p class="text-gray-600 mt-3 text-sm sm:text-base md:text-lg">Món ngon được chọn lọc dựa trên sở thích của bạn</p>
             </div>
 
             <div id="personalized-recommendations-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
@@ -1080,23 +1083,7 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                         }
                         const imageUrl = imagePath.startsWith('http') ? imagePath : `http://localhost:3000${imagePath}`;
                         const price = new Intl.NumberFormat('vi-VN').format(dish.gia_tien);
-                        
-                        let badgeColor = 'bg-orange-500';
-                        let badgeIcon = 'fa-star';
-                        let badgeText = 'Gợi ý';
-                        
-                        if (dish.recommendation_type === 'collaborative') {
-                            badgeColor = 'bg-blue-500'; badgeIcon = 'fa-users'; badgeText = 'Đề xuất cho bạn';
-                        } else if (dish.recommendation_type === 'content_based') {
-                            badgeColor = 'bg-purple-500'; badgeIcon = 'fa-heart'; badgeText = 'Hợp khẩu vị';
-                        } else if (dish.recommendation_type === 'trending') {
-                            badgeColor = 'bg-red-500'; badgeIcon = 'fa-fire'; badgeText = 'Đang Hot';
-                        } else if (dish.recommendation_type === 'top_rated') {
-                            badgeColor = 'bg-yellow-500'; badgeIcon = 'fa-medal'; badgeText = 'Đánh giá cao';
-                        } else if (dish.recommendation_type === 'chat_based') {
-                            badgeColor = 'bg-green-500'; badgeIcon = 'fa-comment-dots'; badgeText = 'Từ Chatbot';
-                        }
-                        
+
                         return `
                             <div class="card-3d-container">
                                 <div class="card-3d-inner bg-white rounded-xl overflow-hidden shadow-sm">
@@ -1106,12 +1093,6 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                                             <img src="${imageUrl}" alt="${dish.ten_mon}"
                                                 class="w-full h-48 sm:h-56 md:h-64 object-cover"
                                                 onerror="this.src='images/default-food.jpg'">
-                                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4 opacity-0 hover:opacity-100 transition-opacity flex justify-center items-end">
-                                                <p class="text-white text-xs sm:text-sm text-center truncate">${dish.reason || 'Món ngon dành cho bạn'}</p>
-                                            </div>
-                                            <span class="absolute top-2 left-2 sm:top-3 sm:left-3 ${badgeColor} text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-medium absolute-badge">
-                                                <i class="fas ${badgeIcon} mr-1"></i>${badgeText}
-                                            </span>
                                         </div>
                                     </a>
                                     <div class="p-3 sm:p-4">
@@ -1141,11 +1122,11 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                         window.initHome3DTiltEffects();
                     }
                 } else {
-                    container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Chưa có đủ dữ liệu để gợi ý. Hãy đặt món để chúng tôi hiểu bạn hơn!</p>';
+                    container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Chưa có món ăn để hiển thị.</p>';
                 }
             } catch (error) {
                 console.error('Error loading personalized recommendations:', error);
-                container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Không thể tải gợi ý. Vui lòng thử lại sau.</p>';
+                container.innerHTML = '<p class="col-span-4 text-center text-gray-500 py-8">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>';
             }
         }
 

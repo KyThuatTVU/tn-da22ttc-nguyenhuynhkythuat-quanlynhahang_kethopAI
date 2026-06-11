@@ -129,14 +129,56 @@ router.post('/momo/create-payment', authenticateToken, async (req, res) => {
                 }
             });
         } else {
-            throw new Error(response.data.message || 'Không thể tạo thanh toán MoMo');
+            // Chi tiết lỗi từ MoMo
+            const errorDetails = {
+                resultCode: response.data.resultCode,
+                message: response.data.message,
+                localMessage: response.data.localMessage || response.data.message
+            };
+            
+            console.error('❌ MoMo Error:', errorDetails);
+            
+            // Map các mã lỗi phổ biến
+            const errorMessages = {
+                1000: 'Giao dịch đã được khởi tạo, chờ người dùng xác nhận thanh toán',
+                1001: 'Giao dịch thanh toán thất bại do tài khoản người dùng không đủ tiền',
+                1002: 'Giao dịch bị từ chối bởi nhà phát hành tài khoản thanh toán',
+                1003: 'Giao dịch bị hủy',
+                1004: 'Giao dịch thất bại do số tiền thanh toán vượt quá hạn mức thanh toán của người dùng',
+                1005: 'Giao dịch thất bại do url hoặc QR code đã hết hạn',
+                1006: 'Giao dịch thất bại do người dùng đã từ chối xác nhận thanh toán',
+                1007: 'Giao dịch bị từ chối vì tài khoản người dùng đang bị tạm khóa',
+                9000: 'Giao dịch được khởi tạo thành công, chờ xử lý thanh toán',
+                9001: 'Tài khoản chưa được kích hoạt',
+                9002: 'Chữ ký không hợp lệ',
+                9003: 'Số dư không đủ',
+                9004: 'URL không hợp lệ'
+            };
+            
+            return res.status(400).json({
+                success: false,
+                message: errorMessages[response.data.resultCode] || response.data.localMessage || response.data.message || 'Không thể tạo thanh toán MoMo',
+                errorCode: response.data.resultCode,
+                details: errorDetails
+            });
         }
 
     } catch (error) {
         console.error('❌ Lỗi tạo thanh toán MoMo:', error);
+        
+        // Nếu là lỗi từ axios (response từ MoMo)
+        if (error.response) {
+            return res.status(500).json({
+                success: false,
+                message: 'Lỗi kết nối với MoMo',
+                error: error.response.data?.message || error.message,
+                details: error.response.data
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: 'Lỗi server',
+            message: 'Lỗi server khi xử lý thanh toán',
             error: error.message
         });
     }
@@ -298,7 +340,29 @@ router.post('/momo/retry-payment/:orderId', authenticateToken, async (req, res) 
                 }
             });
         } else {
-            throw new Error(response.data.message || 'Không thể tạo thanh toán MoMo');
+            // Chi tiết lỗi từ MoMo
+            const errorDetails = {
+                resultCode: response.data.resultCode,
+                message: response.data.message,
+                localMessage: response.data.localMessage || response.data.message
+            };
+            
+            console.error('❌ MoMo Retry Error:', errorDetails);
+            
+            // Map các mã lỗi phổ biến
+            const errorMessages = {
+                1002: 'Giao dịch bị từ chối bởi nhà phát hành tài khoản thanh toán',
+                9002: 'Chữ ký không hợp lệ - Vui lòng kiểm tra cấu hình MoMo',
+                9003: 'Số dư không đủ',
+                9004: 'URL không hợp lệ'
+            };
+            
+            return res.status(400).json({
+                success: false,
+                message: errorMessages[response.data.resultCode] || response.data.localMessage || response.data.message || 'Không thể tạo thanh toán MoMo',
+                errorCode: response.data.resultCode,
+                details: errorDetails
+            });
         }
 
     } catch (error) {

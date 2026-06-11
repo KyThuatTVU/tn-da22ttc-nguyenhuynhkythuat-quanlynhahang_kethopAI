@@ -396,7 +396,35 @@ async function submitOrder(event) {
                         // Redirect to payment gateway
                         window.location.href = paymentResult.data.paymentUrl;
                     } else {
-                        showNotification(paymentResult.message || `Không thể tạo thanh toán ${gatewayName}`, 'error');
+                        // Hiển thị lỗi chi tiết từ MoMo
+                        let errorMessage = paymentResult.message || `Không thể tạo thanh toán ${gatewayName}`;
+                        
+                        // Thêm thông tin chi tiết nếu có
+                        if (paymentResult.errorCode) {
+                            errorMessage += ` (Mã lỗi: ${paymentResult.errorCode})`;
+                        }
+                        
+                        // Gợi ý khắc phục cho một số lỗi phổ biến
+                        if (paymentResult.errorCode === 1002) {
+                            errorMessage += '\n\n💡 Đề xuất: Vui lòng kiểm tra lại phương thức thanh toán hoặc liên hệ ngân hàng.';
+                        } else if (paymentResult.errorCode === 9002) {
+                            errorMessage += '\n\n⚠️ Hệ thống thanh toán đang gặp sự cố. Vui lòng thử lại sau hoặc chọn phương thức khác.';
+                        }
+                        
+                        console.error('Payment error details:', paymentResult.details);
+                        showNotification(errorMessage, 'error');
+                        
+                        // Nếu lỗi nghiêm trọng, có thể hủy đơn hàng hoặc chuyển sang COD
+                        if (paymentResult.errorCode === 9002 || paymentResult.errorCode === 9004) {
+                            // Hiển thị option chuyển sang COD
+                            setTimeout(() => {
+                                if (confirm('Thanh toán online đang gặp sự cố. Bạn có muốn chuyển sang thanh toán khi nhận hàng (COD)?')) {
+                                    document.getElementById('cod').checked = true;
+                                    // Auto-submit lại form với COD
+                                    // (optional - có thể để user tự submit)
+                                }
+                            }, 2000);
+                        }
                     }
                 } catch (error) {
                     console.error(`Lỗi tạo thanh toán ${gatewayName}:`, error);

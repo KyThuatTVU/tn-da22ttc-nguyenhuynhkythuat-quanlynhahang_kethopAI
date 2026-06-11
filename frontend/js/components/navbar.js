@@ -118,6 +118,10 @@ window.renderUserMenu = function() {
 
     if (userStr && token) {
         try {
+            const navbar = document.getElementById('navbar');
+            if (navbar) {
+                navbar.classList.add('user-logged-in');
+            }
             const user = JSON.parse(userStr);
             const displayName = user.ten_nguoi_dung || user.email || 'Người dùng';
             console.log('👤 User data:', { 
@@ -153,8 +157,8 @@ window.renderUserMenu = function() {
                                 : `<i class="fas fa-user text-orange-600 text-sm"></i>`
                             }
                         </div>
-                        <span class="hidden lg:inline font-medium text-sm max-w-[150px] truncate">${displayName}</span>
-                        <i class="fas fa-chevron-down text-xs hidden lg:inline ml-1"></i>
+                        <span class="hidden xl:inline font-medium text-sm max-w-[140px] truncate">${displayName}</span>
+                        <i class="fas fa-chevron-down text-xs hidden xl:inline ml-1"></i>
                     </button>
                     <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100" style="z-index: 9999;">
                         <div class="px-4 py-3 border-b border-gray-100">
@@ -216,6 +220,10 @@ window.renderUserMenu = function() {
 
 // Render menu for guests (not logged in) (global function)
 window.renderGuestMenu = function() {
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+        navbar.classList.remove('user-logged-in');
+    }
     const userMenuContainer = document.getElementById('user-menu-container');
     if (!userMenuContainer) return;
 

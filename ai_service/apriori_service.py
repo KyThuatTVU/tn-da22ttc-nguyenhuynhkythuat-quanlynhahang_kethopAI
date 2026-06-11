@@ -22,8 +22,22 @@ def get_db_connection():
         database=DB_NAME
     )
 
-def train_apriori_model(min_support=0.01, min_confidence=0.1):
+def train_apriori_model(min_support=0.015, min_confidence=0.3):
+    """
+    Train Apriori model để tìm luật kết hợp món ăn
+    
+    Parameters:
+    - min_support: Món phải xuất hiện ít nhất X% đơn hàng (default: 1.5%)
+    - min_confidence: Luật phải có confidence ≥ X (default: 30%)
+      → Confidence = P(B|A) = "Khi mua A, bao nhiêu % cũng mua B"
+    
+    LƯU Ý:
+    - Với ít đơn hàng (< 50), nên dùng ngưỡng thấp (20-30%)
+    - Với nhiều đơn hàng (> 100), có thể tăng lên 50-60%
+    - Luật có Lift > 1.0 được ưu tiên (quan hệ tích cực)
+    """
     print("🚀 Bắt đầu huấn luyện mô hình Apriori (Association Rules)...")
+    print(f"   Ngưỡng: min_support={min_support*100:.1f}%, min_confidence={min_confidence*100:.1f}%")
     try:
         conn = get_db_connection()
         
@@ -96,7 +110,19 @@ def train_apriori_model(min_support=0.01, min_confidence=0.1):
             pickle.dump(rules_dict, f)
             
         print("✅ Hoàn tất huấn luyện Apriori!")
-        print(f"Tìm thấy quy tắc cho {len(rules_dict)} món ăn.")
+        print(f"📊 Tìm thấy {len(frequent_itemsets)} tập phổ biến (frequent itemsets)")
+        print(f"📊 Tạo được {len(rules)} luật kết hợp (association rules)")
+        print(f"📊 Lọc thành quy tắc cho {len(rules_dict)} món ăn")
+        
+        # Thống kê luật
+        total_rules = sum(len(v) for v in rules_dict.values())
+        print(f"📊 Tổng cộng {total_rules} luật đề xuất")
+        
+        if total_rules > 0:
+            all_confidences = [rule['confidence'] for rules in rules_dict.values() for rule in rules]
+            avg_confidence = sum(all_confidences) / len(all_confidences)
+            print(f"📊 Confidence trung bình: {avg_confidence*100:.1f}%")
+        
         return True
 
     except Exception as e:

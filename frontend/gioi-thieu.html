@@ -17,29 +17,40 @@
         /* ===== Lời nhắn từ Chủ nhà hàng - Chị Hoàng Thục Linh ===== */
         /* Tone TRẦM, DỊU MẮT - không dùng cam/đỏ/vàng rực */
         .linh-quote-box {
-            background: #fdfcfa;
-            border: 1px solid #e5e0d6;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 248, 240, 0.45) 100%);
+            backdrop-filter: blur(15px) saturate(130%);
+            -webkit-backdrop-filter: blur(15px) saturate(130%);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-bottom: 3.5px solid rgba(139, 69, 19, 0.28);
             box-shadow:
-                0 2px 4px rgba(50, 40, 30, 0.06),
-                0 8px 24px -6px rgba(60, 50, 40, 0.12);
+                0 20px 40px rgba(92, 44, 12, 0.08),
+                0 5px 12px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.65);
             position: relative;
+            overflow: hidden;
+            isolation: isolate;
         }
-        /* Chữ chính: NÂU ĐEN trung tính - dễ đọc lâu */
+        /* Chữ chính: Sans-serif không chân - dễ đọc */
         .linh-quote-text {
-            font-family: 'Playfair Display', 'Georgia', serif;
-            font-style: italic;
-            font-size: 1.05rem;
-            line-height: 1.9;
-            color: #2a2520;
-            letter-spacing: 0.2px;
-        }
-        /* Tên "Phương Nam": NÂU SOCOLA đơn sắc, chỉ nhấn bằng font + cỡ chữ */
-        .linh-quote-text .highlight-pn {
-            font-family: 'Pacifico', cursive;
+            font-family: 'Inter', 'Nunito', 'Segoe UI', sans-serif;
             font-style: normal;
-            font-size: 1.15em;
-            color: #3e2723;
-            padding: 0 4px;
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #3f2a1d;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+        /* Tên "Phương Nam": Nâu ấm cổ điển, nhấn bằng độ đậm và cỡ chữ */
+        .linh-quote-text .highlight-pn {
+            font-family: inherit;
+            font-style: normal;
+            font-weight: 800;
+            font-size: 1.05em;
+            color: #5a4634;
+            padding: 0 2px;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
         }
         /* Chữ ký: NÂU ĐEN đơn sắc với shadow xám trung tính tạo độ nổi nhẹ */
         .linh-signature {
@@ -143,12 +154,11 @@
 
         <div class="relative grid grid-cols-1 lg:grid-cols-2">
 
-            <!-- Left Content -->
             <div
-                class="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-12 lg:px-16 flex items-center order-2 lg:order-1">
+                class="py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-12 lg:pl-28 lg:pr-16 flex items-center order-2 lg:order-1">
                 <div class="max-w-2xl">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight"
-                        style="font-family: 'Montserrat', sans-serif; color: #8B4513; letter-spacing: 0.05em;">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-2xl xl:text-3xl lg:whitespace-nowrap font-bold mb-4 sm:mb-6 leading-tight"
+                        style="font-family: 'Montserrat', sans-serif; color: #8B4513; letter-spacing: 0.01em;">
                         PHƯƠNG NAM – NGON NHƯ MẸ NẤU
                     </h2>
 
@@ -214,8 +224,8 @@
             </div>
 
             <!-- Right Image -->
-            <div class="flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 md:px-8 lg:px-6 order-1 lg:order-2">
-                <div class="relative max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl w-full">
+            <div class="flex items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12 order-1 lg:order-2">
+                <div class="relative w-full lg:max-w-2xl xl:max-w-3xl">
                     <!-- Shadow/Border effect -->
                     <div
                         class="absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-full h-full bg-white/30 rounded-2xl transform rotate-2">

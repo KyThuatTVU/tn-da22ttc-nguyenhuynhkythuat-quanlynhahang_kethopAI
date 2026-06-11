@@ -275,10 +275,11 @@
                     <div class="form-group">
                         <label class="form-label">Ngày làm việc</label>
                         <input type="date" id="select-date" class="form-input" required>
+                        <p class="text-xs text-gray-400 mt-1 italic">* Không thể chọn ngày trong quá khứ</p>
                     </div>
                     <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
                         <p class="text-xs text-blue-700 font-medium flex items-center">
-                            <i class="fas fa-info-circle mr-2"></i> Hệ thống sẽ tự động kiểm tra nếu lịch làm việc của nhân viên bị chồng chéo.
+                            <i class="fas fa-info-circle mr-2"></i> Hệ thống sẽ tự động kiểm tra nếu lịch làm việc của nhân viên bị chồng chéo hoặc giờ ca đã qua.
                         </p>
                     </div>
                     <button type="submit" class="btn-primary w-full py-3">Hoàn tất phân ca</button>
@@ -303,6 +304,13 @@
         console.log('✅ API URLs:', { SHIFT_API: SHIFT_API, STAFF_API: STAFF_API });
 
         // ========== 2. ĐỊNH NGHĨA CÁC HÀM TRÊN WINDOW NGAY LẬP TỨC ==========
+
+        // Helper: trả về 'YYYY-MM-DD' theo giờ local (tránh lỗi UTC của toISOString)
+        window.getLocalDateStr = function(d) {
+            var dt = d || new Date();
+            var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+            return dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
+        };
 
         window.openShiftModal = function(id) {
             if (id && typeof id === 'object') id = null;
@@ -329,7 +337,14 @@
             document.body.style.overflow = 'hidden';
             var schedDate = document.getElementById('schedule-date');
             var selDate = document.getElementById('select-date');
-            if (schedDate && selDate) selDate.value = schedDate.value;
+            var today = window.getLocalDateStr();
+            if (selDate) {
+                // Ràng buộc: không chọn ngày trong quá khứ
+                selDate.setAttribute('min', today);
+                // Nếu ngày đang xem trên header đã qua thì mặc định lấy hôm nay
+                var headerDate = schedDate ? schedDate.value : today;
+                selDate.value = (headerDate && headerDate >= today) ? headerDate : today;
+            }
         };
 
         window.closeModal = function(id) {
@@ -520,6 +535,33 @@
             if (e.target && e.target.id === 'schedule-date') {
                 window.loadSchedules();
             }
+            // Cảnh báo sớm khi đổi ngày/ca trong modal phân ca
+            if (e.target && (e.target.id === 'select-date' || e.target.id === 'select-shift')) {
+                try {
+                    var ngay = document.getElementById('select-date').value;
+                    var todayStr = window.getLocalDateStr();
+                    if (ngay && ngay < todayStr) {
+                        alert('Cảnh báo: Không thể phân ca cho ngày trong quá khứ!');
+                        document.getElementById('select-date').value = todayStr;
+                        return;
+                    }
+                    var maCa = document.getElementById('select-shift').value;
+                    var selShift = document.getElementById('select-shift');
+                    if (ngay === todayStr && selShift && selShift.selectedIndex >= 0) {
+                        // Trích giờ bắt đầu từ label "Tên (HH:MM - HH:MM)"
+                        var label = selShift.options[selShift.selectedIndex].text || '';
+                        var m = label.match(/\((\d{1,2}:\d{2})/);
+                        if (m) {
+                            var p = m[1].split(':');
+                            var st = new Date();
+                            st.setHours(parseInt(p[0], 10) || 0, parseInt(p[1], 10) || 0, 0, 0);
+                            if (st.getTime() <= Date.now()) {
+                                alert('Cảnh báo: Giờ bắt đầu ca này (' + m[1] + ') đã qua giờ hiện tại. Bạn không thể phân ca này hôm nay.');
+                            }
+                        }
+                    }
+                } catch (err) { console.warn(err); }
+            }
         });
 
         // ESC key đóng modal
@@ -567,11 +609,71 @@
             scheduleForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 try {
-                    var payload = {
-                        ma_nhan_vien: document.getElementById('select-staff').value,
-                        ma_ca: document.getElementById('select-shift').value,
-                        ngay: document.getElementById('select-date').value
-                    };
+                    var maNV = document.getElementById('select-staff').value;
+                    var maCa = document.getElementById('select-shift').value;
+                    var ngay = document.getElementById('select-date').value;
+
+                    // === Validate phía client ===
+                    if (!maNV || !maCa || !ngay) {
+                        alert('Vui lòng chọn đầy đủ nhân viên, ca và ngày!');
+                        return;
+                    }
+
+                    var now = new Date();
+                    var todayStr = window.getLocalDateStr(now);
+
+                    // 1. Không cho phân ca cho ngày trong quá khứ
+                    if (ngay < todayStr) {
+                        alert('LỖI: Không thể phân ca cho ngày trong quá khứ!');
+                        return;
+                    }
+
+                    // 2. Lấy thông tin ca đang chọn để check giờ
+                    var shiftRes = await fetch(SHIFT_API, { credentials: 'include' });
+                    var shiftData = await shiftRes.json();
+                    var targetShift = (shiftData.data || []).find(function(s) {
+                        return String(s.ma_ca) === String(maCa);
+                    });
+                    if (!targetShift) {
+                        alert('LỖI: Không tìm thấy ca làm việc đã chọn!');
+                        return;
+                    }
+
+                    // 3. Nếu phân cho hôm nay → giờ bắt đầu ca không được nằm trong quá khứ
+                    if (ngay === todayStr) {
+                        var parts = String(targetShift.gio_bat_dau).split(':');
+                        var shiftStart = new Date();
+                        shiftStart.setHours(parseInt(parts[0], 10) || 0, parseInt(parts[1], 10) || 0, 0, 0);
+                        if (shiftStart.getTime() <= now.getTime()) {
+                            alert('LỖI: Giờ bắt đầu ca (' + targetShift.gio_bat_dau + ') đã qua giờ hiện tại. Không thể phân ca này!');
+                            return;
+                        }
+                    }
+
+                    // 4. Kiểm tra trùng / chồng chéo ca với lịch đã có của nhân viên trong ngày đó
+                    var schedRes = await fetch(SHIFT_API + '/schedules?start=' + ngay + '&end=' + ngay, { credentials: 'include' });
+                    var schedData = await schedRes.json();
+                    if (schedData.success && Array.isArray(schedData.data)) {
+                        var existing = schedData.data.filter(function(s) {
+                            return String(s.ma_nhan_vien) === String(maNV) && s.trang_thai !== 'cancelled';
+                        });
+                        for (var i = 0; i < existing.length; i++) {
+                            var ex = existing[i];
+                            // Trùng y nguyên ca
+                            if (String(ex.ma_ca) === String(maCa)) {
+                                alert('LỖI: Nhân viên đã được phân ca "' + ex.ten_ca + '" trong ngày này. Không thể phân trùng!');
+                                return;
+                            }
+                            // Chồng chéo khung giờ
+                            if (targetShift.gio_bat_dau < ex.gio_ket_thuc && targetShift.gio_ket_thuc > ex.gio_bat_dau) {
+                                alert('LỖI: Khung giờ ca bị chồng chéo với ca "' + ex.ten_ca + '" (' + ex.gio_bat_dau + ' - ' + ex.gio_ket_thuc + ') đã phân trước đó!');
+                                return;
+                            }
+                        }
+                    }
+
+                    // === Gửi lên server (server vẫn validate thêm để an toàn) ===
+                    var payload = { ma_nhan_vien: maNV, ma_ca: maCa, ngay: ngay };
                     var res = await fetch(SHIFT_API + '/schedules', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -580,6 +682,7 @@
                     });
                     var result = await res.json();
                     if (result.success) {
+                        alert('Phân ca thành công!');
                         window.closeModal('scheduleModal');
                         window.loadSchedules();
                     } else { alert('LỖI: ' + result.message); }
@@ -590,11 +693,14 @@
         // ========== 6. KHỞI TẠO TRANG ==========
         (function initPage() {
             try {
-                var today = new Date().toISOString().split('T')[0];
+                var today = window.getLocalDateStr();
                 var schedDate = document.getElementById('schedule-date');
                 var selDate = document.getElementById('select-date');
                 if (schedDate) schedDate.value = today;
-                if (selDate) selDate.value = today;
+                if (selDate) {
+                    selDate.value = today;
+                    selDate.setAttribute('min', today);
+                }
                 window.loadShifts();
                 window.loadSchedules();
                 window.loadStaffOptions();

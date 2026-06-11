@@ -114,13 +114,25 @@ const createPOSOrder = async (req, res) => {
         
         // Create order based on type
         if (orderType === 'online') {
+            // Nếu khách có số điện thoại trùng với 1 user đã đăng ký → auto-link
+            // để CF (lọc cộng tác) ghi nhận hành vi mua của đúng user, không bị
+            // xếp vào "khách vãng lai" làm mất dữ liệu hành vi.
+            let linkedUserId = null;
+            if (customerPhone) {
+                const [matchedUser] = await connection.query(
+                    'SELECT ma_nguoi_dung FROM nguoi_dung WHERE so_dien_thoai = ? LIMIT 1',
+                    [customerPhone]
+                );
+                if (matchedUser.length > 0) linkedUserId = matchedUser[0].ma_nguoi_dung;
+            }
+
             // Đơn hàng giao đi - lưu vào bảng don_hang
             const [orderResult] = await connection.query(
-                `INSERT INTO don_hang 
-                (ten_khach_vang_lai, so_dt_khach, dia_chi_giao, tong_tien, tien_giam_gia, 
+                `INSERT INTO don_hang
+                (ma_nguoi_dung, ten_khach_vang_lai, so_dt_khach, dia_chi_giao, tong_tien, tien_giam_gia,
                  phuong_thuc_thanh_toan, trang_thai, ma_khuyen_mai, ghi_chu)
-                VALUES (?, ?, ?, ?, ?, ?, 'confirmed', ?, ?)`,
-                [customerName, customerPhone, address, totalAmount, discountAmount, 
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?)`,
+                [linkedUserId, customerName, customerPhone, address, totalAmount, discountAmount,
                  paymentMethod, discountCode, note]
             );
             
@@ -180,12 +192,21 @@ const createPOSOrder = async (req, res) => {
             
         } else {
             // Đơn hàng tại quầy (offline) - lưu vào don_hang với địa chỉ NULL
+            // Auto-link với user nếu số điện thoại trùng (để dữ liệu mua phục vụ CF)
+            let linkedUserIdOffline = null;
+            if (customerPhone) {
+                const [matched] = await connection.query(
+                    'SELECT ma_nguoi_dung FROM nguoi_dung WHERE so_dien_thoai = ? LIMIT 1',
+                    [customerPhone]
+                );
+                if (matched.length > 0) linkedUserIdOffline = matched[0].ma_nguoi_dung;
+            }
             const [orderResult] = await connection.query(
-                `INSERT INTO don_hang 
-                (ten_khach_vang_lai, so_dt_khach, dia_chi_giao, tong_tien, tien_giam_gia, 
+                `INSERT INTO don_hang
+                (ma_nguoi_dung, ten_khach_vang_lai, so_dt_khach, dia_chi_giao, tong_tien, tien_giam_gia,
                  phuong_thuc_thanh_toan, trang_thai, ma_khuyen_mai, ghi_chu)
-                VALUES (?, ?, NULL, ?, ?, ?, 'delivered', ?, ?)`,
-                [customerName, customerPhone, totalAmount, discountAmount, 
+                VALUES (?, ?, ?, NULL, ?, ?, ?, 'delivered', ?, ?)`,
+                [linkedUserIdOffline, customerName, customerPhone, totalAmount, discountAmount,
                  paymentMethod, discountCode, note]
             );
             

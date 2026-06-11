@@ -962,6 +962,82 @@ router.get('/:orderId', authenticateToken, async (req, res) => {
     }
 });
 
+// Admin: Cập nhật trạng thái thanh toán (dành cho đơn COD hoặc cập nhật thủ công)
+router.put('/:orderId/payment-status', requireAdmin, async (req, res) => {
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        const { orderId } = req.params;
+        const { trang_thai_thanh_toan } = req.body;
+
+        const ALLOWED = ['pending', 'success', 'failed', 'cancelled'];
+        if (!trang_thai_thanh_toan || !ALLOWED.includes(trang_thai_thanh_toan)) {
+            await connection.rollback();
+            return res.status(400).json({
+                success: false,
+                message: 'Trạng thái thanh toán không hợp lệ. Cho phép: ' + ALLOWED.join(', ')
+            });
+        }
+
+        // Kiểm tra đơn hàng tồn tại
+        const [orderRows] = await connection.query(
+            'SELECT ma_don_hang, trang_thai FROM don_hang WHERE ma_don_hang = ?',
+            [orderId]
+        );
+        if (orderRows.length === 0) {
+            await connection.rollback();
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+        if (orderRows[0].trang_thai === 'cancelled') {
+            await connection.rollback();
+            return res.status(400).json({ success: false, message: 'Đơn hàng đã hủy, không thể cập nhật thanh toán' });
+        }
+
+        // Lấy bản ghi thanh toán hiện tại
+        const [payRows] = await connection.query(
+            'SELECT ma_thanh_toan, phuong_thuc, trang_thai FROM thanh_toan WHERE ma_don_hang = ? ORDER BY ma_thanh_toan DESC LIMIT 1',
+            [orderId]
+        );
+
+        if (payRows.length === 0) {
+            // Chưa có record thanh toán (thường là COD chưa init) → tạo mới
+            await connection.query(
+                `INSERT INTO thanh_toan (ma_don_hang, so_tien, phuong_thuc, trang_thai, thoi_gian_thanh_toan)
+                 SELECT ma_don_hang, tong_tien, 'cod', ?, ${trang_thai_thanh_toan === 'success' ? 'NOW()' : 'NULL'}
+                 FROM don_hang WHERE ma_don_hang = ?`,
+                [trang_thai_thanh_toan, orderId]
+            );
+        } else {
+            const current = payRows[0];
+            // Không cho đảo ngược trạng thái 'success' (an toàn dữ liệu)
+            if (current.trang_thai === 'success' && trang_thai_thanh_toan !== 'success') {
+                await connection.rollback();
+                return res.status(400).json({
+                    success: false,
+                    message: 'Đơn đã thanh toán thành công, không thể đổi sang trạng thái khác'
+                });
+            }
+            await connection.query(
+                `UPDATE thanh_toan
+                 SET trang_thai = ?,
+                     thoi_gian_thanh_toan = ${trang_thai_thanh_toan === 'success' ? 'NOW()' : 'thoi_gian_thanh_toan'}
+                 WHERE ma_thanh_toan = ?`,
+                [trang_thai_thanh_toan, current.ma_thanh_toan]
+            );
+        }
+
+        await connection.commit();
+        res.json({ success: true, message: 'Cập nhật trạng thái thanh toán thành công' });
+    } catch (error) {
+        await connection.rollback();
+        console.error('Lỗi cập nhật trạng thái thanh toán:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    } finally {
+        connection.release();
+    }
+});
+
 // Admin: Cập nhật trạng thái đơn hàng
 router.put('/:orderId/status', requireAdmin, async (req, res) => {
     const connection = await db.getConnection();

@@ -300,6 +300,70 @@
                 min-width: auto;
             }
         }
+
+        /* Horizontal SVG UML Activity Diagram Styles */
+        .uml-svg-container {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .uml-svg {
+            display: block;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .uml-box {
+            fill: #7ec0ee;
+            stroke: #000000;
+            stroke-width: 1.5;
+            transition: all 0.2s;
+        }
+
+        .uml-box:hover {
+            fill: #6bb3e2;
+        }
+
+        .uml-decision {
+            fill: #7ec0ee;
+            stroke: #000000;
+            stroke-width: 1.5;
+            transition: all 0.2s;
+        }
+
+        .uml-decision:hover {
+            fill: #6bb3e2;
+        }
+
+        .uml-text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            fill: #000000;
+            dominant-baseline: middle;
+            text-anchor: middle;
+        }
+
+        .uml-label {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            fill: #000000;
+        }
+
+        .uml-path {
+            fill: none;
+            stroke: #000000;
+            stroke-width: 1.5;
+        }
+
+        .uml-join-bar {
+            stroke: #000000;
+            stroke-width: 8;
+            stroke-linecap: square;
+        }
     </style>
 </head>
 <body>
@@ -323,6 +387,13 @@
                 <li><a href="#diagram10">10. Quản Lý Kho Nguyên Liệu</a></li>
                 <li><a href="#diagram11">11. Chấm Công Nhân Viên</a></li>
                 <li><a href="#diagram12">12. Tính Lương Nhân Viên</a></li>
+                <li><a href="#diagram13">13. Lọc Cộng Tác (Collaborative Filtering)</a></li>
+                <li><a href="#diagram14">14. Lọc Độ Phổ Biến (Popularity Filtering)</a></li>
+                <li><a href="#diagram15">15. Lọc Nội Dung (Content-Based Filtering)</a></li>
+                <li><a href="#diagram16">16. Phương Pháp Kết Hợp (Hybrid Recommendation)</a></li>
+                <li><a href="#diagram17">17. Người Dùng Chat Với Chatbot</a></li>
+                <li><a href="#diagram18">18. Gợi Ý Món Ăn Kèm (Apriori Association Rules)</a></li>
+                <li><a href="#diagram19">19. Luồng Người Dùng Nhận Gợi Ý Món Ăn Kèm (Apriori)</a></li>
             </ul>
         </div>
 
@@ -1300,11 +1371,835 @@
             </div>
         </div>
 
+        <!-- Sơ đồ 13: Lọc Cộng Tác -->
+        <div class="diagram-section" id="diagram13">
+            <h2 class="diagram-title">13. Lọc Cộng Tác (Collaborative Filtering)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình đề xuất món ăn cá nhân hóa dựa trên hành vi của nhóm người dùng có cùng sở thích (thuật toán SVD).
+                <br><strong>Actor:</strong> Khách hàng đã đăng nhập
+                <br><strong>Hệ thống:</strong> Python AI Service, Database
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1730 310" width="1730" height="310">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Lấy lịch sử</tspan>
+                            <tspan x="140" dy="14">đơn hàng &amp; đánh giá</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Tạo ma trận</tspan>
+                            <tspan x="300" dy="14">Người dùng - Món ăn</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">Phân tích SVD</tspan>
+                            <tspan x="460" dy="14">giảm chiều ma trận</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Tính tương đồng</tspan>
+                            <tspan x="620" dy="14">Cosine giữa các User</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Xác định nhóm</tspan>
+                            <tspan x="780" dy="14">User cùng sở thích</tspan>
+                        </text>
+                        <path d="M 840 150 H 880" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 6 -->
+                        <rect x="880" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="940" y="145" class="uml-text">
+                            <tspan x="940" dy="0">Tính điểm ưa thích</tspan>
+                            <tspan x="940" dy="14">dự đoán cho món ăn</tspan>
+                        </text>
+                        <path d="M 1000 150 H 1040" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 7 -->
+                        <rect x="1040" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1100" y="145" class="uml-text">
+                            <tspan x="1100" dy="0">Lọc bỏ các món</tspan>
+                            <tspan x="1100" dy="14">đã đặt trước đó</tspan>
+                        </text>
+                        <path d="M 1160 150 H 1200" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 8 -->
+                        <rect x="1200" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1260" y="145" class="uml-text">
+                            <tspan x="1260" dy="0">Sắp xếp &amp;</tspan>
+                            <tspan x="1260" dy="14">Trích xuất Top gợi ý</tspan>
+                        </text>
+                        <path d="M 1320 150 H 1360" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision -->
+                        <polygon points="1395,120 1435,150 1395,180 1355,150" class="uml-decision" />
+                        <text x="1395" y="105" class="uml-text" font-weight="bold">Chọn món?</text>
+                        
+                        <!-- Path "Có" -->
+                        <path d="M 1435 150 H 1485" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1455" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 9 -->
+                        <rect x="1485" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1545" y="145" class="uml-text">
+                            <tspan x="1545" dy="0">Lưu tương tác</tspan>
+                            <tspan x="1545" dy="14">&amp; feedback</tspan>
+                        </text>
+                        <path d="M 1605 150 H 1645" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 1395 180 V 250 H 1485" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1405" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 10 (Hủy) -->
+                        <rect x="1485" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1545" y="253" class="uml-text">Hủy bỏ</text>
+                        <path d="M 1605 250 H 1645" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1645" y1="100" x2="1645" y2="280" class="uml-join-bar" />
+                        <path d="M 1645 150 H 1680" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- End Node -->
+                        <circle cx="1695" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1695" cy="150" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 14: Lọc Độ Phổ Biến -->
+        <div class="diagram-section" id="diagram14">
+            <h2 class="diagram-title">14. Lọc Độ Phổ Biến (Popularity Filtering)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình gợi ý các món ăn bán chạy nhất, được quan tâm nhiều nhất toàn hệ thống (dành cho khách hàng mới hoặc vãng lai).
+                <br><strong>Actor:</strong> Khách vãng lai, Khách hàng mới
+                <br><strong>Hệ thống:</strong> Database, Python AI Service
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1410 310" width="1410" height="310">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Khách vãng lai</tspan>
+                            <tspan x="140" dy="14">truy cập hệ thống</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Thống kê số lượt</tspan>
+                            <tspan x="300" dy="14">xem &amp; đơn đặt món</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">Tính điểm xu hướng</tspan>
+                            <tspan x="460" dy="14">giảm hao mòn thời gian</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Sắp xếp thực đơn</tspan>
+                            <tspan x="620" dy="14">theo điểm giảm dần</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Lọc bỏ các món</tspan>
+                            <tspan x="780" dy="14">hết nguyên liệu</tspan>
+                        </text>
+                        <path d="M 840 150 H 880" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 6 -->
+                        <rect x="880" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="940" y="145" class="uml-text">
+                            <tspan x="940" dy="0">Hiển thị Top 10</tspan>
+                            <tspan x="940" dy="14">món bán chạy gợi ý</tspan>
+                        </text>
+                        <path d="M 1000 150 H 1035" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision -->
+                        <polygon points="1075,120 1115,150 1075,180 1035,150" class="uml-decision" />
+                        <text x="1075" y="105" class="uml-text" font-weight="bold">Chọn món?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 1115 150 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1135" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 7 -->
+                        <rect x="1165" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="145" class="uml-text">
+                            <tspan x="1225" dy="0">Đặt món thành công</tspan>
+                            <tspan x="1225" dy="14">&amp; Cập nhật lượt mua</tspan>
+                        </text>
+                        <path d="M 1285 150 H 1325" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 1075 180 V 250 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1085" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 8 -->
+                        <rect x="1165" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="253" class="uml-text">Hủy bỏ</text>
+                        <path d="M 1285 250 H 1325" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1325" y1="100" x2="1325" y2="280" class="uml-join-bar" />
+                        <path d="M 1325 150 H 1360" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- End Node -->
+                        <circle cx="1375" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1375" cy="150" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 15: Lọc Nội Dung -->
+        <div class="diagram-section" id="diagram15">
+            <h2 class="diagram-title">15. Lọc Nội Dung (Content-Based Filtering)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình đề xuất các món ăn tương tự với các đặc tính của món ăn khách hàng đã thích hoặc tương tác trong quá khứ.
+                <br><strong>Actor:</strong> Khách hàng đã tương tác món ăn
+                <br><strong>Hệ thống:</strong> Database, Python AI Service (TF-IDF &amp; Cosine)
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1410 310" width="1410" height="310">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Ghi nhận món ăn</tspan>
+                            <tspan x="140" dy="14">khách đã tương tác</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Trích xuất thuộc tính</tspan>
+                            <tspan x="300" dy="14">&amp; đặc trưng món ăn</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">Thiết lập &amp; cập nhật</tspan>
+                            <tspan x="460" dy="14">Hồ sơ gu khách hàng</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Tính tương đồng Cosine</tspan>
+                            <tspan x="620" dy="14">món ăn &amp; Hồ sơ gu khách</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Lọc bỏ món đã đặt</tspan>
+                            <tspan x="780" dy="14">&amp; Xếp hạng score</tspan>
+                        </text>
+                        <path d="M 840 150 H 880" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 6 -->
+                        <rect x="880" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="940" y="145" class="uml-text">
+                            <tspan x="940" dy="0">Hiển thị các món</tspan>
+                            <tspan x="940" dy="14">đề xuất tương đồng</tspan>
+                        </text>
+                        <path d="M 1000 150 H 1035" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision -->
+                        <polygon points="1075,120 1115,150 1075,180 1035,150" class="uml-decision" />
+                        <text x="1075" y="105" class="uml-text" font-weight="bold">Chọn món?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 1115 150 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1135" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 7 -->
+                        <rect x="1165" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="145" class="uml-text">
+                            <tspan x="1225" dy="0">Đặt món thành công</tspan>
+                            <tspan x="1225" dy="14">&amp; Lưu feedback nội dung</tspan>
+                        </text>
+                        <path d="M 1285 150 H 1325" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 1075 180 V 250 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1085" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 8 -->
+                        <rect x="1165" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="253" class="uml-text">Hủy bỏ</text>
+                        <path d="M 1285 250 H 1325" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1325" y1="100" x2="1325" y2="280" class="uml-join-bar" />
+                        <path d="M 1325 150 H 1360" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- End Node -->
+                        <circle cx="1375" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1375" cy="150" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 16: Phương Pháp Kết Hợp -->
+        <div class="diagram-section" id="diagram16">
+            <h2 class="diagram-title">16. Phương Pháp Kết Hợp (Hybrid Recommendation)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Hệ thống gợi ý lai ghép kết hợp song song 3 thuật toán đề xuất (Collaborative Filtering, Content-Based, Association Rules) nhằm đem lại trải nghiệm gợi ý chính xác nhất.
+                <br><strong>Actor:</strong> Khách hàng truy cập trang chủ / mục Gợi ý
+                <br><strong>Hệ thống:</strong> Python AI Service, Node.js Backend, MySQL Database
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1620 380" width="1620" height="380">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="200" r="8" fill="#000000" />
+                        <path d="M 38 200 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="195" class="uml-text">
+                            <tspan x="140" dy="0">Khách truy cập</tspan>
+                            <tspan x="140" dy="14">&amp; Lấy mã người dùng</tspan>
+                        </text>
+                        <path d="M 200 200 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="195" class="uml-text">
+                            <tspan x="300" dy="0">Lưu hành vi (click, view)</tspan>
+                            <tspan x="300" dy="14">vào table hành vi</tspan>
+                        </text>
+                        <path d="M 360 200 H 390" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Fork Bar -->
+                        <line x1="390" y1="70" x2="390" y2="330" class="uml-join-bar" />
+
+                        <!-- Top Branch -->
+                        <path d="M 390 100 H 420" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="420" y="70" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="480" y="95" class="uml-text">
+                            <tspan x="480" dy="0">Collaborative Filtering</tspan>
+                            <tspan x="480" dy="14">(SVD Model)</tspan>
+                        </text>
+                        <path d="M 540 100 H 575" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="575" y="70" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="635" y="95" class="uml-text">
+                            <tspan x="635" dy="0">Tính điểm tương đồng</tspan>
+                            <tspan x="635" dy="14">nhóm người dùng</tspan>
+                        </text>
+                        <path d="M 695 100 H 725" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Middle Branch -->
+                        <path d="M 390 200 H 420" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="420" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="480" y="195" class="uml-text">
+                            <tspan x="480" dy="0">Content-based</tspan>
+                            <tspan x="480" dy="14">(TF-IDF &amp; Cosine)</tspan>
+                        </text>
+                        <path d="M 540 200 H 575" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="575" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="635" y="195" class="uml-text">
+                            <tspan x="635" dy="0">Tính điểm tương đồng</tspan>
+                            <tspan x="635" dy="14">đặc trưng món ăn</tspan>
+                        </text>
+                        <path d="M 695 200 H 725" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Bottom Branch -->
+                        <path d="M 390 300 H 420" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="420" y="270" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="480" y="295" class="uml-text">
+                            <tspan x="480" dy="0">Association Rules</tspan>
+                            <tspan x="480" dy="14">(Thuật toán Apriori)</tspan>
+                        </text>
+                        <path d="M 540 300 H 575" class="uml-path" marker-end="url(#arrowhead)" />
+                        <rect x="575" y="270" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="635" y="295" class="uml-text">
+                            <tspan x="635" dy="0">Tìm các món ăn</tspan>
+                            <tspan x="635" dy="14">thường mua kèm nhau</tspan>
+                        </text>
+                        <path d="M 695 300 H 725" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar 1 -->
+                        <line x1="725" y1="70" x2="725" y2="330" class="uml-join-bar" />
+                        <path d="M 725 200 H 765" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="765" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="825" y="195" class="uml-text">
+                            <tspan x="825" dy="0">Trộn các danh sách</tspan>
+                            <tspan x="825" dy="14">&amp; Tính điểm kết hợp</tspan>
+                        </text>
+                        <path d="M 885 200 H 925" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 6 -->
+                        <rect x="925" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="985" y="195" class="uml-text">
+                            <tspan x="985" dy="0">Sắp xếp, lọc món hết</tspan>
+                            <tspan x="985" dy="14">&amp; Lưu vào table gợi ý</tspan>
+                        </text>
+                        <path d="M 1045 200 H 1085" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 7 -->
+                        <rect x="1085" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1145" y="195" class="uml-text">
+                            <tspan x="1145" dy="0">Hiển thị gợi ý</tspan>
+                            <tspan x="1145" dy="14">tại Homepage / Suggest</tspan>
+                        </text>
+                        <path d="M 1205 200 H 1240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision -->
+                        <polygon points="1280,170 1320,200 1280,230 1240,200" class="uml-decision" />
+                        <text x="1280" y="155" class="uml-text" font-weight="bold">Chọn món?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 1320 200 H 1370" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1340" y="192" class="uml-label">Có</text>
+
+                        <!-- Act 8 -->
+                        <rect x="1370" y="170" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1430" y="195" class="uml-text">
+                            <tspan x="1430" dy="0">Đặt món thành công</tspan>
+                            <tspan x="1430" dy="14">&amp; Hoàn thành luồng</tspan>
+                        </text>
+                        <path d="M 1490 200 H 1530" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 1280 230 V 300 H 1370" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1290" y="260" class="uml-label">Không</text>
+
+                        <!-- Act 9 -->
+                        <rect x="1370" y="270" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1430" y="303" class="uml-text">Hủy bỏ</text>
+                        <path d="M 1490 300 H 1530" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar 2 -->
+                        <line x1="1530" y1="150" x2="1530" y2="320" class="uml-join-bar" />
+                        <path d="M 1530 200 H 1565" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- End Node -->
+                        <circle cx="1580" cy="200" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1580" cy="200" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 17: Người Dùng Chat Với Chatbot -->
+        <div class="diagram-section" id="diagram17">
+            <h2 class="diagram-title">17. Người Dùng Chat Với Chatbot</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình giao tiếp giữa người dùng và Trợ lý ảo AI trực tuyến, truy vấn tri thức RAG và phản hồi Rich Message tương tác.
+                <br><strong>Actor:</strong> Tất cả khách hàng sử dụng khung chat
+                <br><strong>AI Model:</strong> Groq API LLaMA 3.1 8B, RAG Service (TF-IDF &amp; Cosine Similarity)
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1530 350" width="1530" height="350">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Mở khung chat</tspan>
+                            <tspan x="140" dy="14">&amp; Nhập câu hỏi</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Tạo session_id &amp;</tspan>
+                            <tspan x="300" dy="14">lưu tin nhắn vào DB</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">Truy vấn tri thức</tspan>
+                            <tspan x="460" dy="14">RAG phù hợp từ DB</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Tổng hợp context</tspan>
+                            <tspan x="620" dy="14">&amp; Gửi Groq API</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Nhận phản hồi</tspan>
+                            <tspan x="780" dy="14">từ Groq LLaMA</tspan>
+                        </text>
+                        <path d="M 840 150 H 875" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision 1 -->
+                        <polygon points="915,120 955,150 915,180 875,150" class="uml-decision" />
+                        <text x="915" y="105" class="uml-text" font-weight="bold">Hỏi món ăn?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 955 150 H 1005" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="975" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 6 (Yes) -->
+                        <rect x="1005" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1065" y="145" class="uml-text">
+                            <tspan x="1065" dy="0">Truy vấn DB lấy món,</tspan>
+                            <tspan x="1065" dy="14">giá &amp; nút Đặt ngay</tspan>
+                        </text>
+                        <path d="M 1125 150 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 915 180 V 250 H 1005" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="925" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 7 (No) -->
+                        <rect x="1005" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1065" y="253" class="uml-text">Không đính kèm món</text>
+                        <path d="M 1125 250 H 1165" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1165" y1="100" x2="1165" y2="280" class="uml-join-bar" />
+                        <path d="M 1165 150 H 1205" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 8 -->
+                        <rect x="1205" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1265" y="145" class="uml-text">
+                            <tspan x="1265" dy="0">Lưu phản hồi &amp;</tspan>
+                            <tspan x="1265" dy="14">hiển thị Rich Msg</tspan>
+                        </text>
+                        <path d="M 1325 150 H 1360" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision 2 -->
+                        <polygon points="1400,120 1440,150 1400,180 1360,150" class="uml-decision" />
+                        <text x="1400" y="105" class="uml-text" font-weight="bold">Hỏi tiếp?</text>
+
+                        <!-- Path "Không" (to End) -->
+                        <path d="M 1440 150 H 1480" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1455" y="142" class="uml-label">Không</text>
+
+                        <!-- End Node -->
+                        <circle cx="1495" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1495" cy="150" r="5" fill="#000000" />
+
+                        <!-- Path "Có" (Loop back to Act 1) -->
+                        <path d="M 1400 180 V 320 H 140 V 180" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="770" y="312" class="uml-label">Có (Hỏi tiếp)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 18: Gợi Ý Món Ăn Kèm (Apriori) -->
+        <div class="diagram-section" id="diagram18">
+            <h2 class="diagram-title">18. Gợi Ý Món Ăn Kèm (Apriori Association Rules)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình phân tích giỏ hàng hiện tại và đề xuất các món ăn kèm dựa trên quy luật kết hợp mua chung được khai phá từ lịch sử hóa đơn (thuật toán Apriori).
+                <br><strong>Actor:</strong> Khách hàng đặt món
+                <br><strong>Hệ thống:</strong> Database, Python AI Service (Association Rules)
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1730 310" width="1730" height="310">
+                        <defs>
+                            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Lấy danh sách</tspan>
+                            <tspan x="140" dy="14">chi tiết đơn hàng</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Gom nhóm món ăn</tspan>
+                            <tspan x="300" dy="14">theo từng đơn hàng</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">Mã hóa One-hot</tspan>
+                            <tspan x="460" dy="14">Transaction Matrix</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Apriori: Tìm các</tspan>
+                            <tspan x="620" dy="14">tập món ăn phổ biến</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Sinh luật kết hợp</tspan>
+                            <tspan x="780" dy="14">theo Confidence &amp; Lift</tspan>
+                        </text>
+                        <path d="M 840 150 H 880" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 6 -->
+                        <rect x="880" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="940" y="145" class="uml-text">
+                            <tspan x="940" dy="0">Lọc luật tiền đề = 1</tspan>
+                            <tspan x="940" dy="14">&amp; lưu file rules.pkl</tspan>
+                        </text>
+                        <path d="M 1000 150 H 1040" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 7 -->
+                        <rect x="1040" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1100" y="145" class="uml-text">
+                            <tspan x="1100" dy="0">Tra cứu giỏ hàng</tspan>
+                            <tspan x="1100" dy="14">với rules.pkl</tspan>
+                        </text>
+                        <path d="M 1160 150 H 1200" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Act 8 -->
+                        <rect x="1200" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1260" y="145" class="uml-text">
+                            <tspan x="1260" dy="0">Tính điểm = Lift*Conf,</tspan>
+                            <tspan x="1260" dy="14">trích xuất Top món</tspan>
+                        </text>
+                        <path d="M 1320 150 H 1355" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Decision -->
+                        <polygon points="1395,120 1435,150 1395,180 1355,150" class="uml-decision" />
+                        <text x="1395" y="105" class="uml-text" font-weight="bold">Mua kèm?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 1435 150 H 1485" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1455" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 9 -->
+                        <rect x="1485" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1545" y="145" class="uml-text">Đặt hàng thành công</text>
+                        <path d="M 1605 150 H 1645" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 1395 180 V 250 H 1485" class="uml-path" marker-end="url(#arrowhead)" />
+                        <text x="1405" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 10 (Hủy) -->
+                        <rect x="1485" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1545" y="253" class="uml-text">Hủy bỏ</text>
+                        <path d="M 1605 250 H 1645" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1645" y1="100" x2="1645" y2="280" class="uml-join-bar" />
+                        <path d="M 1645 150 H 1680" class="uml-path" marker-end="url(#arrowhead)" />
+
+                        <!-- End Node -->
+                        <circle cx="1695" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1695" cy="150" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sơ đồ 19: Luồng Người Dùng Nhận Gợi Ý Món Ăn Kèm (Apriori) -->
+        <div class="diagram-section" id="diagram19">
+            <h2 class="diagram-title">19. Luồng Người Dùng Nhận Gợi Ý Món Ăn Kèm (Apriori)</h2>
+            <div class="diagram-description">
+                <strong>Mô tả:</strong> Quy trình khách hàng nhận đề xuất món ăn kèm tự động khi tương tác với giỏ hàng dựa trên các luật mua chung đã khai phá (thuật toán Apriori).
+                <br><strong>Actor:</strong> Khách hàng đặt món
+                <br><strong>Hệ thống:</strong> Web Frontend, AI Service, Database
+            </div>
+            <div class="diagram">
+                <div class="uml-svg-container">
+                    <svg class="uml-svg" viewBox="0 0 1410 310" width="1410" height="310">
+                        <defs>
+                            <marker id="arrowhead-diag19" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000" />
+                            </marker>
+                        </defs>
+
+                        <!-- Start Node -->
+                        <circle cx="30" cy="150" r="8" fill="#000000" />
+                        <path d="M 38 150 H 80" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 1 -->
+                        <rect x="80" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="140" y="145" class="uml-text">
+                            <tspan x="140" dy="0">Thêm món chính</tspan>
+                            <tspan x="140" dy="14">vào giỏ hàng</tspan>
+                        </text>
+                        <path d="M 200 150 H 240" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 2 -->
+                        <rect x="240" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="300" y="145" class="uml-text">
+                            <tspan x="300" dy="0">Frontend gửi</tspan>
+                            <tspan x="300" dy="14">giỏ hàng cho AI</tspan>
+                        </text>
+                        <path d="M 360 150 H 400" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 3 -->
+                        <rect x="400" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="460" y="145" class="uml-text">
+                            <tspan x="460" dy="0">AI Service tra cứu</tspan>
+                            <tspan x="460" dy="14">rules.pkl đã train</tspan>
+                        </text>
+                        <path d="M 520 150 H 560" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 4 -->
+                        <rect x="560" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="620" y="145" class="uml-text">
+                            <tspan x="620" dy="0">Tính điểm và lọc</tspan>
+                            <tspan x="620" dy="14">Top món kèm</tspan>
+                        </text>
+                        <path d="M 680 150 H 720" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 5 -->
+                        <rect x="720" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="780" y="145" class="uml-text">
+                            <tspan x="780" dy="0">Hiển thị gợi ý</tspan>
+                            <tspan x="780" dy="14">lên giỏ hàng</tspan>
+                        </text>
+                        <path d="M 840 150 H 875" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Decision -->
+                        <polygon points="915,120 955,150 915,180 875,150" class="uml-decision" />
+                        <text x="915" y="105" class="uml-text" font-weight="bold">Mua kèm?</text>
+
+                        <!-- Path "Có" -->
+                        <path d="M 955 150 H 1005" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+                        <text x="975" y="142" class="uml-label">Có</text>
+
+                        <!-- Act 6 -->
+                        <rect x="1005" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1065" y="145" class="uml-text">
+                            <tspan x="1065" dy="0">Thêm món kèm</tspan>
+                            <tspan x="1065" dy="14">vào giỏ hàng</tspan>
+                        </text>
+                        <path d="M 1125 150 H 1165" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Act 7 -->
+                        <rect x="1165" y="120" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="153" class="uml-text">Đặt hàng thành công</text>
+                        <path d="M 1285 150 H 1325" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Path "Không" -->
+                        <path d="M 915 180 V 250 H 1165" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+                        <text x="925" y="210" class="uml-label">Không</text>
+
+                        <!-- Act 8 -->
+                        <rect x="1165" y="220" width="120" height="60" rx="8" ry="8" class="uml-box" />
+                        <text x="1225" y="253" class="uml-text">Giữ nguyên giỏ hàng</text>
+                        <path d="M 1285 250 H 1325" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- Join Bar -->
+                        <line x1="1325" y1="100" x2="1325" y2="280" class="uml-join-bar" />
+                        <path d="M 1325 150 H 1360" class="uml-path" marker-end="url(#arrowhead-diag19)" />
+
+                        <!-- End Node -->
+                        <circle cx="1375" cy="150" r="10" fill="#ffffff" stroke="#000000" stroke-width="1.5" />
+                        <circle cx="1375" cy="150" r="5" fill="#000000" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <div style="margin-top: 60px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; text-align: center;">
             <h3 style="margin-bottom: 15px;">📊 Tổng Kết</h3>
             <p style="font-size: 1.1em; line-height: 1.8;">
-                Hệ thống bao gồm <strong>12 sơ đồ hoạt động chính</strong> mô tả đầy đủ các quy trình nghiệp vụ<br>
+                Hệ thống bao gồm <strong>19 Sơ đồ hoạt động chính</strong> mô tả đầy đủ các quy trình nghiệp vụ<br>
                 từ quản lý khách hàng, đặt hàng, thanh toán, đến quản lý nội bộ nhà hàng.<br><br>
                 <strong>Công nghệ:</strong> Node.js, Express, MySQL, Groq AI, MoMo Payment, GraphQL<br>
                 <strong>Tác giả:</strong> Nhóm phát triển Hệ thống Quản lý Nhà hàng Phương Nam<br>
@@ -1344,6 +2239,337 @@
 
         document.querySelectorAll('.diagram-section').forEach(section => {
             observer.observe(section);
+        });
+
+        // Dynamic Download Buttons for SVG/PNG in So_Do_Hoat_Dong_Day_Du.html
+        document.addEventListener('DOMContentLoaded', () => {
+            const containers = document.querySelectorAll('.uml-svg-container');
+            containers.forEach((container, index) => {
+                const svg = container.querySelector('svg');
+                if (!svg) return;
+                
+                // Assign a unique id if not present
+                const diagramId = `uml-svg-diag-${index + 13}`;
+                svg.setAttribute('id', diagramId);
+                
+                // Create control panel
+                const controlPanel = document.createElement('div');
+                controlPanel.className = 'diagram-controls';
+                controlPanel.style.display = 'flex';
+                controlPanel.style.gap = '10px';
+                controlPanel.style.marginBottom = '10px';
+                controlPanel.style.justifyContent = 'flex-end';
+                
+                // SVG Download Button
+                const btnSvg = document.createElement('button');
+                btnSvg.className = 'btn-download-dynamic';
+                btnSvg.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; margin:0; vertical-align:middle; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Tải SVG
+                `;
+                btnSvg.style.backgroundColor = '#4f46e5';
+                btnSvg.style.color = '#ffffff';
+                btnSvg.style.border = 'none';
+                btnSvg.style.borderRadius = '6px';
+                btnSvg.style.padding = '6px 12px';
+                btnSvg.style.fontSize = '12px';
+                btnSvg.style.cursor = 'pointer';
+                btnSvg.style.fontWeight = '500';
+                btnSvg.style.display = 'inline-flex';
+                btnSvg.style.alignItems = 'center';
+                btnSvg.style.transition = 'opacity 0.2s';
+                btnSvg.addEventListener('mouseenter', () => btnSvg.style.opacity = '0.9');
+                btnSvg.addEventListener('mouseleave', () => btnSvg.style.opacity = '1');
+                
+                btnSvg.addEventListener('click', () => {
+                    const svgClone = svg.cloneNode(true);
+                    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+                    style.textContent = `
+                        .uml-box {
+                            fill: #7ec0ee !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-decision {
+                            fill: #7ec0ee !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-text {
+                            font-family: 'Segoe UI', Arial, sans-serif !important;
+                            font-size: 11px !important;
+                            fill: #000000 !important;
+                        }
+                        .uml-label {
+                            font-family: 'Segoe UI', Arial, sans-serif !important;
+                            font-size: 10px !important;
+                            fill: #000000 !important;
+                        }
+                        .uml-path {
+                            fill: none !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-join-bar {
+                            stroke: #000000 !important;
+                            stroke-width: 4px !important;
+                        }
+                    `;
+                    svgClone.insertBefore(style, svgClone.firstChild);
+
+                    const serializer = new XMLSerializer();
+                    let source = serializer.serializeToString(svgClone);
+                    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\/1999\/xlink"/)) {
+                        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                    }
+                    source = '<?xml version="1.0" encoding="utf-8"?>\n' + source;
+                    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    const titleElement = container.closest('.diagram-section').querySelector('.diagram-title');
+                    const titleText = titleElement ? titleElement.textContent.trim().replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') : `diagram_${index + 13}`;
+                    link.download = `${titleText}.svg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                });
+                
+                // PNG Download Button
+                const btnPng = document.createElement('button');
+                btnPng.className = 'btn-download-dynamic';
+                btnPng.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; margin:0; vertical-align:middle; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Tải PNG
+                `;
+                btnPng.style.backgroundColor = '#10b981';
+                btnPng.style.color = '#ffffff';
+                btnPng.style.border = 'none';
+                btnPng.style.borderRadius = '6px';
+                btnPng.style.padding = '6px 12px';
+                btnPng.style.fontSize = '12px';
+                btnPng.style.cursor = 'pointer';
+                btnPng.style.fontWeight = '500';
+                btnPng.style.display = 'inline-flex';
+                btnPng.style.alignItems = 'center';
+                btnPng.style.transition = 'opacity 0.2s';
+                btnPng.addEventListener('mouseenter', () => btnPng.style.opacity = '0.9');
+                btnPng.addEventListener('mouseleave', () => btnPng.style.opacity = '1');
+                
+                btnPng.addEventListener('click', () => {
+                    const svgClone = svg.cloneNode(true);
+                    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+                    style.textContent = `
+                        .uml-box {
+                            fill: #7ec0ee !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-decision {
+                            fill: #7ec0ee !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-text {
+                            font-family: 'Segoe UI', Arial, sans-serif !important;
+                            font-size: 11px !important;
+                            fill: #000000 !important;
+                        }
+                        .uml-label {
+                            font-family: 'Segoe UI', Arial, sans-serif !important;
+                            font-size: 10px !important;
+                            fill: #000000 !important;
+                        }
+                        .uml-path {
+                            fill: none !important;
+                            stroke: #000000 !important;
+                            stroke-width: 1.5px !important;
+                        }
+                        .uml-join-bar {
+                            stroke: #000000 !important;
+                            stroke-width: 4px !important;
+                        }
+                    `;
+                    svgClone.insertBefore(style, svgClone.firstChild);
+
+                    const serializer = new XMLSerializer();
+                    let source = serializer.serializeToString(svgClone);
+                    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\/1999\/xlink"/)) {
+                        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                    }
+                    
+                    const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+                    const URLObj = window.URL || window.webkitURL || window;
+                    const blobURL = URLObj.createObjectURL(svgBlob);
+                    
+                    const image = new Image();
+                    image.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const viewBox = svg.viewBox.baseVal;
+                        const width = viewBox.width || svg.width.baseVal.value || 1400;
+                        const height = viewBox.height || svg.height.baseVal.value || 400;
+                        
+                        const scale = 2; // high resolution
+                        canvas.width = width * scale;
+                        canvas.height = height * scale;
+                        
+                        const context = canvas.getContext('2d');
+                        context.fillStyle = '#ffffff';
+                        context.fillRect(0, 0, canvas.width, canvas.height);
+                        context.scale(scale, scale);
+                        context.drawImage(image, 0, 0, width, height);
+                        
+                        canvas.toBlob((pngBlob) => {
+                            const pngURL = URLObj.createObjectURL(pngBlob);
+                            const link = document.createElement('a');
+                            link.href = pngURL;
+                            const titleElement = container.closest('.diagram-section').querySelector('.diagram-title');
+                            const titleText = titleElement ? titleElement.textContent.trim().replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') : `diagram_${index + 13}`;
+                            link.download = `${titleText}.png`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URLObj.revokeObjectURL(pngURL);
+                        }, 'image/png');
+                        URLObj.revokeObjectURL(blobURL);
+                    };
+                    image.src = blobURL;
+                });
+                
+                controlPanel.appendChild(btnSvg);
+                controlPanel.appendChild(btnPng);
+                // Insert controlPanel above container
+                container.parentNode.insertBefore(controlPanel, container);
+            });
+
+            // Full Screen Viewer Modal
+            const modal = document.createElement('div');
+            modal.id = 'uml-full-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+            modal.style.display = 'none';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '99999';
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s ease';
+            modal.style.backdropFilter = 'blur(8px)';
+            modal.style.cursor = 'zoom-out';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '20px';
+            closeBtn.style.right = '30px';
+            closeBtn.style.background = 'none';
+            closeBtn.style.border = 'none';
+            closeBtn.style.color = '#ffffff';
+            closeBtn.style.fontSize = '40px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.zIndex = '100000';
+            closeBtn.style.transition = 'transform 0.2s';
+            closeBtn.addEventListener('mouseenter', () => closeBtn.style.transform = 'scale(1.2)');
+            closeBtn.addEventListener('mouseleave', () => closeBtn.style.transform = 'scale(1)');
+            
+            const contentContainer = document.createElement('div');
+            contentContainer.id = 'uml-full-content';
+            contentContainer.style.width = '90%';
+            contentContainer.style.maxHeight = '85%';
+            contentContainer.style.overflow = 'auto';
+            contentContainer.style.backgroundColor = '#ffffff';
+            contentContainer.style.borderRadius = '12px';
+            contentContainer.style.padding = '30px';
+            contentContainer.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)';
+            contentContainer.style.cursor = 'default';
+            
+            const modalTitle = document.createElement('h3');
+            modalTitle.style.margin = '0 0 20px 0';
+            modalTitle.style.fontFamily = 'system-ui, sans-serif';
+            modalTitle.style.color = '#0f172a';
+            modalTitle.style.fontSize = '18px';
+            modalTitle.style.borderBottom = '1px solid #e2e8f0';
+            modalTitle.style.paddingBottom = '10px';
+            
+            const svgWrapper = document.createElement('div');
+            svgWrapper.style.display = 'flex';
+            svgWrapper.style.justifyContent = 'center';
+            
+            contentContainer.appendChild(modalTitle);
+            contentContainer.appendChild(svgWrapper);
+            modal.appendChild(closeBtn);
+            modal.appendChild(contentContainer);
+            document.body.appendChild(modal);
+            
+            function openModal(element, titleText) {
+                modalTitle.textContent = titleText || 'Sơ Đồ Hoạt Động (Full Size)';
+                svgWrapper.innerHTML = '';
+                
+                const cloned = element.cloneNode(true);
+                cloned.style.display = 'block';
+                cloned.style.margin = '0 auto';
+                
+                if (cloned.tagName.toLowerCase() === 'svg') {
+                    cloned.removeAttribute('style');
+                    cloned.style.width = '100%';
+                    const clonedSvgWrapper = document.createElement('div');
+                    clonedSvgWrapper.style.width = '100%';
+                    clonedSvgWrapper.style.overflowX = 'auto';
+                    clonedSvgWrapper.appendChild(cloned);
+                    svgWrapper.appendChild(clonedSvgWrapper);
+                } else {
+                    cloned.style.maxWidth = '100%';
+                    svgWrapper.appendChild(cloned);
+                }
+                
+                modal.style.display = 'flex';
+                modal.offsetHeight; // force reflow
+                modal.style.opacity = '1';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeModal() {
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target === closeBtn) {
+                    closeModal();
+                }
+            });
+            
+            contentContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            const diagrams = document.querySelectorAll('.uml-svg-container svg, .activity-diagram');
+            diagrams.forEach(diag => {
+                diag.style.cursor = 'zoom-in';
+                diag.setAttribute('title', 'Click để phóng to toàn màn hình');
+                diag.addEventListener('click', () => {
+                    let title = '';
+                    const section = diag.closest('.diagram-section');
+                    if (section) {
+                        const titleEl = section.querySelector('.diagram-title');
+                        if (titleEl) title = titleEl.textContent;
+                    }
+                    openModal(diag, title);
+                });
+            });
         });
     </script>
 </body>

@@ -49,6 +49,7 @@ a, a:hover, a:focus, a:active {
 body {
     font-family: 'Inter', 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     overflow-x: hidden;
+    margin: 0 !important;
     padding-top: 80px; /* Space for fixed navbar */
 }
 
@@ -1137,4 +1138,207 @@ a.link-primary:hover {
         align-items: center;
         font-size: 0.9375rem;
     }
+}
+
+/* ==========================================================================
+   PREMIUM 3D GLASSMORPHIC & TRANSPARENT BUTTON STYLE OVERRIDES (CLIENT-SIDE)
+   ========================================================================== */
+
+/* 1. Primary Buttons: Orange/Red Bright 3D Glass */
+.btn-primary,
+.btn-gradient,
+.btn-submit,
+#btn-confirm-payment,
+#btn-submit-booking,
+#btn-checkout,
+.checkout-btn,
+#apply-filter,
+.hero-content-mobile a[href="dat-ban.html"] {
+    position: relative;
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.78) 0%, rgba(239, 68, 68, 0.68) 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    border-bottom: 3.5px solid rgba(154, 52, 18, 0.8) !important;
+    box-shadow: 
+        0 8px 22px rgba(234, 88, 12, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.22s ease, 
+                background 0.22s ease !important;
+    transform-style: preserve-3d !important;
+    transform: translateZ(0);
+    text-decoration: none !important;
+}
+
+.btn-primary:hover,
+.btn-gradient:hover,
+.btn-submit:hover,
+#btn-confirm-payment:hover,
+#btn-submit-booking:hover,
+#btn-checkout:hover,
+.checkout-btn:hover,
+#apply-filter:hover,
+.hero-content-mobile a[href="dat-ban.html"]:hover {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.88) 0%, rgba(239, 68, 68, 0.78) 100%) !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 
+        0 12px 28px rgba(234, 88, 12, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+.btn-primary:active,
+.btn-gradient:active,
+.btn-submit:active,
+#btn-confirm-payment:active,
+#btn-submit-booking:active,
+#btn-checkout:active,
+.checkout-btn:active,
+#apply-filter:active,
+.hero-content-mobile a[href="dat-ban.html"]:active {
+    transform: translateY(2px) scale(0.98) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 
+        0 4px 10px rgba(234, 88, 12, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 2. Secondary & Cancellation Buttons: White/Cream Bright 3D Glass */
+.btn-secondary,
+.btn-cancel,
+#reset-filter,
+#mobile-filter-close,
+button[onclick="cancelPayment()"],
+button[onclick="goToStep(2)"],
+button[onclick="goToStep(1)"] {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 247, 237, 0.65) 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    color: #c2410c !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(249, 115, 22, 0.3) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 3.5px solid rgba(194, 65, 12, 0.5) !important;
+    box-shadow: 
+        0 8px 20px rgba(120, 53, 15, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+    transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.22s ease, 
+                background 0.22s ease !important;
+    transform-style: preserve-3d !important;
+    transform: translateZ(0);
+    text-decoration: none !important;
+}
+
+.btn-secondary:hover,
+.btn-cancel:hover,
+#reset-filter:hover,
+#mobile-filter-close:hover,
+button[onclick="cancelPayment()"]:hover,
+button[onclick="goToStep(2)"]:hover,
+button[onclick="goToStep(1)"]:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 247, 237, 0.78) 100%) !important;
+    color: #ea580c !important;
+    border-color: rgba(249, 115, 22, 0.4) !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 
+        0 12px 28px rgba(120, 53, 15, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.btn-secondary:active,
+.btn-cancel:active,
+#reset-filter:active,
+#mobile-filter-close:active,
+button[onclick="cancelPayment()"]:active,
+button[onclick="goToStep(2)"]:active,
+button[onclick="goToStep(1)"]:active {
+    transform: translateY(2px) scale(0.98) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 
+        0 4px 10px rgba(120, 53, 15, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+
+/* 3. General Clickable Buttons (Modern Styles) */
+.btn-modern {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 247, 237, 0.65) 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    color: #c2410c !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(249, 115, 22, 0.28) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 3.5px solid rgba(194, 65, 12, 0.55) !important;
+    box-shadow: 
+        0 8px 20px rgba(120, 53, 15, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+    transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.22s ease, 
+                background 0.22s ease !important;
+    transform-style: preserve-3d !important;
+    transform: translateZ(0);
+    text-decoration: none !important;
+}
+
+.btn-modern:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 247, 237, 0.78) 100%) !important;
+    color: #ea580c !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 
+        0 12px 28px rgba(120, 53, 15, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+.btn-modern:active {
+    transform: translateY(2px) scale(0.98) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 
+        0 4px 10px rgba(120, 53, 15, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 4. Category Filters: 3D Frosted Glass */
+.category-filter {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 247, 237, 0.65) 100%) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    color: #3f2a1d !important;
+    font-weight: 600 !important;
+    border: 1px solid rgba(249, 115, 22, 0.22) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+    border-bottom: 2.5px solid rgba(249, 115, 22, 0.35) !important;
+    box-shadow: 
+        0 6px 12px rgba(120, 53, 15, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+    transition: all 0.22s ease-in-out !important;
+    transform-style: preserve-3d !important;
+}
+
+.category-filter:hover {
+    color: #c2410c !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 247, 237, 0.75) 100%) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+    box-shadow: 
+        0 8px 16px rgba(120, 53, 15, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+.category-filter.active,
+.category-filter.filter-active {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.8) 0%, rgba(239, 68, 68, 0.7) 100%) !important;
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 2.5px solid rgba(194, 65, 12, 0.6) !important;
+    box-shadow: 
+        0 8px 16px rgba(234, 88, 12, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }

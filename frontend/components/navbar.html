@@ -1,9 +1,8 @@
 <!-- Navigation Bar -->
-<style>
-    /* Active nav link styles */
+<style>    /* Active nav link styles */
     .nav-link.active,
     .nav-link-mobile.active {
-        color: #c2410c !important;
+        color: #ea580c !important;
         position: relative;
     }
 
@@ -31,14 +30,19 @@
     }
 
     .navbar-3d {
-        background: linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(255, 255, 255, 0.99) 48%, rgba(255, 251, 235, 0.98) 100%) !important;
-        border-bottom: 1px solid rgba(217, 119, 6, 0.24);
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-top: 0 !important;
+        background: linear-gradient(135deg, rgba(255, 247, 237, 0.55) 0%, rgba(255, 255, 255, 0.6) 48%, rgba(255, 251, 235, 0.55) 100%) !important;
+        border-bottom: 1px solid rgba(217, 119, 6, 0.18);
         box-shadow:
-            0 16px 34px rgba(120, 53, 15, 0.16),
-            0 6px 16px rgba(15, 23, 42, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.95),
-            inset 0 -1px 0 rgba(180, 83, 9, 0.08);
-        backdrop-filter: blur(14px);
+            0 16px 34px rgba(120, 53, 15, 0.08),
+            0 6px 16px rgba(15, 23, 42, 0.03),
+            inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
+            inset 0 -1px 0 rgba(180, 83, 9, 0.05);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
         transform-style: preserve-3d;
     }
 
@@ -70,6 +74,73 @@
         transform-style: preserve-3d;
     }
 
+    /* ONLY apply compact styling to nav-links when user is logged in */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+        .user-logged-in .nav-link {
+            padding: 0.25rem 0.35rem !important;
+            font-size: 0.8rem !important;
+        }
+        .user-logged-in .nav-link::before {
+            inset: -0.08rem -0.2rem !important;
+        }
+    }
+
+    @media (min-width: 1280px) and (max-width: 1439px) {
+        .user-logged-in .nav-link {
+            padding: 0.3rem 0.45rem !important;
+            font-size: 0.85rem !important;
+        }
+        .user-logged-in .nav-link::before {
+            inset: -0.1rem -0.24rem !important;
+        }
+    }
+
+    @media (min-width: 1440px) and (max-width: 1535px) {
+        .user-logged-in .nav-link {
+            padding: 0.32rem 0.48rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
+
+    /* ONLY reduce desktop-menu gaps, right-side-actions gaps, and logo size when logged in */
+    .user-logged-in #desktop-menu {
+        gap: 0.375rem !important; /* lg:gap-x-1.5 */
+    }
+    
+    .user-logged-in #right-side-actions {
+        gap: 0.375rem !important; /* lg:gap-x-1.5 */
+    }
+
+    @media (min-width: 1024px) and (max-width: 1279px) {
+        .user-logged-in #logo-title {
+            font-size: 1.25rem !important; /* lg:text-xl (20px) */
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .user-logged-in #desktop-menu {
+            gap: 0.75rem !important; /* xl:gap-x-3 */
+        }
+        .user-logged-in #right-side-actions {
+            gap: 0.625rem !important; /* xl:gap-x-2.5 */
+        }
+    }
+
+    @media (min-width: 1280px) and (max-width: 1535px) {
+        .user-logged-in #logo-title {
+            font-size: 1.5rem !important; /* xl:text-2xl (24px) */
+        }
+    }
+
+    @media (min-width: 1536px) {
+        .user-logged-in #desktop-menu {
+            gap: 1rem !important; /* 2xl:gap-x-4 */
+        }
+        .user-logged-in #right-side-actions {
+            gap: 0.75rem !important; /* 2xl:gap-x-3 */
+        }
+    }
+
     .nav-link::before {
         content: '';
         position: absolute;
@@ -77,15 +148,30 @@
         z-index: -1;
         opacity: 0;
         border-radius: 999px;
-        border: 1px solid rgba(249, 115, 22, 0.32);
-        background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 46%, #fb923c 100%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(249, 115, 22, 0.22);
+        border-top: 1.5px solid rgba(255, 255, 255, 0.8);
+        border-bottom: 2.5px solid rgba(249, 115, 22, 0.35);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 248, 240, 0.65) 50%, rgba(254, 215, 170, 0.35) 100%);
         box-shadow:
-            0 12px 22px rgba(234, 88, 12, 0.24),
-            0 4px 8px rgba(120, 53, 15, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.72),
-            inset 0 -2px 4px rgba(194, 65, 12, 0.2);
+            0 12px 22px rgba(234, 88, 12, 0.1),
+            0 4px 8px rgba(120, 53, 15, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.75),
+            inset 0 -1.5px 3px rgba(249, 115, 22, 0.1);
         transform: perspective(520px) rotateX(18deg) translateY(5px) scale(0.96);
         transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    /* Hiển thị kính mờ màu cam đậm hơn một chút khi active để nổi bật */
+    .nav-link.active::before {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 248, 240, 0.75) 50%, rgba(254, 215, 170, 0.45) 100%);
+        border-color: rgba(249, 115, 22, 0.28);
+        border-bottom: 2.5px solid rgba(249, 115, 22, 0.45);
+        box-shadow:
+            0 12px 22px rgba(234, 88, 12, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.85),
+            inset 0 -1.5px 3px rgba(249, 115, 22, 0.12);
     }
 
     .nav-link:hover::before,
@@ -116,7 +202,7 @@
     .nav-link:hover,
     .nav-action-3d:hover,
     #user-menu-container > .relative > button:hover {
-        color: #9a3412 !important;
+        color: #c2410c !important;
         transform: translateY(-2px);
         filter: drop-shadow(0 4px 6px rgba(234, 88, 12, 0.18));
     }
@@ -240,16 +326,16 @@
 
 <nav id="navbar" class="navbar-3d fixed w-full top-0 z-50 bg-gradient-to-r from-[#fff7ed] via-white to-[#fffbeb] shadow-xl transition-all duration-300">
     <div class="container mx-auto px-3 sm:px-4">
-        <div class="flex items-center justify-between h-16 sm:h-18 md:h-20">
+        <div class="flex items-center justify-between flex-nowrap gap-2 lg:gap-4 h-16 sm:h-18 md:h-20">
             <!-- Logo - Responsive Design -->
             <a href="index.html" class="flex items-center space-x-1.5 sm:space-x-3 md:space-x-4 group flex-shrink-0">
                 <!-- Logo Image -->
                 <img src="images/Green Simple Clean Vegan Food Logo.png" alt="Phương Nam Logo"
-                    class="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 object-cover rounded-full border-2 border-orange-400 shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    class="w-10 sm:w-12 md:w-14 lg:w-12 xl:w-16 2xl:w-20 h-10 sm:h-12 md:h-14 lg:h-12 xl:h-16 2xl:h-20 object-cover rounded-full border-2 border-orange-400 shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
 
                 <!-- Logo Text -->
                 <div class="flex flex-col min-w-0">
-                    <h1 class="font-dancing font-bold text-[#4a2f1d] group-hover:text-orange-600 transition-colors leading-tight whitespace-nowrap"
+                    <h1 id="logo-title" class="font-dancing font-bold text-[#4a2f1d] group-hover:text-orange-600 transition-colors leading-tight whitespace-nowrap"
                         style="font-size: clamp(0.875rem, 4vw, 1.875rem);">
                          Ẩm thực Phương Nam
                     </h1>
@@ -260,32 +346,32 @@
 
 
             <!-- Desktop Menu -->
-            <div class="hidden lg:flex items-center space-x-8">
-                <a href="index.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="index">
-                    <i class="fas fa-home mr-1"></i> Trang chủ
+            <div id="desktop-menu" class="hidden lg:flex items-center flex-nowrap gap-x-2 xl:gap-x-4 2xl:gap-x-6 min-w-0">
+                <a href="index.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="index">
+                    <i class="fas fa-home mr-1 hidden xl:inline"></i> Trang chủ
                 </a>
-                <a href="gioi-thieu.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="gioi-thieu">
-                    <i class="fas fa-info-circle mr-1"></i> Giới thiệu
+                <a href="gioi-thieu.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="gioi-thieu">
+                    <i class="fas fa-info-circle mr-1 hidden xl:inline"></i> Giới thiệu
                 </a>
-                <a href="tin-tuc.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="tin-tuc">
-                    <i class="fas fa-newspaper mr-1"></i> Tin tức
+                <a href="tin-tuc.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="tin-tuc">
+                    <i class="fas fa-newspaper mr-1 hidden xl:inline"></i> Tin tức
                 </a>
-                <a href="album.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="album">
-                    <i class="fas fa-images mr-1"></i> Album ảnh
+                <a href="album.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="album">
+                    <i class="fas fa-images mr-1 hidden xl:inline"></i> Album ảnh
                 </a>
-                <a href="thuc-don.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="thuc-don">
-                    <i class="fas fa-book-open mr-1"></i> Thực đơn
+                <a href="thuc-don.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="thuc-don">
+                    <i class="fas fa-book-open mr-1 hidden xl:inline"></i> Thực đơn
                 </a>
-                <a href="dat-ban.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="dat-ban">
-                    <i class="fas fa-calendar-check mr-1"></i> Đặt bàn
+                <a href="dat-ban.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="dat-ban">
+                    <i class="fas fa-calendar-check mr-1 hidden xl:inline"></i> Đặt bàn
                 </a>
-                <a href="lien-he.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium" data-page="lien-he">
-                    <i class="fas fa-phone mr-1"></i> Liên hệ
+                <a href="lien-he.html" class="nav-link text-[#3f2a1d] hover:text-orange-600 transition font-medium whitespace-nowrap" data-page="lien-he">
+                    <i class="fas fa-phone mr-1 hidden xl:inline"></i> Liên hệ
                 </a>
             </div>
 
             <!-- Right Side Actions -->
-            <div class="hidden lg:flex items-center space-x-4">
+            <div id="right-side-actions" class="hidden lg:flex items-center flex-nowrap gap-x-2 xl:gap-x-3 2xl:gap-x-4 flex-shrink-0">
                 <!-- Search -->
                 <button class="nav-action-3d text-[#3f2a1d] hover:text-orange-600 transition">
                     <i class="fas fa-search text-xl"></i>

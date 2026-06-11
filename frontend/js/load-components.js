@@ -373,6 +373,10 @@ async function updateUserMenu() {
 
 // Render menu cho user đã đăng nhập - đồng nhất style cho cả Google và user thường
 function renderLoggedInMenu(userMenuContainer, mobileUserMenu, user, avatarUrl, displayName) {
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+        navbar.classList.add('user-logged-in');
+    }
     // Desktop User Menu - xóa toàn bộ nội dung cũ và thay thế
     // Avatar size: w-9 h-9 (36px) - đồng nhất cho tất cả các trang
     userMenuContainer.innerHTML = `
@@ -385,8 +389,8 @@ function renderLoggedInMenu(userMenuContainer, mobileUserMenu, user, avatarUrl, 
                         : `<i class="fas fa-user text-orange-600 text-sm"></i>`
                     }
                 </div>
-                <span class="hidden lg:inline font-medium text-sm max-w-[150px] truncate">${displayName}</span>
-                <i class="fas fa-chevron-down text-xs hidden lg:inline ml-1"></i>
+                <span class="hidden 2xl:inline font-medium text-sm max-w-[140px] truncate">${displayName}</span>
+                <i class="fas fa-chevron-down text-xs hidden 2xl:inline ml-1"></i>
             </button>
             <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100" style="z-index: 9999;">
                 <div class="px-4 py-3 border-b border-gray-100">
@@ -437,6 +441,10 @@ function renderLoggedInMenu(userMenuContainer, mobileUserMenu, user, avatarUrl, 
 
 // Render menu for guests (not logged in)
 function renderGuestMenu(userMenuContainer, mobileUserMenu) {
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+        navbar.classList.remove('user-logged-in');
+    }
     if (userMenuContainer) {
         userMenuContainer.innerHTML = `
             <div class="relative group">

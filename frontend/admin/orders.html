@@ -209,6 +209,41 @@
         .payment-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
         .payment-success { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
         .payment-pending { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+        .payment-failed { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+
+        /* Payment dropdown (admin edit) */
+        .payment-wrap { position: relative; display: inline-block; }
+        .payment-btn { cursor: pointer; border: none; }
+        .payment-btn:hover { filter: brightness(0.95); }
+        .payment-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            min-width: 160px;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .payment-menu.show { display: block; }
+        .payment-menu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            background: #fff;
+            border: none;
+            font-size: 0.78rem;
+            color: #334155;
+            text-align: left;
+            cursor: pointer;
+        }
+        .payment-menu button:hover { background: #f1f5f9; }
+        .payment-menu button.active { background: #eff6ff; color: #1e40af; font-weight: 700; }
 
         /* Status step buttons */
         .status-steps {
@@ -789,10 +824,27 @@
                         <td class="text-slate-500">${formatDate(order.thoi_gian_tao)}</td>
                         <td><span class="font-bold text-blue-600">${formatPrice(order.tong_tien || 0)}</span></td>
                         <td>
-                            <span class="payment-badge ${trangThaiTT === 'success' ? 'payment-success' : 'payment-pending'}">
-                                <i class="fas ${trangThaiTT === 'success' ? 'fa-check-circle' : 'fa-clock'}"></i>
-                                ${trangThaiTT === 'success' ? 'Đã TT' : 'Chưa TT'}
-                            </span>
+                            <div class="payment-wrap" data-payment-wrap="${order.ma_don_hang}">
+                                <button type="button"
+                                    onclick="event.stopPropagation(); togglePaymentMenu(${order.ma_don_hang})"
+                                    class="payment-badge payment-btn ${trangThaiTT === 'success' ? 'payment-success' : (trangThaiTT === 'failed' ? 'payment-failed' : 'payment-pending')}"
+                                    title="Click để cập nhật trạng thái thanh toán">
+                                    <i class="fas ${trangThaiTT === 'success' ? 'fa-check-circle' : (trangThaiTT === 'failed' ? 'fa-times-circle' : 'fa-clock')}"></i>
+                                    ${trangThaiTT === 'success' ? 'Đã TT' : (trangThaiTT === 'failed' ? 'TT lỗi' : 'Chưa TT')}
+                                    <i class="fas fa-caret-down ml-1 text-xs opacity-70"></i>
+                                </button>
+                                <div class="payment-menu" id="payment-menu-${order.ma_don_hang}">
+                                    <button type="button" onclick="updatePaymentStatus(${order.ma_don_hang}, 'pending')" class="${trangThaiTT === 'pending' ? 'active' : ''}">
+                                        <i class="fas fa-clock text-amber-500"></i> Chưa thanh toán
+                                    </button>
+                                    <button type="button" onclick="updatePaymentStatus(${order.ma_don_hang}, 'success')" class="${trangThaiTT === 'success' ? 'active' : ''}">
+                                        <i class="fas fa-check-circle text-emerald-500"></i> Đã thanh toán
+                                    </button>
+                                    <button type="button" onclick="updatePaymentStatus(${order.ma_don_hang}, 'failed')" class="${trangThaiTT === 'failed' ? 'active' : ''}">
+                                        <i class="fas fa-times-circle text-red-500"></i> Thanh toán lỗi
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <div class="status-steps">
@@ -812,13 +864,69 @@
             try {
                 const response = await fetch(`${API_URL}/orders/${orderId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ trang_thai_don_hang: newStatus }) });
                 const result = await response.json();
-                if (result.success) { 
+                if (result.success) {
                     showToast('Cập nhật trạng thái thành công!', 'success');
-                    loadOrders(); 
+                    loadOrders();
                 } else {
                     showToast('Lỗi: ' + result.message, 'error');
                 }
             } catch (error) { console.error('Error:', error); showToast('Có lỗi xảy ra khi cập nhật', 'error'); }
+        }
+
+        // === Trạng thái thanh toán ===
+        function togglePaymentMenu(orderId) {
+            // Đóng tất cả menu khác
+            document.querySelectorAll('.payment-menu.show').forEach(function (el) {
+                if (el.id !== 'payment-menu-' + orderId) el.classList.remove('show');
+            });
+            const menu = document.getElementById('payment-menu-' + orderId);
+            if (menu) menu.classList.toggle('show');
+        }
+
+        // Click ra ngoài → đóng menu thanh toán
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.payment-wrap')) {
+                document.querySelectorAll('.payment-menu.show').forEach(function (el) {
+                    el.classList.remove('show');
+                });
+            }
+        });
+
+        async function updatePaymentStatus(orderId, newStatus) {
+            const labels = { pending: 'Chưa thanh toán', success: 'Đã thanh toán', failed: 'Thanh toán lỗi' };
+            const order = orders.find(function (o) { return o.ma_don_hang === orderId; });
+            const current = (order && order.trang_thai_thanh_toan) || 'pending';
+            if (current === newStatus) {
+                // Không có gì thay đổi → chỉ đóng menu
+                const menu = document.getElementById('payment-menu-' + orderId);
+                if (menu) menu.classList.remove('show');
+                return;
+            }
+            if (current === 'success' && newStatus !== 'success') {
+                showToast('Đơn đã thanh toán thành công, không thể đổi sang trạng thái khác.', 'error');
+                return;
+            }
+            if (!confirm('Xác nhận đổi trạng thái thanh toán đơn #DH' + String(orderId).padStart(6, '0') + ' sang "' + labels[newStatus] + '"?')) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}/payment-status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ trang_thai_thanh_toan: newStatus })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Cập nhật trạng thái thanh toán thành công!', 'success');
+                    loadOrders();
+                } else {
+                    showToast('Lỗi: ' + (result.message || 'Không cập nhật được'), 'error');
+                }
+            } catch (err) {
+                console.error('Error updating payment:', err);
+                showToast('Lỗi kết nối server', 'error');
+            }
         }
 
         function viewOrder(orderId) {

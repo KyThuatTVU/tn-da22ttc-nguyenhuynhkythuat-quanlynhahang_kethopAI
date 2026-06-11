@@ -135,6 +135,9 @@ const SIDEBAR_TEMPLATE = `
                 <a href="contacts.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-envelope w-5"></i><span class="text-sm">Liên hệ</span>
                 </a>
+                <a href="apriori-rules.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-apriori">
+                    <i class="fas fa-project-diagram w-5"></i><span class="text-sm">Luật kết hợp AI</span>
+                </a>
                 <a href="chatbot-history.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-robot w-5"></i><span class="text-sm">Lịch sử Chatbot</span>
                 </a>

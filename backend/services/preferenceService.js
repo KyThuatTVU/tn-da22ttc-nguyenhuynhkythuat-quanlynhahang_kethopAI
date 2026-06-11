@@ -152,6 +152,24 @@ async function ensurePreferenceTables() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS chatbot_preference_insights (
+                ma_insight INT NOT NULL AUTO_INCREMENT,
+                ma_nguoi_dung INT NOT NULL,
+                ma_mon INT NULL,
+                ten_mon VARCHAR(255) NULL,
+                tag_key VARCHAR(80) NOT NULL,
+                sentiment ENUM('positive','negative','neutral') NOT NULL DEFAULT 'positive',
+                score_delta DECIMAL(10,2) NOT NULL DEFAULT 0,
+                confidence DECIMAL(5,2) NOT NULL DEFAULT 0,
+                evidence VARCHAR(255) NULL,
+                ngay_tao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (ma_insight),
+                KEY idx_user (ma_nguoi_dung),
+                KEY idx_user_tag (ma_nguoi_dung, tag_key)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
         for (const tag of TAG_DEFINITIONS) {
             await db.query(
                 `INSERT INTO preference_tags
@@ -242,18 +260,21 @@ async function rebuildUserPreferenceProfile(userId) {
             SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative_count,
             COUNT(*) as mention_count,
             AVG(confidence) as avg_confidence
-        FROM review_preference_insights
-        WHERE ma_nguoi_dung = ?
+        FROM (
+            SELECT ma_nguoi_dung, tag_key, score_delta, sentiment, confidence FROM review_preference_insights WHERE ma_nguoi_dung = ?
+            UNION ALL
+            SELECT ma_nguoi_dung, tag_key, score_delta, sentiment, confidence FROM chatbot_preference_insights WHERE ma_nguoi_dung = ?
+        ) combined
         GROUP BY ma_nguoi_dung, tag_key
         HAVING ABS(score) >= 0.25
-    `, [userId]);
+    `, [userId, userId]);
 
     for (const row of rows) {
         const mentionCount = Number(row.mention_count || 0);
         const avgConfidence = Number(row.avg_confidence || 0);
         const confidence = Math.min(1, avgConfidence * 0.65 + Math.min(mentionCount / 5, 1) * 0.35);
         const sourceSummary = JSON.stringify({
-            review_mentions: mentionCount,
+            mentions: mentionCount,
             positive_count: Number(row.positive_count || 0),
             negative_count: Number(row.negative_count || 0)
         });
@@ -463,6 +484,164 @@ async function getProfilesForUsers(userIds) {
     }, {});
 }
 
+const FLAVOR_TO_TAG_KEY = {
+    1: ['cay'],
+    2: ['chua'],
+    3: ['man'],
+    4: ['ngot'],
+    5: ['an_chay'],
+    6: ['thanh_mat'],
+    7: ['thit_bo', 'thit_ga'],
+    8: ['hai_san'],
+    9: ['chien']
+};
+
+// Hàm phụ để kiểm tra xem một cụm từ có xuất hiện trong đoạn văn hay không
+function containsPhrase(text, phrase) {
+    if (!text || !phrase) return false;
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|\\s)${escaped}(\\s|$)`).test(text);
+}
+
+async function processChatbotMessagePreference(userId, text, rebuildProfileAfter = true) {
+    try {
+        await ensurePreferenceTables();
+        const commentText = normalizeText(text || '');
+        if (!commentText || !userId) return 0;
+
+        // 1. Lấy tất cả món ăn đang hoạt động để so khớp
+        const [dishes] = await db.query(`
+            SELECT m.ma_mon, m.ten_mon, GROUP_CONCAT(DISTINCT mk.id_thuoc_tinh) as flavor_ids
+            FROM mon_an m
+            JOIN mon_an_khau_vi mk ON m.ma_mon = mk.ma_mon
+            WHERE m.trang_thai = 1
+            GROUP BY m.ma_mon, m.ten_mon
+        `);
+
+        let insertedCount = 0;
+
+        // So khớp trực tiếp món ăn
+        for (const dish of dishes) {
+            const dishNameNormalized = normalizeText(dish.ten_mon);
+            if (containsPhrase(commentText, dishNameNormalized)) {
+                const sentiment = inferSentimentAroundTag(commentText, [dishNameNormalized]);
+                const isPositive = sentiment !== 'negative';
+                const scoreDelta = isPositive ? 1.5 : -1.5;
+                const confidence = 0.8;
+
+                const flavorIds = dish.flavor_ids ? dish.flavor_ids.split(',').map(Number) : [];
+                for (const fId of flavorIds) {
+                    const tagKeys = FLAVOR_TO_TAG_KEY[fId] || [];
+                    for (const tagKey of tagKeys) {
+                        await db.query(`
+                            INSERT INTO chatbot_preference_insights
+                                (ma_nguoi_dung, ma_mon, ten_mon, tag_key, sentiment, score_delta, confidence, evidence)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            userId,
+                            dish.ma_mon,
+                            dish.ten_mon,
+                            tagKey,
+                            isPositive ? 'positive' : 'negative',
+                            scoreDelta,
+                            confidence,
+                            text.substring(0, 255)
+                        ]);
+                        insertedCount++;
+                    }
+                }
+            }
+        }
+
+        // 2. So khớp trực tiếp từ khóa khẩu vị (synonyms)
+        for (const tag of TAG_DEFINITIONS) {
+            const matches = findMatches(commentText, tag);
+            if (matches.length > 0) {
+                const sentiment = inferSentimentAroundTag(commentText, matches);
+                const isPositive = sentiment !== 'negative';
+                const scoreDelta = isPositive ? 1.5 : -1.5;
+                const confidence = 0.85;
+
+                await db.query(`
+                    INSERT INTO chatbot_preference_insights
+                        (ma_nguoi_dung, ma_mon, ten_mon, tag_key, sentiment, score_delta, confidence, evidence)
+                    VALUES (?, NULL, NULL, ?, ?, ?, ?, ?)
+                `, [
+                    userId,
+                    tag.key,
+                    isPositive ? 'positive' : 'negative',
+                    scoreDelta,
+                    confidence,
+                    matches.slice(0, 3).join(', ')
+                ]);
+                insertedCount++;
+            }
+        }
+
+        if (insertedCount > 0 && rebuildProfileAfter) {
+            await rebuildUserPreferenceProfile(userId);
+        }
+
+        return insertedCount;
+    } catch (err) {
+        console.error('Error processing chatbot message preference:', err.message);
+        return 0;
+    }
+}
+
+async function rebuildAllChatbotPreferences() {
+    try {
+        await ensurePreferenceTables();
+        await db.query('DELETE FROM chatbot_preference_insights');
+
+        const [messages] = await db.query(`
+            SELECT ma_nguoi_dung, noi_dung
+            FROM lich_su_chatbot
+            WHERE nguoi_gui = 'user' AND ma_nguoi_dung IS NOT NULL
+            ORDER BY thoi_diem_chat ASC
+        `);
+
+        console.log(`🤖 Rebuilding chatbot preferences for ${messages.length} messages...`);
+
+        let count = 0;
+        for (const msg of messages) {
+            const res = await processChatbotMessagePreference(msg.ma_nguoi_dung, msg.noi_dung, false);
+            count += res;
+        }
+
+        console.log(`🤖 Chatbot preference rebuild complete. Generated ${count} insights.`);
+        return count;
+    } catch (err) {
+        console.error('Error rebuilding all chatbot preferences:', err.message);
+        return 0;
+    }
+}
+
+async function rebuildAllProfiles() {
+    try {
+        await ensurePreferenceTables();
+        await db.query('DELETE FROM user_preference_profile');
+
+        const [users] = await db.query(`
+            SELECT DISTINCT ma_nguoi_dung FROM review_preference_insights
+            UNION
+            SELECT DISTINCT ma_nguoi_dung FROM chatbot_preference_insights
+        `);
+
+        console.log(`🤖 Rebuilding user preference profiles for ${users.length} users...`);
+
+        for (const u of users) {
+            await rebuildUserPreferenceProfile(u.ma_nguoi_dung);
+        }
+
+        console.log('🤖 Rebuilding user preference profiles complete.');
+        return users.length;
+    } catch (err) {
+        console.error('Error rebuilding all profiles:', err.message);
+        return 0;
+    }
+}
+
 module.exports = {
     ensurePreferenceTables,
     analyzeReviewPreference,
@@ -475,5 +654,8 @@ module.exports = {
     getProfilesForUsers,
     normalizeText,
     TAG_DEFINITIONS,
-    TAG_MAP
+    TAG_MAP,
+    processChatbotMessagePreference,
+    rebuildAllChatbotPreferences,
+    rebuildAllProfiles
 };

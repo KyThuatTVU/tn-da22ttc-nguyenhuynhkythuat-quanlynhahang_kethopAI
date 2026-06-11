@@ -124,6 +124,7 @@ router.post('/create', authenticateToken, async (req, res) => {
             so_luong, 
             khu_vuc, 
             ghi_chu,
+            ma_ban, // Thêm mã bàn được chọn
             mon_an // Mảng các món ăn đã chọn: [{ma_mon, so_luong, ghi_chu}]
         } = req.body;
 
@@ -134,6 +135,28 @@ router.post('/create', authenticateToken, async (req, res) => {
                 success: false,
                 message: 'Vui lòng điền đầy đủ thông tin bắt buộc'
             });
+        }
+
+        // Kiểm tra và ràng buộc bàn trống
+        if (ma_ban) {
+            const [tableRows] = await connection.query(
+                'SELECT trang_thai, ten_ban FROM ban WHERE ma_ban = ?',
+                [ma_ban]
+            );
+            if (tableRows.length === 0) {
+                await connection.rollback();
+                return res.status(400).json({
+                    success: false,
+                    message: 'Bàn được chọn không tồn tại'
+                });
+            }
+            if (tableRows[0].trang_thai !== 'trong') {
+                await connection.rollback();
+                return res.status(400).json({
+                    success: false,
+                    message: `Bàn "${tableRows[0].ten_ban}" hiện tại không trống, vui lòng chọn bàn khác`
+                });
+            }
         }
 
         // Validate phải có ít nhất 1 món ăn
@@ -223,13 +246,22 @@ router.post('/create', authenticateToken, async (req, res) => {
 
         // Insert vào bảng dat_ban
         const [result] = await connection.query(
-            `INSERT INTO dat_ban (ma_nguoi_dung, ten_nguoi_dat, so_dien_thoai, email, so_luong, ngay_dat, gio_den, ghi_chu, trang_thai, tong_tien_du_kien)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
-            [ma_nguoi_dung, ten_nguoi_dat, so_dien_thoai, email || null, parseInt(so_luong), ngay_dat, gio_den, fullGhiChu || null, tongTienMonAn]
+            `INSERT INTO dat_ban (ma_nguoi_dung, ma_ban, ten_nguoi_dat, so_dien_thoai, email, so_luong_nguoi, ngay_dat, gio_den, ghi_chu, trang_thai, tong_tien_du_kien)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+            [ma_nguoi_dung, ma_ban || null, ten_nguoi_dat, so_dien_thoai, email || null, parseInt(so_luong), ngay_dat, gio_den, fullGhiChu || null, tongTienMonAn]
         );
 
         const ma_dat_ban = result.insertId;
         console.log('✅ Đã tạo đặt bàn với mã:', ma_dat_ban);
+
+        // Cập nhật trạng thái bàn sang 'da_dat' (Đã đặt trước)
+        if (ma_ban) {
+            await connection.query(
+                "UPDATE ban SET trang_thai = 'da_dat' WHERE ma_ban = ?",
+                [ma_ban]
+            );
+            console.log(`✅ Cập nhật trạng thái bàn #${ma_ban} thành 'da_dat'`);
+        }
 
         // Insert chi tiết món ăn đã đặt
         console.log('📦 Đang insert', monAnDetails.length, 'món ăn...');
@@ -303,10 +335,13 @@ router.get('/my-reservations', authenticateToken, async (req, res) => {
         try {
             const [rows] = await db.query(`
                 SELECT db.*, 
+                       b.ten_ban,
+                       b.vi_tri as ten_khu_vuc,
                        tt.trang_thai as payment_status,
                        tt.so_tien as so_tien_da_thanh_toan,
                        tt.thoi_gian_het_han as payment_expiry
                 FROM dat_ban db
+                LEFT JOIN ban b ON db.ma_ban = b.ma_ban
                 LEFT JOIN (
                     SELECT ma_dat_ban, trang_thai, so_tien, thoi_gian_het_han
                     FROM thanh_toan_dat_ban t1
@@ -337,6 +372,7 @@ router.get('/my-reservations', authenticateToken, async (req, res) => {
                 
                 return {
                     ...r,
+                    so_luong: r.so_luong_nguoi, // Map để giữ tương thích với frontend
                     trang_thai_thanh_toan,
                     payment_status: undefined,
                     payment_expiry: undefined
@@ -536,9 +572,15 @@ router.get('/', requireAdmin, async (req, res) => {
 
         const [reservations] = await db.query(query);
 
+        // Map so_luong_nguoi thành so_luong cho frontend
+        const mappedReservations = reservations.map(r => ({
+            ...r,
+            so_luong: r.so_luong_nguoi
+        }));
+
         res.json({
             success: true,
-            data: reservations
+            data: mappedReservations
         });
     } catch (error) {
         console.error('Error fetching reservations:', error);
@@ -616,6 +658,7 @@ router.get('/:id', requireAdmin, async (req, res) => {
             success: true,
             data: {
                 ...reservations[0],
+                so_luong: reservations[0].so_luong_nguoi, // Map so_luong
                 mon_an: items
             }
         });
@@ -659,11 +702,28 @@ router.put('/:id/status', requireAdmin, async (req, res) => {
         const reservation = reservations[0];
         const oldStatus = reservation.trang_thai;
 
-        // Cập nhật trạng thái
+        // Cập nhật trạng thái đặt bàn
         await db.query(
             'UPDATE dat_ban SET trang_thai = ? WHERE ma_dat_ban = ?',
             [trang_thai, id]
         );
+
+        // Đồng bộ trạng thái bàn
+        if (reservation.ma_ban) {
+            if (trang_thai === 'cancelled') {
+                await db.query(
+                    "UPDATE ban SET trang_thai = 'trong' WHERE ma_ban = ?",
+                    [reservation.ma_ban]
+                );
+                console.log(`✅ Giải phóng bàn #${reservation.ma_ban} sau khi đặt bàn bị hủy`);
+            } else if (trang_thai === 'attended') {
+                await db.query(
+                    "UPDATE ban SET trang_thai = 'dang_phuc_vu' WHERE ma_ban = ?",
+                    [reservation.ma_ban]
+                );
+                console.log(`✅ Chuyển trạng thái bàn #${reservation.ma_ban} thành 'dang_phuc_vu' do khách đã đến`);
+            }
+        }
 
         // Gửi thông báo cho người dùng nếu có ma_nguoi_dung
         if (reservation.ma_nguoi_dung && oldStatus !== trang_thai) {
@@ -724,6 +784,9 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 
+        // Lấy thông tin đặt bàn để xem có gán bàn không
+        const [resRows] = await db.query('SELECT ma_ban FROM dat_ban WHERE ma_dat_ban = ?', [id]);
+
         // Xóa chi tiết món ăn trước
         await db.query('DELETE FROM chi_tiet_dat_ban WHERE ma_dat_ban = ?', [id]);
 
@@ -731,6 +794,15 @@ router.delete('/:id', requireAdmin, async (req, res) => {
             'DELETE FROM dat_ban WHERE ma_dat_ban = ?',
             [id]
         );
+
+        // Giải phóng bàn nếu có
+        if (resRows.length > 0 && resRows[0].ma_ban) {
+            await db.query(
+                "UPDATE ban SET trang_thai = 'trong' WHERE ma_ban = ?",
+                [resRows[0].ma_ban]
+            );
+            console.log(`✅ Giải phóng bàn #${resRows[0].ma_ban} sau khi xóa đặt bàn`);
+        }
 
         if (result.affectedRows === 0) {
             return res.status(404).json({
@@ -798,6 +870,15 @@ router.put('/:id/cancel', authenticateToken, async (req, res) => {
             'UPDATE dat_ban SET trang_thai = ? WHERE ma_dat_ban = ?',
             ['cancelled', id]
         );
+
+        // Giải phóng bàn nếu có
+        if (reservation.ma_ban) {
+            await db.query(
+                "UPDATE ban SET trang_thai = 'trong' WHERE ma_ban = ?",
+                [reservation.ma_ban]
+            );
+            console.log(`✅ Giải phóng bàn #${reservation.ma_ban} sau khi khách hàng tự hủy đặt bàn`);
+        }
 
         res.json({
             success: true,

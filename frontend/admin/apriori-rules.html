@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Luật Kết Hợp Apriori - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <!-- Vis.js for network graph -->
+    <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <style>
+        .rule-card {
+            transition: all 0.3s ease;
+        }
+        .rule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .confidence-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #f87171 0%, #fbbf24 50%, #34d399 100%);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <!-- Scrollable Main Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
+                <!-- Page Header -->
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-project-diagram text-orange-600"></i>
+                        Luật Kết Hợp Apriori (AI)
+                    </h1>
+                    <p class="text-gray-600 mt-1">Quản lý các quy tắc "Món này → Món kia" học từ lịch sử đơn hàng</p>
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="retrainModel()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Train lại Model</span>
+                        </button>
+                        <button onclick="toggleView('network')" id="btn-network" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Xem dạng Graph</span>
+                        </button>
+                        <button onclick="toggleView('list')" id="btn-list" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-list"></i>
+                            <span>Xem dạng List</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Tổng số luật</p>
+                            <p id="total-rules" class="text-2xl font-bold text-gray-900">-</p>
+                        </div>
+                        <div class="bg-blue-100 rounded-full p-3">
+                            <i class="fas fa-list text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Món gốc</p>
+                            <p id="total-antecedents" class="text-2xl font-bold text-gray-900">-</p>
+                        </div>
+                        <div class="bg-green-100 rounded-full p-3">
+                            <i class="fas fa-utensils text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Confidence TB</p>
+                            <p id="avg-confidence" class="text-2xl font-bold text-gray-900">-</p>
+                        </div>
+                        <div class="bg-purple-100 rounded-full p-3">
+                            <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                        <input type="text" id="search-input" placeholder="Tên món ăn..." 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confidence tối thiểu</label>
+                        <input type="range" id="confidence-slider" min="0" max="100" value="0" 
+                            class="w-full" oninput="document.getElementById('confidence-value').textContent = this.value + '%'">
+                        <span id="confidence-value" class="text-sm text-gray-600">0%</span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo</label>
+                        <select id="sort-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option value="confidence">Confidence (Cao → Thấp)</option>
+                            <option value="lift">Lift (Cao → Thấp)</option>
+                            <option value="antecedent">Món gốc (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Graph View -->
+            <div id="network-view" class="hidden mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-project-diagram text-blue-600"></i>
+                        Biểu đồ mối quan hệ món ăn
+                    </h3>
+                    <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-gray-700">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                            <strong>Cách đọc:</strong> Mũi tên chỉ từ món A → món B nghĩa là "khi khách mua món A, họ thường mua thêm món B"
+                        </p>
+                        <p class="text-sm text-gray-600 mt-2">
+                            • Độ dày mũi tên = Confidence (% khách mua cả 2 món)<br>
+                            • Màu mũi tên: <span class="text-red-600">Đỏ</span> (yếu) → <span class="text-yellow-600">Vàng</span> (TB) → <span class="text-green-600">Xanh</span> (mạnh)
+                        </p>
+                    </div>
+                    <div id="network-graph" style="height: 600px; border: 1px solid #e5e7eb; border-radius: 0.5rem;"></div>
+                </div>
+            </div>
+
+            <!-- Rules List -->
+            <div id="rules-container" class="space-y-4">
+                <!-- Loading skeleton -->
+                <div class="animate-pulse bg-white rounded-lg shadow p-6">
+                    <div class="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-12">
+                <i class="fas fa-inbox text-gray-300 text-6xl mb-4"></i>
+                <p class="text-gray-500 text-lg">Chưa có luật Apriori nào</p>
+                <button onclick="retrainModel()" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition">
+                    Train Model ngay
+                </button>
+            </div>
+        </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Load admin layout (sidebar + header) -->
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+    <script>
+        let allRules = [];
+        let filteredRules = [];
+
+        // Load rules on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRules();
+            
+            // Event listeners cho filters
+            document.getElementById('search-input').addEventListener('input', filterRules);
+            document.getElementById('confidence-slider').addEventListener('input', filterRules);
+            document.getElementById('sort-select').addEventListener('change', filterRules);
+        });
+
+        async function loadRules() {
+            try {
+                const response = await fetch('http://localhost:5000/api/ml/apriori/rules');
+                const result = await response.json();
+
+                if (!result.success) {
+                    showEmptyState(result.message);
+                    return;
+                }
+
+                allRules = result.data;
+                filteredRules = [...allRules];
+
+                // Update stats
+                document.getElementById('total-rules').textContent = result.meta.total_rules.toLocaleString();
+                document.getElementById('total-antecedents').textContent = result.meta.total_antecedents.toLocaleString();
+                document.getElementById('avg-confidence').textContent = (result.meta.avg_confidence * 100).toFixed(1) + '%';
+
+                renderRules();
+            } catch (error) {
+                console.error('Error loading rules:', error);
+                showEmptyState('Lỗi kết nối đến AI Service');
+            }
+        }
+
+        function filterRules() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const minConfidence = parseInt(document.getElementById('confidence-slider').value) / 100;
+            const sortBy = document.getElementById('sort-select').value;
+
+            // Filter
+            filteredRules = allRules.filter(rule => {
+                const matchesSearch = rule.antecedent.name.toLowerCase().includes(searchTerm) ||
+                                    rule.consequent.name.toLowerCase().includes(searchTerm);
+                const matchesConfidence = rule.confidence >= minConfidence;
+                return matchesSearch && matchesConfidence;
+            });
+
+            // Sort
+            filteredRules.sort((a, b) => {
+                if (sortBy === 'confidence') return b.confidence - a.confidence;
+                if (sortBy === 'lift') return b.lift - a.lift;
+                if (sortBy === 'antecedent') return a.antecedent.name.localeCompare(b.antecedent.name);
+            });
+
+            renderRules();
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rules-container');
+            const emptyState = document.getElementById('empty-state');
+
+            if (filteredRules.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            container.innerHTML = filteredRules.map(rule => `
+                <div class="rule-card bg-white rounded-lg shadow p-6">
+                    <div class="flex items-start gap-6">
+                        <!-- Antecedent (Món gốc) -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4">
+                                <img src="http://localhost:3000/images/${rule.antecedent.image}" 
+                                     alt="${rule.antecedent.name}"
+                                     class="w-20 h-20 object-cover rounded-lg"
+                                     onerror="this.src='http://localhost:3000/images/default-food.jpg'">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 mb-1">${rule.antecedent.name}</h3>
+                                    <p class="text-sm text-gray-500">${new Intl.NumberFormat('vi-VN').format(rule.antecedent.price)} đ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="flex items-center justify-center">
+                            <div class="bg-orange-100 rounded-full p-3">
+                                <i class="fas fa-arrow-right text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+
+                        <!-- Consequent (Món được gợi ý) -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4">
+                                <img src="http://localhost:3000/images/${rule.consequent.image}" 
+                                     alt="${rule.consequent.name}"
+                                     class="w-20 h-20 object-cover rounded-lg"
+                                     onerror="this.src='http://localhost:3000/images/default-food.jpg'">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 mb-1">${rule.consequent.name}</h3>
+                                    <p class="text-sm text-gray-500">${new Intl.NumberFormat('vi-VN').format(rule.consequent.price)} đ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metrics -->
+                        <div class="w-48">
+                            <div class="mb-3">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm text-gray-600">Confidence:</span>
+                                    <span class="text-sm font-semibold text-gray-900">${(rule.confidence * 100).toFixed(1)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="confidence-bar rounded-full h-2" style="width: ${rule.confidence * 100}%"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-600">Lift:</span>
+                                <span class="font-semibold ${rule.lift > 1 ? 'text-green-600' : 'text-gray-600'}">${rule.lift.toFixed(2)}x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showEmptyState(message) {
+            document.getElementById('rules-container').innerHTML = '';
+            const emptyState = document.getElementById('empty-state');
+            emptyState.classList.remove('hidden');
+            emptyState.querySelector('p').textContent = message;
+        }
+
+        function toggleView(viewType) {
+            const networkView = document.getElementById('network-view');
+            const rulesContainer = document.getElementById('rules-container');
+            const btnNetwork = document.getElementById('btn-network');
+            const btnList = document.getElementById('btn-list');
+
+            if (viewType === 'network') {
+                networkView.classList.remove('hidden');
+                rulesContainer.classList.add('hidden');
+                btnNetwork.classList.add('bg-blue-700');
+                btnNetwork.classList.remove('bg-blue-600');
+                btnList.classList.remove('bg-gray-700');
+                btnList.classList.add('bg-gray-600');
+                
+                // Render network graph
+                renderNetworkGraph();
+            } else {
+                networkView.classList.add('hidden');
+                rulesContainer.classList.remove('hidden');
+                btnList.classList.add('bg-gray-700');
+                btnList.classList.remove('bg-gray-600');
+                btnNetwork.classList.remove('bg-blue-700');
+                btnNetwork.classList.add('bg-blue-600');
+            }
+        }
+
+        function renderNetworkGraph() {
+            if (filteredRules.length === 0) return;
+
+            const container = document.getElementById('network-graph');
+            
+            // Prepare nodes and edges
+            const nodesMap = new Map();
+            const edges = [];
+
+            filteredRules.forEach((rule, index) => {
+                // Add antecedent node
+                if (!nodesMap.has(rule.antecedent.id)) {
+                    nodesMap.set(rule.antecedent.id, {
+                        id: rule.antecedent.id,
+                        label: rule.antecedent.name,
+                        title: `${rule.antecedent.name}\n${new Intl.NumberFormat('vi-VN').format(rule.antecedent.price)} đ`,
+                        shape: 'box',
+                        color: {
+                            background: '#FFF7ED',
+                            border: '#EA580C',
+                            highlight: { background: '#FFEDD5', border: '#C2410C' }
+                        },
+                        font: { size: 14, face: 'Arial' }
+                    });
+                }
+
+                // Add consequent node
+                if (!nodesMap.has(rule.consequent.id)) {
+                    nodesMap.set(rule.consequent.id, {
+                        id: rule.consequent.id,
+                        label: rule.consequent.name,
+                        title: `${rule.consequent.name}\n${new Intl.NumberFormat('vi-VN').format(rule.consequent.price)} đ`,
+                        shape: 'box',
+                        color: {
+                            background: '#EFF6FF',
+                            border: '#2563EB',
+                            highlight: { background: '#DBEAFE', border: '#1D4ED8' }
+                        },
+                        font: { size: 14, face: 'Arial' }
+                    });
+                }
+
+                // Add edge (arrow from antecedent to consequent)
+                const edgeWidth = 1 + (rule.confidence * 5); // Width based on confidence
+                
+                // Color based on lift strength
+                let edgeColor = '#EF4444'; // Red (weak)
+                if (rule.lift >= 2.0) {
+                    edgeColor = '#22C55E'; // Green (strong)
+                } else if (rule.lift >= 1.0) {
+                    edgeColor = '#EAB308'; // Yellow (medium)
+                }
+
+                edges.push({
+                    from: rule.antecedent.id,
+                    to: rule.consequent.id,
+                    arrows: 'to',
+                    width: edgeWidth,
+                    color: { color: edgeColor, highlight: edgeColor },
+                    title: `Confidence: ${(rule.confidence * 100).toFixed(1)}%\nLift: ${rule.lift.toFixed(2)}x`,
+                    smooth: { type: 'curvedCW', roundness: 0.2 }
+                });
+            });
+
+            const nodes = new vis.DataSet(Array.from(nodesMap.values()));
+            const edgesDataSet = new vis.DataSet(edges);
+
+            const data = { nodes, edges: edgesDataSet };
+            
+            const options = {
+                nodes: {
+                    borderWidth: 2,
+                    borderWidthSelected: 3,
+                    font: { color: '#374151' }
+                },
+                edges: {
+                    arrows: {
+                        to: { enabled: true, scaleFactor: 1.2 }
+                    },
+                    smooth: { type: 'curvedCW' }
+                },
+                physics: {
+                    enabled: true,
+                    solver: 'forceAtlas2Based',
+                    forceAtlas2Based: {
+                        gravitationalConstant: -50,
+                        centralGravity: 0.01,
+                        springLength: 150,
+                        springConstant: 0.08,
+                        damping: 0.4,
+                        avoidOverlap: 1
+                    },
+                    stabilization: {
+                        enabled: true,
+                        iterations: 200,
+                        updateInterval: 25
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 100,
+                    navigationButtons: true,
+                    keyboard: true
+                },
+                layout: {
+                    improvedLayout: true,
+                    hierarchical: false
+                }
+            };
+
+            // Destroy previous network if exists
+            if (window.networkInstance) {
+                window.networkInstance.destroy();
+            }
+
+            // Create new network
+            window.networkInstance = new vis.Network(container, data, options);
+
+            // Stop physics after stabilization for better performance
+            window.networkInstance.on('stabilizationIterationsDone', function() {
+                window.networkInstance.setOptions({ physics: false });
+            });
+        }
+
+        async function retrainModel() {
+            if (!confirm('Bạn có chắc muốn train lại model Apriori? Quá trình này có thể mất vài phút.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/ml/train', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Train model thành công! Đang tải lại dữ liệu...');
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                alert('Lỗi kết nối: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

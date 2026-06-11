@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Hoạt Động UML - Hệ Thống Gợi Ý & Chatbot AI</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --container-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --tab-bg: #f1f5f9;
+            --tab-active: #ffffff;
+            --transition: all 0.25s ease;
+
+            /* UML Colors */
+            --uml-text: #1e293b;
+            --uml-bg: #ffffff;
+            --uml-stroke: #cbd5e1;
+            --uml-activity-bg: #ffffff;
+            --uml-decision-bg: #dbeafe;
+            --uml-decision-stroke: #3b82f6;
+            --uml-bar-bg: #475569;
+            --uml-arrow: #1e293b;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --tab-bg: #0f172a;
+            --tab-active: #334155;
+
+            /* UML Colors */
+            --uml-text: #f8fafc;
+            --uml-bg: #1e293b;
+            --uml-stroke: #475569;
+            --uml-activity-bg: #1e293b;
+            --uml-decision-bg: #1e3a8a;
+            --uml-decision-stroke: #60a5fa;
+            --uml-bar-bg: #94a3b8;
+            --uml-arrow: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .btn-theme {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-theme:hover {
+            opacity: 0.9;
+        }
+
+        .btn-download {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Tabs Style */
+        .tabs-container {
+            display: flex;
+            background-color: var(--tab-bg);
+            padding: 6px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex: 1;
+            text-align: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background-color: transparent;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background-color: var(--tab-active);
+            color: var(--accent-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Diagram Area */
+        .diagram-wrapper {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px 10px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 460px;
+            margin-bottom: 35px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        svg {
+            display: none;
+            height: auto;
+        }
+
+        svg.active {
+            display: block;
+        }
+
+        /* UML Elements Style */
+        .uml-box {
+            fill: var(--uml-activity-bg);
+            stroke: var(--uml-stroke);
+            stroke-width: 1.5;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.05));
+            transition: var(--transition);
+        }
+
+        .uml-box:hover {
+            stroke: var(--accent-color);
+            stroke-width: 2;
+        }
+
+        .uml-decision {
+            fill: var(--uml-decision-bg);
+            stroke: var(--uml-decision-stroke);
+            stroke-width: 1.5;
+            transition: var(--transition);
+        }
+
+        .uml-decision:hover {
+            filter: brightness(0.95);
+        }
+
+        .uml-text {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            fill: var(--uml-text);
+            dominant-baseline: middle;
+            text-anchor: middle;
+        }
+
+        .uml-label {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            fill: var(--uml-text);
+        }
+
+        .uml-path {
+            fill: none;
+            stroke: var(--uml-arrow);
+            stroke-width: 1.5;
+        }
+
+        /* Info Card */
+        .info-card {
+            background-color: var(--tab-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            transition: var(--transition);
+        }
+
+        .info-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .info-meta {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .info-meta strong {
+            color: var(--text-color);
+        }
+
+        .info-steps {
+            display: none;
+        }
+
+        .info-steps.active {
+            display: block;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 20px;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 22px;
+            height: 22px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Print Style */
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+            }
+            .tabs-container, .controls {
+                display: none;
+            }
+            .diagram-wrapper {
+                page-break-inside: avoid;
+                border: none;
+                padding: 0;
+            }
+            svg {
+                display: block !important;
+                margin-bottom: 50px;
+                page-break-after: always;
+            }
+            .info-steps {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <h1>🍽️ SƠ ĐỒ HOẠT ĐỘNG CHUẨN UML TƯƠNG TÁC</h1>
+                <p>Khóa Luận Tốt Nghiệp - Hệ Thống Gợi Ý Món Ăn & Chatbot AI Phương Nam</p>
+            </div>
+            <div class="controls">
+                <button class="btn-theme" id="theme-toggle" title="Chuyển chế độ Sáng/Tối">☀️</button>
+                <button class="btn-download" id="download-svg" title="Tải ảnh SVG chuẩn Vector">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; margin:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Tải ảnh SVG
+                </button>
+                <button class="btn-download" id="download-png" title="Tải ảnh PNG" style="background-color: #10b981; margin-left: 10px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; margin:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Tải ảnh PNG
+                </button>
+            </div>
+        </header>
+
+        <!-- Segmented Tab Picker -->
+        <div class="tabs-container">
+            <button class="tab-button active" data-tab="collab">1. Lọc Cộng Tác (UML)</button>
+            <button class="tab-button" data-tab="content">2. Lọc Nội Dung (UML)</button>
+            <button class="tab-button" data-tab="popular">3. Lọc Độ Phổ Biến (UML)</button>
+            <button class="tab-button" data-tab="chatbot">4. Luồng Chatbot AI (UML)</button>
+            <button class="tab-button" data-tab="hybrid">5. Gợi Ý Tổng Hợp (UML)</button>
+            <button class="tab-button" data-tab="apriori">6. Gợi Ý Món Kèm (Apriori)</button>
+        </div>
+
+        <!-- Diagram Workspace -->
+        <div class="diagram-wrapper">
+            <!-- 1. Lọc Cộng Tác UML SVG (Ngang theo ảnh mẫu) -->
+            <svg id="collab-svg" class="active" viewBox="0 0 1440 430" width="1440" height="430">
+                <defs>
+                    <marker id="arrow-uml" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                    <!-- Gradients for 3D User shapes -->
+                    <radialGradient id="user-head-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a8c7fa"/>
+                        <stop offset="60%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1b50b5"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-blue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7baaf7"/>
+                        <stop offset="40%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1c3a94"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-orange" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ffcc80"/>
+                        <stop offset="60%" stop-color="#e67e22"/>
+                        <stop offset="100%" stop-color="#a04000"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-orange" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ffe0b2"/>
+                        <stop offset="40%" stop-color="#e67e22"/>
+                        <stop offset="100%" stop-color="#803000"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-green" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a5d6a7"/>
+                        <stop offset="60%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-green" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c8e6c9"/>
+                        <stop offset="40%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#145a32"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-purple" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#e1bee7"/>
+                        <stop offset="60%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#6a1b9a"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-purple" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f3e5f5"/>
+                        <stop offset="40%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#4a148c"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-teal" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#b2dfdb"/>
+                        <stop offset="60%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#00796b"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-teal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#e0f2f1"/>
+                        <stop offset="40%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#004d40"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-lightblue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="60%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#94a3b8"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-lightblue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f1f5f9"/>
+                        <stop offset="40%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <!-- Metallic 3D Gradients -->
+                    <linearGradient id="gold-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff9c4"/>
+                        <stop offset="30%" stop-color="#f1c40f"/>
+                        <stop offset="70%" stop-color="#f39c12"/>
+                        <stop offset="100%" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <linearGradient id="silver-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <radialGradient id="red-metallic" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ff8a80"/>
+                        <stop offset="60%" stop-color="#ea4335"/>
+                        <stop offset="100%" stop-color="#991b1b"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Start Node -->
+                <circle cx="35" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="35" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="35" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+
+                <line x1="45" y1="175" x2="100" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 1. Lấy lịch sử -->
+                <rect class="uml-box" x="100" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Circular History Clock 3D -->
+                <g transform="translate(150, 140)">
+                    <g filter="url(#shadow-3d)">
+                        <circle cx="0" cy="0" r="10" fill="url(#silver-metallic)"/>
+                        <circle cx="0" cy="0" r="8.5" fill="var(--uml-activity-bg)" stroke="url(#silver-metallic)" stroke-width="1"/>
+                        <path d="M 0 -6.5 A 6.5 6.5 0 1 1 -5.63 -3.25" fill="none" stroke="#4285f4" stroke-width="1.8" stroke-linecap="round"/>
+                        <polygon points="-5.63,-3.25 -8.5,-5.5 -3.5,-5.5" fill="#4285f4"/>
+                        <path d="M 0 -4 V 0 H 3" fill="none" stroke="var(--uml-text)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="0" cy="0" r="1" fill="#ea4335"/>
+                    </g>
+                </g>
+                <text x="150" y="200" class="uml-text">
+                    <tspan x="150" dy="0">Lấy lịch sử</tspan>
+                    <tspan x="150" dy="14">đánh giá /</tspan>
+                    <tspan x="150" dy="14">đơn hàng</tspan>
+                </text>
+
+                <line x1="200" y1="175" x2="230" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 2. Tạo ma trận -->
+                <rect class="uml-box" x="230" y="100" width="100" height="150" rx="15" />
+                <!-- Icon User + Food Matrix 3D -->
+                <g transform="translate(280, 140)">
+                    <!-- Left: User 3D -->
+                    <g transform="translate(-8, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-blue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-blue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <!-- Right: Food cloche 3D -->
+                    <g transform="translate(8, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <path d="M -11 5 C -11 3.5, 11 3.5, 11 5 Z" fill="url(#silver-metallic)"/>
+                        <line x1="-11" y1="5" x2="11" y2="5" stroke="#94a3b8" stroke-width="1"/>
+                        <path d="M -9 4 C -9 -2, -5 -4, 0 -4 C 5 -4, 9 -2, 9 4 Z" fill="url(#user-head-orange)"/>
+                        <ellipse cx="-2.5" cy="-2.5" rx="2" ry="1" fill="#fff" opacity="0.5" transform="rotate(-15)"/>
+                        <circle cx="0" cy="-5.2" r="1.5" fill="url(#gold-metallic)"/>
+                    </g>
+                    <path d="M -2 0 H 3" stroke="var(--uml-text)" stroke-width="1.5" stroke-dasharray="2,2"/>
+                </g>
+                <text x="280" y="200" class="uml-text">
+                    <tspan x="280" dy="0">Tạo ma trận</tspan>
+                    <tspan x="280" dy="14">Người dùng -</tspan>
+                    <tspan x="280" dy="14">Món ăn</tspan>
+                </text>
+
+                <line x1="330" y1="175" x2="360" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 3. Tính tương đồng Cosine -->
+                <rect class="uml-box" x="360" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Cosine Similarity (Two Users comparison 3D) -->
+                <g transform="translate(410, 140)">
+                    <g transform="translate(-8, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-blue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-blue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <g transform="translate(8, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-green)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-green)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <path d="M -2 0 H 2" stroke="var(--uml-text)" stroke-width="1.5" stroke-dasharray="2,2"/>
+                </g>
+                <text x="410" y="200" class="uml-text">
+                    <tspan x="410" dy="0">Tính tương đồng</tspan>
+                    <tspan x="410" dy="14">Cosine giữa</tspan>
+                    <tspan x="410" dy="14">người dùng</tspan>
+                </text>
+
+                <line x1="460" y1="175" x2="490" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 4. Xác định nhóm -->
+                <rect class="uml-box" x="490" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Group Users (3 People with V-necks 3D) -->
+                <g transform="translate(540, 140) scale(0.9)">
+                    <!-- Back Left User -->
+                    <g transform="translate(-7, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-lightblue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-lightblue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <!-- Back Right User -->
+                    <g transform="translate(7, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-lightblue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-lightblue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <!-- Front Center User -->
+                    <g transform="translate(0, 0)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5.5" fill="url(#user-head-blue)"/>
+                        <ellipse cx="-1.5" cy="-7.2" rx="1.3" ry="0.7" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -10 5 C -10 2, -6 1, 0 1 C 6 1, 10 2, 10 5 L 10 11 L -10 11 Z" fill="url(#user-body-blue)"/>
+                        <polygon points="-3,1 3,1 0,5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                </g>
+                <text x="540" y="200" class="uml-text">
+                    <tspan x="540" dy="0">Xác định nhóm</tspan>
+                    <tspan x="540" dy="14">người cùng</tspan>
+                    <tspan x="540" dy="14">sở thích</tspan>
+                </text>
+
+                <line x1="590" y1="175" x2="620" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 5. Lọc bỏ món ăn -->
+                <rect class="uml-box" x="620" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Funnel 3D -->
+                <g transform="translate(670, 140)">
+                    <g filter="url(#shadow-3d)">
+                        <path d="M -10 -10 L 10 -10 L 4 0 V 8 L -4 8 V 0 Z" fill="url(#silver-metallic)" stroke="#94a3b8" stroke-width="1" stroke-linejoin="round"/>
+                        <ellipse cx="0" cy="-10" rx="10" ry="2.5" fill="#475569"/>
+                        <circle cx="0" cy="-2" r="3.5" fill="url(#user-head-orange)"/>
+                        <circle cx="7" cy="7" r="4.5" fill="url(#red-metallic)"/>
+                        <line x1="4.5" y1="7" x2="9.5" y2="7" stroke="#fff" stroke-width="1.2"/>
+                    </g>
+                </g>
+                <text x="670" y="200" class="uml-text">
+                    <tspan x="670" dy="0">Lọc bỏ món ăn</tspan>
+                    <tspan x="670" dy="14">người dùng</tspan>
+                    <tspan x="670" dy="14">đã đặt</tspan>
+                </text>
+
+                <line x1="720" y1="175" x2="750" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 6. Tính điểm ưu thích -->
+                <rect class="uml-box" x="750" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Chart + Star 3D -->
+                <g transform="translate(800, 140)">
+                    <g filter="url(#shadow-3d)">
+                        <rect x="-10" y="-2" width="4.5" height="12" fill="url(#user-body-blue)" rx="0.5"/>
+                        <rect x="-4.5" y="-7" width="4.5" height="17" fill="url(#user-body-green)" rx="0.5"/>
+                        <rect x="1" y="-12" width="4.5" height="22" fill="url(#user-body-purple)" rx="0.5"/>
+                        <path d="M 8.5 -5 L 9.7 -1.5 L 13 -1.5 L 10.5 0.5 L 11.5 3.5 L 8.5 1.5 L 5.5 3.5 L 6.5 0.5 L 4 -1.5 L 7.3 -1.5 Z" fill="url(#gold-metallic)"/>
+                    </g>
+                </g>
+                <text x="800" y="200" class="uml-text">
+                    <tspan x="800" dy="0">Tính điểm ưu</tspan>
+                    <tspan x="800" dy="14">thích dự đoán</tspan>
+                </text>
+
+                <line x1="850" y1="175" x2="880" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- 7. Sắp xếp và lấy Top -->
+                <rect class="uml-box" x="880" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Podium 3D -->
+                <g transform="translate(930, 140)">
+                    <g filter="url(#shadow-3d)">
+                        <rect x="-10" y="-2" width="6" height="12" fill="url(#silver-metallic)" rx="0.5"/>
+                        <ellipse cx="-7" cy="-2" rx="3" ry="1" fill="#f1f5f9"/>
+                        <rect x="-3" y="-8" width="6" height="18" fill="url(#gold-metallic)" rx="0.5"/>
+                        <ellipse cx="0" cy="-8" rx="3" ry="1" fill="#fff9c4"/>
+                        <rect x="4" y="2" width="6" height="8" fill="url(#user-body-orange)" rx="0.5"/>
+                        <ellipse cx="7" cy="2" rx="3" ry="1" fill="#ffe0b2"/>
+                        <path d="M -3 -12 L -1 -10 L 0 -13 L 1 -10 L 3 -12 L 2 -9 H -2 Z" fill="url(#gold-metallic)"/>
+                    </g>
+                </g>
+                <text x="930" y="200" class="uml-text">
+                    <tspan x="930" dy="0">Sắp xếp và lấy</tspan>
+                    <tspan x="930" dy="14">Top món gợi ý</tspan>
+                </text>
+
+                <line x1="980" y1="175" x2="1035" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Decision Diamond -->
+                <g transform="translate(1055, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Chọn món gợi ý</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml)" />
+                </g>
+
+                <!-- Transition "Có" -> Straight right to Cart -->
+                <line x1="1080" y1="175" x2="1120" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="1098" y="167" class="uml-label">Có</text>
+
+                <!-- Transition "Không" -> Down to Hủy bỏ -->
+                <line x1="1055" y1="200" x2="1055" y2="270" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="1063" y="235" class="uml-label">Không</text>
+
+                <!-- Box Hủy bỏ -->
+                <rect class="uml-box" x="1005" y="270" width="100" height="120" rx="15" />
+                <!-- Icon Trash Can (Red) -->
+                <!-- Icon Trash Can 3D -->
+                <g transform="translate(1055, 305)">
+                    <g filter="url(#shadow-3d)">
+                        <path d="M -8 -6 H 8 L 6 12 H -6 Z" fill="url(#red-metallic)" />
+                        <path d="M -10 -8 H 10" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M -3 -8 V -11 H 3 V -8" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <text x="1055" y="355" class="uml-text">Hủy bỏ</text>
+
+                <!-- Box 8: Lưu tương tác -->
+                <rect class="uml-box" x="1120" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Shopping Cart with check -->
+                <!-- Icon Shopping Cart 3D -->
+                <g transform="translate(1170, 140)">
+                    <g filter="url(#shadow-3d)">
+                        <circle cx="-4.5" cy="5" r="2.5" fill="url(#user-head-blue)"/>
+                        <circle cx="3.5" cy="5" r="2.5" fill="url(#user-head-blue)"/>
+                        <path d="M -12 -8 H -9 L -6 2 H 4 L 7 -5 H -7" fill="none" stroke="url(#silver-metallic)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="-8" r="5" fill="url(#user-head-green)"/>
+                        <ellipse cx="4.5" cy="-9.5" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M 4.5 -8 L 5.5 -7 L 7.5 -9" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <text x="1170" y="200" class="uml-text">
+                    <tspan x="1170" dy="0">Lưu tương tác</tspan>
+                    <tspan x="1170" dy="14">món gợi ý</tspan>
+                    <tspan x="1170" dy="14">(click/mua)</tspan>
+                </text>
+
+                <line x1="1220" y1="175" x2="1250" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 9: Lưu feedback -->
+                <rect class="uml-box" x="1250" y="100" width="100" height="150" rx="15" />
+                <!-- Icon feedback (Human + Bubble with star) -->
+                <g transform="translate(1300, 140)">
+                    <!-- Human User -->
+                <!-- Icon feedback 3D -->
+                <g transform="translate(1300, 140)">
+                    <g transform="translate(-6, 2) scale(0.8)" filter="url(#shadow-3d)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-blue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-blue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <g transform="translate(8, -2) scale(0.8)" filter="url(#shadow-3d)">
+                        <path d="M -7 -6 H 7 C 9 -6, 9 -1, 7 -1 H -2 L -6 3 V -1 C -8 -1, -8 -6, -7 -6 Z" fill="url(#user-head-green)"/>
+                        <ellipse cx="-3.5" cy="-4.5" rx="2" ry="1" fill="#fff" opacity="0.4" transform="rotate(-15)"/>
+                        <path d="M 0 -4 L 0.8 -2.5 L 2.3 -2.5 L 1 -1.5 L 1.5 0 L 0 -1 L -1.5 0 L -1 -1.5 L -2.3 -2.5 L -0.8 -2.5 Z" fill="url(#gold-metallic)"/>
+                    </g>
+                </g>
+                </g>
+                <text x="1300" y="200" class="uml-text">
+                    <tspan x="1300" dy="0">Lưu feedback</tspan>
+                    <tspan x="1300" dy="14">để cải thiện</tspan>
+                </text>
+
+                <!-- Line from feedback to end -->
+                <line x1="1350" y1="175" x2="1378" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- End Node -->
+                <circle cx="1390" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1390" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1390" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+
+                <!-- Line from Hủy bỏ to End vertical line -->
+                <path d="M 1105 330 L 1390 330 L 1390 187" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Loop Back "Tùy chọn" path -->
+                <!-- Goes down from y=175 near End node to y=380, left to x=150, up to bottom of Box 1 -->
+                <path d="M 1390 187 L 1390 380 L 150 380 L 150 252" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="770" y="372" class="uml-label" style="text-anchor:middle;">Tùy chọn</text>
+            </svg>
+
+            <!-- 2. Lọc Nội Dung UML SVG (Ngang theo ảnh mẫu) -->
+            <svg id="content-svg" viewBox="0 0 1320 430" width="1320" height="430">
+                <defs>
+                    <marker id="arrow-uml-content" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d-content" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                    <!-- Gradients for 3D User shapes -->
+                    <radialGradient id="user-head-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a8c7fa"/>
+                        <stop offset="60%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1b50b5"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-blue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7baaf7"/>
+                        <stop offset="40%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1c3a94"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-orange" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ffcc80"/>
+                        <stop offset="60%" stop-color="#e67e22"/>
+                        <stop offset="100%" stop-color="#a04000"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-orange" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ffe0b2"/>
+                        <stop offset="40%" stop-color="#e67e22"/>
+                        <stop offset="100%" stop-color="#803000"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-green" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a5d6a7"/>
+                        <stop offset="60%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-green" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c8e6c9"/>
+                        <stop offset="40%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#145a32"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-purple" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#e1bee7"/>
+                        <stop offset="60%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#6a1b9a"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-purple" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f3e5f5"/>
+                        <stop offset="40%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#4a148c"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-teal" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#b2dfdb"/>
+                        <stop offset="60%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#00796b"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-teal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#e0f2f1"/>
+                        <stop offset="40%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#004d40"/>
+                    </linearGradient>
+                    <!-- Metallic 3D Gradients -->
+                    <linearGradient id="gold-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff9c4"/>
+                        <stop offset="30%" stop-color="#f1c40f"/>
+                        <stop offset="70%" stop-color="#f39c12"/>
+                        <stop offset="100%" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <linearGradient id="silver-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <radialGradient id="red-metallic" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ff8a80"/>
+                        <stop offset="60%" stop-color="#ea4335"/>
+                        <stop offset="100%" stop-color="#991b1b"/>
+                    </radialGradient>
+                </defs>
+                <!-- Start Node -->
+                <circle cx="35" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="35" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="35" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+
+                <line x1="45" y1="175" x2="100" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 1: Tương tác -->
+                <rect class="uml-box" x="100" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(150, 140)">
+                    <!-- Human User 3D -->
+                    <g transform="translate(-5, 2) scale(0.8)" filter="url(#shadow-3d-content)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-orange)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-orange)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <!-- Interaction Arrow 3D -->
+                    <path d="M 4 -1 L 11 6 M 11 6 H 7 M 11 6 V 2" stroke="var(--uml-text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow-3d-content)"/>
+                </g>
+                <text x="150" y="200" class="uml-text">
+                    <tspan x="150" dy="0">Khách hàng</tspan>
+                    <tspan x="150" dy="14">tương tác</tspan>
+                    <tspan x="150" dy="14">món ăn</tspan>
+                </text>
+
+                <line x1="200" y1="175" x2="230" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 2: Trích xuất -->
+                <rect class="uml-box" x="230" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(280, 140)" filter="url(#shadow-3d-content)">
+                    <path d="M -7 -8 C -7 -9, -6 -10, -5 -10 H 5 C 6 -10, 7 -9, 7 -8 V 8 L 0 4 L -7 8 Z" fill="url(#user-head-blue)"/>
+                    <ellipse cx="-2.5" cy="-4" rx="2" ry="1" fill="#fff" opacity="0.4" transform="rotate(-15)"/>
+                    <circle cx="0" cy="-6" r="2" fill="var(--uml-activity-bg)"/>
+                </g>
+                <text x="280" y="200" class="uml-text">
+                    <tspan x="280" dy="0">Trích xuất</tspan>
+                    <tspan x="280" dy="14">đặc trưng</tspan>
+                    <tspan x="280" dy="14">món ăn</tspan>
+                </text>
+
+                <line x1="330" y1="175" x2="360" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 3: Cập nhật vector -->
+                <rect class="uml-box" x="360" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(410, 140)">
+                    <!-- Human User 3D -->
+                    <g transform="translate(-5, 2) scale(0.8)" filter="url(#shadow-3d-content)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-purple)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-purple)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <!-- Vector Arrow 3D -->
+                    <path d="M 4 2 L 10 -4 M 10 -4 H 6 M 10 -4 V 0" stroke="var(--uml-text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow-3d-content)"/>
+                </g>
+                <text x="410" y="200" class="uml-text">
+                    <tspan x="410" dy="0">Cập nhật</tspan>
+                    <tspan x="410" dy="14">vector gu</tspan>
+                    <tspan x="410" dy="14">khách hàng</tspan>
+                </text>
+
+                <line x1="460" y1="175" x2="490" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 4: Tính tương đồng -->
+                <rect class="uml-box" x="490" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(540, 140)">
+                    <circle cx="-5" cy="0" r="8" fill="none" stroke="url(#gold-metallic)" stroke-width="1.8" filter="url(#shadow-3d-content)"/>
+                    <circle cx="5" cy="0" r="8" fill="none" stroke="url(#user-head-green)" stroke-width="1.8" filter="url(#shadow-3d-content)"/>
+                    <path d="M 0 -6.2 A 8 8 0 0 1 5 0 A 8 8 0 0 1 0 6.2 A 8 8 0 0 1 -5 0 A 8 8 0 0 1 0 -6.2 Z" fill="url(#user-head-blue)" opacity="0.75"/>
+                </g>
+                <text x="540" y="200" class="uml-text">
+                    <tspan x="540" dy="0">Tính tương đồng</tspan>
+                    <tspan x="540" dy="14">với thực đơn</tspan>
+                    <tspan x="540" dy="14">nhà hàng</tspan>
+                </text>
+
+                <line x1="590" y1="175" x2="620" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 5: Lọc bỏ món trùng -->
+                <rect class="uml-box" x="620" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(670, 140)">
+                    <g filter="url(#shadow-3d-content)">
+                        <path d="M -10 -10 L 10 -10 L 4 0 V 8 L -4 8 V 0 Z" fill="url(#silver-metallic)" stroke="#94a3b8" stroke-width="1" stroke-linejoin="round"/>
+                        <ellipse cx="0" cy="-10" rx="10" ry="2.5" fill="#475569"/>
+                        <circle cx="7" cy="7" r="4.5" fill="url(#red-metallic)"/>
+                        <line x1="5" y1="5" x2="9" y2="9" stroke="#fff" stroke-width="1.2"/>
+                        <line x1="9" y1="5" x2="5" y2="9" stroke="#fff" stroke-width="1.2"/>
+                    </g>
+                </g>
+                <text x="670" y="200" class="uml-text">
+                    <tspan x="670" dy="0">Lọc bỏ món ăn</tspan>
+                    <tspan x="670" dy="14">trùng lặp /</tspan>
+                    <tspan x="670" dy="14">đã đặt</tspan>
+                </text>
+
+                <line x1="720" y1="175" x2="750" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 6: Xếp hạng -->
+                <rect class="uml-box" x="750" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(800, 140)" filter="url(#shadow-3d-content)">
+                    <path d="M -8 -8 H 8 V -2 C 8 2.5, 4.5 6, 0 6 C -4.5 6, -8 2.5, -8 -2 Z" fill="url(#gold-metallic)"/>
+                    <ellipse cx="0" cy="-8" rx="8" ry="2" fill="#fff9c4"/>
+                    <path d="M -8 -6 H -11 V -2 H -8" fill="none" stroke="url(#gold-metallic)" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M 8 -6 H 11 V -2 H 8" fill="none" stroke="url(#gold-metallic)" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M -3 6 V 10 H 3 V 6 Z" fill="url(#user-body-orange)"/>
+                    <path d="M -6 10 H 6" stroke="url(#user-body-orange)" stroke-width="2" stroke-linecap="round"/>
+                </g>
+                <text x="800" y="200" class="uml-text">
+                    <tspan x="800" dy="0">Xếp hạng</tspan>
+                    <tspan x="800" dy="14">danh sách</tspan>
+                    <tspan x="800" dy="14">đề xuất</tspan>
+                </text>
+
+                <line x1="850" y1="175" x2="905" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Decision Diamond -->
+                <g transform="translate(925, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Chọn món gợi ý</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml)" />
+                </g>
+
+                <!-- Transition "Có" -> Cart -->
+                <line x1="950" y1="175" x2="990" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="965" y="167" class="uml-label">Có</text>
+
+                <!-- Transition "Không" -> Down to Hủy bỏ -->
+                <line x1="925" y1="200" x2="925" y2="270" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="933" y="235" class="uml-label">Không</text>
+
+                <!-- Box Hủy bỏ -->
+                <rect class="uml-box" x="875" y="270" width="100" height="120" rx="15" />
+                <g transform="translate(925, 305)">
+                    <g filter="url(#shadow-3d-content)">
+                        <path d="M -8 -6 H 8 L 6 12 H -6 Z" fill="url(#red-metallic)" />
+                        <path d="M -10 -8 H 10" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <text x="925" y="355" class="uml-text">Hủy bỏ</text>
+
+                <!-- Box 7: Đặt món thành công -->
+                <rect class="uml-box" x="990" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(1040, 140)">
+                    <g filter="url(#shadow-3d-content)">
+                        <circle cx="-4.5" cy="5" r="2.5" fill="url(#user-head-blue)"/>
+                        <circle cx="3.5" cy="5" r="2.5" fill="url(#user-head-blue)"/>
+                        <path d="M -12 -8 H -9 L -6 2 H 4 L 7 -5 H -7" fill="none" stroke="url(#silver-metallic)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="-8" r="5" fill="url(#user-head-green)"/>
+                        <ellipse cx="4.5" cy="-9.5" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M 4.5 -8 L 5.5 -7 L 7.5 -9" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <text x="1040" y="200" class="uml-text">
+                    <tspan x="1040" dy="0">Đặt món</tspan>
+                    <tspan x="1040" dy="14">thành công</tspan>
+                </text>
+
+                <line x1="1090" y1="175" x2="1120" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Box 8: Lưu feedback -->
+                <rect class="uml-box" x="1120" y="100" width="100" height="150" rx="15" />
+                <!-- Icon feedback (Human + Bubble with star) -->
+                <!-- Icon feedback 3D -->
+                <g transform="translate(1170, 140)">
+                    <g transform="translate(-6, 2) scale(0.8)" filter="url(#shadow-3d-content)">
+                        <circle cx="0" cy="-5" r="5" fill="url(#user-head-blue)"/>
+                        <ellipse cx="-1.5" cy="-7" rx="1.2" ry="0.6" fill="#fff" opacity="0.6" transform="rotate(-15)"/>
+                        <path d="M -9 5 C -9 2, -6 1, 0 1 C 6 1, 9 2, 9 5 L 9 10 L -9 10 Z" fill="url(#user-body-blue)"/>
+                        <polygon points="-2.5,1 2.5,1 0,4.5" fill="var(--uml-activity-bg)"/>
+                    </g>
+                    <g transform="translate(8, -2) scale(0.8)" filter="url(#shadow-3d-content)">
+                        <path d="M -7 -6 H 7 C 9 -6, 9 -1, 7 -1 H -2 L -6 3 V -1 C -8 -1, -8 -6, -7 -6 Z" fill="url(#user-head-green)"/>
+                        <ellipse cx="-3.5" cy="-4.5" rx="2" ry="1" fill="#fff" opacity="0.4" transform="rotate(-15)"/>
+                        <path d="M 0 -4 L 0.8 -2.5 L 2.3 -2.5 L 1 -1.5 L 1.5 0 L 0 -1 L -1.7 -1 L -1.2 -2.5 L -2.5 -3.5 L -1 -3.5 Z" fill="url(#gold-metallic)"/>
+                    </g>
+                </g>
+                <text x="1170" y="200" class="uml-text">
+                    <tspan x="1170" dy="0">Lưu feedback</tspan>
+                    <tspan x="1170" dy="14">nâng cao</tspan>
+                    <tspan x="1170" dy="14">mô hình</tspan>
+                </text>
+
+                <line x1="1220" y1="175" x2="1258" y2="175" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- End Node -->
+                <circle cx="1270" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1270" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1270" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+
+                <!-- Line from Hủy bỏ to End vertical line -->
+                <path d="M 975 330 L 1270 330 L 1270 187" class="uml-path" marker-end="url(#arrow-uml)" />
+
+                <!-- Loop Back "Tùy chọn" path -->
+                <path d="M 1270 187 L 1270 380 L 150 380 L 150 252" class="uml-path" marker-end="url(#arrow-uml)" />
+                <text x="710" y="372" class="uml-label" style="text-anchor:middle;">Tùy chọn</text>
+            </svg>
+
+            <!-- 3. Lọc Độ Phổ Biến UML SVG (Ngang theo ảnh mẫu) -->
+            <svg id="popular-svg" viewBox="0 0 1320 430" width="1320" height="430">
+                <defs>
+                    <marker id="arrow-uml-popular" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d-popular" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                    <!-- Gradients for 3D User shapes -->
+                    <radialGradient id="user-head-teal" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#b2dfdb"/>
+                        <stop offset="60%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#00796b"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-teal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#e0f2f1"/>
+                        <stop offset="40%" stop-color="#1abc9c"/>
+                        <stop offset="100%" stop-color="#004d40"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a8c7fa"/>
+                        <stop offset="60%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1b50b5"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-blue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7baaf7"/>
+                        <stop offset="40%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1c3a94"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-green" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a5d6a7"/>
+                        <stop offset="60%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </radialGradient>
+                    <!-- Metallic 3D Gradients -->
+                    <radialGradient id="globe-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#4fc3f7"/>
+                        <stop offset="60%" stop-color="#0288d1"/>
+                        <stop offset="100%" stop-color="#01579b"/>
+                    </radialGradient>
+                    <linearGradient id="bar-blue-grad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#1e88e5"/>
+                        <stop offset="50%" stop-color="#42a5f5"/>
+                        <stop offset="100%" stop-color="#1565c0"/>
+                    </linearGradient>
+                    <linearGradient id="bar-green-grad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#2e7d32"/>
+                        <stop offset="50%" stop-color="#4caf50"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </linearGradient>
+                    <linearGradient id="bar-yellow-grad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#f57f17"/>
+                        <stop offset="50%" stop-color="#fbc02d"/>
+                        <stop offset="100%" stop-color="#f57f17"/>
+                    </linearGradient>
+                    <linearGradient id="arrow-purple-grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c084fc"/>
+                        <stop offset="50%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#6b21a8"/>
+                    </linearGradient>
+                    <linearGradient id="silver-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <linearGradient id="gold-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff9c4"/>
+                        <stop offset="30%" stop-color="#f1c40f"/>
+                        <stop offset="70%" stop-color="#f39c12"/>
+                        <stop offset="100%" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <radialGradient id="red-metallic" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ff8a80"/>
+                        <stop offset="60%" stop-color="#ea4335"/>
+                        <stop offset="100%" stop-color="#991b1b"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Start Node -->
+                <circle cx="35" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="35" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="35" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+
+                <line x1="45" y1="175" x2="100" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 1: Khách vãng lai -->
+                <rect class="uml-box" x="100" y="100" width="100" height="150" rx="15" />
+                <!-- Globe + User 3D -->
+                <g transform="translate(150, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- 3D Globe -->
+                    <g transform="translate(8, -2)">
+                        <circle cx="0" cy="0" r="11" fill="url(#globe-blue)"/>
+                        <path d="M -11 0 A 11 11 0 0 0 11 0 M -11 0 A 11 5 0 0 0 11 0 M -11 0 A 11 5 0 0 1 11 0 M 0 -11 A 11 11 0 0 0 0 11 M 0 -11 A 5 11 0 0 0 0 11 M 0 -11 A 5 11 0 0 1 0 11" fill="none" stroke="#e0f2f1" stroke-width="0.8" opacity="0.6"/>
+                        <ellipse cx="-3.5" cy="-3.5" rx="3.5" ry="2" fill="#fff" opacity="0.55" transform="rotate(-20 -3.5 -3.5)"/>
+                    </g>
+                    <!-- 3D User -->
+                    <g transform="translate(-8, 3)">
+                        <circle cx="0" cy="-6" r="6" fill="url(#user-head-teal)" />
+                        <path d="M -10 4 C -10 1, -6 0, 0 0 C 6 0, 10 1, 10 4 L 10 10 L -10 10 Z" fill="url(#user-body-teal)" />
+                        <ellipse cx="-1.8" cy="-8.2" rx="1.5" ry="0.8" fill="#fff" opacity="0.6" transform="rotate(-15 -1.8 -8.2)" />
+                    </g>
+                </g>
+                <text x="150" y="200" class="uml-text">
+                    <tspan x="150" dy="0">Khách vãng lai</tspan>
+                    <tspan x="150" dy="14">truy cập</tspan>
+                    <tspan x="150" dy="14">website</tspan>
+                </text>
+
+                <line x1="200" y1="175" x2="230" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 2: Thống kê đơn hàng -->
+                <rect class="uml-box" x="230" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(280, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- 3D Columns -->
+                    <g>
+                        <!-- Col 1 (Blue) -->
+                        <path d="M -12 -3 L -8 -3 L -8 10 L -12 10 Z" fill="url(#bar-blue-grad)" />
+                        <ellipse cx="-10" cy="-3" rx="2" ry="1" fill="#90caf9" />
+                        <!-- Col 2 (Green) -->
+                        <path d="M -6 -10 L -2 -10 L -2 10 L -6 10 Z" fill="url(#bar-green-grad)" />
+                        <ellipse cx="-4" cy="-10" rx="2" ry="1" fill="#a5d6a7" />
+                        <!-- Col 3 (Yellow) -->
+                        <path d="M 0 -1 L 4 -1 L 4 10 L 0 10 Z" fill="url(#bar-yellow-grad)" />
+                        <ellipse cx="2" cy="-1" rx="2" ry="1" fill="#ffe082" />
+                    </g>
+                    <!-- 3D Eye -->
+                    <g transform="translate(4, 0)">
+                        <path d="M 6 2 Q 13 -6 20 2 Q 13 10 6 2 Z" fill="#fff" stroke="#94a3b8" stroke-width="0.5"/>
+                        <circle cx="13" cy="2" r="4.5" fill="url(#user-head-blue)" />
+                        <circle cx="13" cy="2" r="2" fill="#0f172a" />
+                        <circle cx="11.5" cy="0.5" r="1" fill="#fff" />
+                    </g>
+                </g>
+                <text x="280" y="200" class="uml-text">
+                    <tspan x="280" dy="0">Thống kê</tspan>
+                    <tspan x="280" dy="14">đơn hàng &</tspan>
+                    <tspan x="280" dy="14">lượt xem</tspan>
+                </text>
+
+                <line x1="330" y1="175" x2="360" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 3: Tính điểm Hot -->
+                <rect class="uml-box" x="360" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(410, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Outer Flame -->
+                    <path d="M 0 -14 C -8 -7 -10 -2 -10 4 C -10 9 -5 13 0 13 C 5 13 10 9 10 4 C 10 -2 8 -7 0 -14 Z" fill="url(#red-metallic)" />
+                    <!-- Middle Flame -->
+                    <path d="M 0 -8 C -5 -3 -6 0 -6 4 C -6 7 -3 10 0 10 C 3 10 6 7 6 4 C 6 0 5 -3 0 -8 Z" fill="url(#gold-metallic)" />
+                    <!-- Inner Core -->
+                    <path d="M 0 -3 C -2 -1 -3 1 -3 3 C -3 5 -1 6 0 6 C 1 6 3 5 3 3 C 3 1 2 -1 0 -3 Z" fill="#fff" opacity="0.8" />
+                </g>
+                <text x="410" y="200" class="uml-text">
+                    <tspan x="410" dy="0">Tính điểm Hot</tspan>
+                    <tspan x="410" dy="14">xu hướng</tspan>
+                    <tspan x="410" dy="14">(Time Decay)</tspan>
+                </text>
+
+                <line x1="460" y1="175" x2="490" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 4: Sắp xếp -->
+                <rect class="uml-box" x="490" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(540, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Stacked 3D Plates -->
+                    <rect x="-14" y="-12" width="16" height="6" rx="2" fill="url(#silver-metallic)" stroke="#94a3b8" stroke-width="0.5"/>
+                    <line x1="-10" y1="-9" x2="-2" y2="-9" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
+                    
+                    <rect x="-14" y="-3" width="12" height="6" rx="2" fill="url(#silver-metallic)" stroke="#94a3b8" stroke-width="0.5"/>
+                    <line x1="-10" y1="0" x2="-4" y2="0" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
+                    
+                    <rect x="-14" y="6" width="8" height="6" rx="2" fill="url(#silver-metallic)" stroke="#94a3b8" stroke-width="0.5"/>
+                    <line x1="-10" y1="9" x2="-8" y2="9" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
+
+                    <!-- 3D Purple Arrow -->
+                    <path d="M 6 -12 H 10 V 0 H 13 L 8 9 L 3 0 H 6 Z" fill="url(#arrow-purple-grad)" />
+                </g>
+                <text x="540" y="200" class="uml-text">
+                    <tspan x="540" dy="0">Sắp xếp</tspan>
+                    <tspan x="540" dy="14">thực đơn</tspan>
+                    <tspan x="540" dy="14">giảm dần</tspan>
+                </text>
+
+                <line x1="590" y1="175" x2="620" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 5: Lọc món sẵn sàng -->
+                <rect class="uml-box" x="620" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(670, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Tray bottom shadow -->
+                    <ellipse cx="0" cy="5" rx="14" ry="2" fill="#000" opacity="0.15" />
+                    <!-- Knob -->
+                    <circle cx="0" cy="-10" r="2.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5" />
+                    <!-- Dome Cover -->
+                    <path d="M -12 2 C -12 -7, -9 -9, 0 -9 C 9 -9, 12 -7, 12 2 Z" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5" />
+                    <!-- Reflection highlight -->
+                    <path d="M -8 -2 A 7 7 0 0 1 -1 -7" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.6" stroke-linecap="round"/>
+                    <!-- Tray plate -->
+                    <rect x="-15" y="2" width="30" height="3" rx="1.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5" />
+                    <!-- Green glossy status lamp -->
+                    <circle cx="10" cy="-4" r="4.5" fill="url(#user-head-green)" stroke="#fff" stroke-width="0.5" />
+                    <ellipse cx="9" cy="-5" rx="1.2" ry="0.6" fill="#fff" opacity="0.7" transform="rotate(-15 9 -5)" />
+                </g>
+                <text x="670" y="200" class="uml-text">
+                    <tspan x="670" dy="0">Lọc món ăn</tspan>
+                    <tspan x="670" dy="14">đang sẵn sàng</tspan>
+                    <tspan x="670" dy="14">phục vụ</tspan>
+                </text>
+
+                <line x1="720" y1="175" x2="750" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 6: Trích xuất top món -->
+                <rect class="uml-box" x="750" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(800, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Base shadow -->
+                    <ellipse cx="0" cy="14" rx="8" ry="2" fill="#000" opacity="0.2"/>
+                    <!-- Handles -->
+                    <path d="M -10 -7 C -15 -7, -15 0, -8 0" fill="none" stroke="url(#gold-metallic)" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M 10 -7 C 15 -7, 15 0, 8 0" fill="none" stroke="url(#gold-metallic)" stroke-width="2.2" stroke-linecap="round"/>
+                    <!-- Cup Bowl -->
+                    <path d="M -10 -10 H 10 L 8 1 C 8 6, 4 9, 0 9 C -4 9, -8 6, -8 1 Z" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5"/>
+                    <!-- Specular Highlight on bowl -->
+                    <path d="M -7 -7 C -7 -3, -5 4, 0 5" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.6" stroke-linecap="round"/>
+                    <!-- Stem -->
+                    <rect x="-2.5" y="9" width="5" height="4" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5"/>
+                    <!-- Base -->
+                    <path d="M -6 13 L 6 13 L 8 15 H -8 Z" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5"/>
+                </g>
+                <text x="800" y="200" class="uml-text">
+                    <tspan x="800" dy="0">Trích xuất</tspan>
+                    <tspan x="800" dy="14">Top món</tspan>
+                    <tspan x="800" dy="14">bán chạy</tspan>
+                </text>
+
+                <line x1="850" y1="175" x2="905" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Decision Diamond -->
+                <g transform="translate(925, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Chọn món gợi ý</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+                </g>
+
+                <!-- Transition "Có" -> Cart -->
+                <line x1="950" y1="175" x2="990" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+                <text x="965" y="167" class="uml-label">Có</text>
+
+                <!-- Transition "Không" -> Down to Hủy bỏ -->
+                <line x1="925" y1="200" x2="925" y2="270" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+                <text x="933" y="235" class="uml-label">Không</text>
+
+                <!-- Box Hủy bỏ -->
+                <rect class="uml-box" x="875" y="270" width="100" height="120" rx="15" />
+                <g transform="translate(925, 305)" filter="url(#shadow-3d-popular)">
+                    <!-- Bin Body -->
+                    <path d="M -7 -4 L -5 10 A 3 1.5 0 0 0 5 10 L 7 -4 Z" fill="url(#red-metallic)" stroke="#991b1b" stroke-width="0.5" />
+                    <!-- Ridges -->
+                    <line x1="-3" y1="-2" x2="-2" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <line x1="0" y1="-2" x2="0" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <line x1="3" y1="-2" x2="2" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <!-- Rim/Lid -->
+                    <ellipse cx="0" cy="-4" rx="8" ry="2" fill="url(#red-metallic)" stroke="#991b1b" stroke-width="0.5" />
+                    <!-- Lid Handle -->
+                    <path d="M -2.5 -6 C -2.5 -8, 2.5 -8, 2.5 -6" fill="none" stroke="url(#red-metallic)" stroke-width="1.5" stroke-linecap="round" />
+                </g>
+                <text x="925" y="355" class="uml-text">Hủy bỏ</text>
+
+                <!-- Box 7: Đặt món thành công -->
+                <rect class="uml-box" x="990" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(1040, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Basket Body 3D -->
+                    <path d="M -12 -7 L -9 1 C -9 2, -8 3, -7 3 H 3 C 4 3, 5 2, 5 1 L 8 -5 H -6" fill="none" stroke="url(#user-body-blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M -9 -2 H 6 M -8 1 H 4 M -3 -5 L -5 3 M 1 -5 L 0 3" stroke="#93c5fd" stroke-width="0.8" opacity="0.6"/>
+                    <path d="M -12 -7 H -14" stroke="url(#user-body-blue)" stroke-width="2.2" stroke-linecap="round"/>
+                    <!-- Wheels -->
+                    <circle cx="-6" cy="7" r="2.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5"/>
+                    <circle cx="-6" cy="7" r="1" fill="#1e293b"/>
+                    <circle cx="2" cy="7" r="2.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5"/>
+                    <circle cx="2" cy="7" r="1" fill="#1e293b"/>
+                    <!-- Glossy green check circle -->
+                    <g transform="translate(7, -8)">
+                        <circle cx="0" cy="0" r="5" fill="url(#user-head-green)" stroke="#fff" stroke-width="0.5"/>
+                        <ellipse cx="-1" cy="-1.5" rx="1" ry="0.5" fill="#fff" opacity="0.7" transform="rotate(-15 -1 -1.5)"/>
+                        <path d="M -2.5 0 L -0.8 1.7 L 2.5 -1.5" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                </g>
+                <text x="1040" y="200" class="uml-text">
+                    <tspan x="1040" dy="0">Đặt món</tspan>
+                    <tspan x="1040" dy="14">thành công</tspan>
+                </text>
+
+                <line x1="1090" y1="175" x2="1120" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Box 8: Cập nhật thống kê -->
+                <rect class="uml-box" x="1120" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(1170, 140)" filter="url(#shadow-3d-popular)">
+                    <!-- Top-Right arrow -->
+                    <path d="M -10 0 A 10 10 0 0 1 7 -7" fill="none" stroke="url(#user-body-blue)" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M 3 -10 L 9 -7 L 5 -2 Z" fill="url(#user-head-blue)" stroke="#1b50b5" stroke-width="0.5"/>
+                    <!-- Bottom-Left arrow -->
+                    <path d="M 10 0 A 10 10 0 0 1 -7 7" fill="none" stroke="url(#user-body-blue)" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M -3 10 L -9 7 L -5 2 Z" fill="url(#user-head-blue)" stroke="#1b50b5" stroke-width="0.5"/>
+                    <!-- Center glow dot -->
+                    <circle cx="0" cy="0" r="2" fill="url(#gold-metallic)" stroke="#fff" stroke-width="0.5"/>
+                </g>
+                <text x="1170" y="200" class="uml-text">
+                    <tspan x="1170" dy="0">Cập nhật</tspan>
+                    <tspan x="1170" dy="14">thống kê</tspan>
+                    <tspan x="1170" dy="14">hệ thống</tspan>
+                </text>
+
+                <line x1="1220" y1="175" x2="1258" y2="175" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- End Node -->
+                <circle cx="1270" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1270" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1270" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+
+                <!-- Line from Hủy bỏ to End vertical line -->
+                <path d="M 975 330 L 1270 330 L 1270 187" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+
+                <!-- Loop Back "Tùy chọn" path -->
+                <path d="M 1270 187 L 1270 380 L 150 380 L 150 252" class="uml-path" marker-end="url(#arrow-uml-popular)" />
+                <text x="710" y="372" class="uml-label" style="text-anchor:middle;">Tùy chọn</text>
+            </svg>
+            <!-- 4. Luồng Chatbot AI UML SVG (Ngang theo ảnh mẫu) -->
+            <svg id="chatbot-svg" viewBox="0 0 1320 430" width="1320" height="430">
+                <defs>
+                    <marker id="arrow-uml-chatbot" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d-chatbot" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                    <!-- Gradients for 3D User shapes -->
+                    <radialGradient id="user-head-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a8c7fa"/>
+                        <stop offset="60%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1b50b5"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-blue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7baaf7"/>
+                        <stop offset="40%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1c3a94"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-green" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a5d6a7"/>
+                        <stop offset="60%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </radialGradient>
+                    <radialGradient id="user-head-purple" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#e1bee7"/>
+                        <stop offset="60%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#6a1b9a"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-purple" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f3e5f5"/>
+                        <stop offset="40%" stop-color="#9b59b6"/>
+                        <stop offset="100%" stop-color="#4a148c"/>
+                    </linearGradient>
+                    <!-- Metallic 3D Gradients -->
+                    <radialGradient id="globe-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#4fc3f7"/>
+                        <stop offset="60%" stop-color="#0288d1"/>
+                        <stop offset="100%" stop-color="#01579b"/>
+                    </radialGradient>
+                    <linearGradient id="silver-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <linearGradient id="gold-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff9c4"/>
+                        <stop offset="30%" stop-color="#f1c40f"/>
+                        <stop offset="70%" stop-color="#f39c12"/>
+                        <stop offset="100%" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <radialGradient id="red-metallic" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ff8a80"/>
+                        <stop offset="60%" stop-color="#ea4335"/>
+                        <stop offset="100%" stop-color="#991b1b"/>
+                    </radialGradient>
+                    <linearGradient id="db-cylinder-blue" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#1976d2"/>
+                        <stop offset="50%" stop-color="#42a5f5"/>
+                        <stop offset="100%" stop-color="#0d47a1"/>
+                    </linearGradient>
+                    <radialGradient id="db-cylinder-top-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#90caf9"/>
+                        <stop offset="70%" stop-color="#42a5f5"/>
+                        <stop offset="100%" stop-color="#1e88e5"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Start Node -->
+                <circle cx="35" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="35" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="35" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+
+                <line x1="45" y1="175" x2="100" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 1: Khách mở chatbot -->
+                <rect class="uml-box" x="100" y="100" width="100" height="150" rx="15" />
+                <!-- User + Robot 3D -->
+                <g transform="translate(150, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- 3D Blue User -->
+                    <g transform="translate(-8, 3)">
+                        <circle cx="0" cy="-6" r="6" fill="url(#user-head-blue)" />
+                        <path d="M -10 4 C -10 1, -6 0, 0 0 C 6 0, 10 1, 10 4 L 10 10 L -10 10 Z" fill="url(#user-body-blue)" />
+                        <ellipse cx="-1.8" cy="-8.2" rx="1.5" ry="0.8" fill="#fff" opacity="0.6" transform="rotate(-15 -1.8 -8.2)" />
+                    </g>
+                    <!-- 3D Robot Head -->
+                    <g transform="translate(8, -2)">
+                        <!-- Antenna -->
+                        <line x1="0" y1="-7" x2="0" y2="-12" stroke="url(#silver-metallic)" stroke-width="1.5"/>
+                        <circle cx="0" cy="-13" r="2" fill="url(#red-metallic)" stroke="#fff" stroke-width="0.3"/>
+                        <!-- Head Sphere -->
+                        <circle cx="0" cy="0" r="8.5" fill="url(#silver-metallic)" stroke="#64748b" stroke-width="0.5"/>
+                        <!-- Glowing blue eyes -->
+                        <circle cx="-3" cy="-1.5" r="1.5" fill="#38bdf8"/>
+                        <circle cx="-3" cy="-1.5" r="0.7" fill="#fff"/>
+                        <circle cx="3" cy="-1.5" r="1.5" fill="#38bdf8"/>
+                        <circle cx="3" cy="-1.5" r="0.7" fill="#fff"/>
+                        <!-- Ears -->
+                        <rect x="-10" y="-2" width="1.5" height="4" rx="0.5" fill="url(#silver-metallic)"/>
+                        <rect x="8.5" y="-2" width="1.5" height="4" rx="0.5" fill="url(#silver-metallic)"/>
+                        <!-- Mouth -->
+                        <rect x="-3" y="3" width="6" height="1.5" rx="0.5" fill="#1e293b"/>
+                        <line x1="-2" y1="3.8" x2="2" y2="3.8" stroke="#38bdf8" stroke-width="0.6"/>
+                        <!-- Glass specular reflection -->
+                        <ellipse cx="-3" cy="-4.5" rx="3.5" ry="1.5" fill="#fff" opacity="0.6" transform="rotate(-15 -3 -4.5)"/>
+                    </g>
+                </g>
+                <text x="150" y="200" class="uml-text">
+                    <tspan x="150" dy="0">Khách hàng</tspan>
+                    <tspan x="150" dy="14">mở Chatbot</tspan>
+                </text>
+
+                <line x1="200" y1="175" x2="230" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 2: Lấy session_id -->
+                <rect class="uml-box" x="230" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(280, 140) rotate(-45)" filter="url(#shadow-3d-chatbot)">
+                    <!-- Key shaft -->
+                    <rect x="-3" y="-1.5" width="18" height="3" rx="1" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5" />
+                    <!-- Key head (Ring) -->
+                    <circle cx="-6" cy="0" r="6.5" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5" />
+                    <circle cx="-6" cy="0" r="3" fill="var(--uml-activity-bg)" stroke="#b7791f" stroke-width="0.5" />
+                    <!-- Key teeth -->
+                    <rect x="8" y="1" width="3" height="4" rx="0.5" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5" />
+                    <rect x="12" y="1" width="3" height="4" rx="0.5" fill="url(#gold-metallic)" stroke="#b7791f" stroke-width="0.5" />
+                    <!-- Specular reflection -->
+                    <circle cx="-8" cy="-2.5" r="1" fill="#fff" opacity="0.8" />
+                    <line x1="-2" y1="-0.8" x2="10" y2="-0.8" stroke="#fff" stroke-width="0.7" opacity="0.6" />
+                </g>
+                <text x="280" y="200" class="uml-text">
+                    <tspan x="280" dy="0">Tạo hoặc lấy</tspan>
+                    <tspan x="280" dy="14">session_id</tspan>
+                </text>
+
+                <line x1="330" y1="175" x2="360" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 3: Nhập câu hỏi (Loop target) -->
+                <rect class="uml-box" x="360" y="100" width="100" height="150" rx="15" />
+                <!-- 3D User + 3D Bubble Question -->
+                <g transform="translate(410, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- 3D Blue User -->
+                    <g transform="translate(-8, 3)">
+                        <circle cx="0" cy="-6" r="6" fill="url(#user-head-blue)" />
+                        <path d="M -10 4 C -10 1, -6 0, 0 0 C 6 0, 10 1, 10 4 L 10 10 L -10 10 Z" fill="url(#user-body-blue)" />
+                        <ellipse cx="-1.8" cy="-8.2" rx="1.5" ry="0.8" fill="#fff" opacity="0.6" transform="rotate(-15 -1.8 -8.2)" />
+                    </g>
+                    <!-- 3D Question Bubble -->
+                    <g transform="translate(8, -3)">
+                        <path d="M -8 -6 C -8 -9, 8 -9, 8 -6 C 8 -3, 3 -3, 1 -3 L -3 1 V -3 C -8 -3, -8 -3, -8 -6 Z" fill="url(#globe-blue)" stroke="#0288d1" stroke-width="0.5"/>
+                        <ellipse cx="-3.5" cy="-6.5" rx="3.5" ry="1.5" fill="#fff" opacity="0.5" transform="rotate(-15 -3.5 -6.5)"/>
+                        <text x="0" y="-3.5" fill="url(#gold-metallic)" font-size="8.5" font-weight="extrabold" text-anchor="middle" font-family="system-ui">?</text>
+                    </g>
+                </g>
+                <text x="410" y="200" class="uml-text">
+                    <tspan x="410" dy="0">Khách hàng</tspan>
+                    <tspan x="410" dy="14">nhập câu hỏi</tspan>
+                </text>
+
+                <line x1="460" y1="175" x2="490" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 4: Lưu tin nhắn & Lấy lịch sử -->
+                <rect class="uml-box" x="490" y="100" width="100" height="150" rx="15" />
+                <!-- Icon Overlapping Speech Bubbles 3D -->
+                <g transform="translate(540, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- User Bubble (Bottom Left) -->
+                    <g transform="translate(-4, -4)">
+                        <path d="M -8 -6 C -8 -9, 4 -9, 4 -6 C 4 -3, 0 -3, -2 -3 L -5 0 V -3 C -8 -3, -8 -3, -8 -6 Z" fill="url(#globe-blue)" stroke="#0288d1" stroke-width="0.5"/>
+                        <ellipse cx="-3.5" cy="-6.5" rx="3" ry="1.2" fill="#fff" opacity="0.5" transform="rotate(-15 -3.5 -6.5)"/>
+                    </g>
+                    <!-- Bot Bubble (Top Right) -->
+                    <g transform="translate(4, 2)">
+                        <path d="M -4 -6 C -4 -9, 8 -9, 8 -6 C 8 -3, 4 -3, 2 -3 L -1 0 V -3 C -4 -3, -4 -3, -4 -6 Z" fill="url(#silver-metallic)" stroke="#64748b" stroke-width="0.5"/>
+                        <ellipse cx="1.5" cy="-6.5" rx="3" ry="1.2" fill="#fff" opacity="0.6" transform="rotate(-15 1.5 -6.5)"/>
+                        <!-- Text placeholder lines -->
+                        <line x1="-1.5" y1="-6.5" x2="4.5" y2="-6.5" stroke="#1e293b" stroke-width="0.8" stroke-linecap="round"/>
+                        <line x1="-1.5" y1="-4.5" x2="2.5" y2="-4.5" stroke="#1e293b" stroke-width="0.8" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <text x="540" y="200" class="uml-text">
+                    <tspan x="540" dy="0">Lưu tin nhắn</tspan>
+                    <tspan x="540" dy="14">& lấy lịch sử</tspan>
+                    <tspan x="540" dy="14">gần đây</tspan>
+                </text>
+
+                <line x1="590" y1="175" x2="620" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 5: AI NLP & Tri thức -->
+                <rect class="uml-box" x="620" y="100" width="100" height="150" rx="15" />
+                <!-- 3D AI Brain Hub -->
+                <g transform="translate(670, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- Orbit Ring 1 -->
+                    <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="none" stroke="url(#user-body-purple)" stroke-width="1.2" transform="rotate(30)"/>
+                    <!-- Orbit Ring 2 -->
+                    <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="none" stroke="url(#user-body-purple)" stroke-width="1.2" transform="rotate(-30)"/>
+                    <!-- Orbit Nodes -->
+                    <circle cx="7" cy="4" r="1.5" fill="url(#gold-metallic)" stroke="#fff" stroke-width="0.3"/>
+                    <circle cx="-7" cy="-4" r="1.5" fill="url(#user-head-blue)" stroke="#fff" stroke-width="0.3"/>
+                    <!-- Central Glowing 3D Sphere -->
+                    <circle cx="0" cy="0" r="6.5" fill="url(#user-head-purple)" stroke="#6a1b9a" stroke-width="0.5"/>
+                    <ellipse cx="-1.8" cy="-2.5" rx="2" ry="1" fill="#fff" opacity="0.7" transform="rotate(-15 -1.8 -2.5)"/>
+                </g>
+                <text x="670" y="200" class="uml-text">
+                    <tspan x="670" dy="0">Truy vấn tri thức</tspan>
+                    <tspan x="670" dy="14">& gửi request</tspan>
+                    <tspan x="670" dy="14">đến Groq API</tspan>
+                </text>
+
+                <line x1="720" y1="175" x2="750" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Box 6: Nhận phản hồi -->
+                <rect class="uml-box" x="750" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(800, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- Antenna -->
+                    <line x1="0" y1="-8" x2="0" y2="-13" stroke="url(#silver-metallic)" stroke-width="1.5"/>
+                    <circle cx="0" cy="-14" r="2.2" fill="url(#gold-metallic)" stroke="#fff" stroke-width="0.3"/>
+                    <!-- Ears -->
+                    <rect x="-11" y="-2" width="2" height="4" rx="0.5" fill="url(#silver-metallic)"/>
+                    <rect x="9" y="-2" width="2" height="4" rx="0.5" fill="url(#silver-metallic)"/>
+                    <!-- Head Base Sphere -->
+                    <circle cx="0" cy="0" r="9" fill="url(#user-head-green)" stroke="#1b5e20" stroke-width="0.5"/>
+                    <!-- Visor screen -->
+                    <rect x="-6" y="-3" width="12" height="4" rx="1.5" fill="#0f172a"/>
+                    <!-- Visor lights -->
+                    <circle cx="-3" cy="-1" r="1" fill="#86efac"/>
+                    <circle cx="3" cy="-1" r="1" fill="#86efac"/>
+                    <!-- Mouth -->
+                    <line x1="-3" y1="4.5" x2="3" y2="4.5" stroke="#1b5e20" stroke-width="1.2" stroke-linecap="round"/>
+                    <!-- Glossy highlight -->
+                    <ellipse cx="-2.5" cy="-5" rx="3.5" ry="1.5" fill="#fff" opacity="0.6" transform="rotate(-15 -2.5 -5)"/>
+                </g>
+                <text x="800" y="200" class="uml-text">
+                    <tspan x="800" dy="0">Nhận phản hồi</tspan>
+                    <tspan x="800" dy="14">từ AI</tspan>
+                </text>
+
+                <line x1="850" y1="175" x2="905" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Decision Diamond (Là món ăn?) -->
+                <g transform="translate(925, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Là món ăn?</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                </g>
+
+                <!-- Transition "Có" -> Goes UP to Side Branch -->
+                <path d="M 925 150 L 925 80 L 970 80" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                <text x="935" y="115" class="uml-label">Có</text>
+
+                <!-- Activity 6A (Side branch) -->
+                <rect class="uml-box" x="970" y="30" width="100" height="100" rx="15" />
+                <!-- 3D DB + 3D Red Magnifying Glass -->
+                <g transform="translate(1020, 60)" filter="url(#shadow-3d-chatbot)">
+                    <!-- 3D Database Cylinders -->
+                    <g transform="translate(-7, 0)">
+                        <path d="M -7 4 V 10 A 7 2.2 0 0 0 7 10 V 4 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <ellipse cx="0" cy="4" rx="7" ry="2.2" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <path d="M -7 -2 V 4 A 7 2.2 0 0 0 7 4 V -2 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <ellipse cx="0" cy="-2" rx="7" ry="2.2" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <path d="M -7 -8 V -2 A 7 2.2 0 0 0 7 -2 V -8 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <ellipse cx="0" cy="-8" rx="7" ry="2.2" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    </g>
+                    <!-- 3D Red Magnifying Glass -->
+                    <g transform="translate(7, 3)">
+                        <line x1="3.5" y1="3.5" x2="8" y2="8" stroke="url(#red-metallic)" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="3.5" y1="3.5" x2="8" y2="8" stroke="#fff" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
+                        <circle cx="0" cy="0" r="5" fill="none" stroke="url(#red-metallic)" stroke-width="1.8"/>
+                        <path d="M -2.5 -2.5 A 3.5 3.5 0 0 1 1.5 -3" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.7"/>
+                    </g>
+                </g>
+                <text x="1020" y="95" class="uml-text">
+                    <tspan x="1020" dy="0">Truy vấn DB &</tspan>
+                    <tspan x="1020" dy="14">bổ sung món</tspan>
+                </text>
+
+                <!-- From Side branch to Activity 7 -->
+                <path d="M 1070 80 L 1140 80 L 1140 100" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Transition "Không" -> Straight right -->
+                <line x1="950" y1="175" x2="1090" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                <text x="915" y="167" class="uml-label">Không</text>
+
+                <!-- Activity 7: Lưu phản hồi & hiển thị -->
+                <rect class="uml-box" x="1090" y="100" width="100" height="150" rx="15" />
+                <g transform="translate(1140, 140)" filter="url(#shadow-3d-chatbot)">
+                    <!-- 3D Bubble Body -->
+                    <path d="M -10 -8 H 10 C 12 -8, 12 -2, 10 -2 H -4 L -8 2 V -2 C -11 -2, -11 -8, -10 -8 Z" fill="url(#silver-metallic)" stroke="#64748b" stroke-width="0.5"/>
+                    <ellipse cx="-4.5" cy="-6" rx="4" ry="1.5" fill="#fff" opacity="0.6" transform="rotate(-12 -4.5 -6)"/>
+                    <line x1="-6" y1="-5.5" x2="6" y2="-5.5" stroke="#1e40af" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="-6" y1="-2.5" x2="2" y2="-2.5" stroke="#1e40af" stroke-width="1.5" stroke-linecap="round"/>
+                </g>
+                <text x="1140" y="200" class="uml-text">
+                    <tspan x="1140" dy="0">Lưu phản hồi &</tspan>
+                    <tspan x="1140" dy="14">hiển thị cho</tspan>
+                    <tspan x="1140" dy="14">khách hàng</tspan>
+                </text>
+
+                <line x1="1190" y1="175" x2="1225" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+
+                <!-- Decision Node 2: Hỏi tiếp? -->
+                <g transform="translate(1250, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Hỏi tiếp?</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                </g>
+
+                <!-- Transition "Có" -> Loop back to Activity 3 (Nhập câu hỏi) -->
+                <path d="M 1250 200 L 1250 280 L 410 280 L 410 252" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                <text x="1235" y="235" class="uml-label">Có</text>
+
+                <!-- Transition "Không" -> Goes right to End -->
+                <line x1="1275" y1="175" x2="1318" y2="175" class="uml-path" marker-end="url(#arrow-uml-chatbot)" />
+                <text x="1285" y="167" class="uml-label">Không</text>
+
+                <!-- End Node -->
+                <circle cx="1330" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1330" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1330" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+            </svg>
+
+            <!-- 5. Gợi Ý Món Ăn Tổng Hợp UML SVG (Ngang theo ảnh mẫu) -->
+            <svg id="hybrid-svg" viewBox="0 0 1380 430" width="1380" height="430">
+                <defs>
+                    <marker id="arrow-uml-hybrid" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d-hybrid" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                    <!-- Gradients for 3D User shapes -->
+                    <radialGradient id="user-head-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a8c7fa"/>
+                        <stop offset="60%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1b50b5"/>
+                    </radialGradient>
+                    <linearGradient id="user-body-blue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7baaf7"/>
+                        <stop offset="40%" stop-color="#4285f4"/>
+                        <stop offset="100%" stop-color="#1c3a94"/>
+                    </linearGradient>
+                    <radialGradient id="user-head-green" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#a5d6a7"/>
+                        <stop offset="60%" stop-color="#2ecc71"/>
+                        <stop offset="100%" stop-color="#1b5e20"/>
+                    </radialGradient>
+                    <radialGradient id="user-head-orange" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ffcc80"/>
+                        <stop offset="60%" stop-color="#e67e22"/>
+                        <stop offset="100%" stop-color="#a04000"/>
+                    </radialGradient>
+                    <!-- Metallic 3D Gradients -->
+                    <linearGradient id="silver-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#475569"/>
+                    </linearGradient>
+                    <linearGradient id="gold-metallic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff9c4"/>
+                        <stop offset="30%" stop-color="#f1c40f"/>
+                        <stop offset="70%" stop-color="#f39c12"/>
+                        <stop offset="100%" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <radialGradient id="red-metallic" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#ff8a80"/>
+                        <stop offset="60%" stop-color="#ea4335"/>
+                        <stop offset="100%" stop-color="#991b1b"/>
+                    </radialGradient>
+                    <linearGradient id="db-cylinder-blue" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#1976d2"/>
+                        <stop offset="50%" stop-color="#42a5f5"/>
+                        <stop offset="100%" stop-color="#0d47a1"/>
+                    </linearGradient>
+                    <radialGradient id="db-cylinder-top-blue" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#90caf9"/>
+                        <stop offset="70%" stop-color="#42a5f5"/>
+                        <stop offset="100%" stop-color="#1e88e5"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Start Node -->
+                <circle cx="35" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="35" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="35" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+
+                <line x1="45" y1="175" x2="80" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Activity 1 -->
+                <rect class="uml-box" x="80" y="100" width="100" height="150" rx="15" />
+                <!-- 3D User + 3D Home -->
+                <g transform="translate(130, 140)" filter="url(#shadow-3d-hybrid)">
+                    <!-- 3D Blue User -->
+                    <g transform="translate(-8, 3)">
+                        <circle cx="0" cy="-6" r="6" fill="url(#user-head-blue)" />
+                        <path d="M -10 4 C -10 1, -6 0, 0 0 C 6 0, 10 1, 10 4 L 10 10 L -10 10 Z" fill="url(#user-body-blue)" />
+                        <ellipse cx="-1.8" cy="-8.2" rx="1.5" ry="0.8" fill="#fff" opacity="0.6" transform="rotate(-15 -1.8 -8.2)" />
+                    </g>
+                    <!-- 3D Home -->
+                    <g transform="translate(8, -2)">
+                        <!-- Base/Walls -->
+                        <rect x="-6" y="-1" width="12" height="9" fill="url(#silver-metallic)" stroke="#64748b" stroke-width="0.5"/>
+                        <!-- Door -->
+                        <rect x="-2" y="3" width="4" height="5" fill="url(#user-body-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                        <circle cx="1.2" cy="5.5" r="0.4" fill="url(#gold-metallic)"/>
+                        <!-- Roof -->
+                        <polygon points="0,-8 -8,-1 -7,0 0,-6.5 7,0 8,-1" fill="url(#red-metallic)" stroke="#991b1b" stroke-width="0.5"/>
+                        <!-- Roof cap top -->
+                        <polygon points="0,-8 -7,-1 7,-1" fill="url(#red-metallic)" opacity="0.9"/>
+                        <!-- Window -->
+                        <rect x="-4" y="1" width="2.5" height="2.5" fill="#fff" opacity="0.7" stroke="#64748b" stroke-width="0.3"/>
+                        <rect x="1.5" y="1" width="2.5" height="2.5" fill="#fff" opacity="0.7" stroke="#64748b" stroke-width="0.3"/>
+                    </g>
+                </g>
+                <text x="130" y="200" class="uml-text">
+                    <tspan x="130" dy="0">Khách hàng</tspan>
+                    <tspan x="130" dy="14">truy cập</tspan>
+                    <tspan x="130" dy="14">trang chủ</tspan>
+                </text>
+
+                <line x1="180" y1="175" x2="210" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Activity 2 -->
+                <rect class="uml-box" x="210" y="100" width="100" height="150" rx="15" />
+                <!-- 3D User + 3D Magnifying Glass -->
+                <g transform="translate(260, 140)" filter="url(#shadow-3d-hybrid)">
+                    <!-- 3D Blue User -->
+                    <g transform="translate(-8, 3)">
+                        <circle cx="0" cy="-6" r="6" fill="url(#user-head-blue)" />
+                        <path d="M -10 4 C -10 1, -6 0, 0 0 C 6 0, 10 1, 10 4 L 10 10 L -10 10 Z" fill="url(#user-body-blue)" />
+                        <ellipse cx="-1.8" cy="-8.2" rx="1.5" ry="0.8" fill="#fff" opacity="0.6" transform="rotate(-15 -1.8 -8.2)" />
+                    </g>
+                    <!-- 3D Magnifying Glass -->
+                    <g transform="translate(8, -2)">
+                        <!-- Handle -->
+                        <line x1="3.5" y1="3.5" x2="8" y2="8" stroke="url(#user-body-blue)" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="3.5" y1="3.5" x2="8" y2="8" stroke="#fff" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
+                        <!-- Rim -->
+                        <circle cx="0" cy="0" r="5.5" fill="none" stroke="url(#gold-metallic)" stroke-width="1.8"/>
+                        <!-- Highlight -->
+                        <path d="M -2.5 -2.5 A 3.5 3.5 0 0 1 1.5 -3" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.7"/>
+                    </g>
+                </g>
+                <text x="260" y="200" class="uml-text">
+                    <tspan x="260" dy="0">Lấy mã ND &</tspan>
+                    <tspan x="260" dy="14">thu thập</tspan>
+                    <tspan x="260" dy="14">hành vi</tspan>
+                </text>
+
+                <line x1="310" y1="175" x2="337" y2="175" class="uml-path" />
+
+                <!-- Fork Bar (Phân nhánh dọc) -->
+                <line x1="340" y1="75" x2="340" y2="275" stroke="var(--uml-bar-bg)" stroke-width="6" stroke-linecap="round" />
+
+                <!-- Branch 1: CF -->
+                <path d="M 340 100 L 370 100" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="370" y="60" width="100" height="80" rx="12" />
+                <text x="420" y="100" class="uml-text">
+                    <tspan x="420" dy="0">Lọc cộng tác</tspan>
+                    <tspan x="420" dy="14">(Collaborative)</tspan>
+                </text>
+                <path d="M 470 100 L 500 100" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="500" y="60" width="100" height="80" rx="12" />
+                <text x="550" y="100" class="uml-text">
+                    <tspan x="550" dy="0">Tìm người dùng</tspan>
+                    <tspan x="550" dy="14">tương tự</tspan>
+                </text>
+                <path d="M 600 100 L 630 100" class="uml-path" />
+
+                <!-- Branch 2: Content-based -->
+                <path d="M 340 175 L 370 175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="370" y="150" width="100" height="80" rx="12" />
+                <text x="420" y="190" class="uml-text">
+                    <tspan x="420" dy="0">Lọc nội dung</tspan>
+                    <tspan x="420" dy="14">(Content-based)</tspan>
+                </text>
+                <path d="M 470 175 L 500 175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="500" y="150" width="100" height="80" rx="12" />
+                <text x="550" y="190" class="uml-text">
+                    <tspan x="550" dy="0">Phân tích món</tspan>
+                    <tspan x="550" dy="14">đã xem</tspan>
+                </text>
+                <path d="M 600 175 L 630 175" class="uml-path" />
+
+                <!-- Branch 3: Association Rules -->
+                <path d="M 340 250 L 370 250" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="370" y="240" width="100" height="80" rx="12" />
+                <text x="420" y="280" class="uml-text">
+                    <tspan x="420" dy="0">Luật kết hợp</tspan>
+                    <tspan x="420" dy="14">(Association)</tspan>
+                </text>
+                <path d="M 470 250 L 500 250" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <rect class="uml-box" x="500" y="240" width="100" height="80" rx="12" />
+                <text x="550" y="280" class="uml-text">
+                    <tspan x="550" dy="0">Phân tích đơn</tspan>
+                    <tspan x="550" dy="14">hàng</tspan>
+                </text>
+                <path d="M 600 250 L 630 250" class="uml-path" />
+
+                <!-- Join Bar (Hội tụ dọc) -->
+                <line x1="630" y1="75" x2="630" y2="275" stroke="var(--uml-bar-bg)" stroke-width="6" stroke-linecap="round" />
+
+                <line x1="630" y1="175" x2="660" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Box 6: Kết hợp kết quả -->
+                <rect class="uml-box" x="660" y="100" width="100" height="150" rx="15" />
+                <!-- Glowing Streams + 3D fusion core -->
+                <g transform="translate(710, 140)" filter="url(#shadow-3d-hybrid)">
+                    <path d="M -14 -8 Q -4 -8 2 -2" fill="none" stroke="url(#user-body-blue)" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M -14 0 H 0" fill="none" stroke="url(#user-body-blue)" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M -14 8 Q -4 8 2 2" fill="none" stroke="url(#user-body-blue)" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="8" cy="0" r="7.5" fill="url(#user-head-orange)" stroke="#ffcc80" stroke-width="0.5"/>
+                    <ellipse cx="6" cy="-2.5" rx="2.5" ry="1.2" fill="#fff" opacity="0.7" transform="rotate(-15 6 -2.5)"/>
+                </g>
+                <text x="710" y="200" class="uml-text">
+                    <tspan x="710" dy="0">Kết hợp kết quả</tspan>
+                    <tspan x="710" dy="14">& tính điểm</tspan>
+                    <tspan x="710" dy="14">tổng hợp</tspan>
+                </text>
+
+                <line x1="760" y1="175" x2="790" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Box 7: Sắp xếp & Lọc món bếp -->
+                <rect class="uml-box" x="790" y="100" width="100" height="150" rx="15" />
+                <!-- 3D Tray + Green glowing lamp -->
+                <g transform="translate(840, 140)" filter="url(#shadow-3d-hybrid)">
+                    <ellipse cx="0" cy="6" rx="13" ry="2" fill="#000" opacity="0.15" />
+                    <ellipse cx="0" cy="4" rx="12" ry="3" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5" />
+                    <path d="M -9 4 C -9 -3, -6 -5, 0 -5 C 6 -5, 9 -3, 9 4 Z" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5" />
+                    <path d="M -6 1 A 5 5 0 0 1 -1 -3" fill="none" stroke="#fff" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+                    <circle cx="0" cy="-6" r="1.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.3" />
+                    <circle cx="7" cy="1" r="3.5" fill="url(#user-head-green)" stroke="#fff" stroke-width="0.5" />
+                    <circle cx="6.2" cy="0.2" r="0.7" fill="#fff" />
+                </g>
+                <text x="840" y="200" class="uml-text">
+                    <tspan x="840" dy="0">Sắp xếp &</tspan>
+                    <tspan x="840" dy="14">lọc món còn</tspan>
+                    <tspan x="840" dy="14">phục vụ</tspan>
+                </text>
+
+                <line x1="890" y1="175" x2="920" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Box 8: Lưu DB -->
+                <rect class="uml-box" x="920" y="100" width="100" height="150" rx="15" />
+                <!-- 3D Database Cylinders -->
+                <g transform="translate(970, 140)" filter="url(#shadow-3d-hybrid)">
+                    <path d="M -8 5 V 11 A 8 2.5 0 0 0 8 11 V 5 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    <ellipse cx="0" cy="5" rx="8" ry="2.5" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    <path d="M -8 -1 V 5 A 8 2.5 0 0 0 8 5 V -1 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    <ellipse cx="0" cy="-1" rx="8" ry="2.5" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    <path d="M -8 -7 V -1 A 8 2.5 0 0 0 8 -1 V -7 Z" fill="url(#db-cylinder-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                    <ellipse cx="0" cy="-7" rx="8" ry="2.5" fill="url(#db-cylinder-top-blue)" stroke="#1c3a94" stroke-width="0.3"/>
+                </g>
+                <text x="970" y="200" class="uml-text">
+                    <tspan x="970" dy="0">Lưu DB &</tspan>
+                    <tspan x="970" dy="14">hiển thị gợi ý</tspan>
+                    <tspan x="970" dy="14">Top 10</tspan>
+                </text>
+
+                <line x1="1020" y1="175" x2="1055" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Decision Diamond -->
+                <g transform="translate(1075, 175)">
+                    <polygon points="0,-25 25,0 0,25 -25,0" class="uml-decision" />
+                    <text x="0" y="-55" class="uml-text" style="font-weight:bold;">Chọn món gợi ý</text>
+                    <line x1="0" y1="-45" x2="0" y2="-25" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                </g>
+
+                <!-- Transition "Có" -> Cart -->
+                <line x1="1100" y1="175" x2="1140" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <text x="1115" y="167" class="uml-label">Có</text>
+
+                <!-- Transition "Không" -> Down to Hủy bỏ -->
+                <line x1="1075" y1="200" x2="1075" y2="270" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <text x="1083" y="235" class="uml-label">Không</text>
+
+                <!-- Box Hủy bỏ -->
+                <rect class="uml-box" x="1025" y="270" width="100" height="120" rx="15" />
+                <g transform="translate(1075, 305)" filter="url(#shadow-3d-hybrid)">
+                    <!-- Bin Body -->
+                    <path d="M -7 -4 L -5 10 A 3 1.5 0 0 0 5 10 L 7 -4 Z" fill="url(#red-metallic)" stroke="#991b1b" stroke-width="0.5" />
+                    <!-- Ridges -->
+                    <line x1="-3" y1="-2" x2="-2" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <line x1="0" y1="-2" x2="0" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <line x1="3" y1="-2" x2="2" y2="8" stroke="#7f1d1d" stroke-width="1" opacity="0.4" />
+                    <!-- Rim/Lid -->
+                    <ellipse cx="0" cy="-4" rx="8" ry="2" fill="url(#red-metallic)" stroke="#991b1b" stroke-width="0.5" />
+                    <!-- Lid Handle -->
+                    <path d="M -2.5 -6 C -2.5 -8, 2.5 -8, 2.5 -6" fill="none" stroke="url(#red-metallic)" stroke-width="1.5" stroke-linecap="round" />
+                </g>
+                <text x="1075" y="355" class="uml-text">Hủy bỏ</text>
+
+                <!-- Box 9: Đặt món thành công -->
+                <rect class="uml-box" x="1140" y="100" width="100" height="150" rx="15" />
+                <!-- 3D Shopping Cart + Green Check badge -->
+                <g transform="translate(1190, 140)" filter="url(#shadow-3d-hybrid)">
+                    <path d="M -12 -7 L -9 1 C -9 2, -8 3, -7 3 H 3 C 4 3, 5 2, 5 1 L 8 -5 H -6" fill="none" stroke="url(#user-body-blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M -9 -2 H 6 M -8 1 H 4 M -3 -5 L -5 3 M 1 -5 L 0 3" stroke="#93c5fd" stroke-width="0.8" opacity="0.6"/>
+                    <path d="M -12 -7 H -14" stroke="url(#user-body-blue)" stroke-width="2.2" stroke-linecap="round"/>
+                    <!-- Wheels -->
+                    <circle cx="-6" cy="7" r="2.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5"/>
+                    <circle cx="-6" cy="7" r="1" fill="#1e293b"/>
+                    <circle cx="2" cy="7" r="2.5" fill="url(#silver-metallic)" stroke="#475569" stroke-width="0.5"/>
+                    <circle cx="2" cy="7" r="1" fill="#1e293b"/>
+                    <!-- Glossy green check circle -->
+                    <g transform="translate(7, -8)">
+                        <circle cx="0" cy="0" r="5" fill="url(#user-head-green)" stroke="#fff" stroke-width="0.5"/>
+                        <ellipse cx="-1" cy="-1.5" rx="1" ry="0.5" fill="#fff" opacity="0.7" transform="rotate(-15 -1 -1.5)"/>
+                        <path d="M -2.5 0 L -0.8 1.7 L 2.5 -1.5" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                </g>
+                <text x="1190" y="200" class="uml-text">
+                    <tspan x="1190" dy="0">Đặt món</tspan>
+                    <tspan x="1190" dy="14">thành công</tspan>
+                </text>
+
+                <line x1="1240" y1="175" x2="1278" y2="175" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- End Node -->
+                <circle cx="1290" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1290" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1290" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+
+                <!-- Line from Hủy bỏ to End vertical line -->
+                <path d="M 1125 330 L 1290 330 L 1290 187" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+
+                <!-- Loop Back "Tùy chọn" path -->
+                <path d="M 1290 187 L 1290 380 L 130 380 L 130 252" class="uml-path" marker-end="url(#arrow-uml-hybrid)" />
+                <text x="710" y="372" class="uml-label" style="text-anchor:middle;">Tùy chọn</text>
+            </svg>
+
+            <!-- 6. Gợi Ý Món Kèm (Apriori) UML SVG -->
+            <svg id="apriori-svg" viewBox="0 0 1440 430" width="1440" height="430">
+                <defs>
+                    <marker id="arrow-uml-apriori" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--uml-arrow)" />
+                    </marker>
+                    <!-- Drop shadow for 3D effect -->
+                    <filter id="shadow-3d-apriori" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.16"/>
+                    </filter>
+                </defs>
+
+                <!-- Start Node -->
+                <circle cx="50" cy="175" r="10" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="50" cy="175" r="5" fill="var(--uml-arrow)" />
+                <text x="50" y="150" class="uml-text" style="font-weight:bold;">Bắt đầu</text>
+                <line x1="60" y1="175" x2="120" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 1 -->
+                <rect class="uml-box" x="120" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="170" y="200" class="uml-text">
+                    <tspan x="170" dy="0">Thêm món chính</tspan>
+                    <tspan x="170" dy="14">vào giỏ hàng</tspan>
+                </text>
+                <line x1="220" y1="175" x2="270" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 2 -->
+                <rect class="uml-box" x="270" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="320" y="200" class="uml-text">
+                    <tspan x="320" dy="0">Frontend gửi</tspan>
+                    <tspan x="320" dy="14">giỏ hàng cho AI</tspan>
+                </text>
+                <line x1="370" y1="175" x2="420" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 3 -->
+                <rect class="uml-box" x="420" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="470" y="200" class="uml-text">
+                    <tspan x="470" dy="0">AI Service</tspan>
+                    <tspan x="470" dy="14">tra cứu</tspan>
+                    <tspan x="470" dy="14">rules.pkl</tspan>
+                </text>
+                <line x1="520" y1="175" x2="570" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 4 -->
+                <rect class="uml-box" x="570" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="620" y="200" class="uml-text">
+                    <tspan x="620" dy="0">Tính điểm &amp;</tspan>
+                    <tspan x="620" dy="14">lọc món</tspan>
+                    <tspan x="620" dy="14">ăn kèm</tspan>
+                </text>
+                <line x1="670" y1="175" x2="720" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 5 -->
+                <rect class="uml-box" x="720" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="770" y="200" class="uml-text">
+                    <tspan x="770" dy="0">Hiển thị đề xuất</tspan>
+                    <tspan x="770" dy="14">lên giỏ hàng</tspan>
+                </text>
+                <line x1="820" y1="175" x2="870" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Decision -->
+                <polygon points="910,145 950,175 910,205 870,175" class="uml-decision" filter="url(#shadow-3d-apriori)" />
+                <text x="910" y="130" class="uml-text" style="font-weight:bold;">Mua kèm?</text>
+                <line x1="950" y1="175" x2="1000" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+                <text x="975" y="165" class="uml-label">Có</text>
+
+                <!-- Act 6 -->
+                <rect class="uml-box" x="1000" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="1050" y="200" class="uml-text">
+                    <tspan x="1050" dy="0">Thêm món kèm</tspan>
+                    <tspan x="1050" dy="14">vào giỏ hàng</tspan>
+                </text>
+                <line x1="1100" y1="175" x2="1150" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Act 7 -->
+                <rect class="uml-box" x="1150" y="100" width="100" height="150" rx="15" filter="url(#shadow-3d-apriori)" />
+                <text x="1200" y="200" class="uml-text">
+                    <tspan x="1200" dy="0">Đặt hàng</tspan>
+                    <tspan x="1200" dy="14">thành công</tspan>
+                </text>
+                <line x1="1250" y1="175" x2="1328" y2="175" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- Path "Không" -->
+                <path d="M 910 205 V 270 H 1000" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+                <text x="920" y="235" class="uml-label">Không</text>
+
+                <!-- Act 8 -->
+                <rect class="uml-box" x="1000" y="270" width="100" height="110" rx="12" filter="url(#shadow-3d-apriori)" />
+                <text x="1050" y="325" class="uml-text">
+                    <tspan x="1050" dy="0">Giữ nguyên</tspan>
+                    <tspan x="1050" dy="14">giỏ hàng</tspan>
+                </text>
+                <path d="M 1100 325 L 1340 325 L 1340 187" class="uml-path" marker-end="url(#arrow-uml-apriori)" />
+
+                <!-- End Node -->
+                <circle cx="1340" cy="175" r="12" fill="none" stroke="var(--uml-arrow)" stroke-width="2" />
+                <circle cx="1340" cy="175" r="6" fill="var(--uml-arrow)" />
+                <text x="1340" y="150" class="uml-text" style="font-weight:bold;">Kết thúc</text>
+            </svg>
+        </div>
+        </div>
+
+        <!-- Description Cards Section -->
+        <div class="info-card">
+            <!-- 1. Lọc Cộng Tác Description -->
+            <div id="collab-desc" class="info-steps active">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: LỌC CỘNG TÁC (COLLABORATIVE FILTERING)</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Khách hàng đã đăng nhập (Có lịch sử dùng)</strong></span>
+                        <span>Mục tiêu: <strong>Đề xuất món ăn dựa trên hành vi của nhóm người có cùng sở thích</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Lấy lịch sử đánh giá / đơn hàng</div>
+                        <div class="step-desc">Hệ thống tự động truy xuất các hành vi tương tác trong quá khứ của khách hàng như: số lượng sao đánh giá món ăn, số lần xem món, các món đã thêm vào giỏ hàng và lịch sử đơn hàng đã hoàn thành.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Tạo ma trận Người dùng - Món ăn</div>
+                        <div class="step-desc">Dữ liệu được tổ chức dưới dạng ma trận hai chiều, trong đó mỗi hàng biểu diễn một người dùng và mỗi cột biểu diễn một món ăn với giá trị ô là mức độ tương tác.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Tính tương đồng Cosine giữa người dùng</div>
+                        <div class="step-desc">Thuật toán sử dụng các chỉ số đo lường như độ tương đồng Cosine hoặc hệ số Pearson để so sánh vector hành vi của người dùng hiện tại với toàn bộ người dùng khác trong hệ thống.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Xác định nhóm người cùng sở thích</div>
+                        <div class="step-desc">Hệ thống định vị nhóm "người dùng tương đồng" (Nearest Neighbors) có gu ẩm thực giống người dùng hiện tại nhất.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Lọc bỏ món ăn người dùng đã đặt</div>
+                        <div class="step-desc">Để tối ưu trải nghiệm khám phá ẩm thực mới, hệ thống sẽ tiến hành lọc, loại bỏ những món ăn mà người dùng hiện tại đã từng đặt hàng hoặc đánh giá trước đó ra khỏi danh sách đề xuất.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-title">Tính điểm ưa thích dự đoán & Sắp xếp xếp hạng</div>
+                        <div class="step-desc">Hệ thống tính điểm số ưa thích dự kiến cho các món ăn còn lại, sắp xếp giảm dần và lấy ra Top các món có điểm cao nhất.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">7</span>
+                        <div class="step-title">Quyết định rẽ nhánh Chọn món gợi ý</div>
+                        <div class="step-desc">
+                            Người dùng đưa ra quyết định đối với danh sách đề xuất:
+                            <br>• <strong>Nếu Có chọn món</strong>: Hệ thống ghi nhận tương tác đặt hàng (click/mua), lưu feedback đánh giá để cải thiện mô hình học máy.
+                            <br>• <strong>Nếu Không chọn món (Hủy bỏ)</strong>: Hệ thống ghi nhận sự kiện bỏ qua, tiến hành hủy bỏ và cung cấp tùy chọn lặp lại luồng khi người dùng thay đổi hành vi.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 2. Lọc Nội Dung Description -->
+            <div id="content-desc" class="info-steps">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: LỌC NỘI DUNG (CONTENT-BASED FILTERING)</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Khách hàng đã đăng nhập hoặc có tương tác món ăn</strong></span>
+                        <span>Mục tiêu: <strong>Đề xuất các món ăn tương tự với đặc tính của món khách đã thích trong quá khứ</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Ghi nhận món ăn khách đã tương tác</div>
+                        <div class="step-desc">Khách hàng thực hiện các hành động cụ thể như xem chi tiết một món ăn, nhấn nút "Thích món" hoặc đánh giá phản hồi tích cực về một món ăn cụ thể trên website.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Trích xuất đặc trưng của món ăn</div>
+                        <div class="step-desc">Hệ thống tiến hành phân tích và trích xuất các thuộc tính của món ăn đó bao gồm: thể loại (lẩu, nướng, canh, tráng miệng), hương vị (cay, chua, ngọt, béo), nguyên liệu cấu thành (bò, gà, tôm, hải sản) và xuất xứ ẩm thực.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Cập nhật vector sở thích người dùng</div>
+                        <div class="step-desc">Hệ thống tổng hợp các đặc trưng của những món ăn mà khách hàng yêu thích để thiết lập một "Hồ sơ gu ẩm thực cá nhân" (User Preference Profile) dưới dạng vector đặc trưng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Tính tương đồng món ăn và vector gu khách</div>
+                        <div class="step-desc">Hệ thống đối chiếu hồ sơ gu ẩm thực của người dùng với cơ sở dữ liệu các món ăn còn lại trong thực đơn chưa thưởng thức bằng phương pháp Cosine Similarity.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Lọc bỏ món ăn trùng lặp / đã đặt & Xếp hạng</div>
+                        <div class="step-desc">Hệ thống loại bỏ hoàn toàn các món ăn đã nằm trong đơn hàng gần đây của khách và sắp xếp danh sách theo điểm tương thích giảm dần.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-title">Quyết định rẽ nhánh Chọn món gợi ý</div>
+                        <div class="step-desc">
+                            Người dùng đưa ra quyết định đối với danh sách đề xuất:
+                            <br>• <strong>Nếu Có chọn món</strong>: Đặt món thành công, hệ thống lưu feedback phản hồi để tiếp tục tinh chỉnh mô hình nội dung.
+                            <br>• <strong>Nếu Không chọn món (Hủy bỏ)</strong>: Hệ thống ghi nhận sự kiện bỏ qua, tiến hành hủy bỏ và cung cấp tùy chọn lặp lại luồng khi người dùng thay đổi hành vi.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 3. Lọc Độ Phổ Biến Description -->
+            <div id="popular-desc" class="info-steps">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: LỌC ĐỘ PHỔ BIẾN (POPULARITY-BASED FILTERING)</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Khách vãng lai, khách hàng mới (Chưa có lịch sử hoạt động)</strong></span>
+                        <span>Mục tiêu: <strong>Gợi ý các món ăn bán chạy nhất, được quan tâm nhiều nhất toàn hệ thống</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Khách hàng vãng lai vào trang chủ</div>
+                        <div class="step-desc">Khách hàng mới chưa đăng nhập tài khoản hoặc khách hàng vãng lai truy cập vào trang chủ của Web ẩm thực Phương Nam.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Thống kê số lượt xem & đặt món ăn</div>
+                        <div class="step-desc">Hệ thống định kỳ quét cơ sở dữ liệu đơn hàng và lượt xem để thống kê tổng số đơn đặt hàng thành công, số lượng món ăn đã bán ra và lượt xem chi tiết từ tất cả khách hàng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Tính điểm xu hướng & Sắp xếp</div>
+                        <div class="step-desc">Điểm số phổ biến được tính dựa trên số lượng mua và lượt xem, áp dụng thuật toán giảm hao mòn theo thời gian (time decay) và tiến hành sắp xếp thực đơn giảm dần.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Lọc các món đang sẵn sàng phục vụ & Trích xuất</div>
+                        <div class="step-desc">Hệ thống lọc bỏ các món hết nguyên liệu trong bếp và trích xuất ra Top 5 hoặc Top 10 món ăn dẫn đầu xu hướng bán chạy của nhà hàng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Quyết định rẽ nhánh Chọn món gợi ý</div>
+                        <div class="step-desc">
+                            Người dùng đưa ra quyết định đối với danh sách đề xuất:
+                            <br>• <strong>Nếu Có chọn món</strong>: Đặt món thành công, hệ thống cập nhật thống kê doanh thu và lượt mua mới để phục vụ các phiên tính toán tiếp theo.
+                            <br>• <strong>Nếu Không chọn món (Hủy bỏ)</strong>: Hệ thống ghi nhận sự kiện bỏ qua, tiến hành hủy bỏ và cung cấp tùy chọn lặp lại luồng khi người dùng thay đổi hành vi.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 4. Luồng Chatbot AI Description -->
+            <div id="chatbot-desc" class="info-steps">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: CHATBOT AI HỖ TRỢ KHÁCH HÀNG</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Tất cả khách hàng sử dụng khung chat trực tuyến</strong></span>
+                        <span>Mục tiêu: <strong>Tư vấn ẩm thực, gợi ý món ăn nhanh và giải đáp các thắc mắc (FAQ) qua hội thoại tự động</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Khách hàng mở khung chat & Nhập câu hỏi</div>
+                        <div class="step-desc">Khách hàng kích hoạt khung chat và gửi câu hỏi thắc mắc vào hệ thống.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Tạo hoặc lấy session_id và Lưu tin nhắn</div>
+                        <div class="step-desc">Hệ thống tạo phiên làm việc để quản lý trạng thái hội thoại và lưu trữ câu hỏi của người dùng vào cơ sở dữ liệu `lich_su_chatbot`.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Xây dựng context & truy vấn LLM API</div>
+                        <div class="step-desc">Hệ thống lấy ra lịch sử chat, truy vấn tri thức phù hợp từ DB để làm giàu ngữ cảnh (context), sau đó gọi Groq API (LLaMA 3.1 70B) để nhận câu trả lời.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Rẽ nhánh quyết định: Câu hỏi có liên quan món ăn?</div>
+                        <div class="step-desc">
+                            Hệ thống kiểm tra nội dung câu trả lời của AI:
+                            <br>• <strong>Nếu có liên quan món ăn (Có)</strong>: Hệ thống gọi DB để truy vấn thông tin món ăn, bổ sung hình ảnh, giá bán và cấu hình các nút liên kết chi tiết trực quan.
+                            <br>• <strong>Nếu là câu hỏi thông thường (Không)</strong>: Bỏ qua bước truy vấn DB và đi tiếp.
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Lưu phản hồi & Hiển thị cho khách hàng</div>
+                        <div class="step-desc">Lưu câu trả lời của Bot vào cơ sở dữ liệu và hiển thị câu trả lời dạng Rich Message trực tiếp lên khung chat của khách hàng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-title">Kiểm tra rẽ nhánh hỏi tiếp</div>
+                        <div class="step-desc">Nếu người dùng muốn hỏi tiếp (Có), luồng hoạt động sẽ quay về bước nhập câu hỏi. Ngược lại (Không), luồng hoạt động sẽ kết thúc.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 5. Gợi Ý Món Ăn Tổng Hợp Description -->
+            <div id="hybrid-desc" class="info-steps">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: GỢI Ý MÓN ĂN THÔNG MINH (TỔNG HỢP)</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Tất cả khách hàng truy cập trang chủ / mục Gợi ý</strong></span>
+                        <span>Mục tiêu: <strong>Kết hợp song song 3 thuật toán đề xuất để tạo ra kết quả tối ưu nhất</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Khách hàng truy cập trang chủ & Lấy mã người dùng</div>
+                        <div class="step-desc">Hệ thống ghi nhận phiên truy cập và lấy ID người dùng tương ứng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Thu thập & lưu trữ hành vi người dùng</div>
+                        <div class="step-desc">Hệ thống lưu lại các sự kiện click, view, add_to_cart, purchase vào bảng `hanh_vi_nguoi_dung`.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Chạy song song 3 thuật toán gợi ý (Fork)</div>
+                        <div class="step-desc">
+                            Hệ thống kích hoạt đồng thời 3 mô hình xử lý độc lập:
+                            <br>• <strong>Collaborative Filtering</strong>: Tìm người dùng tương tự và lấy các món ăn họ yêu thích.
+                            <br>• <strong>Content-based</strong>: Phân tích món khách đã xem để tìm các món ăn tương đồng thuộc tính.
+                            <br>• <strong>Association Rules</strong>: Phân tích đơn hàng lịch sử để tìm các món thường mua cùng nhau (Luật kết hợp).
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Hội tụ & kết hợp kết quả (Join)</div>
+                        <div class="step-desc">Hệ thống gom kết quả của 3 thuật toán tại thanh Join, trộn các danh sách món ăn và tiến hành tính toán điểm số tổng hợp cho mỗi món.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Sắp xếp, lọc món còn phục vụ & Lưu DB</div>
+                        <div class="step-desc">Danh sách được sắp xếp giảm dần theo điểm số tổng hợp, loại bỏ các món đã hết nguyên liệu phục vụ trong bếp và lưu kết quả tối ưu vào bảng `goi_y_san_pham`.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-title">Quyết định rẽ nhánh Chọn món gợi ý</div>
+                        <div class="step-desc">
+                            Người dùng đưa ra quyết định đối với danh sách đề xuất:
+                            <br>• <strong>Nếu Có chọn món</strong>: Đặt món thành công, hệ thống hoàn thành luồng gợi ý.
+                            <br>• <strong>Nếu Không chọn món (Hủy bỏ)</strong>: Hệ thống ghi nhận sự kiện bỏ qua, tiến hành hủy bỏ và cung cấp tùy chọn lặp lại luồng khi người dùng thay đổi hành vi.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 6. Gợi Ý Món Ăn Kèm (Apriori) Description -->
+            <div id="apriori-desc" class="info-steps">
+                <div class="info-header">
+                    <h2>📋 QUY TRÌNH HOẠT ĐỘNG: GỢI Ý MÓN KÈM (APRIORI)</h2>
+                    <div class="info-meta">
+                        <span>Đối tượng tác động: <strong>Tất cả khách hàng đang tương tác với giỏ hàng</strong></span>
+                        <span>Mục tiêu: <strong>Đề xuất món ăn kèm phù hợp theo thời gian thực dựa trên giỏ hàng hiện tại của người dùng</strong></span>
+                    </div>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Thêm món chính vào giỏ hàng</div>
+                        <div class="step-desc">Khách hàng chọn món chính (ví dụ: món ăn chính, lẩu, đồ uống chính) và thêm vào giỏ hàng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Frontend gửi giỏ hàng cho AI Service</div>
+                        <div class="step-desc">Ứng dụng Web Frontend tự động thu thập thông tin các mã món ăn hiện tại trong giỏ hàng và gửi yêu cầu gợi ý món kèm đến AI Service.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-title">AI Service tra cứu rules.pkl</div>
+                        <div class="step-desc">AI Service tiếp nhận danh sách món trong giỏ hàng và tiến hành tra cứu tệp chứa các luật kết hợp (Association Rules) đã được huấn luyện sẵn (`rules.pkl`).</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-title">Tính điểm &amp; lọc món ăn kèm</div>
+                        <div class="step-desc">Dữ liệu được lọc giữ lại các món ăn kèm liên quan và tính điểm tổng hợp theo công thức <code>Score = Confidence * Lift</code> để xếp hạng các món gợi ý tiềm năng nhất.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-title">Hiển thị đề xuất lên giỏ hàng</div>
+                        <div class="step-desc">Danh sách đề xuất các món ăn kèm tiềm năng được trả về và hiển thị trên giao diện giỏ hàng của người dùng.</div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-title">Quyết định rẽ nhánh Chọn mua kèm</div>
+                        <div class="step-desc">
+                            Khách hàng đưa ra quyết định đối với các gợi ý món ăn kèm:
+                            <br>• <strong>Nếu chọn Có</strong>: Thêm món ăn kèm vào giỏ hàng và hệ thống cập nhật tổng số tiền.
+                            <br>• <strong>Nếu chọn Không</strong>: Bỏ qua đề xuất, giữ nguyên giỏ hàng hiện tại.
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <span class="step-number">7</span>
+                        <div class="step-title">Đặt hàng thành công</div>
+                        <div class="step-desc">Người dùng hoàn thành thanh toán giỏ hàng cuối cùng và hệ thống ghi nhận đặt hàng thành công.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        const tabs = document.querySelectorAll('.tab-button');
+        const svgs = document.querySelectorAll('.diagram-wrapper svg');
+        const descs = document.querySelectorAll('.info-steps');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Get target tab id
+                const targetTab = tab.dataset.tab;
+
+                // Hide all SVGs and show active one
+                svgs.forEach(svg => {
+                    svg.classList.remove('active');
+                    if (svg.id === targetTab + '-svg') {
+                        svg.classList.add('active');
+                    }
+                });
+
+                // Hide all descriptions and show active one
+                descs.forEach(desc => {
+                    desc.classList.remove('active');
+                    if (desc.id === targetTab + '-desc') {
+                        desc.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Theme Toggle (Light/Dark Mode)
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '🌙';
+            }
+        });
+
+        // SVG Download Logic
+        const downloadBtn = document.getElementById('download-svg');
+        downloadBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            const svg = document.getElementById(activeTab + '-svg');
+            
+            // Clone SVG and inject computed styles
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const svgClone = svg.cloneNode(true);
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = `
+                .uml-box {
+                    fill: ${isDark ? '#1e293b' : '#ffffff'} !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-decision {
+                    fill: ${isDark ? '#1e293b' : '#ffffff'} !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-text {
+                    font-family: 'Segoe UI', system-ui, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: bold !important;
+                    fill: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                }
+                .uml-label {
+                    font-family: 'Segoe UI', system-ui, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: bold !important;
+                    fill: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                }
+                .uml-path {
+                    fill: none !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-join-bar {
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 4px !important;
+                }
+            `;
+            svgClone.insertBefore(style, svgClone.firstChild);
+
+            // XML Serialization
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgClone);
+            
+            // Add XML namespace namespaces if not present
+            if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\/1999\/xlink"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+            
+            // Add XML declaration
+            source = '<?xml version="1.0" encoding="utf-8"?>\n' + source;
+            
+            // Convert to blob and trigger download
+            const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = activeTab + "_uml_hybrid_diagram.svg";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Revoke object URL
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        });
+
+        // PNG Download Logic
+        const downloadPngBtn = document.getElementById('download-png');
+        downloadPngBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            const svg = document.getElementById(activeTab + '-svg');
+            
+            // Clone SVG and inject computed styles
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const svgClone = svg.cloneNode(true);
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = `
+                .uml-box {
+                    fill: ${isDark ? '#1e293b' : '#ffffff'} !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-decision {
+                    fill: ${isDark ? '#1e293b' : '#ffffff'} !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-text {
+                    font-family: 'Segoe UI', system-ui, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: bold !important;
+                    fill: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                }
+                .uml-label {
+                    font-family: 'Segoe UI', system-ui, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: bold !important;
+                    fill: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                }
+                .uml-path {
+                    fill: none !important;
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 1.5px !important;
+                }
+                .uml-join-bar {
+                    stroke: ${isDark ? '#f8fafc' : '#0f172a'} !important;
+                    stroke-width: 4px !important;
+                }
+            `;
+            svgClone.insertBefore(style, svgClone.firstChild);
+
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgClone);
+            
+            if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\/1999\/xlink"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+            
+            const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const URLObj = window.URL || window.webkitURL || window;
+            const blobURL = URLObj.createObjectURL(svgBlob);
+            
+            const image = new Image();
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+                const viewBox = svg.viewBox.baseVal;
+                const width = viewBox.width || svg.width.baseVal.value || 1400;
+                const height = viewBox.height || svg.height.baseVal.value || 400;
+                
+                // Scale up for high quality PNG (e.g. 2x resolution)
+                const scale = 2;
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                
+                const context = canvas.getContext('2d');
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.scale(scale, scale);
+                context.drawImage(image, 0, 0, width, height);
+                
+                canvas.toBlob((pngBlob) => {
+                    const pngURL = URLObj.createObjectURL(pngBlob);
+                    const link = document.createElement('a');
+                    link.href = pngURL;
+                    link.download = activeTab + "_uml_hybrid_diagram.png";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URLObj.revokeObjectURL(pngURL);
+                }, 'image/png');
+                
+                URLObj.revokeObjectURL(blobURL);
+            };
+            image.src = blobURL;
+        });
+
+        // Full Screen Viewer Modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.createElement('div');
+            modal.id = 'uml-full-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+            modal.style.display = 'none';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '99999';
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s ease';
+            modal.style.backdropFilter = 'blur(8px)';
+            modal.style.cursor = 'zoom-out';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '20px';
+            closeBtn.style.right = '30px';
+            closeBtn.style.background = 'none';
+            closeBtn.style.border = 'none';
+            closeBtn.style.color = '#ffffff';
+            closeBtn.style.fontSize = '40px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.zIndex = '100000';
+            closeBtn.style.transition = 'transform 0.2s';
+            closeBtn.addEventListener('mouseenter', () => closeBtn.style.transform = 'scale(1.2)');
+            closeBtn.addEventListener('mouseleave', () => closeBtn.style.transform = 'scale(1)');
+            
+            const contentContainer = document.createElement('div');
+            contentContainer.id = 'uml-full-content';
+            contentContainer.style.width = '90%';
+            contentContainer.style.maxHeight = '85%';
+            contentContainer.style.overflow = 'auto';
+            contentContainer.style.backgroundColor = 'var(--container-bg, #ffffff)';
+            contentContainer.style.borderRadius = '12px';
+            contentContainer.style.padding = '30px';
+            contentContainer.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)';
+            contentContainer.style.cursor = 'default';
+            
+            const modalTitle = document.createElement('h3');
+            modalTitle.style.margin = '0 0 20px 0';
+            modalTitle.style.fontFamily = 'system-ui, sans-serif';
+            modalTitle.style.color = 'var(--text-color, #0f172a)';
+            modalTitle.style.fontSize = '18px';
+            modalTitle.style.borderBottom = '1px solid var(--border-color, #e2e8f0)';
+            modalTitle.style.paddingBottom = '10px';
+            
+            const svgWrapper = document.createElement('div');
+            svgWrapper.style.display = 'flex';
+            svgWrapper.style.justifyContent = 'center';
+            
+            contentContainer.appendChild(modalTitle);
+            contentContainer.appendChild(svgWrapper);
+            modal.appendChild(closeBtn);
+            modal.appendChild(contentContainer);
+            document.body.appendChild(modal);
+            
+            function openModal(svgElement, titleText) {
+                modalTitle.textContent = titleText || 'Sơ Đồ Hoạt Động (Full Size)';
+                svgWrapper.innerHTML = '';
+                
+                const clonedSvg = svgElement.cloneNode(true);
+                clonedSvg.style.display = 'block';
+                clonedSvg.style.width = '100%';
+                clonedSvg.style.height = 'auto';
+                clonedSvg.style.maxWidth = '100%';
+                clonedSvg.removeAttribute('style');
+                clonedSvg.style.width = '100%';
+                
+                const clonedSvgWrapper = document.createElement('div');
+                clonedSvgWrapper.style.width = '100%';
+                clonedSvgWrapper.style.overflowX = 'auto';
+                clonedSvgWrapper.appendChild(clonedSvg);
+                svgWrapper.appendChild(clonedSvgWrapper);
+                
+                modal.style.display = 'flex';
+                modal.offsetHeight; // force reflow
+                modal.style.opacity = '1';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeModal() {
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target === closeBtn) {
+                    closeModal();
+                }
+            });
+            
+            contentContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            const svgs = document.querySelectorAll('.diagram-wrapper svg');
+            svgs.forEach(svg => {
+                svg.style.cursor = 'zoom-in';
+                svg.setAttribute('title', 'Click để xem kích thước đầy đủ');
+                svg.addEventListener('click', () => {
+                    let title = '';
+                    const activeTabButton = document.querySelector('.tab-button.active');
+                    if (activeTabButton) {
+                        title = activeTabButton.textContent;
+                    }
+                    openModal(svg, title);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

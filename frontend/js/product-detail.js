@@ -75,6 +75,38 @@ async function fetchProductDetail() {
                 console.error('Error in click tracking flow:', trackErr);
             }
             
+            // Save to LocalStorage for "Recently Viewed" feature
+            try {
+                const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const viewKey = user && user.ma_nguoi_dung ? `viewed_products_${user.ma_nguoi_dung}` : 'viewed_products_guest';
+                
+                let viewedProducts = JSON.parse(localStorage.getItem(viewKey) || '[]');
+                
+                // Remove if already exists to avoid duplicates
+                viewedProducts = viewedProducts.filter(p => p.ma_mon !== currentProduct.ma_mon);
+                
+                // Add to the beginning of the list
+                viewedProducts.unshift({
+                    ma_mon: currentProduct.ma_mon,
+                    ten_mon: currentProduct.ten_mon,
+                    gia_tien: currentProduct.gia_tien,
+                    anh_mon: currentProduct.anh_mon,
+                    trang_thai: currentProduct.trang_thai,
+                    so_luong_ton: currentProduct.so_luong_ton,
+                    clickedAt: new Date().toISOString()
+                });
+                
+                // Keep only the latest 50 items
+                if (viewedProducts.length > 50) {
+                    viewedProducts = viewedProducts.slice(0, 50);
+                }
+                
+                localStorage.setItem(viewKey, JSON.stringify(viewedProducts));
+            } catch (e) {
+                console.error('Error saving viewed product to localStorage:', e);
+            }
+            
             console.log('💰 Giá:', currentProduct.gia_tien);
             console.log('🖼️ Ảnh:', currentProduct.anh_mon);
             console.log('📦 Tồn kho:', currentProduct.so_luong_ton, currentProduct.don_vi_tinh);

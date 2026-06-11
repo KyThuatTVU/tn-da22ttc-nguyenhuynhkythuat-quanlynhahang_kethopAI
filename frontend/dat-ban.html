@@ -241,14 +241,18 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-2">Khu vực</label>
-                                    <select id="khu_vuc" class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
-                                        <option value="">Chọn khu vực (tùy chọn)</option>
-                                        <option value="indoor">Khu vực trong nhà</option>
-                                        <option value="outdoor">Khu vực sân vườn</option>
-                                        <option value="vip">Phòng VIP</option>
+                                    <label class="block text-sm font-medium mb-2">Khu vực *</label>
+                                    <select id="khu_vuc" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                        <option value="">Đang tải khu vực...</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Chọn bàn trống *</label>
+                                <select id="ma_ban" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                    <option value="">Vui lòng chọn khu vực trước</option>
+                                </select>
                             </div>
 
                             <div>
@@ -438,6 +442,10 @@
                                         <span class="text-gray-600">Khu vực:</span>
                                         <p id="confirm-area" class="font-medium"></p>
                                     </div>
+                                    <div>
+                                        <span class="text-gray-600">Bàn được chọn:</span>
+                                        <p id="confirm-table" class="font-medium"></p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -580,6 +588,9 @@
             
             // Load menu items
             await loadMenuItems();
+
+            // Load available tables
+            await loadAvailableTables();
             
             // Setup event listeners
             setupEventListeners();
@@ -659,6 +670,9 @@
             // Date change - validate time
             document.getElementById('ngay_dat').addEventListener('change', validateDateTime);
             document.getElementById('gio_den').addEventListener('change', validateDateTime);
+
+            // Area change - filter tables list
+            document.getElementById('khu_vuc').addEventListener('change', populateTablesDropdown);
         }
         
         // Validate date and time
@@ -713,9 +727,10 @@
             const date = document.getElementById('ngay_dat').value;
             const time = document.getElementById('gio_den').value;
             const guests = document.getElementById('so_luong').value;
+            const tableId = document.getElementById('ma_ban').value;
             
-            if (!name || !phone || !date || !time || !guests) {
-                showNotification('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+            if (!name || !phone || !date || !time || !guests || !tableId) {
+                showNotification('Vui lòng điền đầy đủ thông tin bắt buộc và chọn bàn trống', 'error');
                 return false;
             }
             
@@ -739,8 +754,98 @@
                 gio_den: document.getElementById('gio_den').value,
                 so_luong: document.getElementById('so_luong').value,
                 khu_vuc: document.getElementById('khu_vuc').value,
+                ma_ban: parseInt(document.getElementById('ma_ban').value),
                 ghi_chu: document.getElementById('ghi_chu').value.trim()
             };
+        }
+
+        let allTablesList = [];
+
+        // Tạo danh sách khu vực động từ dữ liệu bàn trong database
+        function populateAreasDropdown() {
+            const areaSelect = document.getElementById('khu_vuc');
+            if (!areaSelect) return;
+
+            // Lấy tất cả các vị trí độc duy từ danh sách bàn, thay null/rỗng bằng 'Khu chung'
+            const uniqueAreas = [...new Set(allTablesList.map(t => (t.vi_tri || 'Khu chung').trim()))]
+                .filter(area => area !== '');
+
+            // Sắp xếp Alphabet để hiển thị đẹp mắt
+            uniqueAreas.sort((a, b) => a.localeCompare(b, 'vi'));
+
+            // Lưu giữ khu vực đang được chọn (nếu có)
+            const currentValue = areaSelect.value;
+
+            areaSelect.innerHTML = '<option value="">Chọn khu vực</option>' +
+                uniqueAreas.map(area => `<option value="${area}">${area}</option>`).join('');
+
+            // Khôi phục lại lựa chọn trước đó (nếu vẫn còn hợp lệ)
+            if (currentValue && uniqueAreas.includes(currentValue)) {
+                areaSelect.value = currentValue;
+            }
+        }
+
+        // Tải danh sách bàn trống từ API
+        async function loadAvailableTables() {
+            try {
+                const response = await fetch(`${API_URL}/tables`);
+                const result = await response.json();
+                if (result.success) {
+                    allTablesList = result.data || [];
+                    populateAreasDropdown(); // Tải danh sách khu vực động
+                    populateTablesDropdown();
+
+                    // Đọc bàn được gán qua tham số URL (?ma_ban=X hoặc ?tableId=X)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const preselectedTableId = urlParams.get('tableId') || urlParams.get('ma_ban');
+                    if (preselectedTableId) {
+                        const tableIdNum = parseInt(preselectedTableId);
+                        const table = allTablesList.find(t => t.ma_ban === tableIdNum);
+                        if (table) {
+                            if (table.trang_thai === 'trong') {
+                                // Tự động chọn khu vực dựa theo vị trí của bàn
+                                const matchedArea = table.vi_tri || 'Khu chung';
+
+                                document.getElementById('khu_vuc').value = matchedArea;
+                                populateTablesDropdown(); // Cập nhật lại dropdown bàn theo khu vực vừa chọn
+
+                                document.getElementById('ma_ban').value = tableIdNum;
+                                showNotification(`Đã tự động chọn ${table.ten_ban} (${table.so_cho} chỗ) theo yêu cầu`, 'success');
+                            } else {
+                                showNotification(`Bàn ${table.ten_ban} hiện đã được đặt hoặc đang sử dụng. Vui lòng chọn bàn khác còn trống.`, 'error');
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi tải danh sách bàn:', error);
+                showNotification('Không thể tải danh sách bàn trống từ server', 'error');
+            }
+        }
+
+        // Tạo danh sách bàn trống trong dropdown dựa trên bộ lọc khu vực
+        function populateTablesDropdown() {
+            const area = document.getElementById('khu_vuc').value;
+            const tableSelect = document.getElementById('ma_ban');
+
+            // Chỉ lấy các bàn trống (trang_thai = 'trong')
+            let filteredTables = allTablesList.filter(t => t.trang_thai === 'trong');
+
+            if (area) {
+                filteredTables = filteredTables.filter(t => {
+                    const loc = (t.vi_tri || 'Khu chung').trim();
+                    return loc === area.trim();
+                });
+            }
+
+            if (!area) {
+                tableSelect.innerHTML = '<option value="">Vui lòng chọn khu vực trước</option>';
+            } else if (filteredTables.length === 0) {
+                tableSelect.innerHTML = '<option value="">Không có bàn nào trống trong khu vực này</option>';
+            } else {
+                tableSelect.innerHTML = '<option value="">Chọn bàn trống</option>' +
+                    filteredTables.map(t => `<option value="${t.ma_ban}">${t.ten_ban} - ${t.vi_tri || 'Khu chung'} (${t.so_cho} chỗ)</option>`).join('');
+            }
         }
         
         // Load menu items
@@ -1062,8 +1167,12 @@
             document.getElementById('confirm-time').textContent = bookingInfo.gio_den;
             document.getElementById('confirm-guests').textContent = bookingInfo.so_luong + ' người';
             
-            const areaMap = { 'indoor': 'Trong nhà', 'outdoor': 'Sân vườn', 'vip': 'Phòng VIP' };
-            document.getElementById('confirm-area').textContent = areaMap[bookingInfo.khu_vuc] || 'Không chọn';
+            document.getElementById('confirm-area').textContent = bookingInfo.khu_vuc || 'Không chọn';
+
+            // Hiển thị bàn được chọn
+            const tableSelect = document.getElementById('ma_ban');
+            const selectedTableText = tableSelect.options[tableSelect.selectedIndex]?.text || 'Chưa chọn';
+            document.getElementById('confirm-table').textContent = selectedTableText;
             
             // Items list
             const items = Object.values(selectedItems);
@@ -1299,6 +1408,10 @@
                             <div class="flex justify-between py-2 border-b">
                                 <span class="text-gray-600">Giờ đến:</span>
                                 <span class="font-medium">${data.gio_den}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">Bàn đã chọn:</span>
+                                <span class="font-medium font-bold text-orange-600">${document.getElementById('ma_ban').options[document.getElementById('ma_ban').selectedIndex]?.text || 'Chưa chọn'}</span>
                             </div>
                             <div class="flex justify-between py-2 border-b">
                                 <span class="text-gray-600">Số món đã đặt:</span>

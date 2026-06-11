@@ -238,6 +238,7 @@ async function findSimilarUsers(userId, limit = 5) {
 
 /**
  * Gợi ý món từ người dùng tương tự (Collaborative Filtering - HYBRID WITH PYTHON)
+ * CẢI TIẾN: Đưa số sao vào vector sở thích để tăng độ chính xác
  */
 async function getCollaborativeRecommendations(userId, limit = 5) {
     try {
@@ -254,13 +255,16 @@ async function getCollaborativeRecommendations(userId, limit = 5) {
                 console.log(`🤖 [Python ML] Hybrid Recommendation success cho User: ${userId}`, recommendedItemIds);
                 
                 // Fetch thông tin chi tiết các id này từ database MySQL 
+                // CẢI TIẾN: Lọc theo số sao trung bình >= 3.0
                 const query = `
-                    SELECT m.*, d.ten_danh_muc, AVG(dg.so_sao) as avg_rating
+                    SELECT m.*, d.ten_danh_muc, COALESCE(AVG(dg.so_sao), 4.0) as avg_rating
                     FROM mon_an m
                     LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
-                    LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon
+                    LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
                     WHERE m.ma_mon IN (?) AND m.trang_thai = 1
                     GROUP BY m.ma_mon
+                    HAVING avg_rating >= 3.0
+                    ORDER BY avg_rating DESC
                 `;
                 const [mlRecommendations] = await db.query(query, [recommendedItemIds]);
                 
@@ -288,15 +292,30 @@ async function getCollaborativeRecommendations(userId, limit = 5) {
 
 /**
  * Gợi ý SQL gốc nếu Python tạch (Fall-back plan)
+ * CẢI TIẾN: 
+ * - Tích hợp đánh giá số sao vào vector sở thích
+ * - Lọc món có số sao >= 3.0 hoặc chưa đánh giá
  */
 async function getSQLCollaborativeRecommendations(userId, limit = 5) {
     try {
-        const similarUsers = await findSimilarUsers(userId);
-        if (similarUsers.length === 0) return [];
+        // 1. Tìm người dùng tương tự dựa trên hành vi mua hàng VÀ đánh giá
+        const similarUsers = await findSimilarUsersWithRatings(userId);
+        
+        console.log(`🤝 [Collaborative] User ${userId}: Found ${similarUsers.length} similar users`);
+        if (similarUsers.length > 0) {
+            console.log(`   Top similar users:`, similarUsers.slice(0, 3).map(u => 
+                `User ${u.ma_nguoi_dung} (similarity: ${(u.similarity * 100).toFixed(1)}%, common: ${u.common_dishes})`
+            ).join(', '));
+        }
+        
+        if (similarUsers.length === 0) {
+            console.log(`   ⚠️ No similar users found, returning empty recommendations`);
+            return [];
+        }
         
         const similarUserIds = similarUsers.map(u => u.ma_nguoi_dung);
         
-        // Lấy các món user chưa mua nhưng users tương tự đã mua
+        // 2. Lấy các món user chưa mua nhưng users tương tự đã mua
         const [userOrders] = await db.query(
             `SELECT DISTINCT ct.ma_mon 
              FROM chi_tiet_don_hang ct
@@ -305,15 +324,17 @@ async function getSQLCollaborativeRecommendations(userId, limit = 5) {
             [userId]
         );
         const userDishes = userOrders.map(o => o.ma_mon);
+        console.log(`   User already purchased ${userDishes.length} dishes: [${userDishes.slice(0, 5).join(', ')}...]`);
         
         let query = `
-            SELECT m.*, d.ten_danh_muc, COUNT(*) as purchase_count,
-                   AVG(dg.so_sao) as avg_rating
+            SELECT m.*, d.ten_danh_muc, COUNT(DISTINCT dh.ma_don_hang) as purchase_count,
+                   COALESCE(AVG(dg.so_sao), 4.0) as avg_rating,
+                   COUNT(dg.ma_danh_gia) as review_count
             FROM chi_tiet_don_hang ct
             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
             JOIN mon_an m ON ct.ma_mon = m.ma_mon
             LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
-            LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon
+            LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
             WHERE dh.ma_nguoi_dung IN (?) AND m.trang_thai = 1
         `;
         const params = [similarUserIds];
@@ -323,10 +344,26 @@ async function getSQLCollaborativeRecommendations(userId, limit = 5) {
             params.push(userDishes);
         }
         
-        query += ` GROUP BY m.ma_mon ORDER BY purchase_count DESC, avg_rating DESC LIMIT ?`;
+        // CẢI TIẾN: Lọc món có đánh giá >= 3.0 hoặc chưa đánh giá (NULL)
+        // COALESCE đã xử lý NULL thành 4.0, nên chỉ cần filter >= 3.0
+        query += ` 
+            GROUP BY m.ma_mon, m.ten_mon, d.ten_danh_muc, m.gia_tien, m.gia_khuyen_mai, m.don_vi_tinh, 
+                     m.anh_mon, m.trang_thai, m.ma_danh_muc, m.so_luong_ton, m.mo_ta_chi_tiet, m.tu_khoa
+            HAVING COUNT(DISTINCT dh.ma_nguoi_dung) >= 1 AND avg_rating >= 3.0
+            ORDER BY avg_rating DESC, purchase_count DESC
+            LIMIT ?
+        `;
         params.push(limit);
         
         const [recommendations] = await db.query(query, params);
+        
+        console.log(`   ✅ Found ${recommendations.length} collaborative recommendations (filtered by rating >= 3.0)`);
+        if (recommendations.length > 0) {
+            console.log(`   Top dishes:`, recommendations.slice(0, 3).map(r => 
+                `"${r.ten_mon}" (⭐${parseFloat(r.avg_rating).toFixed(1)}, ${r.purchase_count} orders)`
+            ).join(', '));
+        }
+        
         return recommendations.map(r => ({
             ...r,
             recommendation_type: 'collaborative',
@@ -338,12 +375,115 @@ async function getSQLCollaborativeRecommendations(userId, limit = 5) {
     }
 }
 
+/**
+ * Tìm người dùng tương tự dựa trên lịch sử mua hàng VÀ đánh giá số sao
+ * CẢI TIẾN: Đưa số sao vào vector sở thích
+ */
+async function findSimilarUsersWithRatings(userId, limit = 5) {
+    try {
+        // Lấy vector sở thích của user (món ăn + đánh giá)
+        const [userVector] = await db.query(
+            `SELECT 
+                ct.ma_mon,
+                COALESCE(dg.so_sao, 3) as rating
+             FROM chi_tiet_don_hang ct
+             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+             LEFT JOIN danh_gia_san_pham dg ON dg.ma_mon = ct.ma_mon AND dg.ma_nguoi_dung = ?
+             WHERE dh.ma_nguoi_dung = ?`,
+            [userId, userId]
+        );
+        
+        if (userVector.length === 0) return [];
+        
+        // Tạo map điểm số sở thích: >=4 sao = +1, <=2 sao = -1
+        const userPreferenceMap = {};
+        userVector.forEach(item => {
+            const rating = Number(item.rating);
+            if (rating >= 4) {
+                userPreferenceMap[item.ma_mon] = 1.5;
+            } else if (rating <= 2) {
+                userPreferenceMap[item.ma_mon] = -1.5;
+            } else {
+                userPreferenceMap[item.ma_mon] = 0.25;
+            }
+        });
+        
+        const userDishes = Object.keys(userPreferenceMap).map(Number);
+        
+        // Tìm users khác có món tương tự
+        const [similarUsers] = await db.query(
+            `SELECT 
+                dh.ma_nguoi_dung, 
+                ct.ma_mon,
+                COALESCE(dg.so_sao, 3) as rating
+             FROM chi_tiet_don_hang ct
+             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+             LEFT JOIN danh_gia_san_pham dg ON dg.ma_mon = ct.ma_mon AND dg.ma_nguoi_dung = dh.ma_nguoi_dung
+             WHERE ct.ma_mon IN (?) AND dh.ma_nguoi_dung != ? AND dh.ma_nguoi_dung IS NOT NULL
+             GROUP BY dh.ma_nguoi_dung, ct.ma_mon, dg.so_sao`,
+            [userDishes, userId]
+        );
+        
+        // Tính cosine similarity dựa trên sở thích (rating-weighted)
+        const userSimilarities = {};
+        similarUsers.forEach(row => {
+            const otherId = row.ma_nguoi_dung;
+            if (!userSimilarities[otherId]) {
+                userSimilarities[otherId] = { dotProduct: 0, normOther: 0, count: 0 };
+            }
+            
+            const rating = Number(row.rating);
+            let otherScore = 0.25;
+            if (rating >= 4) {
+                otherScore = 1.5;
+            } else if (rating <= 2) {
+                otherScore = -1.5;
+            }
+            
+            const userScore = userPreferenceMap[row.ma_mon] || 0;
+            userSimilarities[otherId].dotProduct += userScore * otherScore;
+            userSimilarities[otherId].normOther += otherScore * otherScore;
+            userSimilarities[otherId].count++;
+        });
+        
+        // Tính norm của user vector
+        let normUser = 0;
+        Object.values(userPreferenceMap).forEach(score => {
+            normUser += score * score;
+        });
+        normUser = Math.sqrt(normUser);
+        
+        // Tính similarity score
+        const results = [];
+        Object.entries(userSimilarities).forEach(([otherId, data]) => {
+            const normOther = Math.sqrt(data.normOther);
+            const similarity = normUser === 0 || normOther === 0 ? 0 : data.dotProduct / (normUser * normOther);
+            if (similarity > 0) {
+                results.push({
+                    ma_nguoi_dung: parseInt(otherId),
+                    similarity: similarity,
+                    common_dishes: data.count
+                });
+            }
+        });
+        
+        results.sort((a, b) => b.similarity - a.similarity);
+        return results.slice(0, limit);
+    } catch (error) {
+        console.error('Error finding similar users with ratings:', error.message);
+        return [];
+    }
+}
+
 
 // ==================== CONTENT-BASED FILTERING ====================
 
 /**
  * Gợi ý món dựa trên nội dung (danh mục, giá, đặc điểm)
- * CẢI TIẾN: Ưu tiên sở thích khẩu vị từ bảng so_thich_khau_vi_nguoi_dung
+ * CẢI TIẾN: 
+ * - Ưu tiên sở thích khẩu vị từ bảng so_thich_khau_vi_nguoi_dung
+ * - Sắp xếp ưu tiên món có đánh giá cao (>=3.0 sao)
+ * - Ưu tiên món có giá gần với giá trung bình user thường mua
  */
 async function getContentBasedRecommendations(userId, limit = 5, preferredFlavorIds = null) {
     try {
@@ -415,8 +555,10 @@ async function getContentBasedRecommendations(userId, limit = 5, preferredFlavor
                 params.push(userDishes);
             }
             
+            // CẢI TIẾN: Sắp xếp ưu tiên đánh giá cao trước, sau đó đến giá phù hợp
             query += ` GROUP BY m.ma_mon 
-                       ORDER BY ABS(m.gia_tien - ?) ASC, avg_rating DESC 
+                       HAVING avg_rating IS NULL OR avg_rating >= 3.0
+                       ORDER BY COALESCE(avg_rating, 4.0) DESC, ABS(m.gia_tien - ?) ASC
                        LIMIT ?`;
             params.push(avgPrice, limit * 2);
             
@@ -439,7 +581,11 @@ async function getContentBasedRecommendations(userId, limit = 5, preferredFlavor
                 query += ` AND m.ma_mon NOT IN (?)`;
                 params.push(excludedIds);
             }
-            query += ` GROUP BY m.ma_mon ORDER BY avg_rating DESC LIMIT ?`;
+            // CẢI TIẾN: Lọc món có đánh giá >= 3.0 hoặc chưa đánh giá
+            query += ` GROUP BY m.ma_mon 
+                       HAVING avg_rating IS NULL OR avg_rating >= 3.0
+                       ORDER BY COALESCE(avg_rating, 4.0) DESC 
+                       LIMIT ?`;
             params.push(limit - recommendations.length);
             
             const [extra] = await db.query(query, params);
@@ -828,9 +974,9 @@ router.get('/', async (req, res) => {
 
             // User đã đăng nhập - sử dụng ML recommendations
             const [contentBased, chatBased, collaborative] = await Promise.all([
-                getContentBasedRecommendations(userId, Math.ceil(limit * 0.6), preferredFlavorIds), // 60% từ sở thích (Khảo sát + Clicks)
+                getContentBasedRecommendations(userId, Math.ceil(limit * 0.4), preferredFlavorIds), // 40% từ sở thích (giảm từ 50%)
                 getChatBasedRecommendations(userId, Math.ceil(limit * 0.2)),    // 20% từ chat
-                getCollaborativeRecommendations(userId, Math.ceil(limit * 0.2)) // 20% từ collaborative
+                getCollaborativeRecommendations(userId, Math.ceil(limit * 0.4)) // 40% từ collaborative (tăng từ 30%)
             ]);
             
             // Gán điểm ưu tiên (score) cho từng loại gợi ý
@@ -842,8 +988,9 @@ router.get('/', async (req, res) => {
                 item.score = 89 - index;
             });
             
+            // CẢI TIẾN: Tăng score của collaborative để cạnh tranh với content-based
             collaborative.forEach((item, index) => {
-                item.score = 79 - index;
+                item.score = 95 - index;  // Tăng từ 79 → 95 (gần bằng content-based)
             });
 
             // ================================================================
@@ -924,7 +1071,31 @@ router.get('/', async (req, res) => {
                 const filteredContent = contentBased.filter(r => matchingDishIds.has(r.ma_mon));
                 const filteredChat = chatBased.filter(r => matchingDishIds.has(r.ma_mon));
                 
-                recommendations = [...directBoostedDishes, ...filteredContent, ...filteredChat, ...collaborative];
+                // CẢI TIẾN: Nếu sau khi lọc không còn đủ món, bổ sung thêm các món khác với score thấp hơn
+                const filteredCount = filteredContent.length + filteredChat.length + collaborative.length;
+                console.log(`🎯 [Filter Debug] User ${userId}: filteredContent=${filteredContent.length}, filteredChat=${filteredChat.length}, collaborative=${collaborative.length}, total=${filteredCount}`);
+                
+                if (filteredCount < 15) {  // Giảm từ 20 → 15 để vừa đủ
+                    console.log(`⚠️ [Recommendation] Chỉ có ${filteredCount} món sau khi lọc khẩu vị. Bổ sung thêm các món khác...`);
+                    // Bổ sung các món không match khẩu vị nhưng có score cao (giảm score xuống 75% thay vì 60%)
+                    const nonMatchedContent = contentBased
+                        .filter(r => !matchingDishIds.has(r.ma_mon))
+                        .map(r => ({ ...r, score: (r.score || 0) * 0.75, reason: r.reason + ' (Gợi ý đa dạng)' }));
+                    const nonMatchedChat = chatBased
+                        .filter(r => !matchingDishIds.has(r.ma_mon))
+                        .map(r => ({ ...r, score: (r.score || 0) * 0.75, reason: r.reason + ' (Gợi ý đa dạng)' }));
+                    
+                    recommendations = [
+                        ...directBoostedDishes, 
+                        ...filteredContent, 
+                        ...filteredChat, 
+                        ...collaborative,
+                        ...nonMatchedContent.slice(0, 8),  // Giảm từ 10 → 8 món
+                        ...nonMatchedChat.slice(0, 8)
+                    ];
+                } else {
+                    recommendations = [...directBoostedDishes, ...filteredContent, ...filteredChat, ...collaborative];
+                }
             } else {
                 recommendations = [...directBoostedDishes, ...contentBased, ...chatBased, ...collaborative];
             }
@@ -1446,7 +1617,7 @@ router.get('/admin/stats', async (req, res) => {
             FROM nguoi_dung n
             LEFT JOIN so_thich_khau_vi_nguoi_dung s ON n.ma_nguoi_dung = s.ma_nguoi_dung
             LEFT JOIN thuoc_tinh_khau_vi f ON s.id_thuoc_tinh = f.id
-            LEFT JOIN don_hang dh ON n.ma_nguoi_dung = dh.ma_nguoi_dung AND dh.trang_thai = 'completed'
+            LEFT JOIN don_hang dh ON n.ma_nguoi_dung = dh.ma_nguoi_dung AND dh.trang_thai = 'delivered'
             GROUP BY n.ma_nguoi_dung, n.ten_nguoi_dung, n.so_dien_thoai
             ORDER BY total_orders DESC, total_spent DESC
             LIMIT 50
@@ -1507,7 +1678,48 @@ router.get('/admin/stats', async (req, res) => {
                 u.preference_tags = profiles[u.ma_nguoi_dung] || [];
                 u.top_dish_click = userTopDishes[u.ma_nguoi_dung] || null;
                 u.top_flavors_click = userTopFlavors[u.ma_nguoi_dung] || [];
+                
+                // CẢI TIẾN: Lấy món ăn và khẩu vị học được từ chatbot
+                u.chatbot_dishes = [];
             });
+            
+            // CẢI TIẾN: Lấy dữ liệu chatbot_preference_insights cho các user
+            try {
+                const [chatbotInsights] = await db.query(`
+                    SELECT 
+                        ci.ma_nguoi_dung,
+                        ci.ten_mon,
+                        ci.ma_mon,
+                        GROUP_CONCAT(DISTINCT pt.ten_tag SEPARATOR ', ') as tags,
+                        SUM(ci.score_delta) as total_score
+                    FROM chatbot_preference_insights ci
+                    LEFT JOIN preference_tags pt ON ci.tag_key = pt.tag_key
+                    WHERE ci.ma_nguoi_dung IN (?)
+                    GROUP BY ci.ma_nguoi_dung, ci.ten_mon, ci.ma_mon
+                    HAVING total_score > 0
+                    ORDER BY ci.ma_nguoi_dung, total_score DESC
+                `, [userIds]);
+                
+                // Nhóm theo user
+                const chatbotByUser = {};
+                chatbotInsights.forEach(row => {
+                    if (!chatbotByUser[row.ma_nguoi_dung]) {
+                        chatbotByUser[row.ma_nguoi_dung] = [];
+                    }
+                    chatbotByUser[row.ma_nguoi_dung].push({
+                        ten_mon: row.ten_mon || 'Từ khóa khẩu vị',
+                        ma_mon: row.ma_mon,
+                        tags: row.tags,
+                        score: parseFloat(row.total_score || 0).toFixed(1)
+                    });
+                });
+                
+                users.forEach(u => {
+                    u.chatbot_dishes = (chatbotByUser[u.ma_nguoi_dung] || []).slice(0, 5);
+                });
+            } catch (chatbotErr) {
+                console.error('Error fetching chatbot preferences:', chatbotErr.message);
+            }
         }
 
         // 5. Thống kê số lượt click chuột / xem món ăn (Dish Click/View Counts)
@@ -1547,6 +1759,62 @@ router.get('/admin/stats', async (req, res) => {
                 GROUP BY h.ma_nguoi_dung, mk.id_thuoc_tinh
             `);
 
+            const [allReviews] = await db.query(`
+                SELECT dg.ma_nguoi_dung, mk.id_thuoc_tinh, dg.so_sao
+                FROM danh_gia_san_pham dg
+                JOIN mon_an_khau_vi mk ON dg.ma_mon = mk.ma_mon
+                WHERE dg.trang_thai = 'approved' AND dg.ma_nguoi_dung IS NOT NULL
+            `);
+            
+            // Lịch sử mua hàng để tìm món đề xuất chéo (Collaborative Filtering)
+            // - Lấy mọi đơn chưa hủy
+            // - Nếu đơn không có ma_nguoi_dung (đơn POS / khách vãng lai), MAP NGƯỢC:
+            //     + ưu tiên match theo số điện thoại
+            //     + fallback theo tên khách (case-insensitive, trim)
+            const [allOrders] = await db.query(`
+                SELECT
+                    COALESCE(dh.ma_nguoi_dung, nd_phone.ma_nguoi_dung, nd_name.ma_nguoi_dung) AS ma_nguoi_dung,
+                    m.ma_mon,
+                    m.ten_mon,
+                    MAX(dh.thoi_gian_tao) AS latest_purchase
+                FROM don_hang dh
+                JOIN chi_tiet_don_hang ct ON dh.ma_don_hang = ct.ma_don_hang
+                JOIN mon_an m ON ct.ma_mon = m.ma_mon
+                LEFT JOIN nguoi_dung nd_phone
+                       ON dh.ma_nguoi_dung IS NULL
+                      AND dh.so_dt_khach IS NOT NULL
+                      AND dh.so_dt_khach <> ''
+                      AND nd_phone.so_dien_thoai = dh.so_dt_khach
+                LEFT JOIN nguoi_dung nd_name
+                       ON dh.ma_nguoi_dung IS NULL
+                      AND nd_phone.ma_nguoi_dung IS NULL
+                      AND dh.ten_khach_vang_lai IS NOT NULL
+                      AND dh.ten_khach_vang_lai <> ''
+                      AND LOWER(TRIM(nd_name.ten_nguoi_dung)) = LOWER(TRIM(dh.ten_khach_vang_lai))
+                WHERE dh.trang_thai <> 'cancelled'
+                  AND COALESCE(dh.ma_nguoi_dung, nd_phone.ma_nguoi_dung, nd_name.ma_nguoi_dung) IS NOT NULL
+                GROUP BY COALESCE(dh.ma_nguoi_dung, nd_phone.ma_nguoi_dung, nd_name.ma_nguoi_dung), m.ma_mon, m.ten_mon
+                ORDER BY latest_purchase DESC
+            `);
+
+            console.log(`🔍 [CF Debug] Tổng số bản ghi (user, mon) lấy được: ${allOrders.length}`);
+            
+            const userPurchases = {};
+            allOrders.forEach(row => {
+                if (!userPurchases[row.ma_nguoi_dung]) userPurchases[row.ma_nguoi_dung] = [];
+                userPurchases[row.ma_nguoi_dung].push({ id: row.ma_mon, name: row.ten_mon });
+            });
+
+            // Log số món mỗi user đã mua (giúp debug khi không có gợi ý chéo)
+            const purchaseSummary = allUsersList.map(u => ({
+                ma: u.ma_nguoi_dung,
+                ten: u.ten_nguoi_dung,
+                so_dien_thoai: u.so_dien_thoai,
+                so_mon_da_mua: (userPurchases[u.ma_nguoi_dung] || []).length,
+                cac_mon: (userPurchases[u.ma_nguoi_dung] || []).map(x => x.name)
+            }));
+            console.log('🔍 [CF Debug] Lịch sử mua của từng user:', JSON.stringify(purchaseSummary, null, 2));
+
             const vectors = {};
             allUsersList.forEach(u => {
                 vectors[u.ma_nguoi_dung] = {};
@@ -1564,6 +1832,13 @@ router.get('/admin/stats', async (req, res) => {
             allImplicitPrefs.forEach(row => {
                 if (vectors[row.ma_nguoi_dung]) {
                     vectors[row.ma_nguoi_dung][row.id_thuoc_tinh] += Math.min(2.0, row.click_count * 0.2);
+                }
+            });
+
+            allReviews.forEach(row => {
+                if (vectors[row.ma_nguoi_dung]) {
+                    const ratingWeight = row.so_sao >= 4 ? 2.5 : (row.so_sao <= 2 ? -2.5 : 0);
+                    vectors[row.ma_nguoi_dung][row.id_thuoc_tinh] += ratingWeight;
                 }
             });
 
@@ -1593,17 +1868,31 @@ router.get('/admin/stats', async (req, res) => {
                         const sharedFlavors = allFlavorsList
                             .filter(f => (vecA[f.id] > 0) && (vecB[f.id] > 0))
                             .map(f => f.ten_thuoc_tinh);
+                        
+                        const purchasesA = userPurchases[uA.ma_nguoi_dung] || [];
+                        const purchasesB = userPurchases[uB.ma_nguoi_dung] || [];
+                        
+                        // Tìm món Khách B đã mua nhưng Khách A chưa mua
+                        const recForA = purchasesB.filter(pb => !purchasesA.some(pa => pa.id === pb.id)).slice(0, 2);
+                        // Tìm món Khách A đã mua nhưng Khách B chưa mua
+                        const recForB = purchasesA.filter(pa => !purchasesB.some(pb => pb.id === pa.id)).slice(0, 2);
                             
                         similarityGroups.push({
                             userA: { id: uA.ma_nguoi_dung, name: uA.ten_nguoi_dung, phone: uA.so_dien_thoai },
                             userB: { id: uB.ma_nguoi_dung, name: uB.ten_nguoi_dung, phone: uB.so_dien_thoai },
                             similarity: Math.round(similarity * 100),
-                            sharedFlavors
+                            sharedFlavors,
+                            recForA,
+                            recForB,
+                            purchasesACount: purchasesA.length,
+                            purchasesBCount: purchasesB.length
                         });
                     }
                 }
             }
             similarityGroups.sort((a, b) => b.similarity - a.similarity);
+            // Giới hạn hiển thị Top 10 cặp giống nhau nhất cho đỡ nặng giao diện
+            similarityGroups = similarityGroups.slice(0, 10);
         } catch (simErr) {
             console.error('Error calculating collaborative similarity groups:', simErr.message);
         }
@@ -1628,8 +1917,9 @@ router.get('/admin/stats', async (req, res) => {
 });
 
 /**
- * API: Huấn luyện lại / Cập nhật hồ sơ sở thích khách hàng từ đánh giá
+ * API: Huấn luyện lại / Cập nhật hồ sơ sở thích khách hàng từ đánh giá VÀ chatbot
  * POST /api/recommendations/admin/rebuild-preferences
+ * CẢI TIẾN: Chạy cả rebuildAllChatbotPreferences() và rebuildAllReviewPreferences()
  */
 router.post('/admin/rebuild-preferences', async (req, res) => {
     try {
@@ -1642,15 +1932,220 @@ router.post('/admin/rebuild-preferences', async (req, res) => {
         }
 
         const preferenceService = require('../services/preferenceService');
-        const result = await preferenceService.rebuildAllReviewPreferences();
+        
+        console.log('🤖 Bắt đầu huấn luyện lại sở thích AI...');
+        
+        // 1. Huấn luyện từ chatbot
+        console.log('📱 Phân tích lịch sử chatbot...');
+        const chatbotCount = await preferenceService.rebuildAllChatbotPreferences();
+        
+        // 2. Huấn luyện từ review
+        console.log('⭐ Phân tích đánh giá sản phẩm...');
+        const reviewResult = await preferenceService.rebuildAllReviewPreferences();
+        
+        // 3. Tính toán lại toàn bộ profile (gộp cả 2 nguồn)
+        console.log('🧮 Tính toán lại hồ sơ sở thích...');
+        const profileCount = await preferenceService.rebuildAllProfiles();
+        
+        console.log('✅ Huấn luyện hoàn tất!');
+        
         res.json({
             success: true,
-            message: 'Đã huấn luyện lại sở thích từ đánh giá thành công',
-            data: result
+            message: 'Đã huấn luyện lại sở thích từ chatbot và đánh giá thành công',
+            data: {
+                chatbot_insights: chatbotCount,
+                review_insights: reviewResult.insight_count || 0,
+                reviews_processed: reviewResult.review_count || 0,
+                profiles_updated: profileCount
+            }
         });
     } catch (error) {
         console.error('Error rebuilding preferences:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server: ' + error.message });
+    }
+});
+
+/**
+ * API: Lấy lịch sử click của người dùng
+ * GET /api/recommendations/admin/user-click-history/:userId
+ */
+router.get('/admin/user-click-history/:userId', async (req, res) => {
+    try {
+        if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = req.params.userId;
+        const [history] = await db.query(`
+            SELECT m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, COUNT(h.id) as click_count, MAX(h.thoi_gian) as last_clicked
+            FROM hanh_vi_nguoi_dung h
+            JOIN mon_an m ON h.ma_mon = m.ma_mon
+            WHERE h.ma_nguoi_dung = ? AND h.hanh_vi IN ('click', 'view')
+            GROUP BY m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien
+            ORDER BY click_count DESC, last_clicked DESC
+            LIMIT 50
+        `, [userId]);
+        res.json({ success: true, data: history });
+    } catch (err) {
+        console.error('Error fetching user click history:', err);
         res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+});
+
+/**
+ * API: Lấy chi tiết từ khóa và món ăn từ chatbot của người dùng
+ * GET /api/recommendations/admin/chatbot-keywords/:userId
+ */
+router.get('/admin/chatbot-keywords/:userId', async (req, res) => {
+    try {
+        if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        
+        const userId = req.params.userId;
+        
+        // 1. Lấy các món ăn được nhắc đến (có ma_mon)
+        const [dishes] = await db.query(`
+            SELECT 
+                ci.ma_mon,
+                ci.ten_mon,
+                GROUP_CONCAT(DISTINCT pt.ten_tag ORDER BY pt.ten_tag SEPARATOR ', ') as tags,
+                ci.sentiment,
+                SUM(ci.score_delta) as score,
+                MAX(ci.evidence) as evidence,
+                MAX(ci.ngay_tao) as last_mentioned
+            FROM chatbot_preference_insights ci
+            LEFT JOIN preference_tags pt ON ci.tag_key = pt.tag_key
+            WHERE ci.ma_nguoi_dung = ? AND ci.ma_mon IS NOT NULL
+            GROUP BY ci.ma_mon, ci.ten_mon, ci.sentiment
+            ORDER BY last_mentioned DESC, score DESC
+        `, [userId]);
+        
+        // 2. Lấy các từ khóa khẩu vị (không có ma_mon)
+        const [keywords] = await db.query(`
+            SELECT 
+                ci.tag_key,
+                pt.ten_tag as tag_name,
+                pt.nhom_tag,
+                ci.sentiment,
+                SUM(ci.score_delta) as score,
+                MAX(ci.evidence) as evidence,
+                MAX(ci.ngay_tao) as last_mentioned,
+                COUNT(*) as mention_count
+            FROM chatbot_preference_insights ci
+            LEFT JOIN preference_tags pt ON ci.tag_key = pt.tag_key
+            WHERE ci.ma_nguoi_dung = ? AND ci.ma_mon IS NULL
+            GROUP BY ci.tag_key, pt.ten_tag, pt.nhom_tag, ci.sentiment
+            ORDER BY last_mentioned DESC, score DESC
+        `, [userId]);
+        
+        // 3. Lấy lịch sử tin nhắn gốc (chỉ lấy 50 tin nhắn gần nhất)
+        const [messages] = await db.query(`
+            SELECT 
+                lc.thoi_diem_chat,
+                lc.nguoi_gui,
+                lc.noi_dung,
+                (SELECT COUNT(*) 
+                 FROM chatbot_preference_insights ci 
+                 WHERE ci.ma_nguoi_dung = lc.ma_nguoi_dung 
+                 AND DATE(ci.ngay_tao) = DATE(lc.thoi_diem_chat)
+                 AND TIME(ci.ngay_tao) BETWEEN TIME(lc.thoi_diem_chat) AND ADDTIME(TIME(lc.thoi_diem_chat), '00:00:05')
+                ) as insights_count
+            FROM lich_su_chatbot lc
+            WHERE lc.ma_nguoi_dung = ?
+            ORDER BY lc.thoi_diem_chat DESC
+            LIMIT 50
+        `, [userId]);
+        
+        // 4. Tính thống kê tổng quan
+        const stats = {
+            total_keywords: keywords.length,
+            total_dishes: dishes.length,
+            total_score: [...dishes, ...keywords].reduce((sum, item) => sum + parseFloat(item.score || 0), 0)
+        };
+        
+        res.json({
+            success: true,
+            data: {
+                dishes,
+                keywords,
+                messages,
+                stats
+            }
+        });
+    } catch (err) {
+        console.error('Error fetching chatbot keywords:', err);
+        res.status(500).json({ success: false, message: 'Lỗi server: ' + err.message });
+    }
+});
+
+// === DEBUG: kiểm tra dữ liệu CF cho 1 user (mở ngoài để soi nhanh) ===
+// GET /api/recommendation/debug-cf?ten=Thuat
+router.get('/debug-cf', async (req, res) => {
+    try {
+        const ten = req.query.ten || '';
+
+        // 1. User trong nguoi_dung khớp tên
+        const [usersByName] = await db.query(
+            `SELECT ma_nguoi_dung, ten_nguoi_dung, so_dien_thoai
+             FROM nguoi_dung
+             WHERE LOWER(ten_nguoi_dung) LIKE LOWER(?)`,
+            [`%${ten}%`]
+        );
+
+        // 2. Đơn hàng có ten_khach_vang_lai khớp tên
+        const [ordersByName] = await db.query(
+            `SELECT ma_don_hang, ma_nguoi_dung, ten_khach_vang_lai, so_dt_khach, trang_thai, thoi_gian_tao
+             FROM don_hang
+             WHERE LOWER(IFNULL(ten_khach_vang_lai,'')) LIKE LOWER(?)
+                OR ma_nguoi_dung IN (SELECT ma_nguoi_dung FROM nguoi_dung WHERE LOWER(ten_nguoi_dung) LIKE LOWER(?))
+             ORDER BY thoi_gian_tao DESC
+             LIMIT 30`,
+            [`%${ten}%`, `%${ten}%`]
+        );
+
+        // 3. Các món trong những đơn đó
+        const orderIds = ordersByName.map(o => o.ma_don_hang);
+        let items = [];
+        if (orderIds.length > 0) {
+            const [rows] = await db.query(
+                `SELECT ct.ma_don_hang, ct.ma_mon, m.ten_mon, ct.so_luong
+                 FROM chi_tiet_don_hang ct
+                 JOIN mon_an m ON ct.ma_mon = m.ma_mon
+                 WHERE ct.ma_don_hang IN (?)`,
+                [orderIds]
+            );
+            items = rows;
+        }
+
+        // 4. Đơn nào KHÔNG link được về user (trống ma_nguoi_dung + không match phone/tên)
+        const [orphanOrders] = await db.query(`
+            SELECT dh.ma_don_hang, dh.ten_khach_vang_lai, dh.so_dt_khach, dh.trang_thai
+            FROM don_hang dh
+            LEFT JOIN nguoi_dung nd_phone
+                   ON dh.so_dt_khach = nd_phone.so_dien_thoai
+                  AND dh.so_dt_khach IS NOT NULL AND dh.so_dt_khach <> ''
+            LEFT JOIN nguoi_dung nd_name
+                   ON LOWER(TRIM(nd_name.ten_nguoi_dung)) = LOWER(TRIM(dh.ten_khach_vang_lai))
+                  AND dh.ten_khach_vang_lai IS NOT NULL AND dh.ten_khach_vang_lai <> ''
+            WHERE dh.ma_nguoi_dung IS NULL
+              AND nd_phone.ma_nguoi_dung IS NULL
+              AND nd_name.ma_nguoi_dung IS NULL
+              AND dh.trang_thai <> 'cancelled'
+            ORDER BY dh.thoi_gian_tao DESC
+            LIMIT 20
+        `);
+
+        res.json({
+            success: true,
+            search: ten,
+            users_match: usersByName,
+            orders_match: ordersByName,
+            items_in_those_orders: items,
+            orphan_orders_cannot_link: orphanOrders
+        });
+    } catch (err) {
+        console.error('debug-cf error:', err);
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 

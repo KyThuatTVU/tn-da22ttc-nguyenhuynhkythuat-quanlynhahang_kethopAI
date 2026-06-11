@@ -126,6 +126,25 @@ def get_apriori():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
+@app.route('/api/ml/apriori/rules', methods=['GET'])
+def get_all_rules():
+    """ Lấy tất cả các luật Apriori để hiển thị cho admin """
+    try:
+        from get_apriori_rules import get_all_apriori_rules
+        result = get_all_apriori_rules()
+        
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 404
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Lỗi: {str(e)}",
+            "data": []
+        }), 500
+
 @app.route('/api/ml/admin/chat', methods=['POST'])
 def admin_chat():
     """ Trả lời câu hỏi phân tích kinh doanh của Admin thông qua LangChain SQL Agent """
