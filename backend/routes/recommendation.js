@@ -1683,8 +1683,13 @@ router.get('/', async (req, res) => {
 
         // 3. Bù tiếp bằng Trending (nếu vẫn thiếu)
         if (missing > 0) {
-            const takeTrending = Math.min(missing, groups.trending.length);
-            finalRecommendations.push(...groups.trending.slice(0, takeTrending));
+            let allowedTrending = groups.trending;
+            // Nếu khách đã đăng nhập, KHÔNG dùng Trending chung chung để bù (để tránh trùng lặp với phần Top Bán Chạy ở UI)
+            if (userId) {
+                allowedTrending = groups.trending.filter(t => t.reason && !t.reason.includes('Đang được nhiều người đặt'));
+            }
+            const takeTrending = Math.min(missing, allowedTrending.length);
+            finalRecommendations.push(...allowedTrending.slice(0, takeTrending));
         }
 
         // 4. Trộn ngẫu nhiên (Shuffle) kết quả để hiển thị đa dạng, không bị cứng nhắc theo điểm
