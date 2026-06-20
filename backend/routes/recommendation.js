@@ -1614,30 +1614,95 @@ router.get('/', async (req, res) => {
         }
         
         // Loại bỏ trùng lặp (giữ món có score cao hơn)
-        const uniqueRecommendations = [];
-        const seenIds = new Map();
+        const uniqueRecommendationsMap = new Map();
         for (const rec of recommendations) {
-            const existingScore = seenIds.get(rec.ma_mon);
-            if (!existingScore || rec.score > existingScore) {
-                if (existingScore) {
-                    // Xóa món cũ có score thấp hơn
-                    const index = uniqueRecommendations.findIndex(r => r.ma_mon === rec.ma_mon);
-                    if (index !== -1) uniqueRecommendations.splice(index, 1);
-                }
-                seenIds.set(rec.ma_mon, rec.score);
-                uniqueRecommendations.push(rec);
+            const existing = uniqueRecommendationsMap.get(rec.ma_mon);
+            if (!existing || rec.score > existing.score) {
+                uniqueRecommendationsMap.set(rec.ma_mon, rec);
             }
         }
         
-        // Sắp xếp theo score giảm dần
-        uniqueRecommendations.sort((a, b) => (b.score || 0) - (a.score || 0));
+        const uniqueRecommendations = Array.from(uniqueRecommendationsMap.values());
+        
+        // --- CƠ CHẾ PHÂN BỔ HẠN NGẠCH (QUOTA) & LẤY LUÂN PHIÊN ---
+        // Chia nhóm các món ăn
+        const groups = {
+            collaborative: [],
+            content_based: [], // Món mới hợp khẩu vị
+            chat_based: [],
+            trending: [],      // Bao gồm cả trending và top_rated
+        };
+
+        uniqueRecommendations.forEach(rec => {
+            const type = rec.recommendation_type;
+            if (groups[type]) {
+                groups[type].push(rec);
+            } else if (type === 'top_rated') {
+                groups.trending.push(rec);
+            } else {
+                groups.trending.push(rec); // Fallback
+            }
+        });
+
+        // Sắp xếp từng nhóm theo điểm giảm dần
+        for (const key in groups) {
+            groups[key].sort((a, b) => (b.score || 0) - (a.score || 0));
+        }
+
+        // Bốc theo hạn ngạch: 3 Collaborative, 3 Content-based, 2 Chat-based. 
+        // Nếu thiếu, bù bằng Trending.
+        const quotas = {
+            collaborative: 3,
+            content_based: 3,
+            chat_based: 2
+        };
+
+        let finalRecommendations = [];
+        
+        // 1. Lấy đủ hạn ngạch cho các nhóm chính
+        for (const type of ['collaborative', 'content_based', 'chat_based']) {
+            const takeCount = Math.min(quotas[type], groups[type].length);
+            finalRecommendations.push(...groups[type].slice(0, takeCount));
+        }
+
+        // 2. Nếu vẫn chưa đủ limit (ví dụ 8), điền đầy bằng các nhóm phụ
+        let missing = limit - finalRecommendations.length;
+        
+        // Ưu tiên bù bằng các món còn dư ở các nhóm chính (nếu có dư)
+        if (missing > 0) {
+            const remainingPool = [
+                ...groups.collaborative.slice(quotas.collaborative),
+                ...groups.content_based.slice(quotas.content_based),
+                ...groups.chat_based.slice(quotas.chat_based)
+            ].sort((a, b) => b.score - a.score);
+
+            const takeRemaining = Math.min(missing, remainingPool.length);
+            finalRecommendations.push(...remainingPool.slice(0, takeRemaining));
+            missing -= takeRemaining;
+        }
+
+        // 3. Bù tiếp bằng Trending (nếu vẫn thiếu)
+        if (missing > 0) {
+            const takeTrending = Math.min(missing, groups.trending.length);
+            finalRecommendations.push(...groups.trending.slice(0, takeTrending));
+        }
+
+        // 4. Trộn ngẫu nhiên (Shuffle) kết quả để hiển thị đa dạng, không bị cứng nhắc theo điểm
+        // (Khách sẽ thấy các loại xen kẽ với nhau)
+        for (let i = finalRecommendations.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [finalRecommendations[i], finalRecommendations[j]] = [finalRecommendations[j], finalRecommendations[i]];
+        }
+        
+        // Cập nhật lại limit
+        const finalLimitedRecommendations = finalRecommendations.slice(0, limit);
         
         res.json({
             success: true,
-            data: uniqueRecommendations.slice(0, limit),
+            data: finalLimitedRecommendations,
             meta: {
                 user_logged_in: !!userId,
-                total: uniqueRecommendations.length,
+                total: finalLimitedRecommendations.length,
                 breakdown: {
                     content_based: recommendations.filter(r => r.recommendation_type === 'content_based').length,
                     chat_based: recommendations.filter(r => r.recommendation_type === 'chat_based').length,
