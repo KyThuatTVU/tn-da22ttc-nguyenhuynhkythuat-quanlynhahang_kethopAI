@@ -1012,7 +1012,15 @@ font-bold text-gray-800 mb-4 sm:mb-6 text-center">
             try {
                 // Determine user token
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+                
+                // ẨN mục này đi nếu khách chưa đăng nhập (Vì chưa đăng nhập thì không có "Gợi Ý Riêng Cho Bạn")
+                if (!token) {
+                    const section = container.closest('section');
+                    if (section) section.style.display = 'none';
+                    return;
+                }
+
+                const headers = { 'Authorization': 'Bearer ' + token };
 
                 // Đọc các khẩu vị được xem nhiều (>= 5 lần) trong session của người dùng để truyền lên API
                 let boostParam = '';
