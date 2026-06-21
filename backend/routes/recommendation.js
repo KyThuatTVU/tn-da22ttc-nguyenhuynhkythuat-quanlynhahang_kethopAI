@@ -1649,12 +1649,12 @@ router.get('/', async (req, res) => {
             groups[key].sort((a, b) => (b.score || 0) - (a.score || 0));
         }
 
-        // Bốc theo hạn ngạch: 3 Collaborative, 3 Content-based, 2 Chat-based. 
-        // Nếu thiếu, bù bằng Trending.
+        // Bốc theo hạn ngạch: 3/8 Collaborative, 3/8 Content-based, 2/8 Chat-based. 
+        // Thay vì fix cứng 3-3-2, chúng ta nhân tỷ lệ với tham số limit để khi UI (như trang Thực Đơn) yêu cầu hiển thị đầy đủ (limit=100) thì hệ thống vẫn trả về đủ.
         const quotas = {
-            collaborative: 3,
-            content_based: 3,
-            chat_based: 2
+            collaborative: Math.ceil((3 / 8) * limit),
+            content_based: Math.ceil((3 / 8) * limit),
+            chat_based: Math.ceil((2 / 8) * limit)
         };
 
         let finalRecommendations = [];
