@@ -163,7 +163,7 @@ async function getChatbotContextForMessage(message) {
             }
 
             // Thực đơn tổng quát
-            if (intent.hoi_thuc_don && context.mon_an_lien_quan.length === 0) {
+            if (intent.hoi_thuc_don && context.mon_an_lien_quan.length === 0 && !intent.hoi_mon_giam_gia && !intent.hoi_mon_moi) {
                 const [allCats] = await db.query('SELECT * FROM danh_muc WHERE trang_thai = 1');
                 for (const cat of allCats) {
                     const [catDishes] = await db.query(`
@@ -417,9 +417,10 @@ function systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMo
         + 'Khi khách muốn đặt món, hãy xác nhận lại món và số lượng, rồi thêm vào giỏ hàng.\n'
         + 'Hướng dẫn khách: "Chỉ cần nói: đặt 2 phần phở bò, 1 cơm tấm"\n\n'
         + '=== QUY TẮC (BẮT BUỘC) ===\n'
-        + '1. NGẮN GỌN, TRỌNG TÂM (2-4 câu), không lan man. Tuyệt đối không tự bịa đặt thông tin nằm ngoài ngữ cảnh.\n'
-        + '2. Hỏi món ăn -> DÙNG tên và giá từ dữ liệu thực tế.\n'
-        + '3. Chào/hỏi tên -> "Em là Trà My, em có thể giúp gì cho anh chị ạ?"\n';
+        + '1. NGẮN GỌN, TRỌNG TÂM (2-4 câu), không lan man.\n'
+        + '2. TỪ CHỐI KHÉO LÉO: Tuyệt đối không bịa giá (như 35.000đ) cho món không có mặt trong thực đơn do hệ thống cung cấp. Nếu khách hỏi món không có, hãy trả lời thật lịch sự và dễ thương, ví dụ: "Dạ em xin lỗi anh/chị, hiện tại nhà hàng Phương Nam chưa có phục vụ món [tên món] ạ. Anh/chị có muốn tham khảo thêm các món khác vô cùng hấp dẫn của nhà em không ạ?" 🌸\n'
+        + '3. Hỏi món ăn -> CHỈ DÙNG tên và giá từ dữ liệu thực tế được cung cấp trong ngữ cảnh.\n'
+        + '4. Chào/hỏi tên -> "Em là Trà My, em có thể giúp gì cho anh chị ạ?"\n';
 
     return prompt;
 }
@@ -712,6 +713,27 @@ async function generateLocalFallbackResponse(graphqlContext, message, settings, 
             `Anh/chị hãy đặt món ngay để được hưởng các ưu đãi tốt nhất nhé! 🎁💕`;
     }
 
+    // 9.5. Hỏi món mới
+    if (intent.hoi_mon_moi && graphqlContext.mon_moi && graphqlContext.mon_moi.length > 0) {
+        let response = `Dạ nhà hàng em vừa ra mắt các món mới vô cùng thơm ngon và hấp dẫn đây ạ: 🆕✨\n\n`;
+        response += graphqlContext.mon_moi.slice(0, 5).map(m => {
+            return `- **${m.ten_mon}**: ${formatPrice(m.gia_tien)}/${m.don_vi_tinh || 'phần'} ${m.diem_danh_gia ? `(⭐ ${parseFloat(m.diem_danh_gia).toFixed(1)})` : ''}`;
+        }).join('\n');
+        response += `\n\nAnh/chị muốn thưởng thức thử món mới nào không ạ? Gõ tên món để em đặt ngay nhé! 💕`;
+        return response;
+    }
+
+    // 9.6. Hỏi món giảm giá
+    if (intent.hoi_mon_giam_gia && graphqlContext.mon_giam_gia && graphqlContext.mon_giam_gia.length > 0) {
+        let response = `Dạ hiện tại nhà hàng đang có các món ăn với ưu đãi giảm giá cực tốt dành cho anh/chị ạ: 🏷️🎉\n\n`;
+        response += graphqlContext.mon_giam_gia.slice(0, 5).map(m => {
+            const salePrice = m.gia_khuyen_mai ? formatPrice(m.gia_khuyen_mai) : '';
+            return `- **${m.ten_mon}**: Giảm còn **${salePrice}** (Giá gốc: ~~${formatPrice(m.gia_tien)}~~)`;
+        }).join('\n');
+        response += `\n\nSố lượng có hạn, anh/chị nhanh tay đặt ngay kẻo lỡ nhé! 💕`;
+        return response;
+    }
+
     // 10. Tìm thấy món ăn cụ thể phù hợp
     if (graphqlContext.has_food_data) {
         let response = `Dạ em tìm thấy các món ăn vô cùng hấp dẫn phù hợp với yêu cầu của anh/chị đây ạ: 🍽️\n\n`;
@@ -822,7 +844,7 @@ router.post('/chat', async (req, res) => {
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
-                temperature: 0.6
+                temperature: 0.2
             });
 
             const botResponse = completion.choices[0]?.message?.content || 'Em khÃ´ng láº¥y Ä‘Æ°á»£c thÃ´ng tin giá» hÃ ng áº¡!';
@@ -854,7 +876,7 @@ router.post('/chat', async (req, res) => {
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
-                temperature: 0.6
+                temperature: 0.2
             });
 
             const botResponse = completion.choices[0]?.message?.content || 'Em khÃ´ng láº¥y Ä‘Æ°á»£c thÃ´ng tin Ä‘Æ¡n hÃ ng áº¡!';
@@ -900,7 +922,7 @@ router.post('/chat', async (req, res) => {
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
-                temperature: 0.6
+                temperature: 0.2
             });
 
             const botResponse = completion.choices[0]?.message?.content || 'Em Ä‘Ã£ thÃªm mÃ³n vÃ o giá» hÃ ng rá»“i áº¡! ðŸ›’';
@@ -926,13 +948,13 @@ router.post('/chat', async (req, res) => {
             });
         }
 
-        // 4. YÃªu cáº§u Ä‘áº·t hÃ ng nhÆ°ng chÆ°a chá»n mÃ³n (hÆ°á»›ng dáº«n)
+        // 4. YÃªu cáº§u Ä‘áº·t hÃ ng nhÆ°ng chÆ°a chá» n mÃ³n (hÆ°á»›ng dáº«n)
         if ((graphqlContext.intent.muon_dat_hang || graphqlContext.intent.muon_them_gio_hang) 
             && graphqlContext.intent.mon_an_dat_hang.length === 0) {
             
             // CÃ³ thá»ƒ user chÆ°a Ä‘Äƒng nháº­p
             if (!ma_nguoi_dung) {
-                const botResponse = 'Anh/chá»‹ Æ¡i, Ä‘á»ƒ Ä‘áº·t hÃ ng qua chatbot, anh/chá»‹ cáº§n Ä‘Äƒng nháº­p trÆ°á»›c áº¡! ðŸŒ¸ Sau khi Ä‘Äƒng nháº­p, anh/chá»‹ chá»‰ cáº§n nÃ³i: "Äáº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m" lÃ  em xá»­ lÃ½ ngay áº¡! ðŸ’•';
+                const botResponse = 'Anh/chị ơi, để đặt hàng qua chatbot, anh/chị cần đăng nhập trước ạ! 🌸 Sau khi đăng nhập, anh/chị chỉ cần nói: "Đặt 2 phần phở bò, 1 cơm tấm" là em xử lý ngay ạ! 💕';
                 await saveChatHistory(ma_nguoi_dung, chatSessionId, 'bot', botResponse);
                 return res.json({
                     success: true,
@@ -944,8 +966,6 @@ router.post('/chat', async (req, res) => {
                 });
             }
             
-            // ÄÃ£ Ä‘Äƒng nháº­p nhÆ°ng chÆ°a chá»n mÃ³n -> gá»£i Ã½
-            let suggestPrompt = '\nKhÃ¡ch muá»‘n Ä‘áº·t hÃ ng nhÆ°ng chÆ°a chá»n mÃ³n cá»¥ thá»ƒ. HÃ£y há»i khÃ¡ch muá»‘n Ä‘áº·t mÃ³n gÃ¬ vÃ  gá»£i Ã½ top mÃ³n bÃ¡n cháº¡y.';
             if (graphqlContext.top_ban_chay.length > 0) {
                 suggestPrompt += '\n=== Gá»¢I Ã ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'Ä‘').join('\n');
             }
@@ -958,7 +978,7 @@ router.post('/chat', async (req, res) => {
                     { role: 'user', content: message }
                 ],
                 max_tokens: 500,
-                temperature: 0.6
+                temperature: 0.2
             });
 
             const botResponse = completion.choices[0]?.message?.content || 'Anh/chá»‹ muá»‘n Ä‘áº·t mÃ³n gÃ¬ áº¡? ðŸœ';
@@ -983,14 +1003,22 @@ router.post('/chat', async (req, res) => {
 
         // System Prompt toi uu
         let foodContextPrompt = '';
-        
-        if (graphqlContext.has_food_data) {
-            foodContextPrompt = '\n=== MÃ“N Ä‚N LIÃŠN QUAN (GraphQL) ===\n' + graphqlContext.compact_menu + '\n\nQUA TRá»ŒNG: Tráº£ lá»i Dá»°A TRÃŠN dá»¯ liá»‡u trÃªn, kÃ¨m giÃ¡ chÃ­nh xÃ¡c. Ngáº¯n gá»n, trá»ng tÃ¢m.\n';
+        if (graphqlContext.intent.hoi_mon_moi) {
+            foodContextPrompt = '\n=== MÓN ĂN MỚI RA MẮT (GraphQL) ===\n' + graphqlContext.compact_menu + '\n\nQUAN TRỌNG: Đây là danh sách các món ăn mới ra mắt của nhà hàng. Bạn hãy giới thiệu nhiệt tình cho khách đây là các món mới kèm giá chính xác. Ngắn gọn, trọng tâm.\n';
+        } else if (graphqlContext.intent.hoi_mon_giam_gia) {
+            const discountMenu = graphqlContext.mon_an_lien_quan.map(m => {
+                const salePrice = new Intl.NumberFormat('vi-VN').format(m.gia_tien);
+                const originalPrice = m.gia_goc ? new Intl.NumberFormat('vi-VN').format(m.gia_goc) : null;
+                const hasDiscount = originalPrice && m.gia_goc > m.gia_tien;
+                return `- ${m.ten_mon}: ${hasDiscount ? `${salePrice}đ (Giá gốc: ${originalPrice}đ)` : `${salePrice}đ`}/${m.don_vi_tinh || 'phần'}`;
+            }).join('\n');
+            foodContextPrompt = '\n=== MÓN ĂN ĐANG GIẢM GIÁ KHUYẾN MÃI (GraphQL) ===\n' + discountMenu + '\n\nQUAN TRỌNG: Đây là danh sách các món ăn đang có chương trình giảm giá. Hãy thông báo chính xác giá khuyến mãi và giá gốc của món ăn cho khách hàng. Ngắn gọn, trọng tâm.\n';
+        } else if (graphqlContext.has_food_data) {
+            foodContextPrompt = '\n=== MÓN ĂN LIÊN QUAN (GraphQL) ===\n' + graphqlContext.compact_menu + '\n\nQUAN TRỌNG: Trả lời DỰA TRÊN dữ liệu trên, kèm giá chính xác. Ngắn gọn, trọng tâm.\n';
         } else if (graphqlContext.intent.hoi_mon_an || graphqlContext.intent.hoi_thuc_don) {
             const fullMenu = await getCompactMenu();
-            foodContextPrompt = '\n=== THá»°C ÄÆ N ===\n' + fullMenu + '\n';
+            foodContextPrompt = '\n=== THỰC ĐƠN ===\n' + fullMenu + '\n';
         }
-
         let topDishesPrompt = '';
         if (graphqlContext.top_ban_chay.length > 0) {
             topDishesPrompt = '\n=== TOP BÃN CHáº Y ===\n' + graphqlContext.top_ban_chay.map((p, i) => (i + 1) + '. ' + p.ten_mon + ' - ' + new Intl.NumberFormat('vi-VN').format(p.gia_tien) + 'Ä‘ (' + p.so_luong_ban + ' pháº§n)').join('\n') + '\n';
@@ -1021,7 +1049,7 @@ router.post('/chat', async (req, res) => {
                 { role: 'user', content: message }
             ],
             max_tokens: 400,
-            temperature: 0.6
+            temperature: 0.2
         });
         
         if (completion.choices && completion.choices[0] && completion.choices[0].message && completion.choices[0].message.content) {

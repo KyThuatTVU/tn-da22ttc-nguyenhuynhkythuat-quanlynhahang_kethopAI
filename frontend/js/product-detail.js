@@ -64,6 +64,7 @@ async function fetchProductDetail() {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
                 
+                // 1. Ghi nhận lượt CLICK ngay lập tức khi vào trang
                 fetch('http://localhost:3000/api/recommendations/track', {
                     method: 'POST',
                     headers: headers,
@@ -71,8 +72,24 @@ async function fetchProductDetail() {
                 }).then(r => r.json())
                   .then(data => console.log('📈 [AI Tracking] Recorded click for dish:', productId, data))
                   .catch(e => console.error('Error sending click tracking:', e));
+
+                // 2. Ghi nhận lượt XEM nếu người dùng ở lại trang trên 50s (được tính là quan tâm/thích món đó)
+                let stayTimer = setTimeout(() => {
+                    fetch('http://localhost:3000/api/recommendations/track', {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({ dish_id: productId, action: 'view' })
+                    }).then(r => r.json())
+                      .then(data => console.log('📈 [AI Tracking] Stayed > 50s. Recorded view for dish:', productId, data))
+                      .catch(e => console.error('Error sending view tracking:', e));
+                }, 50000); // 50s = 50000ms
+
+                // Hủy timer nếu người dùng rời trang trước 50s
+                window.addEventListener('beforeunload', () => {
+                    clearTimeout(stayTimer);
+                });
             } catch (trackErr) {
-                console.error('Error in click tracking flow:', trackErr);
+                console.error('Error in tracking flow:', trackErr);
             }
             
             // Save to LocalStorage for "Recently Viewed" feature
@@ -406,13 +423,18 @@ function renderRelatedProducts() {
                     ${outOfStockBadge}
                 </div>
                 <div class="p-3 md:p-4">
-                    <h3 class="font-semibold text-sm md:text-base mb-2 text-gray-800 line-clamp-2 hover:text-orange-600 transition">${product.ten_mon}</h3>
+                    <h3 class="font-semibold text-sm md:text-base mb-1 text-gray-800 line-clamp-2 hover:text-orange-600 transition">${product.ten_mon}</h3>
+                    
+                    <!-- Stats line -->
+                    <div class="flex flex-wrap items-center gap-y-1 gap-x-2 text-[11px] text-gray-500 mb-2 font-medium">
+                        <span class="text-yellow-400 flex items-center gap-0.5">
+                            <i class="fas fa-star text-[10px]"></i>
+                            <span class="text-gray-700 font-semibold">${formattedRating}</span>
+                        </span>
+                    </div>
+
                     <div class="flex items-center justify-between">
                         <span class="text-orange-600 font-bold text-base md:text-lg">${formattedPrice}</span>
-                        <span class="text-yellow-400 text-sm flex items-center gap-1">
-                            <i class="fas fa-star"></i>
-                            <span class="text-gray-600 font-medium">${formattedRating}</span>
-                        </span>
                     </div>
                 </div>
             </a>
@@ -1052,8 +1074,118 @@ function closeImageModal() {
     }
 }
 
+// ==================== FAVORITE (LIKE) BUTTON FUNCTIONALITY ====================
+
+// Check if current user liked this dish and update heart icon UI
+async function checkFavoriteStatus() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${window.API_URL}/recommendations/like-status/${productId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const result = await response.json();
+        if (result.success) {
+            updateFavoriteButtonUI(result.isLiked);
+        }
+    } catch (error) {
+        console.error('Error checking favorite status:', error);
+    }
+}
+
+// Update the heart button UI based on liked status
+function updateFavoriteButtonUI(isLiked) {
+    const favoriteBtn = document.getElementById('favorite-btn');
+    if (!favoriteBtn) return;
+    
+    const icon = favoriteBtn.querySelector('i');
+    if (!icon) return;
+
+    if (isLiked) {
+        icon.className = 'fas fa-heart text-xl text-red-500 transition';
+        favoriteBtn.classList.add('bg-red-50');
+    } else {
+        icon.className = 'far fa-heart text-xl text-gray-500 group-hover:text-red-500 transition';
+        favoriteBtn.classList.remove('bg-red-50');
+    }
+}
+
+// Initialize favorite button click listener
+function initFavoriteButton() {
+    const favoriteBtn = document.getElementById('favorite-btn');
+    if (!favoriteBtn) {
+        console.warn('⚠️ Favorite button (#favorite-btn) not found');
+        return;
+    }
+
+    // Check status on load
+    checkFavoriteStatus();
+
+    favoriteBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            if (typeof showNotification === 'function') {
+                showNotification('Vui lòng đăng nhập để lưu món ăn yêu thích!', 'warning');
+            } else {
+                alert('Vui lòng đăng nhập để lưu món ăn yêu thích!');
+            }
+            return;
+        }
+
+        try {
+            // Disable button during api call to prevent spamming
+            favoriteBtn.disabled = true;
+            
+            const response = await fetch(`${window.API_URL}/recommendations/track`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    dish_id: productId,
+                    action: 'like'
+                })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                updateFavoriteButtonUI(result.isLiked);
+                
+                // Show notification and play animation
+                if (result.isLiked) {
+                    const icon = favoriteBtn.querySelector('i');
+                    if (icon) {
+                        icon.style.transform = 'scale(1.3)';
+                        setTimeout(() => icon.style.transform = 'scale(1)', 200);
+                    }
+                    if (typeof showNotification === 'function') {
+                        showNotification('Đã lưu vào danh sách yêu thích!', 'success');
+                    }
+                } else {
+                    if (typeof showNotification === 'function') {
+                        showNotification('Đã xóa khỏi danh sách yêu thích!', 'info');
+                    }
+                }
+            } else {
+                console.error('Error toggling favorite:', result.message);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        } finally {
+            favoriteBtn.disabled = false;
+        }
+    });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     fetchProductDetail();
     updateCartBadge();
+    initFavoriteButton();
 });

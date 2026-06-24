@@ -4,7 +4,7 @@ const db = require('../config/database');
 
 // Phân tích intent từ tin nhắn người dùng
 function analyzeUserIntent(message) {
-    const msg = message.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const msg = message.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
     const originalMsg = message.toLowerCase();
 
     const intent = {
@@ -59,7 +59,8 @@ function analyzeUserIntent(message) {
 
     // Check food intent
     for (const kw of monAnKeywords) {
-        if (msg.includes(kw)) {
+        const regex = new RegExp('\\b' + kw + '\\b', 'i');
+        if (regex.test(msg)) {
             intent.hoi_mon_an = true;
             intent.tu_khoa_mon_an.push(kw);
         }
@@ -68,7 +69,8 @@ function analyzeUserIntent(message) {
     // Check category intent
     for (const [cat, keywords] of Object.entries(danhMucKeywords)) {
         for (const kw of keywords) {
-            if (msg.includes(kw)) {
+            const regex = new RegExp('\\b' + kw + '\\b', 'i');
+            if (regex.test(msg)) {
                 intent.hoi_danh_muc = true;
                 intent.tu_khoa_danh_muc.push(cat);
             }
@@ -161,7 +163,8 @@ function analyzeUserIntent(message) {
     // Detect hỏi món mới
     if (msg.includes('mon moi') || msg.includes('mon an moi') || msg.includes('co mon gi moi') 
         || msg.includes('mon moi ra') || msg.includes('mon moi nhat') || msg.includes('thuc don moi')
-        || msg.includes('new dishes') || msg.includes('mon moi them')) {
+        || msg.includes('new dishes') || msg.includes('mon moi them')
+        || (msg.includes('moi') && (msg.includes('mon') || msg.includes('an') || msg.includes('thuc don') || msg.includes('menu') || msg.includes('do uong') || msg.includes('nuoc')))) {
         intent.hoi_mon_moi = true;
     }
 
@@ -1240,8 +1243,8 @@ function extractFoodSearchTerms(message) {
     
     // Các pattern phổ biến
     const patterns = [
-        // "món X", "có X không"
-        /(?:món|có|xem|gọi|đặt|muốn|thử|ăn|uống)\s+(.+?)(?:\s+(?:không|nào|đi|nhé|nha|ạ|à|gì|bao|giá|$))/g,
+        // "món X", "có X không", "hiển thị X"
+        /(?:món|có|xem|gọi|đặt|muốn|thử|ăn|uống|hiển\s+thị|tìm|show)\s+(.+?)(?:\s+(?:không|nào|đi|nhé|nha|ạ|à|gì|bao|giá|$))/g,
         // "X bao nhiêu tiền"
         /(.+?)\s+(?:bao nhiêu|giá|tiền)/g,
         // Trích xuất trực tiếp tên món phổ biến
@@ -1288,19 +1291,78 @@ function extractFoodSearchTerms(message) {
     
     // Fallback: tách từ khóa quan trọng
     if (terms.length === 0) {
-        const importantWords = msg.split(/\s+/).filter(w => 
-            w.length >= 2 && 
-            !['có', 'của', 'và', 'cho', 'hay', 'với', 'trong', 'này', 'đó', 'ạ', 'nhé', 'nha',
-              'em', 'anh', 'chị', 'xin', 'hỏi', 'muốn', 'cần', 'được', 'không', 'bao', 'nhiêu',
-              'giá', 'tiền', 'mình', 'tôi', 'tui', 'bạn', 'quá', 'lắm', 'rất', 'thì', 'là',
-              'nhà', 'hàng', 'ơi', 'dạ', 'vâng', 'the', 'một', 'hai', 'ba', 'cái', 'phần'].includes(w)
-        );
+        const ignoredList = [
+            // Cấu trúc câu, đại từ, liên từ
+            'co', 'cua', 'va', 'cho', 'hay', 'voi', 'trong', 'nay', 'do', 'a', 'nhe', 'nha',
+            'em', 'anh', 'chi', 'xin', 'hoi', 'muon', 'can', 'duoc', 'khong', 'bao', 'nhieu',
+            'gia', 'tien', 'minh', 'toi', 'tui', 'ban', 'qua', 'lam', 'rat', 'thi', 'la',
+            'nha', 'hang', 'oi', 'da', 'vang', 'the', 'mot', 'hai', 'ba', 'cai', 'phan',
+            'ten', 'gi', 'ai', 'nao', 'chu', 'tiem', 'quan', 'khach', 'quy',
+            
+            // Từ bổ trợ hành động/yêu cầu sáng tạo hoặc trò chuyện chung
+            'tho', 've', 'viet', 'doc', 'ke', 'chuyen', 'hat', 'bai', 'nghe', 'noi', 'chao',
+            'khao', 'luan', 'tot', 'nghiep', 'de', 'tai', 'project', 'mon', 'an',
+            'chuc', 'nang', 'website', 'web', 'he', 'thong', 'giup', 'dum', 'gium',
+            
+            // Tính từ, phó từ cảm xúc
+            'ngon', 'dep', 'hay', 're', 'mac', 'dat', 'sach', 'thom', 'vi',
+            'khung', 'chat', 'bot', 'tro', 'ly', 'ao'
+        ];
+        
+        // Normalize message to ASCII for ignoring helper words
+        const msgNormalized = msg.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+        const words = msgNormalized.split(/\s+/);
+        
+        // Match original casing/words
+        const originalWords = message.split(/\s+/);
+        const importantWords = [];
+        
+        for (let idx = 0; idx < words.length; idx++) {
+            const wNorm = words[idx].toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").trim();
+            if (wNorm.length >= 2 && !ignoredList.includes(wNorm)) {
+                importantWords.push(originalWords[idx]);
+            }
+        }
+        
         if (importantWords.length > 0) {
             terms.push(importantWords.join(' '));
         }
     }
     
-    return [...new Set(terms)]; // Remove duplicates
+    // Clean up all terms (strip common action prefixes and question suffixes)
+    const cleanSearchTerm = (term) => {
+        let cleaned = term.trim();
+        const prefixRegex = /^(?:mon\s+an\s+|mon\s+|cac\s+mon\s+|do\s+an\s+|do\s+uong\s+|thuc\s+an\s+|nuoc\s+|hien\s+thi\s+|tim\s+kiem\s+|tim\s+|xem\s+|phan\s+|dia\s+|to\s+|ly\s+|chai\s+|lon\s+|hien\s+)+/i;
+        const normalize = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+        
+        let norm = normalize(cleaned);
+        let match = norm.match(prefixRegex);
+        if (match) {
+            cleaned = cleaned.substring(match[0].length).trim();
+        }
+        
+        const suffixRegex = /\s+(?:khong|nao|a|nhe|nha|di|dum|gium|giup|co\s+khong)$/i;
+        norm = normalize(cleaned);
+        match = norm.match(suffixRegex);
+        if (match) {
+            cleaned = cleaned.substring(0, cleaned.length - match[0].length).trim();
+        }
+        return cleaned;
+    };
+    
+    const genericTerms = new Set([
+        'mon', 'mon an', 'thuc don', 'menu', 'do an', 'nuoc uong', 'do uong', 
+        'gia', 'tien', 'gi', 'giam gia', 'khuyen mai', 'moi', 'mon moi', 'mon giam gia',
+        'do an moi', 'do uong moi', 'nuoc moi', 'nuoc uong moi'
+    ]);
+    const cleanedTerms = terms
+        .map(cleanSearchTerm)
+        .filter(t => {
+            if (t.length < 2) return false;
+            const norm = t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
+            return !genericTerms.has(norm);
+        });
+    return [...new Set(cleanedTerms)];
 }
 
 module.exports = { resolvers, analyzeUserIntent, extractFoodSearchTerms, getCartByUserId };

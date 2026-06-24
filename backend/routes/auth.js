@@ -450,16 +450,25 @@ router.post('/login', async (req, res) => {
             anh_dai_dien: user.anh_dai_dien
         };
 
+        // Kiểm tra xem user đã khai báo khẩu vị chưa
+        const [flavorCheck] = await db.query(
+            'SELECT COUNT(*) as count FROM so_thich_khau_vi_nguoi_dung WHERE ma_nguoi_dung = ?',
+            [user.ma_nguoi_dung]
+        );
+        const hasPreferences = flavorCheck[0].count > 0;
+
         // Trả về thông tin người dùng (không bao gồm mật khẩu)
         const { mat_khau_hash, ...userData } = user;
 
         console.log('✅ Login successful for:', user.email);
+        console.log('🍽️ Has taste preferences:', hasPreferences);
         console.log('🔑 Session ID at login:', req.sessionID);
         console.log('📦 User data being sent:', {
             ma_nguoi_dung: userData.ma_nguoi_dung,
             ten_nguoi_dung: userData.ten_nguoi_dung,
             email: userData.email,
-            anh_dai_dien: userData.anh_dai_dien
+            anh_dai_dien: userData.anh_dai_dien,
+            hasPreferences
         });
         console.log('🔐 Session user set:', req.session.user);
         console.log('📋 Full session:', req.session);
@@ -482,7 +491,8 @@ router.post('/login', async (req, res) => {
                 message: 'Đăng nhập thành công',
                 data: {
                     ...userData,
-                    token
+                    token,
+                    hasPreferences
                 }
             });
         });
@@ -953,6 +963,13 @@ router.get('/google/callback',
                 { expiresIn: '7d' }
             );
 
+            // Kiểm tra xem user đã khai báo khẩu vị chưa
+            const [flavorCheck] = await db.query(
+                'SELECT COUNT(*) as count FROM so_thich_khau_vi_nguoi_dung WHERE ma_nguoi_dung = ?',
+                [user.ma_nguoi_dung]
+            );
+            const hasPreferences = flavorCheck[0].count > 0;
+
             // Tạo object user data
             const userDataObj = {
                 ma_nguoi_dung: user.ma_nguoi_dung,
@@ -962,10 +979,12 @@ router.get('/google/callback',
                 so_dien_thoai: user.so_dien_thoai || null,
                 dia_chi: user.dia_chi || null,
                 token: token,
-                isNewUser: user.isNewUser || false
+                isNewUser: user.isNewUser || false,
+                hasPreferences
             };
 
             console.log('📦 User data to send:', userDataObj);
+            console.log('🍽️ Has taste preferences:', hasPreferences);
 
             // Tạo URL redirect với thông tin user
             const userData = encodeURIComponent(JSON.stringify(userDataObj));

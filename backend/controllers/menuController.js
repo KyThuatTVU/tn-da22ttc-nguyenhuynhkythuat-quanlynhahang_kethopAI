@@ -120,26 +120,115 @@ const getDishById = async (req, res) => {
     }
 };
 
-// Lấy top món ăn bán chạy
+// Lấy top món ăn bán chạy (Đổi tiêu chí thành Lọc Phổ Biến theo yêu cầu của user)
 const getTopSelling = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 4;
 
+        const fs = require('fs');
+        const path = require('path');
+        let wOrder = 30, wClick = 20, wView = 15, wLike = 15, wRating = 20;
+        try {
+            const weightsPath = path.join(__dirname, '../config/popularity-weights.json');
+            if (fs.existsSync(weightsPath)) {
+                const w = JSON.parse(fs.readFileSync(weightsPath, 'utf8'));
+                wOrder = w.orders !== undefined ? w.orders : 30;
+                wClick = w.clicks !== undefined ? w.clicks : 20;
+                wView = w.views !== undefined ? w.views : 15;
+                wLike = w.likes !== undefined ? w.likes : 15;
+                wRating = w.rating !== undefined ? w.rating : 20;
+            }
+        } catch (e) {
+            console.error('Lỗi đọc weights trong getTopSelling:', e);
+        }
+
         const [topProducts] = await db.query(`
             SELECT m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.mo_ta_chi_tiet,
-                   COALESCE(SUM(ct.so_luong), 0) as da_ban,
-                   COALESCE(AVG(dg.so_sao), 0) as avg_rating,
-                   COUNT(DISTINCT dg.ma_danh_gia) as total_reviews
+                   (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) as da_ban,
+                   COALESCE((SELECT AVG(so_sao) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai = 'approved'), 0) as avg_rating,
+                   (SELECT COUNT(*) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai = 'approved') as total_reviews,
+                   GROUP_CONCAT(DISTINCT mk.id_thuoc_tinh) as flavor_ids,
+                   (
+                       ((SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) * ${wOrder}) +
+                       ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') * ${wClick}) +
+                       ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') * ${wView}) +
+                       ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') * ${wLike}) +
+                       (COALESCE((SELECT AVG(so_sao) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai = 'approved'), 0) * 20 * (${wRating}/100))
+                   ) as popularity_score
             FROM mon_an m
-            LEFT JOIN chi_tiet_don_hang ct ON m.ma_mon = ct.ma_mon
-            LEFT JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
-            LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
-            GROUP BY m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.mo_ta_chi_tiet
-            ORDER BY da_ban DESC
-            LIMIT ?
-        `, [limit]);
+            LEFT JOIN mon_an_khau_vi mk ON m.ma_mon = mk.ma_mon
+            WHERE m.trang_thai = 1
+            GROUP BY m.ma_mon
+            ORDER BY popularity_score DESC, m.ma_mon DESC
+            LIMIT 100
+        `);
 
-        res.json({ success: true, data: topProducts });
+        // Check if user is logged in
+        let userId = null;
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            try {
+                const jwt = require('jsonwebtoken');
+                const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+                const decoded = jwt.verify(token, JWT_SECRET);
+                userId = decoded.ma_nguoi_dung;
+            } catch (err) {
+                // Token invalid or expired, proceed as guest
+            }
+        }
+
+        let filteredProducts = topProducts;
+        if (userId) {
+            // Fetch preferred flavors from survey
+            const [surveyPrefs] = await db.query(
+                `SELECT id_thuoc_tinh FROM so_thich_khau_vi_nguoi_dung WHERE ma_nguoi_dung = ?`,
+                [userId]
+            );
+            const preferredIds = surveyPrefs.map(p => p.id_thuoc_tinh);
+
+            // Fetch preferred flavors from ML preference profile (score >= 0.5)
+            const [mlPrefs] = await db.query(
+                `SELECT tag_key FROM user_preference_profile WHERE ma_nguoi_dung = ? AND score >= 0.5`,
+                [userId]
+            );
+            const tagKeyToFlavorId = {
+                'cay': 1, 'chua': 2, 'man': 3, 'ngot': 4,
+                'an_chay': 5, 'thanh_mat': 6, 'thit_bo': 7,
+                'thit_ga': 7, 'hai_san': 8, 'chien': 9, 'tuoi': 10
+            };
+            mlPrefs.forEach(p => {
+                const id = tagKeyToFlavorId[p.tag_key];
+                if (id && !preferredIds.includes(id)) {
+                    preferredIds.push(id);
+                }
+            });
+
+            const isSpicyPreferred = preferredIds.includes(1);
+
+            filteredProducts = topProducts.filter(product => {
+                const productFlavorIds = product.flavor_ids 
+                    ? product.flavor_ids.split(',').map(Number)
+                    : [];
+
+                // 1. Exclude spicy if user does not prefer spicy
+                if (productFlavorIds.includes(1) && !isSpicyPreferred) {
+                    return false;
+                }
+
+                // 2. If user has survey or ML profile preferences, ensure the dish matches at least one (if gán nhãn)
+                if (preferredIds.length > 0 && productFlavorIds.length > 0) {
+                    const hasMatch = productFlavorIds.some(fid => preferredIds.includes(fid));
+                    if (!hasMatch) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        }
+
+        res.json({ success: true, data: filteredProducts.slice(0, limit) });
     } catch (error) {
         console.error('Error fetching top selling products:', error);
         res.status(500).json({ success: false, message: error.message });
@@ -171,14 +260,18 @@ const getRelatedDishes = async (req, res) => {
                 m.so_luong_ton, m.trang_thai, m.ma_danh_muc,
                 COUNT(ct2.ma_mon) as frequency,
                 'bought_together' as recommendation_type,
-                COALESCE(AVG(dg.so_sao), 0) as avg_rating
+                COALESCE(AVG(dg.so_sao), 0) as avg_rating,
+                (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) as order_count,
+                (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') as click_count,
+                (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') as view_count,
+                (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') as like_count
             FROM chi_tiet_don_hang ct1
             JOIN chi_tiet_don_hang ct2 ON ct1.ma_don_hang = ct2.ma_don_hang AND ct1.ma_mon != ct2.ma_mon
             JOIN mon_an m ON ct2.ma_mon = m.ma_mon
             LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
             WHERE ct1.ma_mon = ?
             GROUP BY m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.mo_ta_chi_tiet, m.so_luong_ton, m.trang_thai, m.ma_danh_muc
-            ORDER BY frequency DESC
+            ORDER BY frequency DESC, m.ma_mon DESC
             LIMIT ?
         `, [productId, limit]);
 
@@ -198,13 +291,17 @@ const getRelatedDishes = async (req, res) => {
                     m.so_luong_ton, m.trang_thai, m.ma_danh_muc,
                     COALESCE(SUM(ct.so_luong), 0) as frequency,
                     'same_category' as recommendation_type,
-                    COALESCE(AVG(dg.so_sao), 0) as avg_rating
+                    COALESCE(AVG(dg.so_sao), 0) as avg_rating,
+                    (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) as order_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') as click_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') as view_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') as like_count
                 FROM mon_an m
                 LEFT JOIN chi_tiet_don_hang ct ON m.ma_mon = ct.ma_mon
                 LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
                 WHERE m.ma_danh_muc = ? AND m.ma_mon NOT IN (${placeholders})
                 GROUP BY m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.mo_ta_chi_tiet, m.so_luong_ton, m.trang_thai, m.ma_danh_muc
-                ORDER BY frequency DESC
+                ORDER BY frequency DESC, m.ma_mon DESC
                 LIMIT ?
             `, [categoryId, ...existingIds, remaining]);
 
@@ -225,13 +322,17 @@ const getRelatedDishes = async (req, res) => {
                     m.so_luong_ton, m.trang_thai, m.ma_danh_muc,
                     COALESCE(SUM(ct.so_luong), 0) as frequency,
                     'top_selling' as recommendation_type,
-                    COALESCE(AVG(dg.so_sao), 0) as avg_rating
+                    COALESCE(AVG(dg.so_sao), 0) as avg_rating,
+                    (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) as order_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') as click_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') as view_count,
+                    (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') as like_count
                 FROM mon_an m
                 LEFT JOIN chi_tiet_don_hang ct ON m.ma_mon = ct.ma_mon
                 LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
                 WHERE m.ma_mon NOT IN (${placeholders})
                 GROUP BY m.ma_mon, m.ten_mon, m.anh_mon, m.gia_tien, m.mo_ta_chi_tiet, m.so_luong_ton, m.trang_thai, m.ma_danh_muc
-                ORDER BY frequency DESC
+                ORDER BY frequency DESC, m.ma_mon DESC
                 LIMIT ?
             `, [...existingIds, remaining]);
 
@@ -344,9 +445,10 @@ const createDish = async (req, res) => {
         try {
             await connection.beginTransaction();
 
+            // INSERT món mới với ngay_tao = NOW()
             const [result] = await connection.query(
-                `INSERT INTO mon_an (ten_mon, ma_danh_muc, gia_tien, dinh_luong, so_luong_ton, mo_ta_chi_tiet, trang_thai, anh_mon) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO mon_an (ten_mon, ma_danh_muc, gia_tien, dinh_luong, so_luong_ton, mo_ta_chi_tiet, trang_thai, anh_mon, ngay_tao) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
                 [ten_mon, ma_danh_muc, gia_tien, dinh_luong, stockQty, mo_ta_chi_tiet, finalStatus, anh_mon]
             );
 

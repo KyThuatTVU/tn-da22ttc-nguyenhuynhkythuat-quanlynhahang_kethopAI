@@ -10,8 +10,8 @@ ComponentManager.register('chatbot', () => {
         <div id="chatbot-window" class="fixed bottom-24 right-6 w-96 bg-white rounded-lg shadow-2xl hidden z-40">
             <div class="bg-orange-600 text-white p-4 rounded-t-lg flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                        <i class="fas fa-robot text-orange-600"></i>
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center bg-white">
+                        <img src="images/chatbot.png" alt="Trợ lý ảo" class="w-full h-full object-cover rounded-full" />
                     </div>
                     <div>
                         <h3 class="font-medium">Trợ lý ảo</h3>

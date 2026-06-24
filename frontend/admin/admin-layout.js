@@ -138,6 +138,9 @@ const SIDEBAR_TEMPLATE = `
                 <a href="apriori-rules.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-apriori">
                     <i class="fas fa-project-diagram w-5"></i><span class="text-sm">Luật kết hợp AI</span>
                 </a>
+                <a href="quan-ly-thuat-toan.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-algorithm">
+                    <i class="fas fa-brain w-5 text-emerald-600"></i><span class="text-sm">Dữ liệu thuật toán</span>
+                </a>
                 <a href="chatbot-history.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-robot w-5"></i><span class="text-sm">Lịch sử Chatbot</span>
                 </a>
@@ -531,6 +534,8 @@ async function applyRBAC(userData) {
         'promotions.html': ['xem_khach_hang'],
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
+        'apriori-rules.html': ['xem_khach_hang'],
+        'quan-ly-thuat-toan.html': ['xem_khach_hang'],
         'chatbot-history.html': ['xem_khach_hang'],
         'chatbot-knowledge.html': ['xem_khach_hang'],
         // Hệ thống
@@ -690,6 +695,8 @@ function redirectToDefaultPage(vai_tro) {
         'promotions.html': ['xem_khach_hang'],
         'reviews.html': ['xem_khach_hang'],
         'contacts.html': ['xem_khach_hang'],
+        'apriori-rules.html': ['xem_khach_hang'],
+        'quan-ly-thuat-toan.html': ['xem_khach_hang'],
         'chatbot-history.html': ['xem_khach_hang'],
         'chatbot-knowledge.html': ['xem_khach_hang'],
         'news.html': ['xem_cai_dat'],

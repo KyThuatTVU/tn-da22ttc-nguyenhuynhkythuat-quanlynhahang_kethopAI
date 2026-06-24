@@ -168,6 +168,11 @@
                         token: savedToken ? 'Present' : 'Missing'
                     });
                     
+                    // Kiểm tra nếu chưa có khẩu vị thì set flag để hiển thị modal
+                    if (!user.hasPreferences) {
+                        sessionStorage.setItem('show_preferences_modal', 'true');
+                    }
+                    
                     // Hiển thị thông báo
                     const displayName = user.ten_nguoi_dung || 'bạn';
                     if (user.isNewUser) {

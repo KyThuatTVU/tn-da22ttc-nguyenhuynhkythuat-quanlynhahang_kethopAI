@@ -24,7 +24,13 @@ router.get('/', async (req, res) => {
             SELECT GROUP_CONCAT(id_thuoc_tinh)
             FROM mon_an_khau_vi
             WHERE ma_mon = m.ma_mon
-        ) as khau_vi
+        ) as khau_vi,
+        (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) as order_count,
+        (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') as click_count,
+        (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') as view_count,
+        (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') as like_count,
+        (SELECT COALESCE(AVG(dg.so_sao), 0) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai = 'approved') as avg_rating,
+        (SELECT COUNT(*) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai = 'approved') as total_reviews
       FROM mon_an m
       LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
       WHERE m.trang_thai = 1
@@ -63,14 +69,67 @@ router.get('/', async (req, res) => {
       case 'name_desc':
         query += ' ORDER BY m.ten_mon DESC';
         break;
+      case 'rating':
+        query += ' ORDER BY (SELECT AVG(so_sao) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai="approved") DESC, m.ma_mon DESC';
+        break;
+      case 'views':
+        query += ' ORDER BY (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = "view") DESC, m.ma_mon DESC';
+        break;
+      case 'clicks':
+        query += ' ORDER BY (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = "click") DESC, m.ma_mon DESC';
+        break;
+      case 'orders':
+        query += ' ORDER BY (SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) DESC, m.ma_mon DESC';
+        break;
+      case 'likes':
+        query += ' ORDER BY (SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = "like") DESC, m.ma_mon DESC';
+        break;
+      case 'popular': {
+          const fs = require('fs');
+          const path = require('path');
+          let wOrder = 30, wClick = 20, wView = 15, wLike = 15, wRating = 20;
+          try {
+             const weightsPath = path.join(__dirname, '../config/popularity-weights.json');
+             if (fs.existsSync(weightsPath)) {
+                 const w = JSON.parse(fs.readFileSync(weightsPath, 'utf8'));
+                 wOrder = w.orders !== undefined ? w.orders : 30;
+                 wClick = w.clicks !== undefined ? w.clicks : 20;
+                 wView = w.views !== undefined ? w.views : 15;
+                 wLike = w.likes !== undefined ? w.likes : 15;
+                 wRating = w.rating !== undefined ? w.rating : 20;
+             }
+          } catch(e) {}
+          query += ` ORDER BY (
+            ((SELECT COUNT(*) FROM chi_tiet_don_hang ct WHERE ct.ma_mon = m.ma_mon) * ${wOrder}) +
+            ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'click') * ${wClick}) +
+            ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'view') * ${wView}) +
+            ((SELECT COUNT(*) FROM hanh_vi_nguoi_dung h WHERE h.ma_mon = m.ma_mon AND h.hanh_vi = 'like') * ${wLike}) +
+            (IFNULL((SELECT AVG(so_sao) FROM danh_gia_san_pham dg WHERE dg.ma_mon = m.ma_mon AND dg.trang_thai='approved'), 0) * 20 * (${wRating}/100))
+          ) DESC, m.ma_mon DESC`;
+          break;
+      }
       case 'newest':
       default:
-        query += ' ORDER BY m.ngay_cap_nhat DESC';
+        query += ' ORDER BY m.ngay_cap_nhat DESC, m.ma_mon DESC';
         break;
     }
 
     // Đếm tổng số món
-    const countQuery = query.replace(/SELECT.*FROM/, 'SELECT COUNT(*) as total FROM');
+    let countQuery = `
+      SELECT COUNT(*) as total 
+      FROM mon_an m
+      LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
+      WHERE m.trang_thai = 1
+    `;
+    if (category) {
+      countQuery += ' AND m.ma_danh_muc = ?';
+    }
+    if (featured === 'true') {
+      countQuery += ' AND m.is_featured = 1';
+    }
+    if (search) {
+      countQuery += ' AND (m.ten_mon LIKE ? OR m.mo_ta_chi_tiet LIKE ?)';
+    }
     const [countResult] = await db.query(countQuery, params);
     const total = countResult[0].total;
 
@@ -155,7 +214,7 @@ router.get('/featured/list', async (req, res) => {
       FROM mon_an m
       LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
       WHERE m.trang_thai = 1 AND m.is_featured = 1
-      ORDER BY m.ngay_cap_nhat DESC
+      ORDER BY m.ngay_cap_nhat DESC, m.ma_mon DESC
       LIMIT ?`,
       [parseInt(limit)]
     );

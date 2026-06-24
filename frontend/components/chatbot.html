@@ -21,8 +21,10 @@
             padding-top: max(16px, env(safe-area-inset-top));
         }
         #chatbotPanel.mobile-open #chatbotMessages {
-            height: calc(100vh - 160px) !important;
-            height: calc(100dvh - 160px) !important;
+            height: calc(100dvh - 208px) !important;
+        }
+        #chatbotPanel.mobile-open.hide-suggestions #chatbotMessages {
+            height: calc(100dvh - 144px) !important;
         }
         #chatbotButton {
             width: 56px !important;
@@ -59,7 +61,10 @@
         box-shadow: 0 25px 60px rgba(0,0,0,0.3) !important;
     }
     #chatbotPanel.chatbot-expanded #chatbotMessages {
-        height: calc(85vh - 160px) !important;
+        height: calc(85vh - 208px) !important;
+    }
+    #chatbotPanel.chatbot-expanded.hide-suggestions #chatbotMessages {
+        height: calc(85vh - 144px) !important;
     }
     /* Overlay mờ phía sau khi mở rộng */
     #chatbotOverlay {
@@ -86,10 +91,27 @@
     
     /* Chat bubble styles */
     .chat-bubble-bot {
-        background: white;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 18px;
         border-top-left-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    #chatbotMessages {
+        height: 360px !important;
+        transition: height 0.35s ease;
+    }
+    #chatbotPanel.hide-suggestions #chatbotMessages {
+        height: 424px !important;
+    }
+    #chatbotPanel.hide-suggestions #chatbotQuickSuggestions {
+        display: none !important;
+    }
+    #chatbotMessages p {
+        white-space: pre-line !important;
     }
     
     /* GraphQL Dish Cards Scroll */
@@ -151,14 +173,14 @@
         user-select: none;
     }
     .tts-btn:hover {
-        background: #f0fdf4;
-        border-color: #86efac;
-        color: #16a34a;
+        background: #e8f5e9;
+        border-color: #c8e6c9;
+        color: #1b5e20;
     }
     .tts-btn.tts-playing {
-        background: #dcfce7;
-        border-color: #22c55e;
-        color: #16a34a;
+        background: #c8e6c9;
+        border-color: #4caf50;
+        color: #1b5e20;
     }
     .tts-btn.tts-playing .tts-icon::before {
         content: "\f04d";
@@ -168,7 +190,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #22c55e;
+        background: #4caf50;
         animation: ttsPulse 1s infinite;
     }
     .tts-btn.tts-playing .tts-pulse {
@@ -178,50 +200,182 @@
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.5; transform: scale(0.75); }
     }
+
+    /* ===== 3D GLASS TEXT BUTTONS ===== */
+    .btn-3d-glass {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        padding: 6px 14px;
+        font-weight: 600;
+        color: #1b5e20;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8), 
+                    0 4px 0 #2e7d32; /* Cạnh 3D màu xanh lá miền Tây cực rõ */
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+        transition: all 0.1s ease;
+        transform: translateY(-4px); /* Nhấc cao để tạo chiều sâu 3D */
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 6px;
+    }
+    .btn-3d-glass:hover {
+        background: rgba(255, 255, 255, 0.7);
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9), 
+                    0 5px 0 #2e7d32;
+    }
+    .btn-3d-glass:active {
+        transform: translateY(0px); /* Lún hoàn toàn xuống bề mặt khi click */
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2), 
+                    0 0px 0 #2e7d32; /* Cạnh 3D biến mất khi chạm bề mặt */
+    }
+
+    /* ===== 3D SEND BUTTON ===== */
+    .btn-3d-send {
+        background: linear-gradient(135deg, #81c784, #2e7d32);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 3px 0 #1b5e20;
+        transform: translateY(-3px);
+        transition: all 0.1s ease;
+        cursor: pointer;
+    }
+    .btn-3d-send:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 4px 0 #1b5e20;
+    }
+    .btn-3d-send:active {
+        transform: translateY(0px);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 0px 0 #1b5e20;
+    }
+
+    /* Rice pattern & cream yellow circles for chatbot background */
+    .bg-rice-pattern {
+        background-color: #f1f8e9; /* Nền xanh lá mạ nhạt tươi mát */
+        background-image: 
+            radial-gradient(circle at 15% 25%, rgba(255, 245, 157, 0.4) 18px, transparent 19px),
+            radial-gradient(circle at 80% 45%, rgba(255, 245, 157, 0.4) 28px, transparent 29px),
+            radial-gradient(circle at 45% 75%, rgba(255, 245, 157, 0.35) 15px, transparent 16px),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 100 100' opacity='0.15'%3E%3Cpath d='M20,95 C25,70 30,40 50,30 C60,25 70,30 75,45' fill='none' stroke='%234caf50' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M20,95 C30,75 25,55 10,40 C22,55 25,75 20,95' fill='%234caf50'/%3E%3Cpath d='M20,95 C35,85 45,75 50,60 C42,70 32,80 20,95' fill='%23388e3c'/%3E%3Cellipse cx='52' cy='27' rx='3.5' ry='6' transform='rotate(30,52,27)' fill='%23ffb300' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='58' cy='29' rx='3.5' ry='6' transform='rotate(45,58,29)' fill='%23ffb300' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='64' cy='33' rx='3.5' ry='6' transform='rotate(60,64,33)' fill='%23fbc02d' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='69' cy='38' rx='3.5' ry='6' transform='rotate(75,69,38)' fill='%23fbc02d' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='73' cy='45' rx='3.5' ry='6' transform='rotate(90,73,45)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='75' cy='52' rx='3.5' ry='6' transform='rotate(105,75,52)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='74' cy='59' rx='3.5' ry='6' transform='rotate(120,74,59)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='71' cy='65' rx='3.5' ry='6' transform='rotate(135,71,65)' fill='%23ffb300' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='48' cy='32' rx='3' ry='5.5' transform='rotate(15,48,32)' fill='%23ffb300' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='54' cy='35' rx='3' ry='5.5' transform='rotate(30,54,35)' fill='%23ffb300' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='60' cy='40' rx='3' ry='5.5' transform='rotate(45,60,40)' fill='%23fbc02d' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='64' cy='46' rx='3' ry='5.5' transform='rotate(60,64,46)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='67' cy='53' rx='3' ry='5.5' transform='rotate(75,67,53)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3Cellipse cx='67' cy='60' rx='3' ry='5.5' transform='rotate(90,67,60)' fill='%23ffd54f' stroke='%23f57c00' stroke-width='0.5'/%3E%3C/svg%3E"), 
+            linear-gradient(to bottom, #dcedc8, #f1f8e9);
+        background-size: auto, auto, auto, 120px 120px, auto;
+    }
+
+    /* Hide scrollbars but keep functionality */
+    .scrollbar-none::-webkit-scrollbar {
+        display: none !important;
+    }
+    .scrollbar-none {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+
+    /* ===== FLOATING BUTTON RIPPLE EFFECT (Hiệu ứng sóng nước lan tỏa) ===== */
+    .chatbot-ripple-wave {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+        animation: rippleEffect 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+    }
+    .wave-1 {
+        background: rgba(76, 175, 80, 0.35); /* Xanh lá mạ nhạt */
+        animation-delay: 0s;
+    }
+    .wave-2 {
+        background: rgba(255, 179, 0, 0.25); /* Vàng kem / cam nhẹ */
+        animation-delay: 0.8s;
+    }
+    .wave-3 {
+        background: rgba(76, 175, 80, 0.15);
+        animation-delay: 1.6s;
+    }
+    @keyframes rippleEffect {
+        0% {
+            transform: scale(0.95);
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.55;
+        }
+        100% {
+            transform: scale(1.65);
+            opacity: 0;
+        }
+    }
+
+    /* Tự động ẩn gợn sóng khi khung chat được mở */
+    #chatbotPanel:not(.opacity-0) ~ #chatbotButtonContainer .chatbot-ripple-wave,
+    #chatbotPanel.mobile-open ~ #chatbotButtonContainer .chatbot-ripple-wave {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: scale(0) !important;
+        transition: all 0.3s ease;
+    }
+
+    /* Animation fade in cho nội dung phụ sau khi chạy chữ xong */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+        animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    /* Blinking typing cursor like ChatGPT */
+    @keyframes cursorBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+    .bot-typing-cursor {
+        animation: cursorBlink 0.8s steps(2, start) infinite;
+    }
 </style>
 
-<!-- CHATBOT BUTTON - Màu xanh gradient -->
-<button id="chatbotButton"
-    class="fixed bottom-6 right-6 z-[9999] w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform duration-300">
-    <i class="fas fa-robot text-3xl"></i>
-</button>
-
-<!-- CHAT PANEL -->
+<!-- CHAT PANEL - Đưa lên trước để dùng selector CSS (A ~ B) ẩn gợn sóng khi mở -->
 <div id="chatbotPanel"
     class="fixed bottom-24 right-6 z-[9999] w-[400px] sm:w-[420px] bg-white rounded-2xl shadow-2xl overflow-hidden 
            transform opacity-0 scale-90 pointer-events-none transition-all duration-300"
     style="max-height: 600px;">
     
-    <!-- Header - Màu xanh gradient -->
-    <div class="chatbot-header bg-gradient-to-r from-green-500 to-blue-600 p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <i class="fas fa-robot text-xl text-white"></i>
+    <!-- Header - Màu xanh lá tươi mát miền Tây gradient -->
+    <div class="chatbot-header bg-gradient-to-r from-[#4caf50] to-[#2e7d32] p-3 flex items-center justify-between">
+        <div class="flex items-center gap-2 min-w-0">
+            <div class="w-9 h-9 rounded-full overflow-hidden border border-white/40 flex items-center justify-center flex-shrink-0">
+                <img src="images/chatbot1.png" alt="Trà My" class="w-full h-full object-cover rounded-full" />
             </div>
-            <div>
-                <h3 class="text-white font-bold">Trà My chào quý khách!</h3>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
-                    <p class="text-white/80 text-xs">Trực tuyến 24/7</p>
+            <div class="min-w-0">
+                <h3 class="text-white font-bold text-sm sm:text-base whitespace-nowrap">Trà My chào quý khách!</h3>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse flex-shrink-0"></span>
+                    <p class="text-white/80 text-[10px] sm:text-xs whitespace-nowrap">Trực tuyến 24/7</p>
                 </div>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 flex-shrink-0">
             <!-- Nút xem lịch sử -->
-            <button onclick="toggleChatHistory()" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Lịch sử chat">
-                <i class="fas fa-history text-sm"></i>
+            <button onclick="toggleChatHistory()" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Lịch sử chat">
+                <i class="fas fa-history text-xs"></i>
             </button>
             <!-- Nút chat mới -->
-            <button onclick="startNewChat()" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Chat mới">
-                <i class="fas fa-plus text-sm"></i>
+            <button onclick="startNewChat()" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Chat mới">
+                <i class="fas fa-plus text-xs"></i>
             </button>
             <!-- Nút mở rộng / thu nhỏ -->
-            <button id="expandChatbot" onclick="toggleExpandChatbot()" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Mở rộng">
-                <i class="fas fa-expand text-sm"></i>
+            <button id="expandChatbot" onclick="toggleExpandChatbot()" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Mở rộng">
+                <i class="fas fa-expand text-xs"></i>
             </button>
             <!-- Nút đóng -->
-            <button id="closeChatbot" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Đóng">
-                <i class="fas fa-times"></i>
+            <button id="closeChatbot" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition" title="Đóng">
+                <i class="fas fa-times text-xs"></i>
             </button>
         </div>
     </div>
@@ -250,24 +404,62 @@
         </div>
     </div>
 
-    <!-- Messages Area -->
-    <div id="chatbotMessages" class="p-4 space-y-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" style="height: 420px;">
+    <!-- Messages Area - Đổi sang màu nền xanh lá tươi mát miền Tây kèm hoa văn cây lúa nước -->
+    <div id="chatbotMessages" class="p-4 space-y-3 overflow-y-auto bg-rice-pattern" style="height: 360px;">
         <!-- Messages will be loaded dynamically -->
     </div>
 
-    <!-- Input Area -->
-    <div class="p-3 bg-white border-t border-gray-100">
+    <!-- Thanh nút gợi ý 3D trong suốt cố định (Persistent 3D Glass Suggestion Bar) -->
+    <div id="chatbotQuickSuggestions" class="px-4 py-3 bg-[#e8f5e9]/90 flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-none border-t border-b border-[#a5d6a7]/40 pt-4">
+        <button onclick="chatbotSendQuick('Xem thực đơn')" class="btn-3d-glass text-xs font-semibold flex-shrink-0">🍽️ Thực đơn</button>
+        <button onclick="chatbotSendQuick('Món bán chạy nhất')" class="btn-3d-glass text-xs font-semibold flex-shrink-0">🔥 Bán chạy</button>
+        <button onclick="chatbotSendQuick('Đặt bàn')" class="btn-3d-glass text-xs font-semibold flex-shrink-0">📅 Đặt bàn</button>
+        <button onclick="chatbotSendQuick('Giờ mở cửa')" class="btn-3d-glass text-xs font-semibold flex-shrink-0">🕐 Giờ mở cửa</button>
+        <button onclick="chatbotSendQuick('Gợi ý món ăn cho tôi')" class="btn-3d-glass text-xs font-semibold flex-shrink-0">✨ Gợi ý món</button>
+    </div>
+
+    <!-- Input Area - Đồng bộ tông màu xanh lá nhạt tươi mát -->
+    <div class="p-3 bg-[#e8f5e9]/95 border-t border-[#a5d6a7]/30">
         <div class="flex items-center gap-2">
             <input type="text" id="chatbotInput"
-                class="flex-1 h-11 border border-gray-200 rounded-full px-4 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                class="flex-1 h-11 border border-[#a5d6a7] bg-white/95 rounded-full px-4 text-sm focus:outline-none focus:border-[#4caf50] focus:ring-2 focus:ring-[#c8e6c9] transition"
                 placeholder="Nhập tin nhắn..."
                 onkeypress="if(event.key==='Enter') chatbotSendMessage()">
             <button id="sendMessage" onclick="chatbotSendMessage()"
-                class="w-11 h-11 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white hover:scale-105 transition flex-shrink-0">
+                class="w-11 h-11 btn-3d-send rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
+</div>
+
+<!-- CHATBOT BUTTON CONTAINER WITH RIPPLES (Hộp chứa nút chat nổi kèm gợn sóng lan tỏa) -->
+<div id="chatbotButtonContainer" class="fixed bottom-6 right-6 z-[9999] w-20 h-20 flex items-center justify-center">
+    <!-- Ripple waves chìm phía sau -->
+    <div class="chatbot-ripple-wave wave-1"></div>
+    <div class="chatbot-ripple-wave wave-2"></div>
+    <div class="chatbot-ripple-wave wave-3"></div>
+    
+    <!-- CHATBOT BUTTON - Nền tròn vàng kem và khoảng đệm nhẹ -->
+    <button id="chatbotButton"
+        class="relative w-full h-full rounded-full shadow-2xl overflow-hidden hover:scale-110 transition-transform duration-300 border-2 border-[#ffb300]/30 bg-[#fffde7] p-1.5 focus:outline-none">
+        <img src="images/chatbot1.png" alt="Chatbot" class="w-full h-full object-cover rounded-full" />
+    </button>
+</div>
+
+<!-- BONG BÓNG LỜI CHÀO BÊN NGOÀI ICON -->
+<div id="chatbotGreetingBubble" 
+     class="fixed bottom-[46px] right-[116px] z-[9999] hidden sm:flex bg-white text-gray-800 text-xs py-2 px-3.5 rounded-xl shadow-xl border border-gray-100 items-center gap-2 max-w-[280px] transition-all duration-500 transform opacity-0 scale-90 pointer-events-none">
+    <div class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0"></span>
+        <span class="font-medium text-gray-700">Trà My sẵn sàng hỗ trợ anh/chị! 🌸</span>
+    </div>
+    <!-- Nút đóng bong bóng -->
+    <button onclick="event.stopPropagation(); document.getElementById('chatbotGreetingBubble').remove()" class="text-gray-400 hover:text-gray-600 transition flex-shrink-0 pl-1" title="Đóng">
+        <i class="fas fa-times text-[10px]"></i>
+    </button>
+    <!-- Mũi tên chỉ vào icon chat -->
+    <div class="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-r border-t border-gray-100 rotate-45"></div>
 </div>
 
 <!-- Overlay mờ khi chatbot mở rộng -->

@@ -50,14 +50,16 @@ function saveUserData(data) {
         so_dien_thoai: data.so_dien_thoai || null,
         dia_chi: data.dia_chi || null,
         gioi_tinh: data.gioi_tinh || 'khac',
-        token: data.token
+        token: data.token,
+        hasPreferences: data.hasPreferences || false
     };
     
     console.log('💾 Saving user data to localStorage:', {
         name: userData.ten_nguoi_dung,
         email: userData.email,
         avatar: userData.anh_dai_dien,
-        hasToken: !!userData.token
+        hasToken: !!userData.token,
+        hasPreferences: userData.hasPreferences
     });
     
     localStorage.setItem('user', JSON.stringify(userData));
@@ -83,6 +85,14 @@ function logout() {
     if (typeof cartManager !== 'undefined') {
         cartManager.handleUserLogout();
     }
+    
+    // Dọn dẹp session chatbot
+    const chatbotSessionId = localStorage.getItem('chatbot_session_id');
+    if (chatbotSessionId) {
+        sessionStorage.removeItem(`chatbot_history_${chatbotSessionId}`);
+    }
+    localStorage.removeItem('chatbot_session_id');
+    localStorage.removeItem('chatbot_session_time');
     
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -141,6 +151,11 @@ async function handleLogin(formData) {
             // Handle cart after login
             if (typeof cartManager !== 'undefined') {
                 await cartManager.handleUserLogin();
+            }
+            
+            // Kiểm tra nếu chưa có khẩu vị thì set flag để hiển thị modal
+            if (!result.data.hasPreferences) {
+                sessionStorage.setItem('show_preferences_modal', 'true');
             }
             
             setTimeout(() => {

@@ -478,6 +478,13 @@ function renderGuestMenu(userMenuContainer, mobileUserMenu) {
 // Handle logout (global function)
 window.handleLogout = function() {
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        // Dọn dẹp session chatbot và cache trước khi logout
+        if (typeof currentChatSessionId !== 'undefined' && currentChatSessionId) {
+            sessionStorage.removeItem(`chatbot_history_${currentChatSessionId}`);
+        }
+        localStorage.removeItem('chatbot_session_id');
+        localStorage.removeItem('chatbot_session_time');
+        
         localStorage.removeItem('user'); sessionStorage.removeItem('user');
         localStorage.removeItem('token'); sessionStorage.removeItem('token');
         window.location.href = 'index.html';
@@ -592,6 +599,17 @@ let chatbotGreeted = false;
 let currentChatSessionId = null;
 let chatHistoryLoaded = false; // Đánh dấu đã load history chưa
 
+function saveMessageToSessionStorage(sessionId, messageObj) {
+    try {
+        const key = `chatbot_history_${sessionId}`;
+        let history = JSON.parse(sessionStorage.getItem(key) || '[]');
+        history.push(messageObj);
+        sessionStorage.setItem(key, JSON.stringify(history));
+    } catch (e) {
+        console.error('Error saving message to sessionStorage:', e);
+    }
+}
+
 // Load lịch sử chat từ backend theo session_id
 async function loadChatHistory() {
     console.log('🎯 loadChatHistory() function called');
@@ -607,6 +625,35 @@ async function loadChatHistory() {
     if (!messages || !sessionId) {
         console.log('❌ Missing messages element or sessionId');
         return;
+    }
+    
+    // Thử load từ sessionStorage cache trước
+    const sessionKey = `chatbot_history_${sessionId}`;
+    const cachedHistory = sessionStorage.getItem(sessionKey);
+    
+    if (cachedHistory) {
+        try {
+            const parsed = JSON.parse(cachedHistory);
+            if (parsed && parsed.length > 0) {
+                console.log('⚡ Loaded chat history from sessionStorage cache');
+                messages.innerHTML = '';
+                parsed.forEach(msg => {
+                    if (msg.sender === 'user') {
+                        addUserMessageToUI(messages, msg.text, false);
+                    } else {
+                        addBotMessageToUI(messages, msg.text, false, msg.dishes);
+                    }
+                });
+                chatHistoryLoaded = true;
+                chatbotGreeted = true;
+                messages.scrollTop = messages.scrollHeight;
+                updateChatbotSuggestions();
+                console.log('✅ Chat history restored from cache successfully');
+                return;
+            }
+        } catch (e) {
+            console.error('Error parsing cached history:', e);
+        }
     }
     
     try {
@@ -630,6 +677,14 @@ async function loadChatHistory() {
             // Xóa nội dung cũ
             messages.innerHTML = '';
             
+            // Đồng bộ vào sessionStorage cache
+            const tempHistory = result.data.map(msg => ({
+                sender: msg.nguoi_gui,
+                text: msg.noi_dung,
+                dishes: null
+            }));
+            sessionStorage.setItem(sessionKey, JSON.stringify(tempHistory));
+            
             // Render lại lịch sử chat
             result.data.forEach((msg, index) => {
                 console.log(`Rendering message ${index + 1}:`, msg.nguoi_gui, msg.noi_dung.substring(0, 50));
@@ -645,6 +700,7 @@ async function loadChatHistory() {
             
             // Scroll to bottom
             messages.scrollTop = messages.scrollHeight;
+            updateChatbotSuggestions();
             console.log('✅ Chat history loaded successfully');
         } else {
             // Không có lịch sử -> hiển thị lời chào
@@ -706,6 +762,9 @@ function getChatbotSessionId() {
 
 // Hàm reset session chat (khi user muốn bắt đầu cuộc trò chuyện mới)
 function resetChatbotSession() {
+    if (currentChatSessionId) {
+        sessionStorage.removeItem(`chatbot_history_${currentChatSessionId}`);
+    }
     currentChatSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('chatbot_session_id', currentChatSessionId);
     localStorage.setItem('chatbot_session_time', Date.now().toString());
@@ -746,31 +805,40 @@ function showChatbotGreeting() {
         greeting = 'Chào quý khách ạ! 🌸 Em là Trà My, trợ lý ảo của Nhà hàng Ẩm thực Phương Nam đây ạ. Em có thể giúp anh/chị tìm hiểu về thực đơn, đặt bàn hoặc giải đáp mọi thắc mắc. Anh/chị cần em hỗ trợ gì ạ? 💕';
     }
     
-    // Thêm quick suggestions
-    const quickSuggestions = `
-        <div class="flex flex-wrap gap-2 mt-3">
-            <button onclick="chatbotSendQuick('Xem thực đơn')" class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-yellow-200 transition">🍽️ Thực đơn</button>
-            <button onclick="chatbotSendQuick('Món bán chạy nhất')" class="bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-orange-200 transition">🔥 Bán chạy</button>
-            <button onclick="chatbotSendQuick('Đặt bàn')" class="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-green-200 transition">📅 Đặt bàn</button>
-            <button onclick="chatbotSendQuick('Giờ mở cửa')" class="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-blue-200 transition">🕐 Giờ mở cửa</button>
-            <button onclick="chatbotSendQuick('Gợi ý món ăn cho tôi')" class="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-purple-200 transition">✨ Gợi ý</button>
-        </div>
-    `;
-    
-    // Thêm tin nhắn chào mừng
+    // Thêm tin nhắn chào mừng (không chèn trùng các nút gợi ý nhanh vì đã có thanh gợi ý cố định bên dưới)
     const botMsg = document.createElement('div');
     botMsg.className = 'flex gap-2';
     botMsg.innerHTML = `
-        <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-robot text-white text-sm"></i>
+        <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-white">
+            <img src="images/chatbot1.png" alt="Trà My" class="w-full h-full object-cover rounded-full" />
         </div>
-        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] bg-white rounded-2xl rounded-tl-none shadow-sm">
+        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] rounded-2xl rounded-tl-none shadow-sm">
             <p class="text-gray-700 text-sm leading-relaxed">${greeting}</p>
-            ${quickSuggestions}
         </div>
     `;
     messages.appendChild(botMsg);
     messages.scrollTop = messages.scrollHeight;
+    updateChatbotSuggestions();
+}
+
+// Hàm ẩn/hiện thanh gợi ý nhanh dựa trên số lượng tin nhắn trong cuộc hội thoại (Hallucination & Space optimization)
+function updateChatbotSuggestions() {
+    const panel = document.getElementById('chatbotPanel');
+    const messages = document.getElementById('chatbotMessages');
+    if (!panel || !messages) return;
+    
+    // Đếm số lượng bong bóng tin nhắn (loại trừ khoảng trắng hoặc text node)
+    const messageCount = messages.querySelectorAll(':scope > div').length;
+    
+    console.log('📊 Chat message count for suggestions check:', messageCount);
+    
+    // Nếu chỉ có tối đa 1 tin nhắn (tin nhắn chào mừng), hiển thị gợi ý.
+    // Nếu có từ 2 tin nhắn trở lên (đã bắt đầu chat hoặc load history), ẩn gợi ý đi để tránh chật chỗ.
+    if (messageCount <= 1) {
+        panel.classList.remove('hide-suggestions');
+    } else {
+        panel.classList.add('hide-suggestions');
+    }
 }
 
 // Hàm toggleChatHistory đã được định nghĩa ở dưới (dòng ~1620)
@@ -796,7 +864,7 @@ function addUserMessageToUI(messages, text, shouldScroll = true) {
     const userMsg = document.createElement('div');
     userMsg.className = 'flex justify-end';
     userMsg.innerHTML = `
-        <div class="bg-gradient-to-br from-green-400 to-blue-500 p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">
+        <div class="bg-gradient-to-br from-[#81c784] to-[#2e7d32] p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">
             <p class="text-white text-sm">${escapeHtmlChat(text)}</p>
         </div>
     `;
@@ -807,15 +875,24 @@ function addUserMessageToUI(messages, text, shouldScroll = true) {
 }
 
 // Thêm tin nhắn bot vào UI (đơn giản, không có card)
-function addBotMessageToUI(messages, text, shouldScroll = true) {
+function addBotMessageToUI(messages, text, shouldScroll = true, dishes = null) {
     const botMsg = document.createElement('div');
     botMsg.className = 'flex gap-2';
+    
+    let dishCardsHtml = '';
+    if (dishes && dishes.length > 0) {
+        dishCardsHtml = renderGraphQLDishCards(dishes);
+    }
+    
     botMsg.innerHTML = `
-        <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-robot text-white text-sm"></i>
+        <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-white">
+            <img src="images/chatbot1.png" alt="Trà My" class="w-full h-full object-cover rounded-full" />
         </div>
-        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] bg-white rounded-2xl rounded-tl-none shadow-sm">
+        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] rounded-2xl rounded-tl-none shadow-sm">
             <p class="text-gray-700 text-sm leading-relaxed">${text}</p>
+            <div class="bot-extra-content">
+                ${dishCardsHtml}
+            </div>
         </div>
     `;
     messages.appendChild(botMsg);
@@ -835,17 +912,68 @@ function initializeChatbot() {
         
         const isMobile = () => window.innerWidth <= 640;
         
+        // Quản lý trạng thái ẩn/hiển thị của bong bóng chào mừng (Greeting Bubble)
+        let greetingBubbleTimeout = null;
+
+        const showGreetingBubble = () => {
+            const bubble = document.getElementById('chatbotGreetingBubble');
+            const isPanelOpen = isMobile() 
+                ? chatbotPanel.classList.contains('mobile-open')
+                : !chatbotPanel.classList.contains('opacity-0');
+            
+            if (bubble && !isPanelOpen) {
+                bubble.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+                
+                // Xoá timeout cũ để không bị ẩn đột ngột
+                if (greetingBubbleTimeout) clearTimeout(greetingBubbleTimeout);
+                
+                // Tự động ẩn bong bóng sau 8 giây để không che màn hình
+                greetingBubbleTimeout = setTimeout(() => {
+                    hideGreetingBubble();
+                }, 8000);
+            }
+        };
+
+        const hideGreetingBubble = () => {
+            const bubble = document.getElementById('chatbotGreetingBubble');
+            if (bubble) {
+                bubble.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+            }
+            if (greetingBubbleTimeout) {
+                clearTimeout(greetingBubbleTimeout);
+                greetingBubbleTimeout = null;
+            }
+        };
+
+        // Di chuột vào chatbot button sẽ hiện bong bóng
+        chatbotButton.addEventListener('mouseenter', showGreetingBubble);
+        
+        // Tự động hiện lần đầu sau 4 giây khi tải trang
+        setTimeout(() => {
+            showGreetingBubble();
+        }, 4000);
+
         // Toggle chat panel khi click vào button
         chatbotButton.addEventListener('click', function() {
             if (isMobile()) {
                 // Mobile: fullscreen mode
                 chatbotPanel.classList.toggle('mobile-open');
                 document.body.style.overflow = chatbotPanel.classList.contains('mobile-open') ? 'hidden' : '';
+                if (chatbotPanel.classList.contains('mobile-open')) {
+                    hideGreetingBubble();
+                } else {
+                    showGreetingBubble();
+                }
             } else {
                 // Desktop: popup mode
                 chatbotPanel.classList.toggle('opacity-0');
                 chatbotPanel.classList.toggle('scale-90');
                 chatbotPanel.classList.toggle('pointer-events-none');
+                if (!chatbotPanel.classList.contains('opacity-0')) {
+                    hideGreetingBubble();
+                } else {
+                    showGreetingBubble();
+                }
             }
             
             // Load history khi mở chatbot (backup method)
@@ -903,8 +1031,10 @@ function initializeChatbot() {
                 if (isMobile()) {
                     chatbotPanel.classList.remove('mobile-open');
                     document.body.style.overflow = '';
+                    showGreetingBubble();
                 } else {
                     chatbotPanel.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+                    showGreetingBubble();
                 }
             });
         }
@@ -918,8 +1048,10 @@ function initializeChatbot() {
                     if (isMobile()) {
                         chatbotPanel.classList.remove('mobile-open');
                         document.body.style.overflow = '';
+                        showGreetingBubble();
                     } else {
                         chatbotPanel.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+                        showGreetingBubble();
                     }
                 }
             }
@@ -987,29 +1119,36 @@ window.chatbotSendMessage = async function() {
     
     if (!text) return;
     
-    // Thêm tin nhắn user
+        // Thêm tin nhắn user
     addUserMessageToUI(messages, text);
+    saveMessageToSessionStorage(getChatbotSessionId(), { sender: 'user', text: text });
     input.value = '';
     messages.scrollTop = messages.scrollHeight;
     
-    // Hiển thị typing indicator
-    const typingDiv = document.createElement('div');
-    typingDiv.id = 'chatbot-typing';
-    typingDiv.className = 'flex gap-2';
-    typingDiv.innerHTML = `
-        <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-robot text-white text-sm"></i>
+    // Tạo bong bóng phản hồi của bot ngay lập tức (giống ChatGPT)
+    const botMsg = document.createElement('div');
+    botMsg.className = 'flex gap-2 bot-loading';
+    
+    // Tạo unique id cho mỗi tin nhắn bot (dùng cho TTS)
+    const ttsId = 'tts-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+
+    botMsg.innerHTML = `
+        <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-white">
+            <img src="images/chatbot1.png" alt="Trà My" class="w-full h-full object-cover rounded-full" />
         </div>
-        <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm">
-            <div class="flex gap-1">
-                <span class="w-2 h-2 bg-green-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                <span class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                <span class="w-2 h-2 bg-green-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
+        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] rounded-2xl rounded-tl-none shadow-sm flex flex-col justify-center min-h-[38px]">
+            <div class="flex items-center min-h-[20px]">
+                <p class="bot-text-content text-gray-700 text-sm leading-relaxed inline"></p>
+                <span class="bot-typing-cursor inline-block w-1.5 h-4 bg-green-600 ml-0.5 align-middle"></span>
+            </div>
+            <div class="bot-extra-content hidden">
+                <!-- Sẽ được điền sau khi có kết quả -->
             </div>
         </div>
     `;
-    messages.appendChild(typingDiv);
+    messages.appendChild(botMsg);
     messages.scrollTop = messages.scrollHeight;
+    updateChatbotSuggestions();
     
     try {
         // Lấy token nếu user đã đăng nhập
@@ -1029,7 +1168,6 @@ window.chatbotSendMessage = async function() {
         });
         
         const result = await response.json();
-        document.getElementById('chatbot-typing')?.remove();
         
         let botResponse = result.success && result.data?.response 
             ? result.data.response 
@@ -1053,19 +1191,33 @@ window.chatbotSendMessage = async function() {
             }
         }
         
-        addBotMessage(messages, botResponse, recommendations, graphqlDishes);
+                // Lưu tin nhắn bot vào cache
+        saveMessageToSessionStorage(getChatbotSessionId(), { 
+            sender: 'bot', 
+            text: botResponse, 
+            dishes: graphqlDishes && graphqlDishes.length > 0 ? graphqlDishes : (recommendations && recommendations.length > 0 ? recommendations : null)
+        });
+        
+        // Chạy hiệu ứng chữ chạy trực tiếp trên bong bóng đã tạo
+        animateBotMessage(botMsg, botResponse, recommendations, graphqlDishes, ttsId);
         
     } catch (error) {
         console.error('Chatbot API error:', error);
-        document.getElementById('chatbot-typing')?.remove();
-        addBotMessage(messages, '❌ Lỗi kết nối. Vui lòng thử lại sau!');
+        animateBotMessage(botMsg, '❌ Lỗi kết nối. Vui lòng thử lại sau!', null, null, ttsId);
     }
 };
 
-// Thêm tin nhắn bot - hỗ trợ GraphQL dish cards với ảnh
-function addBotMessage(messages, response, recommendations = null, graphqlDishes = null) {
-    const botMsg = document.createElement('div');
-    botMsg.className = 'flex gap-2';
+// Hàm chạy chữ trực tiếp trên element đã có sẵn (ChatGPT style)
+function animateBotMessage(botMsg, response, recommendations = null, graphqlDishes = null, ttsId) {
+    // Xoá class loading nếu có
+    botMsg.classList.remove('bot-loading');
+    
+    const textEl = botMsg.querySelector('.bot-text-content');
+    const cursorEl = botMsg.querySelector('.bot-typing-cursor');
+    const extraEl = botMsg.querySelector('.bot-extra-content');
+    const messages = document.getElementById('chatbotMessages');
+    
+    if (!textEl) return;
     
     // Render GraphQL dish cards (có ảnh) - ưu tiên hơn ML recommendations
     let dishCardsHtml = '';
@@ -1076,25 +1228,39 @@ function addBotMessage(messages, response, recommendations = null, graphqlDishes
         dishCardsHtml = RecommendationSystem.renderChatRecommendations(recommendations);
     }
     
-    // Tạo unique id cho mỗi tin nhắn bot (dùng cho TTS)
-    const ttsId = 'tts-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
-
-    botMsg.innerHTML = `
-        <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-robot text-white text-sm"></i>
-        </div>
-        <div class="chat-bubble-bot px-3 py-2 max-w-[85%] bg-white rounded-2xl rounded-tl-none shadow-sm">
-            <p class="text-gray-700 text-sm leading-relaxed">${response}</p>
+    // Chuẩn bị nội dung phụ trước trong div ẩn
+    if (extraEl) {
+        extraEl.innerHTML = `
             ${dishCardsHtml}
             <button class="tts-btn" data-tts-id="${ttsId}" onclick="toggleTTS(this)" title="Nghe Trà My đọc">
                 <i class="fas fa-volume-up tts-icon"></i>
                 <span class="tts-label">Nghe</span>
                 <span class="tts-pulse"></span>
             </button>
-        </div>
-    `;
-    messages.appendChild(botMsg);
-    messages.scrollTop = messages.scrollHeight;
+        `;
+    }
+    
+    let i = 0;
+    const speed = 15; // Tốc độ chạy chữ: 15ms mỗi ký tự
+    
+    function typeWriter() {
+        if (i < response.length) {
+            textEl.innerHTML = response.substring(0, i + 1);
+            i++;
+            if (messages) messages.scrollTop = messages.scrollHeight;
+            setTimeout(typeWriter, speed);
+        } else {
+            // Hoàn thành chạy chữ -> Ẩn con trỏ và hiện thêm các nội dung phụ (món ăn gợi ý, nút đọc)
+            if (cursorEl) cursorEl.remove();
+            if (extraEl) {
+                extraEl.classList.remove('hidden');
+                extraEl.classList.add('animate-fadeIn');
+            }
+            if (messages) messages.scrollTop = messages.scrollHeight;
+        }
+    }
+    
+    typeWriter();
 }
 
 // Render dish cards từ GraphQL data (với ảnh món ăn)
@@ -1106,7 +1272,7 @@ function renderGraphQLDishCards(dishes) {
     // Nếu chỉ 1 món - hiển thị card lớn
     if (dishes.length === 1) {
         const d = dishes[0];
-        const imgSrc = d.anh_mon ? (d.anh_mon.startsWith('http') ? d.anh_mon : `http://localhost:3000/images/${d.anh_mon}`) : '';
+        const imgSrc = d.anh_mon ? (d.anh_mon.startsWith('http') ? d.anh_mon : `http://localhost:3000` + (d.anh_mon.startsWith('/') ? d.anh_mon : `/images/${d.anh_mon}`)) : '';
         const rating = d.diem_danh_gia ? `<span class="text-yellow-500 text-xs">⭐ ${parseFloat(d.diem_danh_gia).toFixed(1)}</span>` : '';
         
         return `
@@ -1120,7 +1286,7 @@ function renderGraphQLDishCards(dishes) {
                     <p class="text-green-600 font-bold text-sm mt-1">${formatPrice(d.gia_tien)}/${d.don_vi_tinh || 'phần'}</p>
                     ${d.mo_ta ? `<p class="text-gray-500 text-xs mt-1 line-clamp-2">${escapeHtmlChat(d.mo_ta)}</p>` : ''}
                     ${d.ten_danh_muc ? `<span class="inline-block mt-1.5 px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded-full">${escapeHtmlChat(d.ten_danh_muc)}</span>` : ''}
-                    <button onclick="event.stopPropagation(); addDishToCart(${d.ma_mon})" class="mt-2 w-full py-1.5 bg-gradient-to-r from-green-400 to-blue-500 text-white text-xs rounded-lg font-medium hover:opacity-90 transition">
+                    <button onclick="event.stopPropagation(); addDishToCart(${d.ma_mon})" class="mt-2 w-full py-1.5 bg-gradient-to-r from-[#b09b8d] to-[#8d6e63] text-white text-xs rounded-lg font-medium hover:opacity-90 transition shadow-sm">
                         🛒 Thêm vào giỏ
                     </button>
                 </div>
@@ -1130,7 +1296,7 @@ function renderGraphQLDishCards(dishes) {
     
     // Nhiều món - hiển thị danh sách scroll ngang
     const cards = dishes.slice(0, 6).map(d => {
-        const imgSrc = d.anh_mon ? (d.anh_mon.startsWith('http') ? d.anh_mon : `http://localhost:3000/images/${d.anh_mon}`) : '';
+        const imgSrc = d.anh_mon ? (d.anh_mon.startsWith('http') ? d.anh_mon : `http://localhost:3000` + (d.anh_mon.startsWith('/') ? d.anh_mon : `/images/${d.anh_mon}`)) : '';
         const rating = d.diem_danh_gia ? `<span class="text-yellow-500" style="font-size:10px">⭐${parseFloat(d.diem_danh_gia).toFixed(1)}</span>` : '';
         
         return `
@@ -1504,10 +1670,19 @@ window.loadChatSession = async function(sessionId) {
         
         const result = await response.json();
         
-        if (result.success && result.data && result.data.length > 0) {
+                if (result.success && result.data && result.data.length > 0) {
             // Cập nhật session hiện tại
             currentChatSessionId = sessionId;
             localStorage.setItem('chatbot_session_id', sessionId);
+            localStorage.setItem('chatbot_session_time', Date.now().toString());
+            
+            // Đồng bộ cache
+            const tempHistory = result.data.map(msg => ({
+                sender: msg.nguoi_gui,
+                text: msg.noi_dung,
+                dishes: null
+            }));
+            sessionStorage.setItem(`chatbot_history_${sessionId}`, JSON.stringify(tempHistory));
             
             chatbotGreeted = true;
             
@@ -1525,6 +1700,7 @@ window.loadChatSession = async function(sessionId) {
             
             // Scroll to bottom
             messages.scrollTop = messages.scrollHeight;
+            updateChatbotSuggestions();
             
             // Đóng dropdown
             const dropdown = document.getElementById('chatHistoryDropdown');

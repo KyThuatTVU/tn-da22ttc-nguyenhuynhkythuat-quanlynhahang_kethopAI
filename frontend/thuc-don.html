@@ -433,9 +433,25 @@
                 <!-- Products Grid -->
                 <div class="lg:w-3/4">
                     <!-- Sort Bar -->
-                    <div class="bg-white rounded-xl p-4 mb-6 shadow-sm flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-gray-800">Danh sách món ăn</h2>
-                        <span class="text-gray-600">Tìm thấy <strong id="product-count" class="text-orange-600">0</strong> món ăn</span>
+                    <div class="bg-white rounded-xl p-4 mb-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-semibold text-gray-800">Danh sách món ăn</h2>
+                            <span class="text-gray-500 text-sm">(<strong id="product-count" class="text-orange-600">0</strong> món)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm text-slate-600 font-medium">Sắp xếp:</label>
+                            <select id="sort-select" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:outline-none focus:border-orange-500">
+                                <option value="newest">Mới nhất</option>
+                                <option value="popular">Phổ biến nhất (AI)</option>
+                                <option value="rating">Đánh giá cao nhất</option>
+                                <option value="clicks">Click nhiều nhất</option>
+                                <option value="views">Xem lâu nhất (>50s)</option>
+                                <option value="orders">Mua nhiều nhất</option>
+                                <option value="likes">Thả tim nhiều nhất</option>
+                                <option value="price_asc">Giá: Thấp đến Cao</option>
+                                <option value="price_desc">Giá: Cao đến Thấp</option>
+                            </select>
+                        </div>
                         <div class="hidden">
                             <span id="product-count-mobile"></span>
                         </div>

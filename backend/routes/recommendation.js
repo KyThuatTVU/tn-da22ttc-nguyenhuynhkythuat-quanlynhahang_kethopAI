@@ -935,7 +935,24 @@ async function getChatBasedRecommendations(userId, limit = 5) {
             params.push(pattern);
         }
         
-        query += conditions.join(' OR ') + `)
+        // Lấy các món user đã mua để loại trừ
+        const [userOrders] = await db.query(
+            `SELECT DISTINCT ct.ma_mon 
+             FROM chi_tiet_don_hang ct
+             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+             WHERE dh.ma_nguoi_dung = ?`,
+            [userId]
+        );
+        const userDishes = userOrders.map(o => o.ma_mon);
+
+        query += conditions.join(' OR ') + `)`;
+        
+        if (userDishes.length > 0) {
+            query += ` AND m.ma_mon NOT IN (?)`;
+            params.push(userDishes);
+        }
+        
+        query += `
             GROUP BY m.ma_mon
             ORDER BY avg_rating DESC, review_count DESC, m.ma_mon DESC
             LIMIT ?`;
@@ -1622,7 +1639,29 @@ router.get('/', async (req, res) => {
             }
         }
         
-        const uniqueRecommendations = Array.from(uniqueRecommendationsMap.values());
+        let uniqueRecommendations = Array.from(uniqueRecommendationsMap.values());
+        
+        // --- BỘ LỌC TOÀN CỤC: LOẠI BỎ CÁC MÓN KHÁCH ĐÃ MUA ---
+        if (userId) {
+            try {
+                const [userOrders] = await db.query(
+                    `SELECT DISTINCT ct.ma_mon 
+                     FROM chi_tiet_don_hang ct
+                     JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
+                     WHERE dh.ma_nguoi_dung = ?`,
+                    [userId]
+                );
+                const userDishesSet = new Set(userOrders.map(o => String(o.ma_mon)));
+                console.log(`[GlobalFilter] User ${userId} dishes:`, Array.from(userDishesSet));
+                console.log(`[GlobalFilter] Recommendations before filter:`, uniqueRecommendations.map(r => r.ma_mon));
+                
+                // Lọc bỏ tất cả những món nằm trong danh sách đã mua (cast to string để tránh lỗi type mismatch)
+                uniqueRecommendations = uniqueRecommendations.filter(rec => !userDishesSet.has(String(rec.ma_mon)));
+                console.log(`[GlobalFilter] Recommendations after filter:`, uniqueRecommendations.map(r => r.ma_mon));
+            } catch (filterErr) {
+                console.error('Lỗi khi lọc món đã mua toàn cục:', filterErr.message);
+            }
+        }
         
         // --- CƠ CHẾ PHÂN BỔ HẠN NGẠCH (QUOTA) & LẤY LUÂN PHIÊN ---
         // Chia nhóm các món ăn

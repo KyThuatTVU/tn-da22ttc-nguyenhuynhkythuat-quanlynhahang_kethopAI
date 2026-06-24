@@ -239,6 +239,147 @@ def get_rating_based_score(item_ids):
         print(f"❌ Lỗi get_rating_based_score: {str(e)}")
         return {}
 
+def get_new_dish_recommendations(user_id, limit=5):
+    """
+    Gợi ý món mới ra mắt (≤ 30 ngày) phù hợp khẩu vị người dùng
+    Score: 85/100 (giữa content-based và collaborative)
+    Returns: List of {item_id, score, reason}
+    """
+    try:
+        conn = get_db_connection()
+        
+        # Lấy khẩu vị yêu thích từ NHIỀU NGUỒN theo thứ tự ưu tiên
+        user_flavors_df = pd.DataFrame()
+        
+        # NGUỒN 1: Sở thích khẩu vị được chọn trực tiếp (ưu tiên cao nhất)
+        explicit_pref_query = """
+            SELECT DISTINCT kv.id, kv.ten_thuoc_tinh
+            FROM so_thich_khau_vi_nguoi_dung st
+            JOIN thuoc_tinh_khau_vi kv ON st.id_thuoc_tinh = kv.id
+            WHERE st.ma_nguoi_dung = %s
+        """
+        user_flavors_df = pd.read_sql(explicit_pref_query, conn, params=(user_id,))
+        
+        if user_flavors_df.empty:
+            # NGUỒN 2: Lấy khẩu vị từ lịch sử đánh giá cao (≥4 sao)
+            rating_pref_query = """
+                SELECT DISTINCT kv.id, kv.ten_thuoc_tinh
+                FROM danh_gia_san_pham dg
+                JOIN mon_an_khau_vi makv ON dg.ma_mon = makv.ma_mon
+                JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
+                WHERE dg.ma_nguoi_dung = %s AND dg.so_sao >= 4
+                LIMIT 5
+            """
+            user_flavors_df = pd.read_sql(rating_pref_query, conn, params=(user_id,))
+        
+        if user_flavors_df.empty:
+            # NGUỒN 3: Lấy từ user_preference_profile (học máy)
+            ml_pref_query = """
+                SELECT tag_key, score 
+                FROM user_preference_profile 
+                WHERE ma_nguoi_dung = %s AND score >= 0.5
+            """
+            ml_prefs_df = pd.read_sql(ml_pref_query, conn, params=(user_id,))
+            
+            if not ml_prefs_df.empty:
+                # Map tag_key sang id khẩu vị
+                tag_key_to_flavor_id = {
+                    'cay': 1, 'chua': 2, 'man': 3, 'ngot': 4,
+                    'an_chay': 5, 'thanh_mat': 6, 'thit_bo': 7,
+                    'thit_ga': 7, 'hai_san': 8, 'chien': 9
+                }
+                
+                flavor_ids = [tag_key_to_flavor_id.get(row['tag_key']) 
+                             for _, row in ml_prefs_df.iterrows() 
+                             if row['tag_key'] in tag_key_to_flavor_id]
+                flavor_ids = [fid for fid in flavor_ids if fid is not None]
+                
+                if flavor_ids:
+                    placeholders = ','.join(['%s'] * len(flavor_ids))
+                    ml_flavor_query = f"""
+                        SELECT DISTINCT id, ten_thuoc_tinh 
+                        FROM thuoc_tinh_khau_vi 
+                        WHERE id IN ({placeholders})
+                    """
+                    user_flavors_df = pd.read_sql(ml_flavor_query, conn, params=tuple(flavor_ids))
+        
+        if user_flavors_df.empty:
+            # NGUỒN 4: Fallback - lấy khẩu vị phổ biến nhất
+            popular_flavor_query = """
+                SELECT kv.id, kv.ten_thuoc_tinh
+                FROM thuoc_tinh_khau_vi kv
+                JOIN mon_an_khau_vi makv ON kv.id = makv.id_thuoc_tinh
+                GROUP BY kv.id
+                ORDER BY COUNT(*) DESC
+                LIMIT 3
+            """
+            user_flavors_df = pd.read_sql(popular_flavor_query, conn)
+        
+        if user_flavors_df.empty:
+            # Không có khẩu vị nào, trả về món mới nhất
+            new_dish_query = """
+                SELECT ma_mon, ten_mon, ngay_tao, DATEDIFF(NOW(), ngay_tao) as days_old
+                FROM mon_an
+                WHERE trang_thai = 1 
+                AND DATEDIFF(NOW(), ngay_tao) <= 30
+                ORDER BY ngay_tao DESC, ma_mon DESC
+                LIMIT %s
+            """
+            new_dishes = pd.read_sql(new_dish_query, conn, params=(limit,))
+            conn.close()
+            
+            results = []
+            for idx, row in new_dishes.iterrows():
+                results.append({
+                    'item_id': row['ma_mon'],
+                    'score': 0.85,  # Fixed score
+                    'reason': f"🆕 Món mới ra mắt ({row['days_old']} ngày trước)"
+                })
+            return results
+        
+        # Lấy món mới phù hợp khẩu vị
+        flavor_ids = user_flavors_df['id'].tolist()
+        flavor_names = user_flavors_df['ten_thuoc_tinh'].tolist()
+        
+        placeholders = ','.join(['%s'] * len(flavor_ids))
+        new_dish_query = f"""
+            SELECT DISTINCT
+                ma.ma_mon,
+                ma.ten_mon,
+                ma.ngay_tao,
+                DATEDIFF(NOW(), ma.ngay_tao) as days_old,
+                GROUP_CONCAT(kv.ten_thuoc_tinh SEPARATOR ', ') as matched_flavors
+            FROM mon_an ma
+            JOIN mon_an_khau_vi makv ON ma.ma_mon = makv.ma_mon
+            JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
+            WHERE ma.trang_thai = 1
+            AND DATEDIFF(NOW(), ma.ngay_tao) <= 30
+            AND kv.id IN ({placeholders})
+            GROUP BY ma.ma_mon
+            ORDER BY ma.ngay_tao DESC, ma.ma_mon DESC
+            LIMIT %s
+        """
+        
+        params = flavor_ids + [limit]
+        new_dishes = pd.read_sql(new_dish_query, conn, params=params)
+        conn.close()
+        
+        results = []
+        for idx, row in new_dishes.iterrows():
+            results.append({
+                'item_id': row['ma_mon'],
+                'score': 0.85,
+                'reason': f"🆕 Món mới ra mắt, hợp khẩu vị của bạn ({row['matched_flavors']})"
+            })
+        
+        return results
+        
+    except Exception as e:
+        print(f"❌ Lỗi get_new_dish_recommendations: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
+
 def get_hybrid_recommendations(
     user_id, 
     item_ids=None, 

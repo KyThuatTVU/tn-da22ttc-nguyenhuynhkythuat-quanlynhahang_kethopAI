@@ -35,9 +35,12 @@ async function fetchMenuProducts(categoryId = null) {
     try {
         showLoading();
         
-        let url = `${window.API_URL}/products`;
-        if (categoryId) {
-            url += `?category=${categoryId}`;
+        let url = `${window.API_URL}/products?limit=1000`; // Get more for client-side pagination
+        if (categoryId && categoryId !== 'recommended') {
+            url += `&category=${categoryId}`;
+        }
+        if (sortBy && sortBy !== 'default') {
+            url += `&sort=${sortBy}`;
         }
         
         const response = await fetch(url);
@@ -130,21 +133,39 @@ function applyFiltersAndSort() {
         }
     }
     
-    // Sort products (chỉ áp dụng khi user chọn sắp xếp thủ công)
+    // Sort products (chỉ áp dụng thủ công nếu server chưa sort, ví dụ lọc Gợi ý cho bạn)
     if (sortBy !== 'default') {
         switch(sortBy) {
-            case 'newest':
-                filtered.sort((a, b) => b.ma_mon - a.ma_mon);
-                break;
+            case 'price_asc':
             case 'price-asc':
                 filtered.sort((a, b) => (parseFloat(a.gia_tien) || 0) - (parseFloat(b.gia_tien) || 0));
                 break;
+            case 'price_desc':
             case 'price-desc':
                 filtered.sort((a, b) => (parseFloat(b.gia_tien) || 0) - (parseFloat(a.gia_tien) || 0));
                 break;
+            case 'rating':
+                filtered.sort((a, b) => (parseFloat(b.avg_rating) || 0) - (parseFloat(a.avg_rating) || 0));
+                break;
+            case 'clicks':
+                filtered.sort((a, b) => (parseInt(b.click_count) || 0) - (parseInt(a.click_count) || 0));
+                break;
+            case 'views':
+                filtered.sort((a, b) => (parseInt(b.view_count) || 0) - (parseInt(a.view_count) || 0));
+                break;
+            case 'orders':
+                filtered.sort((a, b) => (parseInt(b.order_count) || 0) - (parseInt(a.order_count) || 0));
+                break;
+            case 'likes':
+                filtered.sort((a, b) => (parseInt(b.like_count) || 0) - (parseInt(a.like_count) || 0));
+                break;
             case 'popular':
-                // Sort by stock quantity (assuming popular items have lower stock)
-                filtered.sort((a, b) => a.so_luong_ton - b.so_luong_ton);
+                // Popularity score order
+                filtered.sort((a, b) => {
+                    const scoreA = (parseInt(a.order_count) || 0) * 30 + (parseInt(a.click_count) || 0) * 20 + (parseInt(a.view_count) || 0) * 15 + (parseInt(a.like_count) || 0) * 15 + (parseFloat(a.avg_rating) || 0) * 4;
+                    const scoreB = (parseInt(b.order_count) || 0) * 30 + (parseInt(b.click_count) || 0) * 20 + (parseInt(b.view_count) || 0) * 15 + (parseInt(b.like_count) || 0) * 15 + (parseFloat(b.avg_rating) || 0) * 4;
+                    return scoreB - scoreA;
+                });
                 break;
         }
     }
@@ -295,7 +316,7 @@ function renderMenuProducts() {
                 </div>
                 
                 <!-- Favorite Button -->
-                <button class="favorite-btn absolute top-3 right-3 bg-white w-11 h-11 rounded-full flex items-center justify-center text-gray-600 shadow-lg hover:shadow-xl">
+                <button onclick="event.preventDefault(); toggleLike(${product.ma_mon}, this)" class="favorite-btn absolute top-3 right-3 bg-white w-11 h-11 rounded-full flex items-center justify-center text-gray-600 shadow-lg hover:shadow-xl z-10 transition">
                     <i class="far fa-heart text-lg"></i>
                 </button>
             </div>
@@ -315,12 +336,14 @@ function renderMenuProducts() {
                     ${product.mo_ta_chi_tiet || 'Món ăn đặc sắc, hương vị đậm đà'}
                 </p>
                 
-                <!-- Rating -->
-                <div class="flex items-center mb-3">
-                    <div class="text-yellow-400 text-sm">
-                        ${generateStars(Number(product.avg_rating) || 0)}
+                <!-- Rating & Stats -->
+                <div class="flex flex-wrap items-center gap-y-1 gap-x-2 text-[11px] text-gray-500 mb-3 font-medium">
+                    <div class="flex items-center">
+                        <div class="text-yellow-400 text-xs flex mr-1">
+                            ${generateStars(Number(product.avg_rating) || 0)}
+                        </div>
+                        <span class="text-gray-700 font-bold">${Number(product.avg_rating || 0).toFixed(1)}</span>
                     </div>
-                    <span class="text-gray-500 text-sm ml-2 font-medium">(${Number(product.total_reviews) || 0})</span>
                 </div>
                 
                 <!-- Spacer to push Price & Action to bottom -->
@@ -534,30 +557,15 @@ function setupPriceFilters() {
     });
 }
 
-// Setup sort buttons
-function setupSortButtons() {
-    const sortButtons = document.querySelectorAll('[data-sort]');
-    
-    sortButtons.forEach((button) => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            sortButtons.forEach(btn => btn.classList.remove('bg-orange-600', 'text-white', 'border-orange-600'));
-            
-            // Add active class to clicked button
-            this.classList.add('bg-orange-600', 'text-white', 'border-orange-600');
-            
-            sortBy = this.dataset.sort;
-            applyFiltersAndSort();
-            renderMenuProducts();
-            renderPagination();
-            
-            // Update mobile dropdown
-            const mobileSort = document.getElementById('mobile-sort');
-            if (mobileSort) {
-                mobileSort.value = sortBy;
-            }
+// Setup Sort Select
+function setupSortSelect() {
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            sortBy = this.value;
+            fetchMenuProducts(selectedCategory);
         });
-    });
+    }
 }
 
 // Setup apply filter button
@@ -793,23 +801,11 @@ function setupMobileSort() {
     }
 }
 
-// Add to cart function
-function addToCart(ma_mon, so_luong = 1) {
-    if (typeof cartManager !== 'undefined') {
-        cartManager.addToCart(ma_mon, so_luong);
-    } else {
-        console.warn('CartManager not loaded yet');
-        // Fallback notification
-        alert('Giỏ hàng chưa sẵn sàng. Vui lòng thử lại sau.');
-    }
-}
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     fetchCategories();
     fetchMenuProducts();
     setupPriceFilters();
-    // setupSortButtons();
     setupApplyFilterButton();
     setupSearch();
     setupMobileFilter();
@@ -830,15 +826,6 @@ async function loadRecommendedProducts() {
             if (recs && recs.length > 0) {
                 recommendedProducts = recs;
                 console.log('✨ [Personalization] Loaded recommendations for menu:', recommendedProducts.length);
-                console.log('📊 [Personalization] Top 5 recommendations:', 
-                    recommendedProducts.slice(0, 5).map(r => ({
-                        id: r.ma_mon,
-                        name: r.ten_mon,
-                        type: r.recommendation_type,
-                        score: r.score,
-                        reason: r.reason
-                    }))
-                );
                 
                 // Render lại bộ lọc danh mục và món ăn để cập nhật badge/reason
                 renderCategoryFilters();
@@ -852,5 +839,60 @@ async function loadRecommendedProducts() {
         }
     } catch (err) {
         console.error('Lỗi tải gợi ý cá nhân hóa cho thực đơn:', err);
+    }
+}
+
+// Add to cart function
+function addToCart(ma_mon, so_luong = 1) {
+    if (typeof cartManager !== 'undefined') {
+        cartManager.addToCart(ma_mon, so_luong);
+    } else {
+        console.warn('CartManager not loaded yet');
+        // Fallback notification
+        alert('Giỏ hàng chưa sẵn sàng. Vui lòng thử lại sau.');
+    }
+}
+
+// Toggle Like
+async function toggleLike(dishId, btnElement) {
+    try {
+        const icon = btnElement.querySelector('i');
+        const isLiked = icon.classList.contains('fas');
+        
+        // Cập nhật UI ngay lập tức
+        if (isLiked) {
+            icon.classList.remove('fas', 'text-red-500');
+            icon.classList.add('far', 'text-gray-600');
+            btnElement.classList.remove('bg-red-50');
+        } else {
+            icon.classList.remove('far', 'text-gray-600');
+            icon.classList.add('fas', 'text-red-500');
+            btnElement.classList.add('bg-red-50');
+            
+            // Animation
+            icon.style.transform = 'scale(1.3)';
+            setTimeout(() => icon.style.transform = 'scale(1)', 200);
+            
+            // Show toast
+            if (typeof window.showToast === 'function') {
+                window.showToast('Đã lưu vào danh sách yêu thích!', 'success');
+            }
+        }
+        
+        // Gọi API lưu hành vi
+        await fetch(`${window.API_URL}/recommendations/track`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            },
+            body: JSON.stringify({
+                dish_id: dishId,
+                action: 'like'
+            })
+        });
+        
+    } catch (error) {
+        console.error('Lỗi toggle like:', error);
     }
 }

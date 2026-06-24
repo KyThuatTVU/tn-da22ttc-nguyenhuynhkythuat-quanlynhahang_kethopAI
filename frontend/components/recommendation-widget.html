@@ -97,6 +97,8 @@
     </div>
 </div>
 
+
+
 <script>
 // Load gợi ý cho giỏ hàng
 async function loadCartRecommendations() {
@@ -204,15 +206,15 @@ async function loadMenuRecommendations() {
             return;
         }
         
+        // Tải gợi ý tổng hợp
         const recommendations = await RecommendationSystem.getRecommendations(8);
         
-        if (recommendations.length === 0) {
+        if (recommendations.length > 0) {
+            container.classList.remove('hidden');
+            RecommendationSystem.renderList(recommendations, 'menu-recommendations-grid');
+        } else {
             container.classList.add('hidden');
-            return;
         }
-        
-        container.classList.remove('hidden');
-        RecommendationSystem.renderList(recommendations, 'menu-recommendations-grid');
         
     } catch (error) {
         console.error('Error loading menu recommendations:', error);

@@ -43,6 +43,22 @@ const RecommendationSystem = {
     },
     
     /**
+     * Lấy gợi ý món mới ra mắt (≤ 30 ngày) phù hợp khẩu vị
+     */
+    async getNewDishes(limit = 5) {
+        try {
+            const response = await fetch(`${this.API_BASE}/new-dishes?limit=${limit}&t=${Date.now()}`, {
+                headers: this.getAuthHeader()
+            });
+            const result = await response.json();
+            return result.success ? result.data : [];
+        } catch (error) {
+            console.error('Error fetching new dishes:', error);
+            return [];
+        }
+    },
+    
+    /**
      * Lấy gợi ý món kèm theo (cho giỏ hàng)
      */
     async getPairingRecommendations(dishIds) {
@@ -182,7 +198,16 @@ const RecommendationSystem = {
                     <a href="chitietmonan.html?id=${dish.ma_mon}">
                         <h3 class="font-medium text-sm mb-1 text-gray-800 hover:text-orange-600 transition line-clamp-1">${dish.ten_mon}</h3>
                     </a>
-                    ${dish.reason ? `<p class="text-xs text-gray-500 mb-2 line-clamp-1">${dish.reason}</p>` : ''}
+                    ${dish.reason ? `<p class="text-xs text-gray-500 mb-1 line-clamp-1">${dish.reason}</p>` : ''}
+                    
+                    <!-- Stats line -->
+                    <div class="flex items-center gap-x-1 text-[9px] text-gray-500 mb-2 font-medium">
+                        <span class="text-yellow-400 flex items-center gap-0.5">
+                            <i class="fas fa-star text-[8px]"></i>${rating}
+                        </span>
+                    <!-- Ẩn thống kê -->
+                    </div>
+
                     <div class="flex items-center justify-between">
                         <span class="text-orange-600 font-bold text-sm">${price}đ</span>
                         <button onclick="event.preventDefault(); event.stopPropagation(); addToCartFromRecommendation(${dish.ma_mon}, '${dish.ten_mon.replace(/'/g, "\\'")}', ${priceValue}, '${imageUrl}')"
