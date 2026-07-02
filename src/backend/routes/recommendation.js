@@ -5,7 +5,7 @@ const db = require('../config/database');
 const axios = require('axios');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-const PYTHON_API_URL = process.env.PYTHON_ML_URL || 'http://localhost:5000/api/ml/recommend/collaborative';
+const PYTHON_API_URL = process.env.PYTHON_ML_URL || 'http://localhost:5000/api/ml/recommend/hybrid';
 const PYTHON_APRIORI_URL = process.env.PYTHON_APRIORI_URL || 'http://localhost:5000/api/ml/recommend/apriori';
 
 // ==================== ML RECOMMENDATION ENGINE ====================
@@ -240,14 +240,14 @@ async function findSimilarUsers(userId, limit = 5) {
  * Gợi ý món từ người dùng tương tự (Collaborative Filtering - HYBRID WITH PYTHON)
  * CẢI TIẾN: Đưa số sao vào vector sở thích để tăng độ chính xác
  */
-async function getCollaborativeRecommendations(userId, limit = 5) {
+async function getCollaborativeRecommendations(userId, limit = 5, searchKeyword = '') {
     try {
         let mlRecommendations = [];
         
         // 1. Gọi Python ML Service (SVD)
         try {
             const pythonResponse = await axios.get(PYTHON_API_URL, {
-                params: { user_id: userId, limit: limit },
+                params: { user_id: userId, limit: limit, keyword: searchKeyword },
                 timeout: 3000 // Tối đa 3 giây gọi API 
             });
 

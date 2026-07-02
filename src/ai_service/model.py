@@ -53,8 +53,13 @@ def train_collaborative_model():
         matrix = df.pivot(index='user_id', columns='item_id', values='rating').fillna(0)
         
         # Chạy SVD (Singular Value Decomposition) giảm chiều dữ liệu
+        # Cần ít nhất 2 users và 2 items để mô hình có ý nghĩa và tránh lỗi n_components không hợp lệ
+        if matrix.shape[0] < 2 or matrix.shape[1] < 2:
+            print("⚠️ Dữ liệu chưa đủ để train SVD (cần ít nhất 2 users và 2 items).")
+            return False
+
         n_components = min(20, matrix.shape[1] - 1) # Tối đa n_components chiều
-        n_components = max(2, n_components) # Ít nhất 2 thành phần
+        n_components = max(1, n_components) # Ít nhất 1 thành phần hợp lệ
         
         svd = TruncatedSVD(n_components=n_components, random_state=42)
         matrix_svd = svd.fit_transform(matrix) # User Matrix M x k
