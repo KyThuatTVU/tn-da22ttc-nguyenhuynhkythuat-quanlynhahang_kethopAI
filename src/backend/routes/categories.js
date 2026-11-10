@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
 // Lấy tất cả danh mục
 router.get('/', async (req, res) => {
@@ -29,7 +30,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Thêm danh mục mới
-router.post('/', async (req, res) => {
+router.post('/', requireManagerOrAdmin, async (req, res) => {
     try {
         const { ten_danh_muc, mo_ta, trang_thai } = req.body;
         if (!ten_danh_muc) {
@@ -52,7 +53,7 @@ router.post('/', async (req, res) => {
 });
 
 // Cập nhật danh mục
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         const { ten_danh_muc, mo_ta, trang_thai } = req.body;
         const { id } = req.params;
@@ -73,7 +74,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Xóa danh mục (Xóa cứng hoặc mềm tùy nhu cầu, ở đây tôi dùng xóa cứng nhưng khuyến cáo nên kiểm tra món ăn trước)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 

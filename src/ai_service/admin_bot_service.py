@@ -1,4 +1,4 @@
-﻿import os
+import os
 from langchain_community.utilities import SQLDatabase
 from langchain_groq import ChatGroq
 from langchain_classic.chains import create_sql_query_chain
@@ -24,7 +24,8 @@ db_uri = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS_ENCODED}@{DB_HOST}/{DB_NAME
 
 try:
     db = SQLDatabase.from_uri(db_uri)
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, groq_api_key=GROQ_API_KEY)
+    groq_model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+    llm = ChatGroq(model=groq_model, temperature=0, groq_api_key=GROQ_API_KEY)
     
     # Create the SQL Agent
     # This agent can see the table schemas, generate queries, execute them, and answer.

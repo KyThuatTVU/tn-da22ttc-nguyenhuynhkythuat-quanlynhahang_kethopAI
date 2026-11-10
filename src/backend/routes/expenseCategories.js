@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const expenseCategoryController = require('../controllers/expenseCategoryController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireManagerOrAdmin);
 
 // Lấy danh sách loại chi phí
 router.get('/', expenseCategoryController.getCategories);

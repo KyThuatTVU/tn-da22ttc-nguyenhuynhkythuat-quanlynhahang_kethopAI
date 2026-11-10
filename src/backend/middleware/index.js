@@ -7,6 +7,7 @@ const corsMiddleware = require('./cors');
 const { adminSessionMiddleware, staffSessionMiddleware } = require('./session');
 const loggerMiddleware = require('./logger');
 const { notFoundHandler, errorHandler } = require('./errorHandler');
+const { apiLimiter, authLimiter, otpLimiter, publicWriteLimiter } = require('./rateLimit');
 
 module.exports = {
     corsMiddleware,
@@ -14,5 +15,9 @@ module.exports = {
     staffSessionMiddleware,
     loggerMiddleware,
     notFoundHandler,
-    errorHandler
+    errorHandler,
+    apiLimiter,
+    authLimiter,
+    otpLimiter,
+    publicWriteLimiter
 };

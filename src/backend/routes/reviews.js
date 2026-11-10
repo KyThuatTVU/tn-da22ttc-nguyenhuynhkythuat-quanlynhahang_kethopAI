@@ -6,12 +6,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { createAdminNotification } = require('./admin-notifications');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+const { publicWriteLimiter } = require('../middleware/rateLimit');
 const {
   processReviewPreference,
   removeReviewPreference
 } = require('../services/preferenceService');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
 
 async function syncReviewPreference(reviewId) {
   try {
@@ -229,7 +231,7 @@ router.get('/check/:productId', authenticateToken, async (req, res) => {
 });
 
 // Thêm bình luận mới với ảnh (yêu cầu đăng nhập VÀ đã mua sản phẩm)
-router.post('/', authenticateToken, (req, res) => {
+router.post('/', publicWriteLimiter, authenticateToken, (req, res) => {
   uploadReviewImages(req, res, async function (err) {
     try {
       if (err instanceof multer.MulterError) {
@@ -428,7 +430,7 @@ router.get('/my-review/:productId', authenticateToken, async (req, res) => {
 // ==================== ADMIN ROUTES ====================
 
 // Lấy tất cả đánh giá (Admin) - bao gồm số lượng replies
-router.get('/admin/all', async (req, res) => {
+router.get('/admin/all', requireManagerOrAdmin, async (req, res) => {
   try {
     const { status, search, product_id } = req.query;
     
@@ -529,7 +531,7 @@ router.get('/admin/all', async (req, res) => {
 });
 
 // Cập nhật trạng thái đánh giá (Admin - duyệt/khóa)
-router.put('/admin/:reviewId/status', async (req, res) => {
+router.put('/admin/:reviewId/status', requireManagerOrAdmin, async (req, res) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
     const { trang_thai } = req.body;
@@ -556,7 +558,7 @@ router.put('/admin/:reviewId/status', async (req, res) => {
 });
 
 // Xóa đánh giá (Admin)
-router.delete('/admin/:reviewId', async (req, res) => {
+router.delete('/admin/:reviewId', requireManagerOrAdmin, async (req, res) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
 
@@ -589,7 +591,7 @@ router.delete('/admin/:reviewId', async (req, res) => {
 });
 
 // Xóa nhiều đánh giá (Admin)
-router.post('/admin/bulk-delete', async (req, res) => {
+router.post('/admin/bulk-delete', requireManagerOrAdmin, async (req, res) => {
   try {
     const { ids } = req.body;
 
@@ -627,7 +629,7 @@ router.post('/admin/bulk-delete', async (req, res) => {
 });
 
 // Cập nhật trạng thái nhiều đánh giá (Admin)
-router.post('/admin/bulk-status', async (req, res) => {
+router.post('/admin/bulk-status', requireManagerOrAdmin, async (req, res) => {
   try {
     const { ids, trang_thai } = req.body;
 
@@ -654,7 +656,7 @@ router.post('/admin/bulk-status', async (req, res) => {
 });
 
 // Admin trả lời đánh giá sản phẩm (Cho phép nhiều replies)
-router.post('/:reviewId/reply', async (req, res) => {
+router.post('/:reviewId/reply', requireManagerOrAdmin, async (req, res) => {
     try {
         // Kiểm tra admin đăng nhập
         if (!req.session || !req.session.admin) {
@@ -762,7 +764,7 @@ router.get('/:reviewId/replies', async (req, res) => {
 });
 
 // Xóa trả lời của admin
-router.delete('/replies/:replyId', async (req, res) => {
+router.delete('/replies/:replyId', requireManagerOrAdmin, async (req, res) => {
     try {
         // Kiểm tra admin đăng nhập
         if (!req.session || !req.session.admin) {

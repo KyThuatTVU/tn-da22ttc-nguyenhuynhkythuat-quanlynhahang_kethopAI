@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const payrollController = require('../controllers/payrollController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireManagerOrAdmin);
 
 // Quản lý lương
 router.get('/', payrollController.getPayrollReports);

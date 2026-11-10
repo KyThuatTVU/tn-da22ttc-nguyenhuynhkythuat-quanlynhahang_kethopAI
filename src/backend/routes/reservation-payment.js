@@ -47,7 +47,7 @@ const authenticateToken = (req, res, next) => {
 
     try {
         const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+        const JWT_SECRET = require('../config/secrets').jwtSecret;
         jwt.verify(token, JWT_SECRET, (err, user) => {
             if (err) {
                 return res.status(403).json({
@@ -224,14 +224,29 @@ router.post('/confirm-payment', authenticateToken, async (req, res) => {
             });
         }
 
-        // Demo mode: Không kiểm tra hết hạn QR code
-        // Khi người dùng bấm "Đã thanh toán" thì ghi nhận ngay
+        // Xác nhận thủ công chỉ được bật tường minh cho môi trường demo.
+        // Mặc định phải xác minh qua cổng thanh toán.
+        if (process.env.ALLOW_MANUAL_PAYMENT_CONFIRM !== 'true') {
+            await connection.rollback();
+            return res.status(403).json({
+                success: false,
+                message: 'Không thể xác nhận thanh toán thủ công. Vui lòng hoàn tất thanh toán qua cổng.'
+            });
+        }
+
+        if (payment.thoi_gian_het_han && new Date(payment.thoi_gian_het_han) < new Date()) {
+            await connection.rollback();
+            return res.status(400).json({
+                success: false,
+                message: 'Mã QR thanh toán đã hết hạn'
+            });
+        }
 
         // Cập nhật trạng thái thanh toán
         await connection.query(
             `UPDATE thanh_toan_dat_ban 
              SET trang_thai = 'paid', thoi_gian_thanh_toan = NOW()
-             WHERE ma_dat_ban = ?`,
+             WHERE ma_dat_ban = ? AND trang_thai = 'pending'`,
             [ma_dat_ban]
         );
 

@@ -92,6 +92,22 @@ const swiper = new Swiper(".mySwiper", {
                         }
                         const imageUrl = imagePath.startsWith('http') ? imagePath : `http://localhost:3000${imagePath}`;
                         const price = new Intl.NumberFormat('vi-VN').format(dish.gia_tien);
+                        
+                        // Gán nhãn thuật toán gợi ý (Badge)
+                        let badgeHTML = '';
+                        if (dish.recommendation_type === 'collaborative') {
+                            badgeHTML = `<span class="absolute top-3 left-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1 z-10"><i class="fas fa-users text-[10px]"></i>Khách cùng gu</span>`;
+                        } else if (dish.recommendation_type === 'content_based') {
+                            badgeHTML = `<span class="absolute top-3 left-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1 z-10"><i class="fas fa-heart text-[10px]"></i>Hợp khẩu vị</span>`;
+                        } else if (dish.recommendation_type === 'chat_based') {
+                            badgeHTML = `<span class="absolute top-3 left-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1 z-10"><i class="fas fa-comment-dots text-[10px]"></i>Từ Chatbot</span>`;
+                        } else {
+                            badgeHTML = `<span class="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1 z-10"><i class="fas fa-fire text-[10px]"></i>Thịnh hành</span>`;
+                        }
+
+                        const reasonHTML = dish.reason 
+                            ? `<p class="text-xs text-orange-600 font-medium mb-1 truncate flex items-center gap-1" title="${dish.reason}"><i class="fas fa-sparkles text-[10px]"></i>${dish.reason}</p>`
+                            : '';
 
                         return `
                             <div class="card-3d-container">
@@ -102,12 +118,14 @@ const swiper = new Swiper(".mySwiper", {
                                             <img src="${imageUrl}" alt="${dish.ten_mon}"
                                                 class="w-full h-48 sm:h-56 md:h-64 object-cover"
                                                 onerror="this.src='images/default-food.jpg'">
+                                            ${badgeHTML}
                                         </div>
                                     </a>
                                     <div class="p-3 sm:p-4">
                                         <a href="/chitietmonan/?id=${dish.ma_mon}">
-                                            <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
+                                            <h3 class="font-medium text-base sm:text-lg mb-1 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
                                         </a>
+                                        ${reasonHTML}
                                         <div class="flex items-center mb-2">
                                             <div class="text-yellow-400 text-xs sm:text-sm">
                                                 ${renderStarsHome(Number(dish.avg_rating) || 0)}

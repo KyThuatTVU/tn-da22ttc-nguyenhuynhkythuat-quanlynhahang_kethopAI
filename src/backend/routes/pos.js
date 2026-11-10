@@ -5,6 +5,9 @@
 const express = require('express');
 const router = express.Router();
 const posController = require('../controllers/posController');
+const { requireStaffOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireStaffOrAdmin);
 
 // Tạo đơn hàng từ POS
 router.post('/orders', posController.createPOSOrder);

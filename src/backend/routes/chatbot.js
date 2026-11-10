@@ -5,8 +5,9 @@ const db = require('../config/database');
 const OpenAI = require('openai');
 const { analyzeUserIntent, extractFoodSearchTerms, getCartByUserId } = require('../graphql');
 const axios = require('axios');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
 
 // Khá»Ÿi táº¡o Groq AI client
 const groq = new OpenAI({
@@ -14,8 +15,10 @@ const groq = new OpenAI({
     baseURL: 'https://api.groq.com/openai/v1'
 });
 
+const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
 console.log('ðŸ¤– Chatbot using: Groq (Free) + GraphQL');
-console.log('ðŸ”‘ Groq API Key:', process.env.GROQ_API_KEY ? 'âœ… Configured (***' + process.env.GROQ_API_KEY.slice(-8) + ')' : 'âŒ NOT SET');
+console.log('Groq API Key:', process.env.GROQ_API_KEY ? 'da cau hinh' : 'chua cau hinh');
 
 // Cache
 let settingsCache = { data: null, lastUpdate: 0 };
@@ -565,7 +568,7 @@ async function chatbotGetOrders(ma_nguoi_dung, limit = 5) {
 
 // ==================== API TEST ====================
 
-router.get('/test-data', async (req, res) => {
+router.get('/test-data', requireManagerOrAdmin, async (req, res) => {
     try {
         const [settings] = await db.query('SELECT * FROM cai_dat');
         const settingsObj = {};
@@ -774,6 +777,7 @@ async function generateLocalFallbackResponse(graphqlContext, message, settings, 
 }
 
 router.post('/chat', async (req, res) => {
+    let message = (req.body && req.body.message) ? req.body.message : '';
     let graphqlContext = null;
     let settings = null;
     let ma_nguoi_dung = null;
@@ -781,7 +785,7 @@ router.post('/chat', async (req, res) => {
     let cartResult = null;
     
     try {
-        const { message, session_id } = req.body;
+        const { session_id } = req.body;
         
         if (!message || message.trim() === '') {
             return res.status(400).json({ success: false, message: 'Vui long nhap tin nhan' });
@@ -838,7 +842,7 @@ router.post('/chat', async (req, res) => {
                 : `\nGiá» hÃ ng cá»§a khÃ¡ch Ä‘ang trá»‘ng. HÃ£y gá»£i Ã½ má»™t vÃ i mÃ³n Äƒn ngon cho khÃ¡ch.`;
             
             const completion = await groq.chat.completions.create({
-                model: 'llama-3.1-8b-instant',
+                model: GROQ_MODEL,
                 messages: [
                     { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + cartPrompt },
                     { role: 'user', content: message }
@@ -870,7 +874,7 @@ router.post('/chat', async (req, res) => {
                 : `\nKhÃ¡ch chÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o. Gá»£i Ã½ khÃ¡ch xem thá»±c Ä‘Æ¡n vÃ  Ä‘áº·t hÃ ng.`;
 
             const completion = await groq.chat.completions.create({
-                model: 'llama-3.1-8b-instant',
+                model: GROQ_MODEL,
                 messages: [
                     { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + orderPrompt },
                     { role: 'user', content: message }
@@ -916,7 +920,7 @@ router.post('/chat', async (req, res) => {
             actionPrompt += `\nHÃ£y xÃ¡c nháº­n Ä‘Ã£ thÃªm mÃ³n vÃ o giá» hÃ ng vÃ  há»i khÃ¡ch muá»‘n Ä‘áº·t hÃ ng hay thÃªm mÃ³n gÃ¬ khÃ¡c. Ngáº¯n gá»n, thÃ¢n thiá»‡n.`;
 
             const completion = await groq.chat.completions.create({
-                model: 'llama-3.1-8b-instant',
+                model: GROQ_MODEL,
                 messages: [
                     { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + actionPrompt },
                     { role: 'user', content: message }
@@ -972,7 +976,7 @@ router.post('/chat', async (req, res) => {
             suggestPrompt += '\n\nHÆ°á»›ng dáº«n: "Chá»‰ cáº§n nÃ³i: Ä‘áº·t 2 pháº§n phá»Ÿ bÃ², 1 cÆ¡m táº¥m lÃ  em thÃªm vÃ o giá» hÃ ng liá»n áº¡!"';
 
             const completion = await groq.chat.completions.create({
-                model: 'llama-3.1-8b-instant',
+                model: GROQ_MODEL,
                 messages: [
                     { role: 'system', content: systemPromptBase(tenNhaHang, diaChi, soDienThoai, email, website, gioMoCuaT2T6, gioMoCuaT7CN, phiGiaoHang, mienPhiGiaoHangTu, ragContext) + suggestPrompt },
                     { role: 'user', content: message }
@@ -1043,7 +1047,7 @@ router.post('/chat', async (req, res) => {
 
         // Goi Groq AI
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.1-8b-instant',
+            model: GROQ_MODEL,
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: message }
@@ -1447,7 +1451,7 @@ router.get('/order/history', async (req, res) => {
 
 // ==================== SESSION & HISTORY ====================
 
-router.get('/sessions', async (req, res) => {
+router.get('/sessions', requireManagerOrAdmin, async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) return res.status(401).json({ success: false, message: 'Vui long dang nhap' });
@@ -1471,7 +1475,7 @@ router.get('/sessions', async (req, res) => {
     }
 });
 
-router.get('/history', async (req, res) => {
+router.get('/history', requireManagerOrAdmin, async (req, res) => {
     try {
         const ma_nguoi_dung = getUserFromToken(req);
         if (!ma_nguoi_dung) return res.status(401).json({ success: false, message: 'Vui long dang nhap' });
@@ -1486,7 +1490,7 @@ router.get('/history', async (req, res) => {
     }
 });
 
-router.get('/history/:session_id', async (req, res) => {
+router.get('/history/:session_id', requireManagerOrAdmin, async (req, res) => {
     try {
         const [history] = await db.query(
             'SELECT ma_tin_nhan, nguoi_gui, noi_dung, thoi_diem_chat FROM lich_su_chatbot WHERE session_id = ? ORDER BY thoi_diem_chat ASC',
@@ -1500,7 +1504,7 @@ router.get('/history/:session_id', async (req, res) => {
 
 // ==================== ADMIN ====================
 
-router.get('/admin/stats', async (req, res) => {
+router.get('/admin/stats', requireManagerOrAdmin, async (req, res) => {
     try {
         const [totalMsg] = await db.query('SELECT COUNT(*) as count FROM lich_su_chatbot');
         const [totalSessions] = await db.query('SELECT COUNT(DISTINCT session_id) as count FROM lich_su_chatbot WHERE session_id IS NOT NULL');
@@ -1519,7 +1523,7 @@ router.get('/admin/stats', async (req, res) => {
     }
 });
 
-router.get('/admin/history', async (req, res) => {
+router.get('/admin/history', requireManagerOrAdmin, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
@@ -1545,7 +1549,7 @@ router.get('/admin/history', async (req, res) => {
     }
 });
 
-router.get('/admin/session/:session_id', async (req, res) => {
+router.get('/admin/session/:session_id', requireManagerOrAdmin, async (req, res) => {
     try {
         const [messages] = await db.query(
             'SELECT l.*, n.ten_nguoi_dung, n.email FROM lich_su_chatbot l LEFT JOIN nguoi_dung n ON l.ma_nguoi_dung = n.ma_nguoi_dung WHERE l.session_id = ? ORDER BY l.thoi_diem_chat ASC',
@@ -1558,7 +1562,7 @@ router.get('/admin/session/:session_id', async (req, res) => {
 });
 
 // API cho user load lá»‹ch sá»­ chat cá»§a session hiá»‡n táº¡i (khÃ´ng cáº§n admin)
-router.get('/history/:session_id', async (req, res) => {
+router.get('/history/:session_id', requireManagerOrAdmin, async (req, res) => {
     try {
         const sessionId = req.params.session_id;
         
@@ -1580,7 +1584,7 @@ router.get('/history/:session_id', async (req, res) => {
     }
 });
 
-router.delete('/admin/message/:id', async (req, res) => {
+router.delete('/admin/message/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         await db.query('DELETE FROM lich_su_chatbot WHERE ma_tin_nhan = ?', [req.params.id]);
         res.json({ success: true, message: 'Da xoa' });

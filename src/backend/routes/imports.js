@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const importController = require('../controllers/importController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireManagerOrAdmin);
 
 // Routes for Import Receipts (Phiếu nhập hàng)
 router.get('/', importController.getImportReceipts);

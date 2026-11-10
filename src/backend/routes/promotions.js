@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
 // Middleware kiểm tra admin
 const requireAdmin = (req, res, next) => {
@@ -93,7 +94,7 @@ router.post('/apply', async (req, res) => {
 
 
 // Su dung ma khuyen mai
-router.post('/use', async (req, res) => {
+router.post('/use', requireManagerOrAdmin, async (req, res) => {
   try {
     const { ma_khuyen_mai } = req.body;
     await db.query(

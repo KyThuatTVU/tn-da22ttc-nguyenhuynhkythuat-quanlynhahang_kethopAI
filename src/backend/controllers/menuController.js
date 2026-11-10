@@ -171,7 +171,7 @@ const getTopSelling = async (req, res) => {
         if (token) {
             try {
                 const jwt = require('jsonwebtoken');
-                const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+                const JWT_SECRET = require('../config/secrets').jwtSecret;
                 const decoded = jwt.verify(token, JWT_SECRET);
                 userId = decoded.ma_nguoi_dung;
             } catch (err) {

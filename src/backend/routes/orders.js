@@ -56,7 +56,7 @@ const authenticateToken = (req, res, next) => {
 
     try {
         const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+        const JWT_SECRET = require('../config/secrets').jwtSecret;
         jwt.verify(token, JWT_SECRET, (err, user) => {
             if (err) {
                 return res.status(403).json({

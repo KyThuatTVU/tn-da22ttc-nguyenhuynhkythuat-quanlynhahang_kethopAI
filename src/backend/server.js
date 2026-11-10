@@ -1,7 +1,11 @@
-const express = require('express');
 const path = require('path');
-const passport = require('./config/passport');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+const express = require('express');
+const helmet = require('helmet');
+const jwt = require('jsonwebtoken');
+const { jwtSecret } = require('./config/secrets');
+const passport = require('./config/passport');
 
 // GraphQL imports
 const { ApolloServer } = require('@apollo/server');
@@ -15,13 +19,23 @@ const {
     staffSessionMiddleware,
     loggerMiddleware,
     notFoundHandler,
-    errorHandler
+    errorHandler,
+    apiLimiter,
+    authLimiter,
+    otpLimiter
 } = require('./middleware');
+const { requireStaffOrAdmin } = require('./middleware/auth.middleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ==================== MIDDLEWARE ====================
+
+// Security headers (CSP tắt tạm thời vì frontend dùng CDN và inline script)
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+}));
 
 // CORS middleware
 app.use(corsMiddleware);
@@ -34,6 +48,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(adminSessionMiddleware);  // Cookie: admin.sid
 app.use(staffSessionMiddleware);  // Cookie: staff.sid
 
+// Rate limiting
+app.use('/api', apiLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/admin-auth/login', authLimiter);
+app.use('/api/staff/login', authLimiter);
+app.use([
+    '/api/auth/send-verification',
+    '/api/auth/resend-verification',
+    '/api/auth/forgot-password',
+    '/api/auth/verify-email',
+    '/api/auth/verify-reset-code',
+    '/api/auth/reset-password'
+], otpLimiter);
+
 // Debug/Logger middleware
 app.use(loggerMiddleware);
 
@@ -43,9 +71,9 @@ app.use(passport.session());
 
 // Static files middleware
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/staff', requireStaffOrAdmin, express.static(path.join(__dirname, 'uploads/staff')));
 app.use('/uploads/wastage', express.static(path.join(__dirname, 'uploads/wastage')));
-app.use('/uploads/staff', express.static(path.join(__dirname, 'uploads/staff')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '../frontend'), {
     setHeaders: (res, filePath) => {
         // Không cache HTML và JS để luôn lấy phiên bản mới nhất
@@ -63,16 +91,40 @@ async function startApolloServer() {
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
-        introspection: true, // Cho phép introspection trong development
+        introspection: process.env.NODE_ENV !== 'production',
+        formatError: (formattedError) => {
+            if (process.env.NODE_ENV !== 'production') {
+                return formattedError;
+            }
+            const extensions = { ...(formattedError.extensions || {}) };
+            delete extensions.stacktrace;
+            return { ...formattedError, extensions };
+        }
     });
     
     await apolloServer.start();
     
     app.use('/graphql', expressMiddleware(apolloServer, {
-        context: async ({ req }) => ({
-            req,
-            token: req.headers.authorization || ''
-        })
+        context: async ({ req }) => {
+            const header = req.headers.authorization || '';
+            const token = header.startsWith('Bearer ') ? header.slice(7) : '';
+            let user = null;
+
+            if (token) {
+                try {
+                    user = jwt.verify(token, jwtSecret);
+                } catch (error) {
+                    user = null;
+                }
+            }
+
+            return {
+                req,
+                token,
+                user,
+                session: req.session
+            };
+        }
     }));
     
     console.log('🚀 GraphQL endpoint: /graphql');
@@ -449,24 +501,6 @@ app.get('/', (req, res) => {
         version: '1.0.0'
     });
 });
-
-app.get('/api/test-db', async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT 1 + 1 AS result');
-        res.json({
-            success: true,
-            message: 'Kết nối database thành công!',
-            data: rows
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi kết nối database',
-            error: error.message
-        });
-    }
-});
-
 
 // ==================== API ROUTES ====================
 

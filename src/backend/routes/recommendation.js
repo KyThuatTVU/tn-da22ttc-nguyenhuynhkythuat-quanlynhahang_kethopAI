@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const axios = require('axios');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 const PYTHON_API_URL = process.env.PYTHON_ML_URL || 'http://localhost:5000/api/ml/recommend/collaborative';
 const PYTHON_APRIORI_URL = process.env.PYTHON_APRIORI_URL || 'http://localhost:5000/api/ml/recommend/apriori';
 
@@ -2259,7 +2260,7 @@ router.get('/like-status/:dishId', async (req, res) => {
  * API: Lấy thống kê sở thích người dùng (Admin)
  * GET /api/recommendations/admin/stats
  */
-router.get('/admin/stats', async (req, res) => {
+router.get('/admin/stats', requireManagerOrAdmin, async (req, res) => {
     try {
         // Kiểm tra quyền truy cập (Admin hoặc Staff)
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
@@ -2627,7 +2628,7 @@ router.get('/admin/stats', async (req, res) => {
  * POST /api/recommendations/admin/rebuild-preferences
  * CẢI TIẾN: Chạy cả rebuildAllChatbotPreferences() và rebuildAllReviewPreferences()
  */
-router.post('/admin/rebuild-preferences', async (req, res) => {
+router.post('/admin/rebuild-preferences', requireManagerOrAdmin, async (req, res) => {
     try {
         // Kiểm tra quyền truy cập (Admin hoặc Staff)
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
@@ -2675,7 +2676,7 @@ router.post('/admin/rebuild-preferences', async (req, res) => {
  * API: Lấy lịch sử click của người dùng
  * GET /api/recommendations/admin/user-click-history/:userId
  */
-router.get('/admin/user-click-history/:userId', async (req, res) => {
+router.get('/admin/user-click-history/:userId', requireManagerOrAdmin, async (req, res) => {
     try {
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -2705,7 +2706,7 @@ router.get('/admin/user-click-history/:userId', async (req, res) => {
  * API: Lấy chi tiết từ khóa và món ăn từ chatbot của người dùng
  * GET /api/recommendations/admin/chatbot-keywords/:userId
  */
-router.get('/admin/chatbot-keywords/:userId', async (req, res) => {
+router.get('/admin/chatbot-keywords/:userId', requireManagerOrAdmin, async (req, res) => {
     try {
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -2790,7 +2791,7 @@ router.get('/admin/chatbot-keywords/:userId', async (req, res) => {
 
 // === DEBUG: kiểm tra dữ liệu CF cho 1 user (mở ngoài để soi nhanh) ===
 // GET /api/recommendation/debug-cf?ten=Thuat
-router.get('/debug-cf', async (req, res) => {
+router.get('/debug-cf', requireManagerOrAdmin, async (req, res) => {
     try {
         const ten = req.query.ten || '';
 
@@ -2863,7 +2864,7 @@ router.get('/debug-cf', async (req, res) => {
  * API: Quản lý trọng số Phổ biến
  * GET/PUT /api/recommendations/admin/popularity-weights
  */
-router.get('/admin/popularity-weights', (req, res) => {
+router.get('/admin/popularity-weights', requireManagerOrAdmin, (req, res) => {
     try {
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -2874,7 +2875,7 @@ router.get('/admin/popularity-weights', (req, res) => {
     }
 });
 
-router.put('/admin/popularity-weights', express.json(), (req, res) => {
+router.put('/admin/popularity-weights', requireManagerOrAdmin, express.json(), (req, res) => {
     try {
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -2904,7 +2905,7 @@ router.put('/admin/popularity-weights', express.json(), (req, res) => {
  * API: Lấy dữ liệu minh họa cho thuật toán (Admin)
  * GET /api/recommendations/admin/algorithm-metrics
  */
-router.get('/admin/algorithm-metrics', async (req, res) => {
+router.get('/admin/algorithm-metrics', requireManagerOrAdmin, async (req, res) => {
     try {
         if ((!req.session || !req.session.admin) && (!req.session || !req.session.staff)) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });

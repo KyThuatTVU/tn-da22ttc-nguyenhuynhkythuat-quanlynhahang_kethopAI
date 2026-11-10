@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const attendanceController = require('../controllers/attendanceController');
+const { requireStaffOrAdmin, requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
-// Quản lý chấm công (Admin)
-router.get('/', attendanceController.getAttendanceRecords);
-router.post('/check-in-out', attendanceController.checkInOut);
-router.post('/manual', attendanceController.createManualAttendance);
-router.put('/:id', attendanceController.updateAttendanceRecord);
-router.delete('/:id', attendanceController.deleteAttendanceRecord);
+// Quản lý chấm công (Admin/Manager)
+router.get('/', requireStaffOrAdmin, attendanceController.getAttendanceRecords);
+router.post('/check-in-out', requireStaffOrAdmin, attendanceController.checkInOut);
+router.post('/manual', requireManagerOrAdmin, attendanceController.createManualAttendance);
+router.put('/:id', requireManagerOrAdmin, attendanceController.updateAttendanceRecord);
+router.delete('/:id', requireManagerOrAdmin, attendanceController.deleteAttendanceRecord);
 
 // Chấm công với ảnh (Staff - có auth)
 router.post('/checkin', attendanceController.upload.single('image'), attendanceController.checkInWithPhoto);

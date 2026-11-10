@@ -4,30 +4,45 @@
 
 const express = require('express');
 const router = express.Router();
+const db = require('../config/database');
 const staffController = require('../controllers/staffController');
 const permissionController = require('../controllers/permissionController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
 // Đăng nhập nhân viên
 router.post('/login', staffController.staffLogin);
 
 // Kiểm tra session nhân viên
 router.get('/check-session', (req, res) => {
-    // Không dùng session nữa, chỉ trả về message
+    const staff = req.session && req.session.staff;
+
+    if (!staff) {
+        return res.json({
+            success: false,
+            isAuthenticated: false
+        });
+    }
+
     res.json({
-        success: false,
-        isAuthenticated: false,
-        message: 'Sử dụng localStorage thay vì session'
+        success: true,
+        isAuthenticated: true,
+        data: staff
     });
 });
 
 // Đăng xuất nhân viên
 router.post('/logout', (req, res) => {
-    // Không cần xóa session, chỉ trả về success
+    if (req.session) {
+        delete req.session.staff;
+    }
     res.json({
         success: true,
-        message: 'Đăng xuất thành công (localStorage sẽ xóa ở client)'
+        message: 'Đăng xuất thành công'
     });
 });
+
+// Tất cả route bên dưới yêu cầu quyền quản lý hoặc admin
+router.use(requireManagerOrAdmin);
 
 // Lấy danh sách nhân viên
 router.get('/', staffController.getAllStaff);

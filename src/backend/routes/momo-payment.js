@@ -5,6 +5,24 @@ const axios = require('axios');
 const db = require('../config/database');
 const momoConfig = require('../config/momo');
 
+function signaturesMatch(received, calculated) {
+    const a = Buffer.from(String(received || ''));
+    const b = Buffer.from(String(calculated || ''));
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+function getRealOrderId(requestId) {
+    const match = String(requestId || '').match(/^(\d+)_/);
+    return match ? Number(match[1]) : null;
+}
+
+async function getOrderAmount(orderId) {
+    if (!orderId) return null;
+    const [rows] = await db.query('SELECT tong_tien FROM don_hang WHERE ma_don_hang = ?', [orderId]);
+    if (rows.length === 0) return null;
+    return Math.round(Number(rows[0].tong_tien));
+}
+
 // Middleware xác thực token
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -19,7 +37,7 @@ const authenticateToken = (req, res, next) => {
 
     try {
         const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+        const JWT_SECRET = require('../config/secrets').jwtSecret;
         jwt.verify(token, JWT_SECRET, (err, user) => {
             if (err) {
                 return res.status(403).json({
@@ -51,9 +69,6 @@ router.post('/momo/create-payment', authenticateToken, async (req, res) => {
             });
         }
 
-        // MoMo yêu cầu amount là số nguyên
-        const amount = Math.round(parseFloat(rawAmount));
-
         // Kiểm tra đơn hàng
         const [orderRows] = await db.query(
             'SELECT * FROM don_hang WHERE ma_don_hang = ? AND ma_nguoi_dung = ?',
@@ -64,6 +79,32 @@ router.post('/momo/create-payment', authenticateToken, async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Không tìm thấy đơn hàng'
+            });
+        }
+
+        const order = orderRows[0];
+
+        if (['cancelled', 'delivered'].includes(order.trang_thai)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Đơn hàng không thể thanh toán ở trạng thái hiện tại'
+            });
+        }
+
+        // Số tiền luôn lấy từ đơn hàng trong database, không tin client
+        const amount = Math.round(Number(order.tong_tien));
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Đơn hàng có số tiền không hợp lệ'
+            });
+        }
+
+        if (rawAmount !== undefined && Math.round(Number(rawAmount)) !== amount) {
+            return res.status(400).json({
+                success: false,
+                message: 'Số tiền thanh toán không khớp với đơn hàng'
             });
         }
 
@@ -213,28 +254,36 @@ router.get('/momo-return', async (req, res) => {
             .update(rawSignature)
             .digest('hex');
 
-        console.log('🔐 Signature Match:', signature === calculatedSignature);
+        if (signaturesMatch(signature, calculatedSignature)) {
+            const realOrderId = getRealOrderId(requestId);
+            const orderAmount = await getOrderAmount(realOrderId);
 
-        if (signature === calculatedSignature) {
-            // Lấy order ID từ requestId
-            const orderIdMatch = requestId.match(/^(\d+)_/);
-            const realOrderId = orderIdMatch ? orderIdMatch[1] : null;
+            if (orderAmount === null) {
+                return res.redirect(`/don-hang-cua-toi/?payment_failed=true&message=${encodeURIComponent('Không tìm thấy đơn hàng')}`);
+            }
+
+            if (Math.round(Number(amount)) !== orderAmount) {
+                console.error('❌ MoMo amount mismatch:', { orderId, amount, orderAmount });
+                return res.redirect(`/don-hang-cua-toi/?payment_failed=true&message=${encodeURIComponent('Số tiền thanh toán không khớp')}`);
+            }
 
             if (resultCode === '0') {
-                // Thanh toán thành công
-                await db.query(
+                // Thanh toán thành công (idempotent: chỉ cập nhật khi chưa success)
+                const [paymentResult] = await db.query(
                     `UPDATE thanh_toan 
                      SET trang_thai = 'success', 
                          thoi_gian_thanh_toan = NOW(),
                          thong_tin_them = ?
-                     WHERE ma_giao_dich = ?`,
+                     WHERE ma_giao_dich = ? AND trang_thai <> 'success'`,
                     [JSON.stringify({ transId, payType, message }), requestId]
                 );
 
-                await db.query(
-                    `UPDATE don_hang SET trang_thai = 'confirmed' WHERE ma_don_hang = ?`,
-                    [realOrderId]
-                );
+                if (paymentResult.affectedRows > 0) {
+                    await db.query(
+                        `UPDATE don_hang SET trang_thai = 'confirmed' WHERE ma_don_hang = ?`,
+                        [realOrderId]
+                    );
+                }
 
                 res.redirect(`/dat-hang-thanh-cong/?orderId=${realOrderId}&payment=momo&status=success`);
             } else {
@@ -404,28 +453,38 @@ router.post('/momo-ipn', async (req, res) => {
             .update(rawSignature)
             .digest('hex');
 
-        if (signature === calculatedSignature && resultCode === 0) {
-            // Lấy order ID từ requestId
-            const orderIdMatch = requestId.match(/^(\d+)_/);
-            const realOrderId = orderIdMatch ? orderIdMatch[1] : null;
+        if (!signaturesMatch(signature, calculatedSignature)) {
+            return res.status(200).json({ resultCode: 97, message: 'Invalid signature' });
+        }
 
-            // Cập nhật database
-            await db.query(
+        if (resultCode === 0) {
+            const realOrderId = getRealOrderId(requestId);
+            const orderAmount = await getOrderAmount(realOrderId);
+
+            if (orderAmount === null || Math.round(Number(amount)) !== orderAmount) {
+                console.error('❌ MoMo IPN amount mismatch:', { orderId, requestId, amount, orderAmount });
+                return res.status(200).json({ resultCode: 97, message: 'Amount mismatch' });
+            }
+
+            // Idempotent: IPN có thể được gọi lặp lại
+            const [paymentResult] = await db.query(
                 `UPDATE thanh_toan 
                  SET trang_thai = 'success', 
                      thoi_gian_thanh_toan = NOW()
-                 WHERE ma_giao_dich = ?`,
+                 WHERE ma_giao_dich = ? AND trang_thai <> 'success'`,
                 [requestId]
             );
 
-            await db.query(
-                `UPDATE don_hang SET trang_thai = 'confirmed' WHERE ma_don_hang = ?`,
-                [realOrderId]
-            );
+            if (paymentResult.affectedRows > 0) {
+                await db.query(
+                    `UPDATE don_hang SET trang_thai = 'confirmed' WHERE ma_don_hang = ?`,
+                    [realOrderId]
+                );
+            }
 
             res.status(200).json({ resultCode: 0, message: 'Success' });
         } else {
-            res.status(200).json({ resultCode: 97, message: 'Invalid signature' });
+            res.status(200).json({ resultCode: 0, message: 'Acknowledged' });
         }
     } catch (error) {
         console.error('❌ Lỗi IPN MoMo:', error);

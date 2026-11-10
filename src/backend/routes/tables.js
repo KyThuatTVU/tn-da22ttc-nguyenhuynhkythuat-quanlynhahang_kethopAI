@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
 // Lấy danh sách tất cả các bàn
 router.get('/', async (req, res) => {
@@ -28,7 +29,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Thêm bàn mới
-router.post('/', async (req, res) => {
+router.post('/', requireManagerOrAdmin, async (req, res) => {
     try {
         const { ten_ban, so_cho, vi_tri, trang_thai } = req.body;
         
@@ -65,7 +66,7 @@ router.post('/', async (req, res) => {
 });
 
 // Cập nhật bàn
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         const { ten_ban, so_cho, vi_tri, trang_thai } = req.body;
         
@@ -106,7 +107,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Xóa bàn
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         // Kiểm tra xem bàn có đang được sử dụng hay không (có order chưa thanh toán, hoặc đã đặt)
         const [checkStatus] = await db.query('SELECT trang_thai FROM ban WHERE ma_ban = ?', [req.params.id]);

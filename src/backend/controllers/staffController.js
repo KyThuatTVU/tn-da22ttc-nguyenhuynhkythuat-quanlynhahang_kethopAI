@@ -243,11 +243,30 @@ const staffLogin = async (req, res) => {
             anh_dai_dien: staff[0].anh_dai_dien || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff[0].ten_nhan_vien)}&background=10b981&color=fff`
         };
         
-        console.log('👤 Staff login - Tài khoản:', staff[0].tai_khoan);
+        // Tạo session nhân viên để bảo vệ các API nội bộ
+        if (req.session) {
+            if (!req.session.admin) {
+                await new Promise((resolve, reject) => {
+                    req.session.regenerate((err) => err ? reject(err) : resolve());
+                });
+            }
+
+            req.session.staff = {
+                ma_nhan_vien: userData.ma_nhan_vien,
+                ma_nv_code: userData.ma_nv_code,
+                ten_nhan_vien: userData.ten_nhan_vien,
+                tai_khoan: userData.tai_khoan,
+                vai_tro: userData.vai_tro,
+                anh_dai_dien: userData.anh_dai_dien
+            };
+
+            await new Promise((resolve, reject) => {
+                req.session.save((err) => err ? reject(err) : resolve());
+            });
+        }
+
         console.log('👤 Staff login - Vai trò:', staff[0].vai_tro);
-        console.log('✅ Trả về dữ liệu staff (không dùng session)');
         
-        // Trả về thông tin luôn, không cần session
         res.json({ 
             success: true, 
             message: 'Đăng nhập thành công!', 

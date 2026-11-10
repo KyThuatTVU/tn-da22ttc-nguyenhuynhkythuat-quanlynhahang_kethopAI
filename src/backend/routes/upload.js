@@ -7,6 +7,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+const crypto = require('crypto');
+const { requireStaffOrAdmin } = require('../middleware/auth.middleware');
+const { verifyAndRenameImage } = require('../services/imageService');
 
 // Đảm bảo thư mục uploads/staff tồn tại
 const uploadDir = path.join(__dirname, '../uploads/staff');
@@ -20,9 +23,7 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname);
-        cb(null, `staff-${uniqueSuffix}${ext}`);
+        cb(null, `pending-${crypto.randomUUID()}`);
     }
 });
 
@@ -42,15 +43,23 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Tối đa 5MB
 });
 
+router.use(requireStaffOrAdmin);
+
 // POST /api/upload/staff - Upload ảnh nhân viên (avatar hoặc cccd)
-router.post('/staff', upload.single('image'), (req, res) => {
+router.post('/staff', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'Không có file nào được tải lên!' });
         }
+
+        const file = await verifyAndRenameImage(req.file, 'staff');
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'File không phải ảnh hợp lệ (jpg, png, gif, webp)!' });
+        }
+
         // Trả về đường dẫn có thể truy cập từ frontend
-        const url = `/uploads/staff/${req.file.filename}`;
-        res.json({ success: true, url, filename: req.file.filename });
+        const url = `/uploads/staff/${file.filename}`;
+        res.json({ success: true, url, filename: file.filename });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -63,7 +72,12 @@ router.post('/crop-face', upload.single('image'), async (req, res) => {
             return res.status(400).json({ success: false, message: 'Không có file nào được tải lên!' });
         }
 
-        const imagePath = req.file.path;
+        const file = await verifyAndRenameImage(req.file, 'face');
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'File không phải ảnh hợp lệ (jpg, png, gif, webp)!' });
+        }
+
+        const imagePath = file.path;
 
         // Gọi Python AI Service để trích chọn & căn chỉnh khuôn mặt
         try {

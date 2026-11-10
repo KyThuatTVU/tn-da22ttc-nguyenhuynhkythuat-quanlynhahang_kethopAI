@@ -5,6 +5,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { createAdminNotification } = require('./admin-notifications');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+const { publicWriteLimiter } = require('../middleware/rateLimit');
 
 // Cấu hình multer cho upload hình ảnh
 const storage = multer.diskStorage({
@@ -36,7 +38,7 @@ const upload = multer({
 });
 
 // GET - Lấy tất cả liên hệ (Admin)
-router.get('/', async (req, res) => {
+router.get('/', requireManagerOrAdmin, async (req, res) => {
     try {
         const { trang_thai, search, page = 1, limit = 10 } = req.query;
         const offset = (page - 1) * limit;
@@ -83,7 +85,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET - Lấy chi tiết liên hệ
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM lien_he WHERE ma_lien_he = ?', [req.params.id]);
         if (rows.length === 0) {
@@ -96,7 +98,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST - Tạo liên hệ mới (từ frontend)
-router.post('/', upload.array('hinh_anh', 5), async (req, res) => {
+router.post('/', publicWriteLimiter, upload.array('hinh_anh', 5), async (req, res) => {
     try {
         const { ho_ten, email, so_dien_thoai, tieu_de, noi_dung } = req.body;
         
@@ -137,7 +139,7 @@ router.post('/', upload.array('hinh_anh', 5), async (req, res) => {
 });
 
 // PUT - Cập nhật trạng thái liên hệ (Admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         const { trang_thai, ghi_chu_admin } = req.body;
         const [result] = await db.query(
@@ -156,7 +158,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE - Xóa liên hệ (Admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireManagerOrAdmin, async (req, res) => {
     try {
         // Lấy thông tin hình ảnh trước khi xóa
         const [contact] = await db.query('SELECT hinh_anh FROM lien_he WHERE ma_lien_he = ?', [req.params.id]);
@@ -185,7 +187,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // GET - Thống kê liên hệ
-router.get('/stats/summary', async (req, res) => {
+router.get('/stats/summary', requireManagerOrAdmin, async (req, res) => {
     try {
         const [stats] = await db.query(`
             SELECT 

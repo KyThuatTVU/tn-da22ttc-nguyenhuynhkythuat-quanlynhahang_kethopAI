@@ -6,7 +6,7 @@ const db = require('../config/database');
 const { sendVerificationEmail } = require('../config/email');
 const passport = require('../config/passport');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
 
 // Đăng nhập Admin
 router.post('/login', async (req, res) => {
@@ -43,6 +43,25 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Tài khoản hoặc mật khẩu không đúng'
+            });
+        }
+
+        if (req.session) {
+            if (!req.session.staff) {
+                await new Promise((resolve, reject) => {
+                    req.session.regenerate((err) => err ? reject(err) : resolve());
+                });
+            }
+
+            req.session.admin = {
+                ma_admin: admin.ma_admin,
+                tai_khoan: admin.tai_khoan,
+                ten_hien_thi: admin.ten_hien_thi,
+                quyen: admin.quyen
+            };
+
+            await new Promise((resolve, reject) => {
+                req.session.save((err) => err ? reject(err) : resolve());
             });
         }
 

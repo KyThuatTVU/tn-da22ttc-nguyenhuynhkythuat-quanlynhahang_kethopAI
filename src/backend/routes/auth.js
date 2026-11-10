@@ -11,7 +11,8 @@ const { sendVerificationEmail, sendWelcomeEmail } = require('../config/email');
 const { createAdminNotification } = require('./admin-notifications');
 
 // Secret key cho JWT (nên đặt trong .env)
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
+const { publicWriteLimiter } = require('../middleware/rateLimit');
 
 // Validation functions
 function validateEmail(email) {
@@ -59,8 +60,7 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'avatar-' + uniqueSuffix + path.extname(file.originalname));
+        cb(null, `pending-${require('crypto').randomUUID()}`);
     }
 });
 
@@ -82,7 +82,7 @@ const upload = multer({
 });
 
 // Upload ảnh đại diện
-router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
+router.post('/upload-avatar', publicWriteLimiter, upload.single('avatar'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -91,7 +91,16 @@ router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
             });
         }
 
-        const avatarPath = '/images/avatars/' + req.file.filename;
+        const { verifyAndRenameImage } = require('../services/imageService');
+        const file = await verifyAndRenameImage(req.file, 'avatar');
+        if (!file) {
+            return res.status(400).json({
+                success: false,
+                message: 'File không phải ảnh hợp lệ (jpg, png, gif, webp)'
+            });
+        }
+
+        const avatarPath = '/images/avatars/' + file.filename;
 
         res.json({
             success: true,
@@ -566,15 +575,6 @@ router.put('/update', authenticateToken, async (req, res) => {
     try {
         const { ten_nguoi_dung, so_dien_thoai, dia_chi, gioi_tinh, anh_dai_dien } = req.body;
         const ma_nguoi_dung = req.user.ma_nguoi_dung;
-
-        console.log('📝 Update request body:', req.body);
-        console.log('🔍 Fields received:', {
-            ten_nguoi_dung: ten_nguoi_dung !== undefined ? 'present' : 'missing',
-            so_dien_thoai: so_dien_thoai !== undefined ? 'present' : 'missing',
-            dia_chi: dia_chi !== undefined ? 'present' : 'missing',
-            gioi_tinh: gioi_tinh !== undefined ? 'present' : 'missing',
-            anh_dai_dien: anh_dai_dien !== undefined ? 'present' : 'missing'
-        });
 
         // Build dynamic update query based on provided fields
         const updates = [];

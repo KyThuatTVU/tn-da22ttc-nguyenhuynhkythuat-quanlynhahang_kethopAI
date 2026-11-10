@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const { GraphQLError } = require('graphql');
 
 // ==================== HELPER FUNCTIONS ====================
 
@@ -1364,5 +1365,89 @@ function extractFoodSearchTerms(message) {
         });
     return [...new Set(cleanedTerms)];
 }
+
+// ==================== AUTHORIZATION GUARDS ====================
+
+function requireUser(context) {
+    const user = context && context.user;
+    if (!user || !user.ma_nguoi_dung) {
+        throw new GraphQLError('Vui lòng đăng nhập để thực hiện thao tác này', {
+            extensions: { code: 'UNAUTHENTICATED' }
+        });
+    }
+    return user;
+}
+
+function requirePrivileged(context) {
+    const session = context && context.session;
+    const user = context && context.user;
+    const isAdminSession = Boolean(session && session.admin);
+    const isStaffSession = Boolean(session && session.staff);
+    const isAdminToken = Boolean(user && user.role === 'admin');
+
+    if (!isAdminSession && !isStaffSession && !isAdminToken) {
+        throw new GraphQLError('Không có quyền truy cập', {
+            extensions: { code: 'FORBIDDEN' }
+        });
+    }
+}
+
+// Các query/mutation thao tác trên dữ liệu của chính người dùng
+const USER_SCOPED_QUERIES = ['xemGioHang', 'danhSachDonHang'];
+const USER_SCOPED_MUTATIONS = [
+    'themVaoGioHang',
+    'themNhieuMonVaoGio',
+    'xoaKhoiGioHang',
+    'xoaToanBoGioHang',
+    'datHangTuGioHang',
+    'datHangNhanh'
+];
+
+for (const name of USER_SCOPED_QUERIES) {
+    const original = resolvers.Query[name];
+    resolvers.Query[name] = (parent, args, context, info) => {
+        const user = requireUser(context);
+        return original(parent, { ...args, ma_nguoi_dung: user.ma_nguoi_dung }, context, info);
+    };
+}
+
+for (const name of USER_SCOPED_MUTATIONS) {
+    const original = resolvers.Mutation[name];
+    resolvers.Mutation[name] = (parent, args, context, info) => {
+        const user = requireUser(context);
+        return original(parent, { ...args, ma_nguoi_dung: user.ma_nguoi_dung }, context, info);
+    };
+}
+
+// Chi tiết đơn hàng: chỉ chủ sở hữu được xem
+const originalChiTietDonHang = resolvers.Query.chiTietDonHang;
+resolvers.Query.chiTietDonHang = async (parent, args, context, info) => {
+    const user = requireUser(context);
+    const [rows] = await db.query(
+        'SELECT ma_don_hang FROM don_hang WHERE ma_don_hang = ? AND ma_nguoi_dung = ?',
+        [args.ma_don_hang, user.ma_nguoi_dung]
+    );
+
+    if (rows.length === 0) {
+        throw new GraphQLError('Không tìm thấy đơn hàng', {
+            extensions: { code: 'NOT_FOUND' }
+        });
+    }
+
+    return originalChiTietDonHang(parent, args, context, info);
+};
+
+// Cấu hình và số liệu kinh doanh chỉ dành cho admin/staff
+const originalCaiDat = resolvers.Query.caiDat;
+resolvers.Query.caiDat = (parent, args, context, info) => {
+    requirePrivileged(context);
+    return originalCaiDat(parent, args, context, info);
+};
+
+const originalThongKe = resolvers.Query.thongKeNhaHang;
+resolvers.Query.thongKeNhaHang = (parent, args, context, info) => {
+    requirePrivileged(context);
+    return originalThongKe(parent, args, context, info);
+};
 
 module.exports = { resolvers, analyzeUserIntent, extractFoodSearchTerms, getCartByUserId };

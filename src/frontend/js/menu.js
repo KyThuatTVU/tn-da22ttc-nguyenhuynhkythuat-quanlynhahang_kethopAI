@@ -287,7 +287,7 @@ function renderMenuProducts() {
         }
         
         return `
-        <div class="dish-card flex flex-col bg-white rounded-2xl overflow-hidden shadow-md h-full">
+        <div class="dish-card flex flex-col rounded-2xl h-full">
             <!-- Image Container -->
             <a href="/chitietmonan/?id=${product.ma_mon}" class="block">
                 <div class="dish-image-container">
@@ -391,7 +391,7 @@ function showLoading() {
     } else {
         // Fallback skeleton
         const skeletonHTML = Array(6).fill(0).map(() => `
-            <div class="bg-white rounded-2xl overflow-hidden shadow-md">
+            <div class="dish-card rounded-2xl">
                 <div class="skeleton h-64 w-full"></div>
                 <div class="p-5">
                     <div class="skeleton h-6 w-3/4 mb-3 rounded"></div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ML Recommendation System - Frontend
  * Hệ thống gợi ý món ăn sử dụng Machine Learning
  */
@@ -180,8 +180,17 @@ const RecommendationSystem = {
         const ratingValue = dish.avg_rating ? parseFloat(dish.avg_rating) : 0;
         const rating = !isNaN(ratingValue) ? ratingValue.toFixed(1) : '0';
         
-        // Badge theo loại recommendation (Được đặt trống để hoạt động âm thầm)
+        // Badge theo loại recommendation
         let badge = '';
+        if (dish.recommendation_type === 'collaborative') {
+            badge = '<span class="absolute top-2 left-2 bg-blue-600 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-sm z-10"><i class="fas fa-users mr-1"></i>Cùng gu</span>';
+        } else if (dish.recommendation_type === 'content_based') {
+            badge = '<span class="absolute top-2 left-2 bg-pink-600 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-sm z-10"><i class="fas fa-heart mr-1"></i>Hợp khẩu vị</span>';
+        } else if (dish.recommendation_type === 'chat_based') {
+            badge = '<span class="absolute top-2 left-2 bg-purple-600 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-sm z-10"><i class="fas fa-comment-dots mr-1"></i>Chatbot</span>';
+        } else if (dish.recommendation_type) {
+            badge = '<span class="absolute top-2 left-2 bg-orange-600 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-sm z-10"><i class="fas fa-fire mr-1"></i>Thịnh hành</span>';
+        }
         
         return `
             <div class="recommendation-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" 

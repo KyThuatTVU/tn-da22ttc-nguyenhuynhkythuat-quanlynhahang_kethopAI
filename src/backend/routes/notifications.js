@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../config/database');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = require('../config/secrets').jwtSecret;
 
 // Middleware xác thực JWT token
 function authenticateToken(req, res, next) {

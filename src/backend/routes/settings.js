@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
 
 // Cache settings để tránh query DB liên tục
 let settingsCache = null;
@@ -53,7 +54,7 @@ router.get('/:key', async (req, res) => {
 });
 
 // Cập nhật một cài đặt
-router.put('/:key', async (req, res) => {
+router.put('/:key', requireManagerOrAdmin, async (req, res) => {
     try {
         const { key } = req.params;
         const { value } = req.body;
@@ -77,7 +78,7 @@ router.put('/:key', async (req, res) => {
 });
 
 // Cập nhật nhiều cài đặt cùng lúc
-router.post('/bulk', async (req, res) => {
+router.post('/bulk', requireManagerOrAdmin, async (req, res) => {
     try {
         const { settings } = req.body;
         

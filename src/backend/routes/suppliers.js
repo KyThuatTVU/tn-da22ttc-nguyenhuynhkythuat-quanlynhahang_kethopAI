@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const supplierController = require('../controllers/supplierController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireManagerOrAdmin);
 
 // Quản lý Nhà cung cấp
 router.get('/', supplierController.getAllSuppliers);

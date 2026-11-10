@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const auditController = require('../controllers/auditController');
+const { requireManagerOrAdmin } = require('../middleware/auth.middleware');
+
+router.use(requireManagerOrAdmin);
 
 // Routes for Inventory Audits (Kiểm kê kho)
 router.get('/', auditController.getAuditSessions);
