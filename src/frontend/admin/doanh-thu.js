@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ doanh-thu.html) ==== */
+/* ==== Script 1 (tách từ /admin/doanh-thu/) ==== */
 let revenueChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {

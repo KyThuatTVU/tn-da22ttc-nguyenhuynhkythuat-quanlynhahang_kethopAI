@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ staff.html) ==== */
+/* ==== Script 1 (tách từ /admin/staff/) ==== */
 // API_URL is handled by admin-layout.js
         const STAFF_API = `${API_URL}/staff`;
         let isEditMode = false;
@@ -176,7 +176,7 @@
                         <div class="flex justify-center space-x-1">
                             <button onclick="openEditModal(${s.ma_nhan_vien})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Chỉnh sửa"><i class="fas fa-edit text-lg"></i></button>
                             <button onclick="openPasswordModal(${s.ma_nhan_vien})" class="p-2 text-orange-500 hover:bg-orange-50 rounded-full transition-colors" title="Đổi mật khẩu"><i class="fas fa-key text-lg"></i></button>
-                            <button onclick="window.location.href='quan-ly-quyen-nhan-vien.html?id=${s.ma_nhan_vien}'" class="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors" title="Phân quyền"><i class="fas fa-shield-alt text-lg"></i></button>
+                            <button onclick="window.location.href='/admin/quan-ly-quyen-nhan-vien/?id=${s.ma_nhan_vien}'" class="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors" title="Phân quyền"><i class="fas fa-shield-alt text-lg"></i></button>
                             <button onclick="deleteStaff(${s.ma_nhan_vien})" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Xóa"><i class="fas fa-trash text-lg"></i></button>
                         </div>
                     </td>

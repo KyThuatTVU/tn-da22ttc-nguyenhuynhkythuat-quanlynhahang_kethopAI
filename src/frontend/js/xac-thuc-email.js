@@ -1,10 +1,10 @@
-/* ==== Script 1 (tách từ xac-thuc-email.html) ==== */
+/* ==== Script 1 (tách từ /xac-thuc-email/) ==== */
 // Get email from URL params
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
         if (!email) {
-            window.location.href = 'dang-ky.html';
+            window.location.href = '/dang-ky/';
         }
 
         document.getElementById('display-email').textContent = email;
@@ -98,7 +98,7 @@
                     saveUserData(result.data);
                     showNotification('Xác thực thành công! Đang chuyển hướng...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = '/';
                     }, 1500);
                 } else {
                     showNotification(result.message || 'Mã xác thực không đúng', 'error');

@@ -16,7 +16,7 @@ function checkAuth() {
     if (!getToken()) {
         showNotification('Vui lòng đăng nhập để xem đơn hàng', 'warning');
         setTimeout(() => {
-            window.location.href = 'dang-nhap.html?redirect=don-hang-cua-toi.html';
+            window.location.href = '/dang-nhap/?redirect=/don-hang-cua-toi/';
         }, 1500);
         return false;
     }

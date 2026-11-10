@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Album ảnh - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Top Actions -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-slate-800">Album ảnh</h2>
+                    <button onclick="openUploadModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl hover:bg-slate-900 font-medium text-sm">
+                        <i class="fas fa-plus mr-2"></i>Thêm ảnh
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Tổng ảnh</p><p id="stat-total" class="text-2xl font-bold text-slate-800">0</p></div><div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center"><i class="fas fa-images text-slate-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Món ăn</p><p id="stat-food" class="text-2xl font-bold text-amber-600">0</p></div><div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center"><i class="fas fa-utensils text-amber-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Không gian</p><p id="stat-space" class="text-2xl font-bold text-blue-600">0</p></div><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-store text-blue-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Sự kiện</p><p id="stat-event" class="text-2xl font-bold text-emerald-600">0</p></div><div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-alt text-emerald-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Khách hàng</p><p id="stat-customer" class="text-2xl font-bold text-purple-600">0</p></div><div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fas fa-users text-purple-600 text-xl"></i></div></div></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="content-card mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="search-filter" placeholder="Tìm theo mô tả..." class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <select id="type-filter" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả loại ảnh</option>
+                            <option value="mon_an">Món ăn</option>
+                            <option value="khong_gian">Không gian</option>
+                            <option value="su_kien">Sự kiện</option>
+                            <option value="khach_hang">Khách hàng</option>
+                        </select>
+                        <input type="date" id="date-filter" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <button onclick="applyFilters()" class="bg-slate-800 text-white px-4 py-2.5 rounded-xl hover:bg-slate-900"><i class="fas fa-filter mr-2"></i>Lọc</button>
+                    </div>
+                </div>
+
+                <!-- Albums Grid -->
+                <div id="albums-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <div class="col-span-full text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-slate-400 mb-4"></i><p class="text-slate-500">Đang tải...</p></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full">
+            <div class="p-6 border-b flex items-center justify-between bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold">Tải ảnh lên</h3>
+                <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="upload-form" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Phương thức thêm ảnh *</label>
+                    <div class="flex space-x-4 mb-3">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="upload_method" value="file" checked class="form-radio text-blue-600" onchange="toggleUploadMethod('upload', 'file')">
+                            <span class="ml-2">Tải file từ máy</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="upload_method" value="link" class="form-radio text-blue-600" onchange="toggleUploadMethod('upload', 'link')">
+                            <span class="ml-2">Dán link ảnh</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="upload-file-group">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Chọn ảnh *</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-slate-500 mt-1">Có thể chọn nhiều ảnh</p>
+                </div>
+
+                <div id="upload-link-group" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Link ảnh *</label>
+                    <textarea id="image_urls" name="image_urls" rows="3" placeholder="Dán các link ảnh vào đây, mỗi link 1 dòng..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea>
+                    <p class="text-xs text-slate-500 mt-1">Hỗ trợ nhiều link ảnh, xuống dòng cho mỗi link</p>
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="">Chọn loại ảnh</option><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khach_hang">Khách hàng</option></select></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Mô tả</label><textarea id="mo_ta" name="mo_ta" rows="3" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea></div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl hover:bg-slate-900 font-medium">Tải lên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+        <div class="max-w-4xl w-full">
+            <div class="flex justify-end mb-4"><button onclick="closePreview()" class="text-white hover:text-slate-300"><i class="fas fa-times text-3xl"></i></button></div>
+            <img id="preview-image" src="" alt="" class="w-full h-auto rounded-2xl">
+            <div id="preview-info" class="mt-4 text-white text-center"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full">
+            <div class="p-6 border-b flex items-center justify-between bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold">Chỉnh sửa ảnh</h3>
+                <button onclick="closeEditModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="edit-form" class="p-6 space-y-4" enctype="multipart/form-data">
+                <input type="hidden" id="edit-id" name="id">
+                <div class="text-center mb-4">
+                    <img id="edit-preview" src="" alt="" class="w-48 h-48 object-cover rounded-xl mx-auto border-2 border-slate-200">
+                    <p class="text-xs text-slate-400 mt-2 mb-3">Chỉ chọn nếu muốn thay đổi ảnh</p>
+
+                    <div class="flex justify-center space-x-4 mb-3">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="edit_method" value="file" checked class="form-radio text-blue-600" onchange="toggleUploadMethod('edit', 'file')">
+                            <span class="ml-2 text-sm">File từ máy</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="edit_method" value="link" class="form-radio text-blue-600" onchange="toggleUploadMethod('edit', 'link')">
+                            <span class="ml-2 text-sm">Dán link ảnh</span>
+                        </label>
+                    </div>
+
+                    <div id="edit-file-group">
+                        <label class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl cursor-pointer hover:bg-blue-100 transition">
+                            <i class="fas fa-camera mr-2"></i>
+                            <span>Chọn file ảnh</span>
+                            <input type="file" id="edit-image" name="image" accept="image/*" class="hidden" onchange="previewEditImage(this)">
+                        </label>
+                    </div>
+
+                    <div id="edit-link-group" class="hidden text-left mt-2 px-6">
+                        <input type="url" id="edit_image_url" name="image_url" placeholder="Dán link ảnh mới..." class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm" oninput="if(this.value) document.getElementById('edit-preview').src = this.value">
+                    </div>
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Loại ảnh *</label><select id="edit-loai_anh" name="loai_anh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"><option value="mon_an">Món ăn</option><option value="khong_gian">Không gian</option><option value="su_kien">Sự kiện</option><option value="khach_hang">Khách hàng</option></select></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Mô tả</label><textarea id="edit-mo_ta" name="mo_ta" rows="3" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea></div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl hover:bg-slate-900 font-medium">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+
+    
+    <script src="albums.js" defer></script>
+
+</body>
+</html>

@@ -18,19 +18,19 @@ const SIDEBAR_TEMPLATE = `
             <!-- 1. Tổng quan -->
             <p class="nav-group-title">Tổng quan</p>
             <div class="space-y-1 mb-6">
-                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/dashboard/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-chart-pie w-5"></i><span class="text-sm">Tổng quan</span>
                 </a>
-                <a href="doanh-thu.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/doanh-thu/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-dollar-sign w-5"></i><span class="text-sm">Báo cáo Doanh thu</span>
                 </a>
-                <a href="loi-nhuan.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/loi-nhuan/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-chart-line w-5"></i><span class="text-sm">Báo cáo Lợi nhuận</span>
                 </a>
-                <a href="chi-phi-hang-ngay.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/chi-phi-hang-ngay/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-money-bill-wave w-5"></i><span class="text-sm">Chi phí hàng ngày</span>
                 </a>
-                <a href="loai-chi-phi.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/loai-chi-phi/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-tags w-5"></i><span class="text-sm">Loại chi phí</span>
                 </a>
             </div>
@@ -38,16 +38,16 @@ const SIDEBAR_TEMPLATE = `
             <!-- 2. Nghiệp vụ bán hàng -->
             <p class="nav-group-title">Nghiệp vụ bán hàng</p>
             <div class="space-y-1 mb-6">
-                <a href="admin-pos-new.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-pos">
+                <a href="/admin/admin-pos-new/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-pos">
                     <i class="fas fa-cash-register w-5"></i><span class="text-sm font-medium">Bán hàng (POS)</span>
                 </a>
-                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/orders/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-shopping-cart w-5"></i><span class="text-sm font-medium">Đơn hàng</span>
                 </a>
-                <a href="reservations.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/reservations/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-calendar-check w-5"></i><span class="text-sm">Đặt bàn</span>
                 </a>
-                <a href="tables.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/tables/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-chair w-5"></i><span class="text-sm">Quản lý bàn</span>
                 </a>
             </div>
@@ -55,37 +55,37 @@ const SIDEBAR_TEMPLATE = `
             <!-- 3. Thực đơn & Chế biến -->
             <p class="nav-group-title">Thực đơn & Chế biến</p>
             <div class="space-y-1 mb-6">
-                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/products/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-utensils w-5"></i><span class="text-sm">Món ăn</span>
                 </a>
-                <a href="categories.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-categories">
+                <a href="/admin/categories/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-categories">
                     <i class="fas fa-tags w-5"></i><span class="text-sm font-medium">Danh mục</span>
                 </a>
-                        <a href="flavors.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-flavors">
+                        <a href="/admin/flavors/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-flavors">
                     <i class="fas fa-heart w-5"></i><span class="text-sm font-medium">Quản lý Khẩu vị</span>
                 </a>
-                <a href="nguyen-lieu.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/nguyen-lieu/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-boxes w-5"></i><span class="text-sm">Nguyên liệu</span>
                 </a>
-                <a href="loai-nguyen-lieu.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/loai-nguyen-lieu/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-tags w-5"></i><span class="text-sm">Loại nguyên liệu</span>
                 </a>
-                <a href="cong-thuc.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/cong-thuc/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-clipboard-list w-5"></i><span class="text-sm">Công thức</span>
                 </a>
-                <a href="nhap-hang.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/nhap-hang/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-file-import w-5"></i><span class="text-sm">Nhập hàng</span>
                 </a>
-                <a href="nha-cung-cap.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/nha-cung-cap/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-truck-field w-5"></i><span class="text-sm">Nhà cung cấp</span>
                 </a>
-                <a href="kiem-ke.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/kiem-ke/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-clipboard-check w-5"></i><span class="text-sm">Kiểm kê kho</span>
                 </a>
-                <a href="hao-hut.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/hao-hut/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-dumpster w-5"></i><span class="text-sm">Báo cáo hao hụt</span>
                 </a>
-                <a href="ke-do-bep.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/ke-do-bep/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-kitchen-set w-5"></i><span class="text-sm">Kê đồ bếp</span>
                 </a>
             </div>
@@ -94,25 +94,25 @@ const SIDEBAR_TEMPLATE = `
             <p class="nav-group-title staff-group-title">Nhân sự & Quản trị</p>
             <div class="space-y-1 mb-6 staff-group-content">
                 <!-- Nút chấm công nhanh cho nhân viên -->
-                <a href="../staff/cham-cong.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 sidebar-staff-only">
+                <a href="/staff/cham-cong/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 sidebar-staff-only">
                     <i class="fas fa-camera w-5"></i><span class="text-sm font-bold">📸 Chấm Công Ngay</span>
                 </a>
-                <a href="admins.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl sidebar-admin-only">
+                <a href="/admin/admins/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl sidebar-admin-only">
                     <i class="fas fa-user-shield w-5 text-amber-600"></i><span class="text-sm text-amber-900 font-medium">Tài khoản Admin</span>
                 </a>
-                <a href="staff.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/staff/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-user-tie w-5"></i><span class="text-sm">Nhân viên</span>
                 </a>
-                <a href="shifts.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/shifts/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-clock w-5"></i><span class="text-sm">Ca làm việc</span>
                 </a>
-                <a href="attendance.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/attendance/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-check-double w-5"></i><span class="text-sm">Chấm công</span>
                 </a>
-                <a href="luong-hang-ngay.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/luong-hang-ngay/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-coins w-5"></i><span class="text-sm">Lương hàng ngày</span>
                 </a>
-                <a href="payroll.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/payroll/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-money-bill-wave w-5"></i><span class="text-sm">Bảng lương</span>
                 </a>
             </div>
@@ -120,31 +120,31 @@ const SIDEBAR_TEMPLATE = `
             <!-- 5. Khách hàng & Tiếp thị -->
             <p class="nav-group-title">Khách hàng & Tiếp thị</p>
             <div class="space-y-1 mb-6">
-                <a href="customers.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/customers/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-users w-5"></i><span class="text-sm">Khách hàng</span>
                 </a>
-                <a href="customer-preferences.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/customer-preferences/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-heart w-5"></i><span class="text-sm">Sở thích khách hàng</span>
                 </a>
-                <a href="promotions.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/promotions/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-ticket-alt w-5"></i><span class="text-sm">Khuyến mãi</span>
                 </a>
-                <a href="reviews.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/reviews/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-star w-5"></i><span class="text-sm">Đánh giá</span>
                 </a>
-                <a href="contacts.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/contacts/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-envelope w-5"></i><span class="text-sm">Liên hệ</span>
                 </a>
-                <a href="apriori-rules.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-apriori">
+                <a href="/admin/apriori-rules/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-apriori">
                     <i class="fas fa-project-diagram w-5"></i><span class="text-sm">Luật kết hợp AI</span>
                 </a>
-                <a href="quan-ly-thuat-toan.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-algorithm">
+                <a href="/admin/quan-ly-thuat-toan/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl menu-algorithm">
                     <i class="fas fa-brain w-5 text-emerald-600"></i><span class="text-sm">Dữ liệu thuật toán</span>
                 </a>
-                <a href="chatbot-history.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/chatbot-history/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-robot w-5"></i><span class="text-sm">Lịch sử Chatbot</span>
                 </a>
-                <a href="chatbot-knowledge.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/chatbot-knowledge/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-brain w-5"></i><span class="text-sm">Tri thức Chatbot</span>
                 </a>
             </div>
@@ -152,16 +152,16 @@ const SIDEBAR_TEMPLATE = `
             <!-- 6. Nội dung & Hệ thống -->
             <p class="nav-group-title content-system-title">Nội dung & Hệ thống</p>
             <div class="space-y-1 content-system-group">
-                <a href="news.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/news/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-newspaper w-5"></i><span class="text-sm">Tin tức</span>
                 </a>
-                <a href="quan-ly-binh-luan.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/quan-ly-binh-luan/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-comments w-5"></i><span class="text-sm">Bình luận</span>
                 </a>
-                <a href="albums.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/albums/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-images w-5"></i><span class="text-sm">Album ảnh</span>
                 </a>
-                <a href="settings.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
+                <a href="/admin/settings/" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-xl">
                     <i class="fas fa-cog w-5"></i><span class="text-sm">Cài đặt hệ thống</span>
                 </a>
             </div>
@@ -223,7 +223,7 @@ const HEADER_TEMPLATE = `
             </div>
         </div>
         
-        <a href="../index.html" target="_blank" class="text-amber-900 hover:text-amber-700 transition" title="Xem website">
+        <a href="/" target="_blank" class="text-amber-900 hover:text-amber-700 transition" title="Xem website">
             <i class="fas fa-external-link-alt text-lg"></i>
         </a>
         <div class="hidden md:flex items-center space-x-3 pl-4 border-l border-amber-900/15">
@@ -359,7 +359,7 @@ async function logout() {
         // ===== STAFF LOGOUT: Xóa localStorage, không cần gọi API =====
         console.log('🚪 Staff đăng xuất...');
         sessionStorage.removeItem('staff_user');
-        window.location.href = '../staff/login.html';
+        window.location.href = '/staff/login/';
     } else {
         // ===== ADMIN LOGOUT: Gọi API xóa session Google =====
         try {
@@ -373,7 +373,7 @@ async function logout() {
             if (result.success) {
                 console.log('✅ Admin logout thành công');
                 document.cookie = 'admin.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                window.location.href = 'dang-nhap-admin.html';
+                window.location.href = '/admin/dang-nhap-admin/';
             } else {
                 alert('Lỗi đăng xuất!');
             }
@@ -381,7 +381,7 @@ async function logout() {
             console.error('❌ Logout error:', e);
             // Fallback: vẫn xóa cookie và chuyển hướng
             document.cookie = 'admin.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            window.location.href = 'dang-nhap-admin.html';
+            window.location.href = '/admin/dang-nhap-admin/';
         }
     }
 }
@@ -500,54 +500,55 @@ async function applyRBAC(userData) {
     // Map quyền → menu sidebar
     const permissionMenuMap = {
         // Tổng quan
-        'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
-        'doanh-thu.html': ['xem_doanh_thu'],
-        'loi-nhuan.html': ['xem_doanh_thu'],
-        'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
-        'loai-chi-phi.html': ['xem_doanh_thu'],
+        '/admin/': ['xem_bao_cao', 'xem_thong_ke'],
+        '/admin/dashboard/': ['xem_bao_cao', 'xem_thong_ke'],
+        '/admin/doanh-thu/': ['xem_doanh_thu'],
+        '/admin/loi-nhuan/': ['xem_doanh_thu'],
+        '/admin/chi-phi-hang-ngay/': ['xem_doanh_thu'],
+        '/admin/loai-chi-phi/': ['xem_doanh_thu'],
         // Bán hàng
-        'admin-pos-new.html': ['xem_pos', 'tao_don_pos'],
-        'orders.html': ['xem_don_hang'],
-        'reservations.html': ['dat_ban', 'xem_ban'],
-        'tables.html': ['xem_ban'],
+        '/admin/admin-pos-new/': ['xem_pos', 'tao_don_pos'],
+        '/admin/orders/': ['xem_don_hang'],
+        '/admin/reservations/': ['dat_ban', 'xem_ban'],
+        '/admin/tables/': ['xem_ban'],
         // Thực đơn
-        'products.html': ['xem_menu'],
-        'categories.html': ['xem_menu'],
-        'flavors.html': ['xem_menu'],
-        'nguyen-lieu.html': ['xem_kho'],
-        'loai-nguyen-lieu.html': ['xem_kho'],
-        'cong-thuc.html': ['xem_cong_thuc'],
-        'nhap-hang.html': ['nhap_kho'],
-        'nha-cung-cap.html': ['xem_kho'],
-        'kiem-ke.html': ['xem_kho'],
-        'hao-hut.html': ['xem_kho'],
-        'ke-do-bep.html': ['xem_phieu_bep'],
+        '/admin/products/': ['xem_menu'],
+        '/admin/categories/': ['xem_menu'],
+        '/admin/flavors/': ['xem_menu'],
+        '/admin/nguyen-lieu/': ['xem_kho'],
+        '/admin/loai-nguyen-lieu/': ['xem_kho'],
+        '/admin/cong-thuc/': ['xem_cong_thuc'],
+        '/admin/nhap-hang/': ['nhap_kho'],
+        '/admin/nha-cung-cap/': ['xem_kho'],
+        '/admin/kiem-ke/': ['xem_kho'],
+        '/admin/hao-hut/': ['xem_kho'],
+        '/admin/ke-do-bep/': ['xem_phieu_bep'],
         // Nhân sự (chỉ admin/manager)
-        'admins.html': [],  // Luôn ẩn đối với staff
-        'staff.html': ['xem_nhan_vien'],
-        'shifts.html': ['xem_nhan_vien'],
-        'attendance.html': ['xem_nhan_vien'],
-        'payroll.html': ['xem_nhan_vien'],
+        '/admin/admins/': [],  // Luôn ẩn đối với staff
+        '/admin/staff/': ['xem_nhan_vien'],
+        '/admin/shifts/': ['xem_nhan_vien'],
+        '/admin/attendance/': ['xem_nhan_vien'],
+        '/admin/payroll/': ['xem_nhan_vien'],
         // Khách hàng
-        'customers.html': ['xem_khach_hang'],
-        'customer-preferences.html': ['xem_khach_hang'],
-        'promotions.html': ['xem_khach_hang'],
-        'reviews.html': ['xem_khach_hang'],
-        'contacts.html': ['xem_khach_hang'],
-        'apriori-rules.html': ['xem_khach_hang'],
-        'quan-ly-thuat-toan.html': ['xem_khach_hang'],
-        'chatbot-history.html': ['xem_khach_hang'],
-        'chatbot-knowledge.html': ['xem_khach_hang'],
+        '/admin/customers/': ['xem_khach_hang'],
+        '/admin/customer-preferences/': ['xem_khach_hang'],
+        '/admin/promotions/': ['xem_khach_hang'],
+        '/admin/reviews/': ['xem_khach_hang'],
+        '/admin/contacts/': ['xem_khach_hang'],
+        '/admin/apriori-rules/': ['xem_khach_hang'],
+        '/admin/quan-ly-thuat-toan/': ['xem_khach_hang'],
+        '/admin/chatbot-history/': ['xem_khach_hang'],
+        '/admin/chatbot-knowledge/': ['xem_khach_hang'],
         // Hệ thống
-        'news.html': ['xem_cai_dat'],
-        'quan-ly-binh-luan.html': ['xem_cai_dat'],
-        'albums.html': ['xem_cai_dat'],
-        'settings.html': ['xem_cai_dat', 'sua_cai_dat'],
+        '/admin/news/': ['xem_cai_dat'],
+        '/admin/quan-ly-binh-luan/': ['xem_cai_dat'],
+        '/admin/albums/': ['xem_cai_dat'],
+        '/admin/settings/': ['xem_cai_dat', 'sua_cai_dat'],
     };
 
     // Kiểm tra từng menu
     const allMenuLinks = document.querySelectorAll('.sidebar-item[href]');
-    const currentPage = window.location.pathname.split('/').pop().split('?')[0];
+    const currentPage = normalizePathname();
 
     allMenuLinks.forEach(link => {
         const href = link.getAttribute('href');
@@ -654,55 +655,63 @@ function getDefaultPermissions(vai_tro) {
     return defaults[vai_tro] || defaults['waiter'];
 }
 
+// Chuẩn hóa pathname hiện tại về dạng /admin/xxx/ (kèm slash cuối)
+function normalizePathname() {
+    let p = window.location.pathname;
+    if (!p.endsWith('/')) p += '/';
+    return p;
+}
+
 // Chuyển hướng về trang mặc định theo vai trò
 function redirectToDefaultPage(vai_tro) {
     if (!window.staffPermissions) {
-        window.location.href = '../staff/login.html';
+        window.location.href = '/staff/login/';
         return;
     }
     
     const permissions = window.staffPermissions;
-    const currentPath = window.location.pathname.split('/').pop().split('?')[0];
+    const currentPath = normalizePathname();
 
     // Map quyền tương ứng giống applyRBAC
     const permissionMenuMap = {
-        'dashboard.html': ['xem_bao_cao', 'xem_thong_ke'],
-        'doanh-thu.html': ['xem_doanh_thu'],
-        'loi-nhuan.html': ['xem_doanh_thu'],
-        'chi-phi-hang-ngay.html': ['xem_doanh_thu'],
-        'loai-chi-phi.html': ['xem_doanh_thu'],
-        'admin-pos-new.html': ['xem_pos', 'tao_don_pos'],
-        'orders.html': ['xem_don_hang'],
-        'reservations.html': ['dat_ban', 'xem_ban'],
-        'tables.html': ['xem_ban'],
-        'products.html': ['xem_menu'],
-        'categories.html': ['xem_menu'],
-        'flavors.html': ['xem_menu'],
-        'nguyen-lieu.html': ['xem_kho'],
-        'loai-nguyen-lieu.html': ['xem_kho'],
-        'cong-thuc.html': ['xem_cong_thuc'],
-        'nhap-hang.html': ['nhap_kho'],
-        'nha-cung-cap.html': ['xem_kho'],
-        'kiem-ke.html': ['xem_kho'],
-        'hao-hut.html': ['xem_kho'],
-        'ke-do-bep.html': ['xem_phieu_bep'],
-        'staff.html': ['xem_nhan_vien'],
-        'shifts.html': ['xem_nhan_vien'],
-        'attendance.html': ['xem_nhan_vien'],
-        'payroll.html': ['xem_nhan_vien'],
-        'customers.html': ['xem_khach_hang'],
-        'customer-preferences.html': ['xem_khach_hang'],
-        'promotions.html': ['xem_khach_hang'],
-        'reviews.html': ['xem_khach_hang'],
-        'contacts.html': ['xem_khach_hang'],
-        'apriori-rules.html': ['xem_khach_hang'],
-        'quan-ly-thuat-toan.html': ['xem_khach_hang'],
-        'chatbot-history.html': ['xem_khach_hang'],
-        'chatbot-knowledge.html': ['xem_khach_hang'],
-        'news.html': ['xem_cai_dat'],
-        'quan-ly-binh-luan.html': ['xem_cai_dat'],
-        'albums.html': ['xem_cai_dat'],
-        'settings.html': ['xem_cai_dat', 'sua_cai_dat']
+        '/admin/': ['xem_bao_cao', 'xem_thong_ke'],
+        '/admin/dashboard/': ['xem_bao_cao', 'xem_thong_ke'],
+        '/admin/doanh-thu/': ['xem_doanh_thu'],
+        '/admin/loi-nhuan/': ['xem_doanh_thu'],
+        '/admin/chi-phi-hang-ngay/': ['xem_doanh_thu'],
+        '/admin/loai-chi-phi/': ['xem_doanh_thu'],
+        '/admin/admin-pos-new/': ['xem_pos', 'tao_don_pos'],
+        '/admin/orders/': ['xem_don_hang'],
+        '/admin/reservations/': ['dat_ban', 'xem_ban'],
+        '/admin/tables/': ['xem_ban'],
+        '/admin/products/': ['xem_menu'],
+        '/admin/categories/': ['xem_menu'],
+        '/admin/flavors/': ['xem_menu'],
+        '/admin/nguyen-lieu/': ['xem_kho'],
+        '/admin/loai-nguyen-lieu/': ['xem_kho'],
+        '/admin/cong-thuc/': ['xem_cong_thuc'],
+        '/admin/nhap-hang/': ['nhap_kho'],
+        '/admin/nha-cung-cap/': ['xem_kho'],
+        '/admin/kiem-ke/': ['xem_kho'],
+        '/admin/hao-hut/': ['xem_kho'],
+        '/admin/ke-do-bep/': ['xem_phieu_bep'],
+        '/admin/staff/': ['xem_nhan_vien'],
+        '/admin/shifts/': ['xem_nhan_vien'],
+        '/admin/attendance/': ['xem_nhan_vien'],
+        '/admin/payroll/': ['xem_nhan_vien'],
+        '/admin/customers/': ['xem_khach_hang'],
+        '/admin/customer-preferences/': ['xem_khach_hang'],
+        '/admin/promotions/': ['xem_khach_hang'],
+        '/admin/reviews/': ['xem_khach_hang'],
+        '/admin/contacts/': ['xem_khach_hang'],
+        '/admin/apriori-rules/': ['xem_khach_hang'],
+        '/admin/quan-ly-thuat-toan/': ['xem_khach_hang'],
+        '/admin/chatbot-history/': ['xem_khach_hang'],
+        '/admin/chatbot-knowledge/': ['xem_khach_hang'],
+        '/admin/news/': ['xem_cai_dat'],
+        '/admin/quan-ly-binh-luan/': ['xem_cai_dat'],
+        '/admin/albums/': ['xem_cai_dat'],
+        '/admin/settings/': ['xem_cai_dat', 'sua_cai_dat']
     };
 
     // Tìm một trang khác trang hiện tại mà nhân viên có quyền để ném nó vào
@@ -720,7 +729,7 @@ function redirectToDefaultPage(vai_tro) {
         // Đăng xuất nếu mồ côi (không có bất kì quyền gì trên toàn bộ trang mảng này)
         alert("Tài khoản của bạn đã bị giới hạn toàn bộ quyền truy cập! Vui lòng liên hệ Admin.");
         sessionStorage.removeItem('staff_user');
-        window.location.href = '../staff/login.html';
+        window.location.href = '/staff/login/';
     }
 }
 
@@ -746,8 +755,8 @@ function setActiveNavLink() {
     // Add small delay to ensure DOM is settled after injection
     setTimeout(() => {
         const path = window.location.pathname;
-        const currentPage = path.split('/').pop().split('?')[0] || 'dashboard.html';
-        const pageName = currentPage.replace('.html', '').toLowerCase();
+        let pageName = path.split('/').filter(Boolean).pop() || 'dashboard';
+        if (pageName === 'admin') pageName = 'dashboard';
         
         console.log('📍 Current Page:', pageName);
         
@@ -770,7 +779,8 @@ function setActiveNavLink() {
             const h = link.getAttribute('href');
             if (!h) return;
             
-            const linkPage = h.split('/').pop().split('?')[0].replace('.html', '').toLowerCase();
+            let linkPage = h.split('/').filter(Boolean).pop() || 'dashboard';
+            if (linkPage === 'admin') linkPage = 'dashboard';
             
             if (linkPage === activeBasePage) {
                 link.classList.add('active');
@@ -810,26 +820,26 @@ function injectLayout() {
 // Thêm data-menu attributes cho các menu items
 function addMenuDataAttributes() {
     const menuMappings = {
-        'dashboard.html': 'dashboard', 'doanh-thu.html': 'doanh-thu',
-        'chi-phi-hang-ngay.html': 'chi-phi-hang-ngay', 'loai-chi-phi.html': 'loai-chi-phi',
-        'admin-pos-new.html': 'admin-pos-new', 'admin-pos-tables.html': 'admin-pos-tables',
-        'admin-pos-order.html': 'admin-pos-order', 'orders.html': 'orders',
-        'reservations.html': 'reservations', 'tables.html': 'tables',
-        'products.html': 'products', 'categories.html': 'categories', 'flavors.html': 'flavors',
-        'nguyen-lieu.html': 'nguyen-lieu', 'loai-nguyen-lieu.html': 'loai-nguyen-lieu',
-        'cong-thuc.html': 'cong-thuc', 'nhap-hang.html': 'nhap-hang',
-        'nha-cung-cap.html': 'nha-cung-cap', 'kiem-ke.html': 'kiem-ke',
-        'hao-hut.html': 'hao-hut', 'ke-do-bep.html': 'ke-do-bep',
-        'admins.html': 'admins', 'staff.html': 'staff',
-        'shifts.html': 'shifts', 'attendance.html': 'attendance',
-        'payroll.html': 'payroll', 'customers.html': 'customers',
-        'customer-preferences.html': 'customer-preferences',
-        'promotions.html': 'promotions', 'reviews.html': 'reviews',
-        'contacts.html': 'contacts', 'chatbot-history.html': 'chatbot-history',
-        'chatbot-knowledge.html': 'chatbot-knowledge',
-        'news.html': 'news', 'quan-ly-binh-luan.html': 'quan-ly-binh-luan',
-        'quan-ly-danh-gia-tin-tuc.html': 'quan-ly-danh-gia-tin-tuc',
-        'albums.html': 'albums', 'settings.html': 'settings'
+        '/admin/dashboard/': 'dashboard', '/admin/doanh-thu/': 'doanh-thu',
+        '/admin/chi-phi-hang-ngay/': 'chi-phi-hang-ngay', '/admin/loai-chi-phi/': 'loai-chi-phi',
+        '/admin/admin-pos-new/': 'admin-pos-new', '/admin/admin-pos-tables/': 'admin-pos-tables',
+        '/admin/admin-pos-order/': 'admin-pos-order', '/admin/orders/': 'orders',
+        '/admin/reservations/': 'reservations', '/admin/tables/': 'tables',
+        '/admin/products/': 'products', '/admin/categories/': 'categories', '/admin/flavors/': 'flavors',
+        '/admin/nguyen-lieu/': 'nguyen-lieu', '/admin/loai-nguyen-lieu/': 'loai-nguyen-lieu',
+        '/admin/cong-thuc/': 'cong-thuc', '/admin/nhap-hang/': 'nhap-hang',
+        '/admin/nha-cung-cap/': 'nha-cung-cap', '/admin/kiem-ke/': 'kiem-ke',
+        '/admin/hao-hut/': 'hao-hut', '/admin/ke-do-bep/': 'ke-do-bep',
+        '/admin/admins/': 'admins', '/admin/staff/': 'staff',
+        '/admin/shifts/': 'shifts', '/admin/attendance/': 'attendance',
+        '/admin/payroll/': 'payroll', '/admin/customers/': 'customers',
+        '/admin/customer-preferences/': 'customer-preferences',
+        '/admin/promotions/': 'promotions', '/admin/reviews/': 'reviews',
+        '/admin/contacts/': 'contacts', '/admin/chatbot-history/': 'chatbot-history',
+        '/admin/chatbot-knowledge/': 'chatbot-knowledge',
+        '/admin/news/': 'news', '/admin/quan-ly-binh-luan/': 'quan-ly-binh-luan',
+        '/admin/quan-ly-danh-gia-tin-tuc/': 'quan-ly-danh-gia-tin-tuc',
+        '/admin/albums/': 'albums', '/admin/settings/': 'settings'
     };
 
     for (const [href, menuName] of Object.entries(menuMappings)) {
@@ -842,7 +852,7 @@ function addMenuDataAttributes() {
 async function initAdminLayout() {
     // Không chạy redirect hoặc check nếu đang ở trang login
     const currentPath = window.location.pathname;
-    if (currentPath.includes('login.html') || currentPath.includes('dang-nhap-admin.html')) {
+    if (currentPath.includes('/admin/login/') || currentPath.includes('/admin/dang-nhap-admin/')) {
         return;
     }
 
@@ -863,7 +873,7 @@ async function initAdminLayout() {
     } else {
         // Nếu không có userData, chuyển ngay ra trang login
         console.warn('⚠️ Phiên đăng nhập hết hạn. Đang chuyển hướng...');
-        window.location.href = 'dang-nhap-admin.html?error=session_expired';
+        window.location.href = '/admin/dang-nhap-admin/?error=session_expired';
     }
 
     // Thiết lập Heartbeat toàn cục (kiểm tra liên tục mỗi 5 giây)
@@ -875,7 +885,7 @@ async function initAdminLayout() {
             });
             const result = await response.json();
             if (!result.isAuthenticated && !sessionStorage.getItem('staff_user')) {
-                window.location.href = 'dang-nhap-admin.html?error=session_expired';
+                window.location.href = '/admin/dang-nhap-admin/?error=session_expired';
             }
         } catch (error) {
             console.warn('⚠️ Mất kết nối tới máy chủ!');
@@ -951,7 +961,7 @@ window.reloadPermissions = async function() {
                 // Hiển thị thông báo
                 const notification = document.createElement('div');
                 notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-weight: 600;';
-                notification.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Quyền của bạn đã là mới nhất';
+                notification.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Quyền của bạn đã được cập nhật mới nhất';
                 document.body.appendChild(notification);
                 
                 setTimeout(() => notification.remove(), 3000);

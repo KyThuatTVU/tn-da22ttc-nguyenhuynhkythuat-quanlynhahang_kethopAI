@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lương Hàng Ngày - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Header Actions -->
+                <div class="content-card mb-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Lương Tạm Tính Hàng Ngày</h2>
+                            <p class="text-sm text-gray-600">Theo dõi lương dự kiến của nhân viên theo ngày</p>
+                        </div>
+                        <button onclick="recalculateToday()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition">
+                            <i class="fas fa-calculator mr-2"></i>Tính Lại Hôm Nay
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="form-group mb-0">
+                            <label class="form-label">Nhân viên</label>
+                            <select id="filterStaff" class="form-select" onchange="loadDailySalary()"></select>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="form-label">Từ ngày</label>
+                            <input type="date" id="filterStart" class="form-input" onchange="loadDailySalary()">
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="form-label">Đến ngày</label>
+                            <input type="date" id="filterEnd" class="form-input" onchange="loadDailySalary()">
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="form-label">&nbsp;</label>
+                            <button onclick="generateMonthly()" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold hover:bg-blue-700 transition">
+                                <i class="fas fa-file-invoice-dollar mr-2"></i>Tạo Bảng Lương Tháng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-blue-600 font-bold uppercase">Nhân viên</p>
+                                <h4 id="countStaff" class="text-2xl font-black text-blue-900">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 border border-green-100 p-4 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-green-600 font-bold uppercase">Tổng giờ</p>
+                                <h4 id="totalHours" class="text-2xl font-black text-green-900">0h</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-100 p-4 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-purple-600 font-bold uppercase">Ngày làm</p>
+                                <h4 id="totalDays" class="text-2xl font-black text-purple-900">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-amber-600 font-bold uppercase">Tổng lương</p>
+                                <h4 id="totalSalary" class="text-2xl font-black text-amber-900">0đ</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="content-card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Ngày</th>
+                                    <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Nhân viên</th>
+                                    <th class="text-center py-4 px-4 text-sm font-bold text-gray-600">Giờ làm</th>
+                                    <th class="text-right py-4 px-4 text-sm font-bold text-gray-600">Lương/giờ</th>
+                                    <th class="text-right py-4 px-4 text-sm font-bold text-gray-600">Lương ngày</th>
+                                    <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Trạng thái</th>
+                                    <th class="text-left py-4 px-4 text-sm font-bold text-gray-600">Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salaryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="check-auth.js"></script>
+    <script src="admin-layout.js"></script>
+    
+    <script src="luong-hang-ngay.js" defer></script>
+
+</body>
+</html>

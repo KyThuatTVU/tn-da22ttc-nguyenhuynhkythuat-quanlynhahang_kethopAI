@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ luong-cua-toi.html) ==== */
+/* ==== Script 1 (tách từ /staff/luong-cua-toi/) ==== */
 const API_URL = 'http://localhost:3000/api';
         let currentUser = null;
 
@@ -10,7 +10,7 @@ const API_URL = 'http://localhost:3000/api';
                 
                 if (!data.success) {
                     alert('Vui lòng đăng nhập!');
-                    window.location.href = 'login.html';
+                    window.location.href = '/staff/login/';
                     return;
                 }
 

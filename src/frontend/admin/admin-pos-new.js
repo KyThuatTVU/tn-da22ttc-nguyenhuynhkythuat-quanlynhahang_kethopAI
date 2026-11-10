@@ -72,7 +72,7 @@ async function initAuth() {
             const nameEl = document.getElementById('admin-name-display');
             if (nameEl) nameEl.textContent = adminUser.ten_hien_thi || adminUser.ho_ten;
         } else {
-            window.location.href = '../staff/login.html';
+            window.location.href = '/staff/login/';
         }
     } catch (e) {
         console.error("Auth error", e);
@@ -629,5 +629,5 @@ function formatCurrency(amount) {
 }
 
 function logout() {
-    window.location.href = 'dang-nhap-admin.html';
+    window.location.href = '/admin/dang-nhap-admin/';
 }

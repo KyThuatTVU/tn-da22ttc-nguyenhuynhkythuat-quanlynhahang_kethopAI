@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ cham-cong.html) ==== */
+/* ==== Script 1 (tách từ /cham-cong/) ==== */
 const API_BASE = 'http://localhost:3000/api';
         let currentMethod = 'code';
         let cameraStream = null;

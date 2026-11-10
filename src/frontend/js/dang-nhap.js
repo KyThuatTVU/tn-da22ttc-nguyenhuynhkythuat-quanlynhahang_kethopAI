@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dang-nhap.html) ==== */
+/* ==== Script 1 (tách từ /dang-nhap/) ==== */
 // Xử lý callback từ Google OAuth
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -74,7 +74,7 @@
                     
                     // Chuyển hướng về trang chủ
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = '/';
                     }, 1500);
                     
                 } catch (e) {

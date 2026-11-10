@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ chi-phi-hang-ngay.html) ==== */
+/* ==== Script 1 (tách từ /admin/chi-phi-hang-ngay/) ==== */
 let expenses = [];
         let categories = [];
 

@@ -4,7 +4,7 @@ function logoutAdmin() {
     const staffUser = sessionStorage.getItem('staff_user');
     if (staffUser) {
         sessionStorage.removeItem('staff_user');
-        window.location.href = '../staff/login.html';
+        window.location.href = '/staff/login/';
         return;
     }
 
@@ -13,7 +13,7 @@ function logoutAdmin() {
     localStorage.removeItem('admin_info');
     
     // Chuyển về trang đăng nhập admin
-    window.location.href = 'dang-nhap-admin.html?logout=success';
+    window.location.href = '/admin/dang-nhap-admin/?logout=success';
 }
 
 // Export function

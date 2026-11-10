@@ -288,7 +288,7 @@ router.post('/', authenticateToken, (req, res) => {
         'new_review',
         `Đánh giá mới ${so_sao}⭐`,
         `${userName} đã đánh giá "${dishName}"`,
-        `../chitietmonan.html?id=${ma_mon}`,
+        `/chitietmonan/?id=${ma_mon}`,
         result.insertId
       );
 
@@ -705,7 +705,7 @@ router.post('/:reviewId/reply', async (req, res) => {
                     review[0].ma_nguoi_dung,
                     `Admin đã trả lời đánh giá của bạn về "${review[0].ten_mon}"`,
                     noi_dung.substring(0, 100) + (noi_dung.length > 100 ? '...' : ''),
-                    `chitietmonan.html?id=${review[0].ma_mon}`,
+                    `/chitietmonan/?id=${review[0].ma_mon}`,
                     reviewId
                 ]);
                 console.log(`📢 Đã gửi thông báo trả lời đánh giá cho user ${review[0].ma_nguoi_dung}`);

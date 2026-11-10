@@ -83,7 +83,7 @@ function displayFeaturedNews(news) {
 
     container.innerHTML = `
         <article class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
-            <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}">
+            <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}">
                 <img src="${getImageUrl(news.anh_dai_dien)}" 
                      alt="${news.tieu_de}" 
                      class="w-full h-48 sm:h-56 md:h-64 object-cover"
@@ -105,12 +105,12 @@ function displayFeaturedNews(news) {
                     </span>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 line-clamp-2 hover:text-orange-600 transition">
-                    <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
+                    <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
                 </h2>
                 <p class="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 line-clamp-3">
                     ${news.tom_tat || ''}
                 </p>
-                <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}" 
+                <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}" 
                    class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium text-sm sm:text-base">
                     Đọc thêm 
                     <i class="fas fa-arrow-right ml-2"></i>
@@ -137,7 +137,7 @@ function displayNews(newsList) {
 
     container.innerHTML = newsList.map(news => `
         <article class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
-            <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}">
+            <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}">
                 <img src="${getImageUrl(news.anh_dai_dien)}" 
                      alt="${news.tieu_de}" 
                      class="w-full h-40 sm:h-48 object-cover"
@@ -155,12 +155,12 @@ function displayNews(newsList) {
                     </span>
                 </div>
                 <h3 class="text-base sm:text-lg font-bold mb-2 line-clamp-2 hover:text-orange-600 transition">
-                    <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
+                    <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
                 </h3>
                 <p class="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
                     ${news.tom_tat || ''}
                 </p>
-                <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}" 
+                <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}" 
                    class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium text-xs sm:text-sm">
                     Đọc thêm 
                     <i class="fas fa-arrow-right ml-1 sm:ml-2 text-xs"></i>
@@ -185,7 +185,7 @@ function displayPopularNews(newsList) {
             </div>
             <div class="flex-1 min-w-0">
                 <h4 class="font-semibold text-xs sm:text-sm line-clamp-2 mb-1 hover:text-orange-600">
-                    <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
+                    <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}">${news.tieu_de}</a>
                 </h4>
                 <div class="flex items-center text-xs text-gray-500 space-x-2">
                     <span><i class="fas fa-calendar mr-1"></i>${formatDate(news.ngay_dang)}</span>

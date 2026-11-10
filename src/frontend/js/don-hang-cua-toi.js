@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ don-hang-cua-toi.html) ==== */
+/* ==== Script 1 (tách từ /don-hang-cua-toi/) ==== */
 // Animate page header only (không animate order cards vì my-orders.js đã xử lý)
         document.addEventListener('DOMContentLoaded', () => {
             gsap.from('.text-center.mb-8', {

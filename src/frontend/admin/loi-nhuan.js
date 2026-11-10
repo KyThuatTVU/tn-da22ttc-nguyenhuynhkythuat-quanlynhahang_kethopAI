@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ loi-nhuan.html) ==== */
+/* ==== Script 1 (tách từ /admin/loi-nhuan/) ==== */
 let financeChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {

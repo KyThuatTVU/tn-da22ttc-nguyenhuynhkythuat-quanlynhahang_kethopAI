@@ -21,7 +21,7 @@ function formatPrice(price) {
 async function fetchProductDetail() {
     if (!productId) {
         console.warn('⚠️ Không có product ID, chuyển về trang thực đơn');
-        window.location.href = 'thuc-don.html';
+        window.location.href = '/thuc-don/';
         return;
     }
 
@@ -412,7 +412,7 @@ function renderRelatedProducts() {
         const formattedRating = !isNaN(rating) ? rating.toFixed(1) : '0';
         
         return `
-            <a href="chitietmonan.html?id=${product.ma_mon}" class="related-card block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+            <a href="/chitietmonan/?id=${product.ma_mon}" class="related-card block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
                 <div class="relative bg-gray-50">
                     <img src="${imageUrl}" 
                          alt="${product.ten_mon}" 
@@ -526,7 +526,7 @@ function addToCart() {
 // Buy now
 function buyNow() {
     addToCart();
-    window.location.href = 'gio-hang.html';
+    window.location.href = '/gio-hang/';
 }
 
 // Update cart badge
@@ -571,7 +571,7 @@ function showError() {
             <i class="fas fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Không tìm thấy món ăn</h2>
             <p class="text-gray-600 mb-6">Món ăn bạn tìm kiếm không tồn tại hoặc đã bị xóa</p>
-            <a href="thuc-don.html" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">
+            <a href="/thuc-don/" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">
                 <i class="fas fa-arrow-left mr-2"></i>Quay lại thực đơn
             </a>
         </div>

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ flavors.html) ==== */
+/* ==== Script 1 (tách từ /admin/flavors/) ==== */
 let flavors = [];
 
         async function loadFlavors() {

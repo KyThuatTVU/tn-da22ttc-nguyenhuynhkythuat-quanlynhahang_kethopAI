@@ -447,7 +447,7 @@ async function sendOrderConfirmationEmail(email, orderData) {
                         </table>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/don-hang-cua-toi.html" class="button">Theo dõi đơn hàng</a>
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/don-hang-cua-toi/" class="button">Theo dõi đơn hàng</a>
                         </div>
 
                         <p><strong>Lưu ý:</strong></p>
@@ -603,7 +603,7 @@ async function sendReservationConfirmationEmail(email, reservationData) {
                         ` : ''}
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dat-ban-cua-toi.html" class="button">Xem đặt bàn của tôi</a>
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dat-ban-cua-toi/" class="button">Xem đặt bàn của tôi</a>
                         </div>
 
                         <p><strong>Lưu ý quan trọng:</strong></p>
@@ -781,7 +781,7 @@ async function sendReservationPaymentSuccessEmail(email, paymentData) {
                         ` : ''}
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dat-ban-cua-toi.html" class="button">Xem đặt bàn của tôi</a>
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dat-ban-cua-toi/" class="button">Xem đặt bàn của tôi</a>
                         </div>
 
                         <p><strong>Lưu ý quan trọng:</strong></p>

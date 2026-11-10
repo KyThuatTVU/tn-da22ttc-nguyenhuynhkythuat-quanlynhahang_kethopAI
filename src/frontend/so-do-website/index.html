@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ cấu trúc Website</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/so-do-website.css">
+
+</head>
+<body>
+    <div class="container">
+        <h1>SƠ ĐỒ CẤU TRÚC WEBSITE NHÀ HÀNG</h1>
+        
+        <!-- Main Structure -->
+        <div class="flow-container">
+            <!-- Root -->
+            <div class="node node-root">TRANG CHỦ</div>
+            
+            <div class="vertical-line"></div>
+            <div class="arrow-point"></div>
+            
+            <!-- Main Navigation Level -->
+            <div class="horizontal-spread" style="width: 100%; justify-content: center; gap: 20px; padding-top: 20px;">
+                
+                <!-- Thực đơn -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-main">Thực đơn</div>
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-sub">Chi tiết món ăn</div>
+                </div>
+                
+                <!-- Đặt bàn -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-main">Đặt bàn</div>
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-sub">Đặt bàn của tôi</div>
+                </div>
+                
+                <!-- Giỏ hàng -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-main">Giỏ hàng</div>
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-sub">Thanh toán</div>
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-sub">Đặt hàng thành công</div>
+                </div>
+                
+                <!-- Tin tức -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-main">Tin tức</div>
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-sub">Chi tiết tin tức</div>
+                </div>
+                
+                <!-- Album -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-main">Album ảnh</div>
+                </div>
+                
+                <!-- Giới thiệu -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-info">Giới thiệu</div>
+                </div>
+                
+                <!-- Liên hệ -->
+                <div class="spread-item">
+                    <div class="vertical-line"></div>
+                    <div class="arrow-point"></div>
+                    <div class="node node-info">Liên hệ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="section">
+            <div class="section-title">CHỨC NĂNG XÁC THỰC</div>
+            <div class="flow-container">
+                <div class="flow-row" style="gap: 40px;">
+                    <div class="flow-branch">
+                        <div class="node node-auth">Đăng nhập</div>
+                    </div>
+                    <div class="flow-branch">
+                        <div class="node node-auth">Đăng ký</div>
+                        <div class="vertical-line"></div>
+                        <div class="arrow-point"></div>
+                        <div class="node node-sub">Xác thực Email</div>
+                    </div>
+                    <div class="flow-branch">
+                        <div class="node node-auth">Quên mật khẩu</div>
+                        <div class="vertical-line"></div>
+                        <div class="arrow-point"></div>
+                        <div class="node node-sub">Đặt lại mật khẩu</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Account Section -->
+        <div class="section">
+            <div class="section-title">QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG</div>
+            <div class="flow-container">
+                <div class="node node-user">Tài khoản</div>
+                <div class="vertical-line"></div>
+                <div class="arrow-point"></div>
+                <div class="flow-row" style="gap: 30px;">
+                    <div class="node node-sub">Đơn hàng của tôi</div>
+                    <div class="node node-sub">Đặt bàn của tôi</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legal Pages -->
+        <div class="section">
+            <div class="section-title">TRANG THÔNG TIN PHÁP LÝ</div>
+            <div class="flow-row" style="gap: 30px; justify-content: center;">
+                <div class="node node-info">Chính sách bảo mật</div>
+                <div class="node node-info">Điều khoản dịch vụ</div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div class="section" style="background: #f0f3f5;">
+            <div class="section-title">HỆ THỐNG QUẢN TRỊ (ADMIN)</div>
+            <div class="flow-container">
+                <div class="node node-admin" style="font-size: 16px;">Đăng nhập Admin</div>
+                <div class="vertical-line"></div>
+                <div class="arrow-point"></div>
+                <div class="node node-admin" style="font-size: 16px;">Dashboard</div>
+                <div class="vertical-line"></div>
+                <div class="arrow-point"></div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 10px;">
+                    <div class="group">
+                        <div class="group-title">Quản lý nội dung</div>
+                        <div class="group-items">
+                            <div class="node node-sub">Sản phẩm</div>
+                            <div class="node node-sub">Tin tức</div>
+                            <div class="node node-sub">Album ảnh</div>
+                            <div class="node node-sub">Khuyến mãi</div>
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <div class="group-title">Quản lý đơn hàng</div>
+                        <div class="group-items">
+                            <div class="node node-sub">Đơn hàng</div>
+                            <div class="node node-sub">Đặt bàn</div>
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <div class="group-title">Quản lý người dùng</div>
+                        <div class="group-items">
+                            <div class="node node-sub">Khách hàng</div>
+                            <div class="node node-sub">Liên hệ</div>
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <div class="group-title">Quản lý đánh giá</div>
+                        <div class="group-items">
+                            <div class="node node-sub">Đánh giá sản phẩm</div>
+                            <div class="node node-sub">Bình luận</div>
+                            <div class="node node-sub">Đánh giá tin tức</div>
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <div class="group-title">Hệ thống</div>
+                        <div class="group-items">
+                            <div class="node node-sub">Cài đặt</div>
+                            <div class="node node-sub">Lịch sử Chatbot</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">CHÚ THÍCH</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e74c3c; border-color: #c0392b;"></div>
+                    <span class="legend-text">Trang chủ</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3498db; border-color: #2980b9;"></div>
+                    <span class="legend-text">Trang chính</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #27ae60; border-color: #1e8449;"></div>
+                    <span class="legend-text">Xác thực</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12; border-color: #d68910;"></div>
+                    <span class="legend-text">Tài khoản người dùng</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1abc9c; border-color: #16a085;"></div>
+                    <span class="legend-text">Thông tin</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #34495e; border-color: #2c3e50;"></div>
+                    <span class="legend-text">Quản trị Admin</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ecf0f1; border-color: #bdc3c7;"></div>
+                    <span class="legend-text">Trang con</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

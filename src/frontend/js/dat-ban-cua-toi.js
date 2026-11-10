@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dat-ban-cua-toi.html) ==== */
+/* ==== Script 1 (tách từ /dat-ban-cua-toi/) ==== */
 const API_URL = window.API_URL || 'http://localhost:3000/api';
         let allReservations = [];
         let currentFilter = 'all';
@@ -7,7 +7,7 @@ const API_URL = window.API_URL || 'http://localhost:3000/api';
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = 'dang-nhap.html?redirect=dat-ban-cua-toi.html';
+                window.location.href = '/dang-nhap/?redirect=/dat-ban-cua-toi/';
                 return;
             }
             loadReservations();

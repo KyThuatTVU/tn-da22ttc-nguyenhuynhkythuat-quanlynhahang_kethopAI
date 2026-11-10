@@ -116,17 +116,17 @@ function getBotResponse(message) {
     const msg = message.toLowerCase();
     
     if (msg.includes('menu') || msg.includes('thực đơn') || msg.includes('món')) {
-        return 'Bạn có thể xem thực đơn đầy đủ tại <a href="thuc-don.html" class="text-orange-600 underline">đây</a>. Chúng tôi có nhiều món đặc sản miền Tây như cá lóc nướng, lẩu mắm, bánh xèo...';
+        return 'Bạn có thể xem thực đơn đầy đủ tại <a href="/thuc-don/" class="text-orange-600 underline">đây</a>. Chúng tôi có nhiều món đặc sản miền Tây như cá lóc nướng, lẩu mắm, bánh xèo...';
     } else if (msg.includes('đặt bàn') || msg.includes('booking') || msg.includes('book')) {
-        return 'Bạn có thể đặt bàn trực tuyến tại <a href="dat-ban.html" class="text-orange-600 underline">đây</a> hoặc gọi hotline: 0123 456 789';
+        return 'Bạn có thể đặt bàn trực tuyến tại <a href="/dat-ban/" class="text-orange-600 underline">đây</a> hoặc gọi hotline: 0123 456 789';
     } else if (msg.includes('giá') || msg.includes('price') || msg.includes('tiền')) {
         return 'Giá các món ăn dao động từ 50.000đ đến 500.000đ. Xem chi tiết tại trang thực đơn.';
     } else if (msg.includes('giờ') || msg.includes('mở cửa') || msg.includes('open')) {
         return 'Nhà hàng mở cửa từ 10:00 - 22:00 hàng ngày, kể cả cuối tuần và lễ tết.';
     } else if (msg.includes('địa chỉ') || msg.includes('address') || msg.includes('ở đâu')) {
-        return 'Nhà hàng tại: 123 Đường ABC, Phường 1, TP. Vĩnh Long. <a href="lien-he.html" class="text-orange-600 underline">Xem bản đồ</a>';
+        return 'Nhà hàng tại: 123 Đường ABC, Phường 1, TP. Vĩnh Long. <a href="/lien-he/" class="text-orange-600 underline">Xem bản đồ</a>';
     } else if (msg.includes('khuyến mãi') || msg.includes('giảm giá') || msg.includes('promotion')) {
-        return 'Hiện tại chúng tôi có giảm giá 20% cho các món đặc sản vào cuối tuần. Xem thêm tại <a href="tin-tuc.html" class="text-orange-600 underline">trang tin tức</a>.';
+        return 'Hiện tại chúng tôi có giảm giá 20% cho các món đặc sản vào cuối tuần. Xem thêm tại <a href="/tin-tuc/" class="text-orange-600 underline">trang tin tức</a>.';
     } else if (msg.includes('giao hàng') || msg.includes('delivery') || msg.includes('ship')) {
         return 'Chúng tôi có dịch vụ giao hàng miễn phí trong bán kính 5km. Phí ship ngoài khu vực là 30.000đ.';
     } else {

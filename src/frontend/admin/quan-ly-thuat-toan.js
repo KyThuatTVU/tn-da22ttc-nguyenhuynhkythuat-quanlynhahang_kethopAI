@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ quan-ly-thuat-toan.html) ==== */
+/* ==== Script 1 (tách từ /admin/quan-ly-thuat-toan/) ==== */
 let algorithmData = null;
         
         document.addEventListener('DOMContentLoaded', () => {

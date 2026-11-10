@@ -14,7 +14,7 @@ ComponentManager.register('emptyState', (data = {}) => {
         title = 'Không có dữ liệu',
         message = 'Không tìm thấy nội dung nào',
         actionText = 'Quay lại',
-        actionLink = 'index.html'
+        actionLink = '/'
     } = data;
     
     return `
@@ -66,7 +66,7 @@ ComponentManager.register('breadcrumb', (items = []) => {
         <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="index.html" class="text-gray-700 hover:text-orange-600 inline-flex items-center">
+                    <a href="/" class="text-gray-700 hover:text-orange-600 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i>
                         Trang chủ
                     </a>

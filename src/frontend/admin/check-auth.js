@@ -73,10 +73,10 @@ async function logoutAdmin() {
         
         // Luôn chuyển hướng về trang đăng nhập admin kể cả thành công hay lỗi
         // vì cơ bản ở client ta đã coi như thoát rồi
-        window.location.href = 'dang-nhap-admin.html?logout=success';
+        window.location.href = '/admin/dang-nhap-admin/?logout=success';
     } catch (error) {
         console.error('Lỗi đăng xuất:', error);
-        window.location.href = 'dang-nhap-admin.html?logout=success';
+        window.location.href = '/admin/dang-nhap-admin/?logout=success';
     }
 }
 

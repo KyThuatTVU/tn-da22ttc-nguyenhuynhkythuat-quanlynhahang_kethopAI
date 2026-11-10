@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ quen-mat-khau.html) ==== */
+/* ==== Script 1 (tách từ /quen-mat-khau/) ==== */
 const API_URL = 'http://localhost:3000/api/auth';
         let userEmail = '';
 
@@ -96,7 +96,7 @@ const API_URL = 'http://localhost:3000/api/auth';
                     sessionStorage.setItem('reset_code', verifyCode);
                     
                     setTimeout(() => {
-                        window.location.href = 'dat-lai-mat-khau.html';
+                        window.location.href = '/dat-lai-mat-khau/';
                     }, 1500);
                 } else {
                     showNotification(data.message || 'Mã xác thực không đúng!', 'error');

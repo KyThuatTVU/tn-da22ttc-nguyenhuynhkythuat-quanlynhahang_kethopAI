@@ -158,7 +158,7 @@ const updateAllDishMaxPortions = async (conn = null) => {
                     'system',
                     'Cảnh báo: Nguyên liệu sắp hết',
                     `Nguyên liệu "${item.ten_nguyen_lieu}" chỉ còn ${item.so_luong_ton} ${item.don_vi_tinh} (Mức cảnh báo: ${item.muc_canh_bao})`,
-                    '/admin/inventory.html',
+                    '/admin/nguyen-lieu/',
                     null
                 ).catch(e => console.error('Alert error:', e));
             }

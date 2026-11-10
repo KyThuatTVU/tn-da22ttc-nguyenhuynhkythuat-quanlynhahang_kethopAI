@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ orders.html) ==== */
+/* ==== Script 1 (tách từ /admin/orders/) ==== */
 // API_URL declared in admin-layout.js
         let orders = [];
         let currentTab = 'all';

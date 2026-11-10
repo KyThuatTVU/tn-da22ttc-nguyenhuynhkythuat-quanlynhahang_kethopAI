@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ customers.html) ==== */
+/* ==== Script 1 (tách từ /admin/customers/) ==== */
 // API_URL đã được khai báo trong admin-layout.js
         let customers = [];
 

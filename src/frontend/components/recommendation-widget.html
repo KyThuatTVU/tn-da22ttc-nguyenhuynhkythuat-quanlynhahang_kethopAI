@@ -142,7 +142,7 @@ async function loadCartRecommendations() {
             return `
                 <div class="recommendation-item">
                     <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
-                        <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                        <a href="/chitietmonan/?id=${dish.ma_mon}" class="block">
                             <div class="relative">
                                 <img src="${imageUrl}" alt="${dish.ten_mon}" 
                                      class="w-full h-28 object-cover"
@@ -224,15 +224,15 @@ async function loadMenuRecommendations() {
 
 // Auto-load based on page
 document.addEventListener('DOMContentLoaded', function() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').filter(Boolean).pop() || 'index';
     
     // Load cart recommendations on cart/checkout pages
-    if (currentPage === 'gio-hang.html' || currentPage === 'thanh-toan.html') {
+    if (currentPage === 'gio-hang' || currentPage === 'thanh-toan') {
         setTimeout(loadCartRecommendations, 500);
     }
     
     // Load menu recommendations on menu page
-    if (currentPage === 'thuc-don.html') {
+    if (currentPage === 'thuc-don') {
         setTimeout(loadMenuRecommendations, 500);
     }
 });

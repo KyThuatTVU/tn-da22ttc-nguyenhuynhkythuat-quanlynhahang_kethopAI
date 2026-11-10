@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng lương & Thu nhập - Admin Phương Nam</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+    
+    <link rel="stylesheet" href="payroll.css">
+
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Status Row -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="content-card flex items-center justify-between border-b-4 border-blue-500">
+                        <div>
+                            <p class="text-xs font-bold text-blue-500 uppercase">Tổng quỹ lương</p>
+                            <h3 id="total-payout" class="text-2xl font-black">0đ</h3>
+                        </div>
+                        <i class="fas fa-vault text-3xl text-blue-100"></i>
+                    </div>
+                    <div class="content-card flex items-center justify-between border-b-4 border-emerald-500">
+                        <div>
+                            <p class="text-xs font-bold text-emerald-500 uppercase">Đã thanh toán</p>
+                            <h3 id="paid-amount" class="text-2xl font-black">0đ</h3>
+                        </div>
+                        <i class="fas fa-check-double text-3xl text-emerald-100"></i>
+                    </div>
+                    <div class="content-card flex items-center justify-between border-b-4 border-amber-500">
+                        <div>
+                            <p class="text-xs font-bold text-amber-500 uppercase">Cần chi trả</p>
+                            <h3 id="unpaid-amount" class="text-2xl font-black text-amber-600">0đ</h3>
+                        </div>
+                        <i class="fas fa-hand-holding-dollar text-3xl text-amber-100"></i>
+                    </div>
+                    <div class="content-card flex items-center justify-between border-b-4 border-indigo-500">
+                        <div>
+                            <p class="text-xs font-bold text-indigo-500 uppercase">Số nhân sự</p>
+                            <h3 id="staff-count" class="text-2xl font-black">0</h3>
+                        </div>
+                        <i class="fas fa-users-cog text-3xl text-indigo-100"></i>
+                    </div>
+                </div>
+
+                <!-- Filters and Actions -->
+                <div class="content-card mb-6 border-l-4 border-blue-600">
+                    <div class="flex flex-wrap gap-4 items-end">
+                        <div class="form-group mb-0 flex-1 min-w-[150px]">
+                            <label class="form-label">Kỳ tính lương</label>
+                            <div class="flex space-x-2">
+                                <select id="filter-month" class="form-select" onchange="loadPayroll()">
+                                    
+                                </select>
+                                <select id="filter-year" class="form-select" onchange="loadPayroll()">
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2026">2026</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex-1"></div>
+                        <button onclick="generatePayroll()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg flex items-center space-x-2">
+                            <i class="fas fa-calculator"></i><span>Khởi tạo & Tính toán lương</span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-2 italic"><i class="fas fa-info-circle mr-1"></i> Hệ thống sẽ tổng hợp số giờ làm thực tế từ bảng chấm công và nhân với đơn giá giờ của từng nhân viên.</p>
+                </div>
+
+                <!-- Payroll Table -->
+                <div class="content-card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase">Nhân viên / Vai trò</th>
+                                    <th class="text-right py-4 px-4 text-xs font-bold text-gray-600 uppercase">Chi tiết lương</th>
+                                    <th class="text-right py-4 px-4 text-xs font-bold text-gray-600 uppercase">Thưởng/Phụ cấp</th>
+                                    <th class="text-right py-4 px-4 text-xs font-bold text-gray-600 uppercase">Khấu trừ</th>
+                                    <th class="text-right py-4 px-4 text-xs font-bold text-gray-600 uppercase">Thực Lĩnh</th>
+                                    <th class="text-center py-4 px-4 text-xs font-bold text-gray-600 uppercase">Trạng thái</th>
+                                    <th class="text-center py-4 px-4 text-xs font-bold text-gray-600 uppercase">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payroll-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Sửa lương -->
+    <div id="payrollModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-bold">Chỉnh sửa phiếu lương</h3>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="payrollForm">
+                <div class="modal-body">
+                    <input type="hidden" id="payroll-id">
+                    <p id="payroll-info" class="text-blue-600 font-bold mb-4 bg-blue-50 p-3 rounded-lg"></p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phụ cấp (VNĐ)</label>
+                        <input type="number" id="form-bonus" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Khấu trừ (VNĐ)</label>
+                        <input type="number" id="form-deduct" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Trạng thái thanh toán</label>
+                        <select id="form-status" class="form-select">
+                            <option value="chua_thanh_toan">Chưa thanh toán</option>
+                            <option value="da_thanh_toan">Đã thanh toán</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition">Hủy bỏ</button>
+                    <button type="submit" class="px-8 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="check-auth.js"></script>
+    <script src="admin-layout.js"></script>
+    
+    <script src="payroll.js" defer></script>
+
+</body>
+</html>

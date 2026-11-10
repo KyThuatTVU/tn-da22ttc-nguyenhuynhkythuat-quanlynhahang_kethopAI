@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!isAuthenticated()) {
         showNotification('Vui lòng đăng nhập để thanh toán', 'warning');
         setTimeout(() => {
-            window.location.href = 'dang-nhap.html?redirect=thanh-toan.html';
+            window.location.href = '/dang-nhap/?redirect=/thanh-toan/';
         }, 2000);
         return;
     }
@@ -214,7 +214,7 @@ async function submitOrder(event) {
         console.warn('❌ User not authenticated');
         showNotification('Vui lòng đăng nhập để đặt hàng', 'warning');
         setTimeout(() => {
-            window.location.href = 'dang-nhap.html?redirect=thanh-toan.html';
+            window.location.href = '/dang-nhap/?redirect=/thanh-toan/';
         }, 1500);
         return;
     }
@@ -233,7 +233,7 @@ async function submitOrder(event) {
         console.error('❌ Cart is empty!');
         showNotification('Giỏ hàng trống!', 'error');
         setTimeout(() => {
-            window.location.href = 'thuc-don.html';
+            window.location.href = '/thuc-don/';
         }, 1500);
         return;
     }
@@ -388,7 +388,7 @@ async function submitOrder(event) {
 
                     if (paymentResponse.ok && paymentResult.success) {
                         // KHÔNG xóa giỏ hàng ở đây - chỉ xóa khi thanh toán thành công
-                        // Cart sẽ được xóa trong trang dat-hang-thanh-cong.html
+                        // Cart sẽ được xóa trong trang /dat-hang-thanh-cong/
 
                         // Lưu địa chỉ giao hàng để prefill lần sau
                         saveLastShippingAddress(orderData);
@@ -464,7 +464,7 @@ async function submitOrder(event) {
 
                 // Redirect to success page
                 setTimeout(() => {
-                    window.location.href = `dat-hang-thanh-cong.html?orderId=${orderId}`;
+                    window.location.href = `/dat-hang-thanh-cong/?orderId=${orderId}`;
                 }, 2000);
             }
         } else {

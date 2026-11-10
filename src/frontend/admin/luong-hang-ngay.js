@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ luong-hang-ngay.html) ==== */
+/* ==== Script 1 (tách từ /admin/luong-hang-ngay/) ==== */
 const DAILY_SALARY_API = `${API_URL}/daily-salary`;
         const STAFF_API = `${API_URL}/staff`;
 

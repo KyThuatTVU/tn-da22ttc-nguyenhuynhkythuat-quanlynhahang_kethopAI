@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ promotions.html) ==== */
+/* ==== Script 1 (tách từ /admin/promotions/) ==== */
 document.addEventListener('DOMContentLoaded', () => {
             window.promoDraftManager = new FormDraftManager('promo-form');
         });

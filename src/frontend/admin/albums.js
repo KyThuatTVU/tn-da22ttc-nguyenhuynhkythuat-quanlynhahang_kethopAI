@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ albums.html) ==== */
+/* ==== Script 1 (tách từ /admin/albums/) ==== */
 let albums = [];
 
         function formatDateVN(dateString) {

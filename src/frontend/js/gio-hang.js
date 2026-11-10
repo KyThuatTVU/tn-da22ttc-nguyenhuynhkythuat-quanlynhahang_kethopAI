@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ gio-hang.html) ==== */
+/* ==== Script 1 (tách từ /gio-hang/) ==== */
 // Load ML-based pairing recommendations
     async function loadPairingRecommendations() {
         const section = document.getElementById('pairing-section');
@@ -41,7 +41,7 @@
                 return `
                     <div class="flex-shrink-0 w-44">
                         <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
-                            <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                            <a href="/chitietmonan/?id=${dish.ma_mon}" class="block">
                                 <div class="relative">
                                     <img src="${imageUrl}" alt="${dish.ten_mon}" 
                                          class="w-full h-28 object-cover"
@@ -103,7 +103,7 @@
         }, 800);
     });
 
-/* ==== Script 2 (tách từ gio-hang.html) ==== */
+/* ==== Script 2 (tách từ /gio-hang/) ==== */
 // Initialize cart page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🛒 Initializing cart page...');
@@ -144,11 +144,11 @@
                             </div>
                             <p class="text-gray-500 text-xl mb-2">Vui lòng đăng nhập</p>
                             <p class="text-gray-400 text-sm mb-4">Đăng nhập để xem và quản lý giỏ hàng của bạn</p>
-                            <a href="dang-nhap.html?redirect=gio-hang.html"
+                            <a href="/dang-nhap/?redirect=/gio-hang/"
                                 class="inline-block bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition mr-2">
                                 <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
                             </a>
-                            <a href="thuc-don.html"
+                            <a href="/thuc-don/"
                                 class="inline-block bg-gray-200 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-300 transition">
                                 Xem thực đơn
                             </a>
@@ -189,7 +189,7 @@
                                 <i class="fas fa-shopping-cart text-6xl text-gray-300"></i>
                             </div>
                             <p class="text-gray-500 text-xl mb-4">Giỏ hàng của bạn đang trống</p>
-                            <a href="thuc-don.html"
+                            <a href="/thuc-don/"
                                 class="inline-block bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition">
                                 Tiếp tục mua sắm
                             </a>
@@ -404,7 +404,7 @@
 
                 return `
                     <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group">
-                        <a href="chitietmonan.html?id=${item.ma_mon}" class="block relative overflow-hidden">
+                        <a href="/chitietmonan/?id=${item.ma_mon}" class="block relative overflow-hidden">
                             <img src="${imageSrc}" 
                                  alt="${item.ten_mon}" 
                                  class="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
@@ -415,7 +415,7 @@
                                 '<span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Hết hàng</span>' : ''}
                         </a>
                         <div class="p-3 sm:p-4">
-                            <a href="chitietmonan.html?id=${item.ma_mon}" class="block">
+                            <a href="/chitietmonan/?id=${item.ma_mon}" class="block">
                                 <h3 class="font-semibold text-gray-800 mb-1 line-clamp-1 hover:text-orange-600 transition text-sm sm:text-base">${item.ten_mon}</h3>
                             </a>
                             <div class="flex items-center gap-1 mb-2">
@@ -467,7 +467,7 @@
                 await loadRecommendedProducts();
             } else {
                 alert('Vui lòng đăng nhập để thêm vào giỏ hàng');
-                window.location.href = 'dang-nhap.html?redirect=gio-hang.html';
+                window.location.href = '/dang-nhap/?redirect=/gio-hang/';
             }
         }
 

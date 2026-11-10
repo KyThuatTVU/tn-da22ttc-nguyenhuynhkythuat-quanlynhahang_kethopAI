@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/staff/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Nhân viên - Phương Nam</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="login.css">
+
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Background Decoration -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-4000"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card rounded-3xl p-8 md:p-12 w-full max-w-md relative z-10">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-block floating">
+                <img src="../images/Green Simple Clean Vegan Food Logo.png" 
+                     alt="Logo" 
+                     class="w-24 h-24 mx-auto rounded-full border-4 border-purple-500 shadow-lg">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mt-6">Cổng Nhân viên</h1>
+            <p class="text-gray-600 mt-2">Nhà hàng Phương Nam Vĩnh Long</p>
+            <div class="flex items-center justify-center gap-2 mt-4">
+                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                    <i class="fas fa-users mr-1"></i>Quản lý
+                </span>
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                    <i class="fas fa-utensils mr-1"></i>Phục vụ
+                </span>
+                <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
+                    <i class="fas fa-fire mr-1"></i>Bếp
+                </span>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
+            <!-- Username -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-user mr-2 text-purple-600"></i>Tên đăng nhập
+                </label>
+                <input type="text" 
+                       id="username" 
+                       required
+                       class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                       placeholder="Nhập tên đăng nhập">
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-lock mr-2 text-purple-600"></i>Mật khẩu
+                </label>
+                <div class="relative">
+                    <input type="password" 
+                           id="password" 
+                           required
+                           class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                           placeholder="Nhập mật khẩu">
+                    <button type="button" 
+                            onclick="togglePassword()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i id="eyeIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="flex items-center justify-between">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                    <span class="ml-2 text-sm text-gray-600">Ghi nhớ đăng nhập</span>
+                </label>
+                <a href="javascript:void(0)" class="text-sm text-purple-600 hover:text-purple-700 font-semibold">
+                    Quên mật khẩu?
+                </a>
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" 
+                    id="btnLogin"
+                    class="btn-login w-full py-4 text-white font-bold rounded-xl flex items-center justify-center gap-2">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Đăng nhập</span>
+            </button>
+        </form>
+
+        <!-- Alert -->
+        <div id="alert" class="hidden mt-6 p-4 rounded-xl"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center space-y-4">
+            <p class="text-sm text-gray-500">
+                <i class="fas fa-shield-alt mr-1"></i>
+                Hệ thống bảo mật cao
+            </p>
+            <div class="pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-600 mb-2">Bạn là Quản trị viên?</p>
+                <a href="/admin/dang-nhap-admin/" class="inline-block px-6 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition font-semibold text-sm w-full">
+                    <i class="fas fa-crown mr-2"></i>Chuyển đến Cổng Đăng nhập Admin
+                </a>
+            </div>
+            <a href="/" class="inline-block text-gray-400 hover:text-gray-600 font-medium text-sm">
+                <i class="fas fa-arrow-left mr-2"></i>Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+
+    
+    <script src="login.js" defer></script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ cong-thuc.html) ==== */
+/* ==== Script 1 (tách từ /admin/cong-thuc/) ==== */
 let products = [];
         let allIngredients = [];
 

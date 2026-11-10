@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khách hàng - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Tổng khách hàng</p><p id="total-customers" class="text-2xl font-bold text-slate-800">0</p></div><div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center"><i class="fas fa-users text-slate-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Mới tháng này</p><p id="new-customers" class="text-2xl font-bold text-emerald-600">0</p></div><div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-user-plus text-emerald-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Đang hoạt động</p><p id="active-customers" class="text-2xl font-bold text-blue-600">0</p></div><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-user-check text-blue-600 text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-sm">Đã khóa</p><p id="locked-customers" class="text-2xl font-bold text-red-600">0</p></div><div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"><i class="fas fa-user-lock text-red-600 text-xl"></i></div></div></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="content-card mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="search" placeholder="Tìm tên, email, SĐT..." class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <select id="status-filter" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="1">Đang hoạt động</option>
+                            <option value="0">Đã khóa</option>
+                        </select>
+                        <select id="gender-filter" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả giới tính</option>
+                            <option value="nam">Nam</option>
+                            <option value="nu">Nữ</option>
+                        </select>
+                        <button onclick="applyFilters()" class="bg-slate-800 text-white px-4 py-2.5 rounded-xl hover:bg-slate-900"><i class="fas fa-filter mr-2"></i>Lọc</button>
+                    </div>
+                </div>
+
+                <!-- Customers Table -->
+                <div class="content-card overflow-hidden p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Khách hàng</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Email</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Số điện thoại</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Giới tính</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Ngày đăng ký</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Trạng thái</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-tbody" class="divide-y divide-slate-100">
+                                <tr><td colspan="7" class="px-6 py-12 text-center text-slate-500"><i class="fas fa-spinner fa-spin text-3xl mb-2"></i><p>Đang tải...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+
+    
+    <script src="customers.js" defer></script>
+
+</body>
+</html>

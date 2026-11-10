@@ -1,4 +1,4 @@
-// GSAP Animations for Cart Page (gio-hang.html)
+// GSAP Animations for Cart Page (/gio-hang/)
 document.addEventListener('DOMContentLoaded', function() {
     // Register GSAP plugins if available
     if (typeof ScrollTrigger !== 'undefined') {

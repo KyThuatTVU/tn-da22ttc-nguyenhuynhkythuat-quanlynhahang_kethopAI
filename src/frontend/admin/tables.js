@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ tables.html) ==== */
+/* ==== Script 1 (tách từ /admin/tables/) ==== */
 const TABLE_API_URL = 'http://localhost:3000/api/tables';
         let isEditMode = false;
         let allManagementTables = [];

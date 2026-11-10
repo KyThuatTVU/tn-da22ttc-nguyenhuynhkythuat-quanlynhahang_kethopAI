@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ mobile-test.html) ==== */
+/* ==== Script 1 (tách từ /mobile-test/) ==== */
 // Display device info
         function updateDeviceInfo() {
             document.getElementById('screen-size').textContent = `${screen.width} x ${screen.height}`;

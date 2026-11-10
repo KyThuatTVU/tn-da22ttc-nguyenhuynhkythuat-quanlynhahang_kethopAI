@@ -4,8 +4,8 @@ ComponentManager.register('heroBanner', (data = {}) => {
         title = 'Ẩm Thực Phương Nam',
         subtitle = 'Hương vị đậm đà miền Tây sông nước',
         backgroundImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920',
-        primaryButton = { text: 'Xem thực đơn', link: 'thuc-don.html', icon: 'fa-book-open' },
-        secondaryButton = { text: 'Đặt bàn ngay', link: 'dat-ban.html', icon: 'fa-calendar-check' },
+        primaryButton = { text: 'Xem thực đơn', link: '/thuc-don/', icon: 'fa-book-open' },
+        secondaryButton = { text: 'Đặt bàn ngay', link: '/dat-ban/', icon: 'fa-calendar-check' },
         height = 'min-h-[600px]'
     } = data;
     
@@ -41,12 +41,12 @@ ComponentManager.register('heroBanner', (data = {}) => {
 // Category Grid Component
 ComponentManager.register('categoryGrid', (categories = []) => {
     const defaultCategories = [
-        { icon: '🍲', name: 'Canh & Súp', link: 'thuc-don.html?category=canh', color: 'orange' },
-        { icon: '🦐', name: 'Hải sản', link: 'thuc-don.html?category=hai-san', color: 'blue' },
-        { icon: '🥩', name: 'Thịt', link: 'thuc-don.html?category=thit', color: 'red' },
-        { icon: '🥬', name: 'Rau', link: 'thuc-don.html?category=rau', color: 'green' },
-        { icon: '🍚', name: 'Cơm', link: 'thuc-don.html?category=com', color: 'yellow' },
-        { icon: '🧃', name: 'Đồ uống', link: 'thuc-don.html?category=nuoc', color: 'purple' }
+        { icon: '🍲', name: 'Canh & Súp', link: '/thuc-don/?category=canh', color: 'orange' },
+        { icon: '🦐', name: 'Hải sản', link: '/thuc-don/?category=hai-san', color: 'blue' },
+        { icon: '🥩', name: 'Thịt', link: '/thuc-don/?category=thit', color: 'red' },
+        { icon: '🥬', name: 'Rau', link: '/thuc-don/?category=rau', color: 'green' },
+        { icon: '🍚', name: 'Cơm', link: '/thuc-don/?category=com', color: 'yellow' },
+        { icon: '🧃', name: 'Đồ uống', link: '/thuc-don/?category=nuoc', color: 'purple' }
     ];
     
     const items = categories.length > 0 ? categories : defaultCategories;
@@ -73,7 +73,7 @@ ComponentManager.register('featuredSection', (data = {}) => {
     const {
         title = 'Món Ăn Nổi Bật',
         viewAllText = 'Xem tất cả',
-        viewAllLink = 'thuc-don.html',
+        viewAllLink = '/thuc-don/',
         products = [],
         backgroundColor = 'bg-gray-50'
     } = data;

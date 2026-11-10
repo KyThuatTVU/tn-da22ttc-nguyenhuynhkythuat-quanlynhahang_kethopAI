@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Nguyên Liệu - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Quản lý Nguyên liệu</h1>
+                        <p class="text-slate-500 text-sm">Quản lý kho và định lượng nguyên liệu nhập về</p>
+                    </div>
+                    <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-200">
+                        <i class="fas fa-plus"></i>
+                        Thêm nguyên liệu
+                    </button>
+                </div>
+                <!-- Filters -->
+                <div class="content-card mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <select id="food-drink-filter" onchange="applyFilters()" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 font-semibold bg-white text-blue-800">
+                            <option value="all">🍽️ Tất cả loại hàng</option>
+                            <option value="food">🥩 Chỉ Đồ ăn</option>
+                            <option value="drink">🥤 Chỉ Hàng nước</option>
+                        </select>
+                        <input type="text" id="search" oninput="applyFilters()" placeholder="Tìm kiếm nguyên liệu..." class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <select id="category-filter" onchange="applyFilters()" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả loại nguyên liệu</option>
+                        </select>
+                        <select id="status-filter" onchange="applyFilters()" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="con_hang">Còn hàng (> Cảnh báo)</option>
+                            <option value="sap_het">Sắp hết (<= Cảnh báo)</option>
+                            <option value="het_hang">Hết hàng (0)</option>
+                        </select>
+                        <button onclick="resetFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all">
+                            <i class="fas fa-redo"></i>
+                            Đặt lại
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Mã NL</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tên nguyên liệu</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Loại</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Đơn vị</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tồn kho / Cảnh báo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Trạng thái</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredients-container" class="bg-white divide-y divide-slate-200">
+                            <tr><td colspan="6" class="px-6 py-8 text-center text-slate-500"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="ingredient-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 border-b flex items-center justify-between bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold" id="modal-title">Thêm nguyên liệu mới</h3>
+                <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="ingredient-form" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="ingredient-id" class="no-draft">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Tên nguyên liệu *</label>
+                    <input type="text" id="ten_nguyen_lieu" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Loại nguyên liệu</label>
+                    <select id="ma_loai_nglieu" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Chưa phân loại --</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Đơn vị nhập (Nhập kho) *</label>
+                        <select id="don_vi_nhap" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl">
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="ml">Mililit (ml)</option>
+                            <option value="l">Lít (L)</option>
+                            <option value="cai">Cái/Quả</option>
+                            <option value="thung">Thùng</option>
+                            <option value="hop">Hộp</option>
+                            <option value="bao">Bao</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Đơn vị xuất (Món ăn) *</label>
+                        <select id="don_vi_tinh" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl">
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="ml">Mililit (ml)</option>
+                            <option value="l">Lít (L)</option>
+                            <option value="cai">Cái/Quả/Bịch</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-slate-700">Tỉ lệ quy đổi (1 Nhập = ? Xuất) *</label>
+                            <button type="button" id="btn-unlock-rate" class="text-xs text-blue-600 hover:text-blue-800 flex items-center hidden" title="Mở khóa để tự nhập số"><i class="fas fa-unlock mr-1"></i>Tự nhập</button>
+                        </div>
+                        <input type="number" id="ti_le_chuyen_doi" required min="0.01" step="0.01" value="1" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-colors">
+                        <p id="ti_le_hint" class="text-xs font-medium text-emerald-600 mt-1 hidden"></p>
+                    </div>
+                    <div id="so-luong-group" class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Nhập số lượng ban đầu (<span id="lbl_dv_nhap" class="text-blue-600 font-bold">đơn vị</span>)</label>
+                            <input type="number" id="so_luong_nhap_ban_dau" min="0" value="0" step="any" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-medium text-slate-700">Tồn kho thực tế (<span id="lbl_dv_xuat" class="text-emerald-600 font-bold">đơn vị</span>) *</label>
+                                <button type="button" id="btn-unlock-ton-kho" class="text-xs text-blue-600 hover:text-blue-800 flex items-center" title="Điền tay số lẻ"><i class="fas fa-pen mr-1"></i>Sửa</button>
+                            </div>
+                            <input type="number" id="so_luong_ton" required min="0" value="0" step="any" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed transition-colors" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Mức cảnh báo sắp hết *</label>
+                    <input type="number" id="muc_canh_bao" required min="1" value="1000" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500">
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-info-circle text-blue-500"></i> Sẽ cảnh báo lên hệ thống nếu tồn kho rớt xuống dưới mức này.</p>
+                </div>
+                
+                <!-- Đơn vị tự nhiên -->
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-sm font-bold text-blue-800">
+                            <i class="fas fa-fish text-blue-600"></i>
+                            Đơn vị tự nhiên (con, quả, trái...)
+                        </label>
+                        <input type="checkbox" id="has_natural_unit" onchange="toggleNaturalUnitFields()" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div id="natural-unit-fields" class="hidden space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Đơn vị tự nhiên</label>
+                                <input type="text" id="don_vi_tu_nhien" placeholder="Ví dụ: con, quả, củ..." class="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                                <p class="text-[10px] text-slate-500 mt-0.5">Đơn vị hiển thị cho người dùng</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">1 kg = bao nhiêu <span id="unit-label-preview" class="text-blue-600 font-bold">con</span>?</label>
+                                <input type="number" id="so_luong_tren_kg" placeholder="Ví dụ: 50" min="1" step="1" class="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-bold text-blue-600" oninput="updateNaturalUnitConversion()">
+                                <p class="text-[10px] text-slate-500 mt-0.5">Nhập số lượng <span id="unit-preview">đơn vị</span> trong 1 kg</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Hiển thị quy đổi ngược: 1 con = ? gram -->
+                        <div id="conversion-display" class="hidden bg-gradient-to-r from-emerald-50 to-blue-50 border-2 border-emerald-200 rounded-lg p-3">
+                            <p class="text-xs font-bold text-emerald-700 mb-1 flex items-center">
+                                <i class="fas fa-calculator mr-2"></i>
+                                Hệ thống tự tính:
+                            </p>
+                            <div class="text-sm font-bold text-slate-800">
+                                1 <span id="unit-name-display" class="text-emerald-600">con</span> = <span id="grams-per-unit" class="text-2xl text-emerald-600">20</span> gram
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1 italic">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Trọng lượng trung bình được tính tự động
+                            </p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-blue-200">
+                            <p class="text-xs text-blue-700 font-medium mb-1"><i class="fas fa-lightbulb mr-1"></i> Ví dụ:</p>
+                            <ul class="text-[11px] text-slate-600 space-y-0.5 ml-4">
+                                <li>• Tôm: 1 kg = 50 con → Hệ thống tính: 1 con = 20g</li>
+                                <li>• Trứng: 1 kg = 16 quả → Hệ thống tính: 1 quả = 62.5g</li>
+                                <li>• Cà chua: 1 kg = 6 quả → Hệ thống tính: 1 quả = 166.7g</li>
+                                <li>• Cua: 1 kg = 3 con → Hệ thống tính: 1 con = 333.3g</li>
+                            </ul>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2">
+                            <p class="text-[10px] text-amber-700"><i class="fas fa-info-circle mr-1"></i> <strong>Lưu ý:</strong> Trọng lượng này là giá trị trung bình, có thể thay đổi tùy kích cỡ thực tế. Bạn có thể cập nhật lại bất cứ lúc nào.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nhập Kho Modal -->
+    <div id="add-stock-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div class="p-6 border-b flex items-center justify-between bg-emerald-600 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold">Nhập Kho/Bổ Sung</h3>
+                <button onclick="closeAddStockModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="add-stock-form" class="p-6 space-y-4">
+                <input type="hidden" id="stock-ingredient-id" class="no-draft">
+                <p id="stock-ingredient-name" class="font-bold text-center text-lg text-slate-800 mb-4"></p>
+                
+                <!-- Tab chọn đơn vị nhập -->
+                <div id="stock-unit-tabs" class="flex gap-2 mb-4">
+                    <button type="button" onclick="switchStockTab('import')" id="tab-import" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm transition-all bg-emerald-600 text-white">
+                        <i class="fas fa-box mr-1"></i>
+                        Nhập theo <span id="tab-import-unit">kg</span>
+                    </button>
+                    <button type="button" onclick="switchStockTab('natural')" id="tab-natural" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm transition-all bg-slate-100 text-slate-600 hidden">
+                        <i class="fas fa-fish mr-1"></i>
+                        Nhập theo <span id="tab-natural-unit">con</span>
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Số lượng nhập thêm (<span id="stock-unit-display"></span>) *
+                    </label>
+                    <input type="number" id="stock-amount" required min="0.01" step="any" placeholder="Nhập số lượng..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-center text-xl focus:ring-2 focus:ring-emerald-500 font-bold text-emerald-600 no-draft" oninput="updateStockHint()">
+                    <p class="text-xs text-slate-500 mt-2 text-center">
+                        Hệ thống sẽ cộng thêm <span class="font-bold text-emerald-600" id="stock-hint">0</span> <span id="stock-base-unit">g</span> vào tồn kho
+                        <br>
+                        <span id="stock-rate-calc" class="text-[10px]"></span>
+                    </p>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeAddStockModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700 shadow-md transform hover:-translate-y-0.5 px-6 py-2.5 rounded-xl transition font-bold">Nhập Kho</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Báo Cáo Hao Hụt Modal -->
+    <div id="wastage-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+            <div class="p-6 border-b flex items-center justify-between bg-orange-600 text-white">
+                <h3 class="text-xl font-bold">Báo Cáo Hao Hụt</h3>
+                <button onclick="closeWastageModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="wastage-form" class="p-6 space-y-4">
+                <input type="hidden" id="wastage-ingredient-id">
+                <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 flex items-center space-x-3">
+                    <i class="fas fa-exclamation-triangle text-orange-500 text-xl"></i>
+                    <div>
+                        <p class="text-xs text-orange-600 font-bold uppercase tracking-wider">Đang báo cáo cho:</p>
+                        <p id="wastage-ingredient-name" class="font-bold text-slate-800"></p>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Số lượng hao hụt (<span id="wastage-unit" class="font-bold"></span>) *</label>
+                    <input type="number" id="wastage-amount" required min="0.01" step="any" placeholder="0.00" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 font-bold text-orange-600">
+                    <p class="text-[10px] text-slate-400 mt-1 italic">Số lượng này sẽ bị trừ trực tiếp vào tồn kho hiện tại.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Lý do hao hụt *</label>
+                    <textarea id="wastage-reason" required rows="3" placeholder="Ví dụ: Hư hỏng do vận chuyển, hết hạn sử dụng, rơi vãi..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Hình ảnh minh chứng</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="wastage-image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
+                            <div id="image-preview-container" class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 mb-2"></i>
+                                <p class="text-xs text-slate-500">Click để tải ảnh lên (JPG, PNG, WEBP)</p>
+                            </div>
+                            <img id="image-preview" class="hidden h-full w-full object-contain p-2" />
+                            <input id="wastage-image" type="file" class="hidden" accept="image/*" onchange="previewWastageImage(this)" />
+                        </label>
+                    </div>
+                    <button type="button" id="btn-remove-image" onclick="removeWastageImage()" class="hidden text-xs text-red-500 mt-1 hover:underline"><i class="fas fa-trash-alt mr-1"></i>Xóa ảnh</button>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeWastageModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-medium transition">Đóng</button>
+                    <button type="submit" class="bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-200 px-6 py-2.5 rounded-xl text-sm font-bold transition flex items-center">
+                        <i class="fas fa-paper-plane mr-2"></i>Gửi Báo Cáo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    <script src="../js/form-draft-manager.js"></script>
+    
+    <script src="nguyen-lieu.js" defer></script>
+
+</body>
+</html>

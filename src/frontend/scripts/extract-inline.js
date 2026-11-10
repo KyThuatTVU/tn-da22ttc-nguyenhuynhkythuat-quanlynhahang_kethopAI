@@ -3,9 +3,9 @@
  * thành file .css / .js riêng biệt, thay bằng thẻ <link> / <script src defer>.
  *
  * Quy ước đặt file:
- *  - Trang gốc (src/frontend/foo.html)      -> css/foo.css  và js/foo.js
- *  - Trang admin (admin/foo.html)           -> admin/foo.css và admin/foo.js
- *  - Trang staff (staff/foo.html)           -> staff/foo.css và staff/foo.js
+ *  - Trang gốc (src/frontend/foo/index.html)      -> css/foo.css  và js/foo.js
+ *  - Trang admin (admin/foo/index.html)           -> admin/foo.css và admin/foo.js
+ *  - Trang staff (staff/foo/index.html)           -> staff/foo.css và staff/foo.js
  *
  * Cách chạy:  node scripts/extract-inline.js
  */
@@ -22,7 +22,7 @@ const DIRS = [
 
 // Tên file sinh ra bị trùng với file đã tồn tại -> đổi tên tại đây
 const CSS_NAME_OVERRIDES = {
-  'admin/admin-pos-new.html': 'admin-pos-new-page.css',
+  'admin/admin-pos-new/index.html': 'admin-pos-new-page.css',
 };
 const JS_NAME_OVERRIDES = {};
 
@@ -47,13 +47,17 @@ for (const { dir, cssSub, jsSub } of DIRS) {
     const absDir = path.join(FRONTEND, dir);
     const cssDirAbs = cssSub === '.' ? absDir : path.join(FRONTEND, cssSub);
     const jsDirAbs = jsSub === '.' ? absDir : path.join(FRONTEND, jsSub);
-    const files = fs.readdirSync(absDir).filter((f) => f.endsWith('.html')).sort();
+    // Sau restructure: mỗi trang nằm trong folder riêng (foo/index.html)
+    const files = fs.readdirSync(absDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && fs.existsSync(path.join(absDir, e.name, 'index.html')))
+        .map((e) => e.name)
+        .sort();
 
     for (const file of files) {
-        const rel = path.join(dir, file).replace(/\\/g, '/');
-        const htmlPath = path.join(absDir, file);
+        const rel = path.join(dir, file, 'index.html').replace(/\\/g, '/');
+        const htmlPath = path.join(absDir, file, 'index.html');
         const html = fs.readFileSync(htmlPath, 'utf8');
-        const name = file.replace(/\.html$/, '');
+        const name = file;
 
         // Tìm style sau khi đã che (blank) vùng script để tránh nhầm
         // thẻ <style> nằm trong chuỗi template của JS (vd: template in phiếu)

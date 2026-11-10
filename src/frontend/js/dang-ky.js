@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dang-ky.html) ==== */
+/* ==== Script 1 (tách từ /dang-ky/) ==== */
 // Toggle password visibility
     function togglePassword(fieldId) {
       const field = document.getElementById(fieldId);
@@ -340,7 +340,7 @@
             showNotification('Mã xác thực đã được gửi đến email của bạn!', 'success');
 
             setTimeout(() => {
-              window.location.href = `xac-thuc-email.html?email=${encodeURIComponent(formData.email)}`;
+              window.location.href = `/xac-thuc-email/?email=${encodeURIComponent(formData.email)}`;
             }, 1500);
           } else {
             showNotification(result.message || 'Đăng ký thất bại', 'error');

@@ -1,8 +1,8 @@
-/* ==== Script 1 (tách từ index.html) ==== */
+/* ==== Script 1 (tách từ /admin/) ==== */
 // Redirect to new dashboard
-        window.location.href = 'dashboard.html';
+        window.location.href = '/admin/dashboard/';
 
-/* ==== Script 2 (tách từ index.html) ==== */
+/* ==== Script 2 (tách từ /admin/) ==== */
 // Check admin authentication
         async function checkAuth() {
             try {
@@ -12,14 +12,14 @@
                 const data = await response.json();
                 
                 if (!data.isAuthenticated) {
-                    window.location.href = 'dang-nhap-admin.html';
+                    window.location.href = '/admin/dang-nhap-admin/';
                     return;
                 }
                 
                 console.log('Admin logged in:', data.data);
             } catch (error) {
                 console.error('Error checking auth:', error);
-                window.location.href = 'dang-nhap-admin.html';
+                window.location.href = '/admin/dang-nhap-admin/';
             }
         }
         

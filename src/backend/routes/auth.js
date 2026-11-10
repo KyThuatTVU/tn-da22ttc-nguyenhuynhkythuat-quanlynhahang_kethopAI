@@ -302,7 +302,7 @@ router.post('/verify-email', async (req, res) => {
             'new_user',
             `Người dùng mới: ${verification.ten_nguoi_dung}`,
             `${verification.email} vừa đăng ký tài khoản`,
-            `quan-ly-khach-hang.html?id=${result.insertId}`,
+            `/admin/customers/?id=${result.insertId}`,
             result.insertId
         );
 
@@ -942,7 +942,7 @@ router.get('/google', passport.authenticate('google-user', {
 // Callback sau khi Google xác thực
 router.get('/google/callback',
     passport.authenticate('google-user', { 
-        failureRedirect: '/dang-nhap.html?error=google_auth_failed',
+        failureRedirect: '/dang-nhap/?error=google_auth_failed',
         session: false 
     }),
     async (req, res) => {
@@ -953,7 +953,7 @@ router.get('/google/callback',
             
             if (!user) {
                 console.log('❌ No user data from Google');
-                return res.redirect('/dang-nhap.html?error=google_auth_failed');
+                return res.redirect('/dang-nhap/?error=google_auth_failed');
             }
 
             // Tạo JWT token
@@ -991,13 +991,13 @@ router.get('/google/callback',
 
             // Redirect về frontend với token
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            const redirectUrl = `${frontendUrl}/dang-nhap.html?google_auth=success&data=${userData}`;
+            const redirectUrl = `${frontendUrl}/dang-nhap/?google_auth=success&data=${userData}`;
             console.log('🔗 Redirect URL length:', redirectUrl.length);
             res.redirect(redirectUrl);
 
         } catch (error) {
             console.error('Lỗi Google callback:', error);
-            res.redirect('/dang-nhap.html?error=server_error');
+            res.redirect('/dang-nhap/?error=server_error');
         }
     }
 );

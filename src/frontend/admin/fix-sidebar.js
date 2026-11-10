@@ -2,17 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const execSync = require('child_process').execSync;
 
-const adminDir = path.join('d:', 'KhoaLuanTotNghiep2026', 'frontend', 'admin');
-const files = fs.readdirSync(adminDir).filter(f => f.endsWith('.html') && !f.includes('dang-nhap'));
+const adminDir = path.join('d:', 'KhoaLuanTotNghiep2026', 'src', 'frontend', 'admin');
+const files = fs.readdirSync(adminDir, { withFileTypes: true })
+    .filter(d => d.isDirectory() && d.name !== 'js' && !d.name.includes('dang-nhap'))
+    .map(d => d.name);
 
-const templateFile = path.join(adminDir, 'orders.html');
+const templateFile = path.join(adminDir, 'orders', 'index.html');
 const templateContent = fs.readFileSync(templateFile, 'utf8');
 
 const sidebarRegex = /<aside id="sidebar"[^>]*>[\s\S]*?<\/aside>/;
 const match = templateContent.match(sidebarRegex);
 
 if (!match) {
-    console.error('Sidebar not found in orders.html');
+    console.error('Sidebar not found in orders/index.html');
     process.exit(1);
 }
 
@@ -21,9 +23,11 @@ sidebarContent = sidebarContent.replace(/\s*class="sidebar-item active"/g, ' cla
 sidebarContent = sidebarContent.replace('</aside>', `
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        let currentPage = window.location.pathname.split('/').filter(Boolean).pop() || 'dashboard';
+        if (currentPage === 'admin') currentPage = 'dashboard';
         document.querySelectorAll('.sidebar-item').forEach(item => {
-            if (item.getAttribute('href') === currentPage) {
+            const linkPage = item.getAttribute('href').split('/').filter(Boolean).pop() || 'dashboard';
+            if (linkPage === currentPage) {
                 item.classList.add('active');
             }
         });
@@ -32,11 +36,11 @@ sidebarContent = sidebarContent.replace('</aside>', `
 </aside>
 `);
 
-for (const file of files) {
-    if (file === 'orders.html' || file === 'admin-pos-new.html') continue;
+for (const dir of files) {
+    if (dir === 'orders' || dir === 'admin-pos-new') continue;
     
     // Use git checkout to restore
-    const filePath = path.join(adminDir, file);
+    const filePath = path.join(adminDir, dir, 'index.html');
     try {
         execSync('git checkout -- "' + filePath + '"', {stdio: 'ignore'});
     } catch(e) {}

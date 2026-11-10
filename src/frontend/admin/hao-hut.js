@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ hao-hut.html) ==== */
+/* ==== Script 1 (tách từ /admin/hao-hut/) ==== */
 let wastageList = [];
         const BACKEND_URL = 'http://localhost:3000'; // Base URL for images
 

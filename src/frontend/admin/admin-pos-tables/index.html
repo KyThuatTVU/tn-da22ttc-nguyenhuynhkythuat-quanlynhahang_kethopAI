@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Bàn (POS) - Admin Phương Nam</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+    
+    <link rel="stylesheet" href="admin-pos-tables.css">
+
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder for central injection -->
+        <div id="sidebar-placeholder"></div>
+
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <header class="header-bar flex items-center justify-between">
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button onclick="toggleSidebar()" class="mobile-menu-btn lg:hidden text-white"><i class="fas fa-bars text-xl"></i></button>
+                    <div>
+                        <h2 class="text-base sm:text-xl font-bold">Bán hàng (Chọn bàn)</h2>
+                        <p class="text-xs sm:text-sm text-blue-200 hidden sm:block">Lựa chọn bàn để order món</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" target="_blank" class="text-white hover:text-blue-200 transition" title="Xem website">
+                        <i class="fas fa-external-link-alt text-lg"></i>
+                    </a>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+                <!-- Stats Bar -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="stat-card">
+                        <div class="stat-icon available"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <h3 id="availableCount" class="text-2xl font-bold text-slate-800">0</h3>
+                            <p class="text-sm text-slate-500 font-medium">Bàn trống</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon occupied"><i class="fas fa-utensils"></i></div>
+                        <div>
+                            <h3 id="occupiedCount" class="text-2xl font-bold text-slate-800">0</h3>
+                            <p class="text-sm text-slate-500 font-medium">Đang phục vụ</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon reserved"><i class="fas fa-calendar-check"></i></div>
+                        <div>
+                            <h3 id="reservedCount" class="text-2xl font-bold text-slate-800">0</h3>
+                            <p class="text-sm text-slate-500 font-medium">Đã đặt trước</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-100 gap-4">
+                    <div class="flex items-center gap-4 w-full md:w-auto">
+                        <h2 class="text-lg font-bold text-slate-800 flex-shrink-0">Danh sách bàn</h2>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-lg">
+                            <i class="fas fa-map-marker-alt text-blue-500"></i>
+                            <select id="area-filter" class="bg-transparent border-none text-sm font-semibold text-slate-700 outline-none cursor-pointer" onchange="filterTablesByArea(this.value)">
+                                <option value="all">Tất cả khu vực</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 md:w-auto">
+                        <button class="filter-btn active" data-filter="all" onclick="filterTables('all')">
+                            <i class="fas fa-th"></i> Tất cả
+                        </button>
+                        <button class="filter-btn" data-filter="trong" onclick="filterTables('trong')">
+                            <i class="fas fa-check-circle"></i> Trống
+                        </button>
+                        <button class="filter-btn" data-filter="dang_phuc_vu" onclick="filterTables('dang_phuc_vu')">
+                            <i class="fas fa-utensils"></i> Đang phục vụ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tables Grid -->
+                <div class="tables-grid" id="tablesGrid">
+                    <!-- Tables will be loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Cần load file RBAC kiểm tra role trước -> Tạm thời code logic phân quyền ở dây luôn hoặc admin-layout -->
+    <script src="admin-layout.js"></script>
+    <script src="admin-pos.js"></script> <!-- Chứa logic chung cho POS -->
+    
+    <script src="admin-pos-tables.js" defer></script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dang-nhap-admin.html) ==== */
+/* ==== Script 1 (tách từ /admin/dang-nhap-admin/) ==== */
 function showAlert(message, type = 'error') {
             const alertDiv = document.getElementById('alert-message');
             alertDiv.className = `p-4 rounded-lg ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
@@ -57,7 +57,7 @@ function showAlert(message, type = 'error') {
                 
                 // Chuyển đến dashboard sau 500ms
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/admin/dashboard/';
                 }, 500);
             }
         });
@@ -83,7 +83,7 @@ function showAlert(message, type = 'error') {
                 if (data.success) {
                     showAlert('Chế độ nhân viên/quản lý đăng nhập thành công!', 'success');
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = '/admin/dashboard/';
                     }, 500);
                 } else {
                     showAlert(data.message || 'Tài khoản hoặc mật khẩu không đúng', 'error');

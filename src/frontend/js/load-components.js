@@ -397,10 +397,10 @@ function renderLoggedInMenu(userMenuContainer, mobileUserMenu, user, avatarUrl, 
                     <p class="text-sm font-medium text-gray-800 truncate">${displayName}</p>
                     <p class="text-xs text-gray-500 truncate">${user.email || ''}</p>
                 </div>
-                <a href="tai-khoan.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                <a href="/tai-khoan/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                     <i class="fas fa-user-circle mr-2"></i> Tài khoản của tôi
                 </a>
-                <a href="dat-ban.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                <a href="/dat-ban/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                     <i class="fas fa-calendar-check mr-2"></i> Đặt bàn
                 </a>
                 <button onclick="handleLogout()" class="w-full text-left block px-4 py-3 text-red-600 hover:bg-red-50 border-t border-gray-100">
@@ -426,10 +426,10 @@ function renderLoggedInMenu(userMenuContainer, mobileUserMenu, user, avatarUrl, 
                     <p class="text-xs text-gray-500 truncate">${user.email || ''}</p>
                 </div>
             </div>
-            <a href="tai-khoan.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/tai-khoan/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-user-circle mr-2"></i> Tài khoản của tôi
             </a>
-            <a href="dat-ban.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/dat-ban/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-calendar-check mr-2"></i> Đặt bàn
             </a>
             <button onclick="handleLogout()" class="w-full text-left py-3 px-4 text-red-600 hover:bg-red-50 font-medium border-t border-gray-200">
@@ -452,10 +452,10 @@ function renderGuestMenu(userMenuContainer, mobileUserMenu) {
                     <i class="fas fa-user text-xl"></i>
                 </button>
                 <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
-                    <a href="dang-nhap.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                    <a href="/dang-nhap/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                         <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập
                     </a>
-                    <a href="dang-ky.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                    <a href="/dang-ky/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                         <i class="fas fa-user-plus mr-2"></i> Đăng ký
                     </a>
                 </div>
@@ -465,10 +465,10 @@ function renderGuestMenu(userMenuContainer, mobileUserMenu) {
 
     if (mobileUserMenu) {
         mobileUserMenu.innerHTML = `
-            <a href="dang-nhap.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/dang-nhap/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập
             </a>
-            <a href="dang-ky.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/dang-ky/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-user-plus mr-2"></i> Đăng ký
             </a>
         `;
@@ -487,7 +487,7 @@ window.handleLogout = function() {
         
         localStorage.removeItem('user'); sessionStorage.removeItem('user');
         localStorage.removeItem('token'); sessionStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 }
 
@@ -497,8 +497,8 @@ function setActiveNavLink() {
     setTimeout(() => {
         // Get current page filename
         const path = window.location.pathname;
-        const currentPage = path.split('/').pop().split('?')[0] || 'index.html';
-        const pageName = currentPage.replace('.html', '').toLowerCase();
+        const currentPage = path.split('/').filter(Boolean).pop() || 'index';
+        const pageName = currentPage.toLowerCase();
         
         console.log('📍 Frontend Page:', pageName);
         
@@ -548,8 +548,8 @@ if (document.readyState === 'loading') {
 // Initialize cart after components are loaded (only if cart.js is already loaded)
 function initializeCart() {
     // Skip cart initialization on pages that don't need it
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const pagesWithoutCart = ['dat-hang-thanh-cong.html', 'dang-nhap.html', 'dang-ky.html', 'quen-mat-khau.html', 'dat-lai-mat-khau.html', 'xac-thuc-email.html'];
+    const currentPage = window.location.pathname.split('/').filter(Boolean).pop() || 'index';
+    const pagesWithoutCart = ['dat-hang-thanh-cong', 'dang-nhap', 'dang-ky', 'quen-mat-khau', 'dat-lai-mat-khau', 'xac-thuc-email'];
     
     if (pagesWithoutCart.includes(currentPage)) {
         console.log('ℹ️ Skipping cart initialization on', currentPage);
@@ -1276,7 +1276,7 @@ function renderGraphQLDishCards(dishes) {
         const rating = d.diem_danh_gia ? `<span class="text-yellow-500 text-xs">⭐ ${parseFloat(d.diem_danh_gia).toFixed(1)}</span>` : '';
         
         return `
-            <div class="mt-3 rounded-xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition" onclick="window.open('chitietmonan.html?id=${d.ma_mon}', '_blank')">
+            <div class="mt-3 rounded-xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition" onclick="window.open('/chitietmonan/?id=${d.ma_mon}', '_blank')">
                 ${imgSrc ? `<img src="${imgSrc}" alt="${escapeHtmlChat(d.ten_mon)}" class="w-full h-36 object-cover" onerror="this.style.display='none'"/>` : ''}
                 <div class="p-3">
                     <div class="flex items-center justify-between">
@@ -1300,7 +1300,7 @@ function renderGraphQLDishCards(dishes) {
         const rating = d.diem_danh_gia ? `<span class="text-yellow-500" style="font-size:10px">⭐${parseFloat(d.diem_danh_gia).toFixed(1)}</span>` : '';
         
         return `
-            <div class="flex-shrink-0 w-36 rounded-xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition" onclick="window.open('chitietmonan.html?id=${d.ma_mon}', '_blank')">
+            <div class="flex-shrink-0 w-36 rounded-xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition" onclick="window.open('/chitietmonan/?id=${d.ma_mon}', '_blank')">
                 ${imgSrc ? `<img src="${imgSrc}" alt="${escapeHtmlChat(d.ten_mon)}" class="w-full h-24 object-cover" onerror="this.parentElement.querySelector('img').style.display='none'"/>` : '<div class="w-full h-24 bg-gray-100 flex items-center justify-center"><i class="fas fa-utensils text-gray-300 text-2xl"></i></div>'}
                 <div class="p-2">
                     <h4 class="font-medium text-gray-800 text-xs truncate" title="${escapeHtmlChat(d.ten_mon)}">${escapeHtmlChat(d.ten_mon)}</h4>
@@ -1330,7 +1330,7 @@ window.addDishToCart = async function(ma_mon) {
         const token = (localStorage.getItem('token') || sessionStorage.getItem('token'));
         if (!token) {
             if (confirm('Bạn cần đăng nhập để thêm vào giỏ hàng. Đăng nhập ngay?')) {
-                window.location.href = 'dang-nhap.html';
+                window.location.href = '/dang-nhap/';
             }
             return;
         }

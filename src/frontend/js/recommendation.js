@@ -186,7 +186,7 @@ const RecommendationSystem = {
         return `
             <div class="recommendation-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" 
                  onclick="RecommendationSystem.trackInteraction(${dish.ma_mon}, 'view')">
-                <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                <a href="/chitietmonan/?id=${dish.ma_mon}" class="block">
                     <div class="relative bg-gray-50">
                         <img src="${imageUrl}" alt="${dish.ten_mon}"
                             class="w-full h-40 object-cover"
@@ -195,7 +195,7 @@ const RecommendationSystem = {
                     </div>
                 </a>
                 <div class="p-3">
-                    <a href="chitietmonan.html?id=${dish.ma_mon}">
+                    <a href="/chitietmonan/?id=${dish.ma_mon}">
                         <h3 class="font-medium text-sm mb-1 text-gray-800 hover:text-orange-600 transition line-clamp-1">${dish.ten_mon}</h3>
                     </a>
                     ${dish.reason ? `<p class="text-xs text-gray-500 mb-1 line-clamp-1">${dish.reason}</p>` : ''}
@@ -257,7 +257,7 @@ const RecommendationSystem = {
             const price = !isNaN(priceValue) ? new Intl.NumberFormat('vi-VN').format(priceValue) : 'Liên hệ';
             
             html += `
-                <a href="chitietmonan.html?id=${dish.ma_mon}" 
+                <a href="/chitietmonan/?id=${dish.ma_mon}" 
                    class="flex-shrink-0 w-32 bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition">
                     <img src="${imageUrl}" alt="${dish.ten_mon}" class="w-full h-20 object-cover" onerror="this.src='images/default-food.jpg'">
                     <div class="p-2">

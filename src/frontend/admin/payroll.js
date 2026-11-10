@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ payroll.html) ==== */
+/* ==== Script 1 (tách từ /admin/payroll/) ==== */
 // Sinh danh sách tháng cho select #filter-month (thay thế document.write)
 (function () {
     const select = document.getElementById('filter-month');
@@ -12,7 +12,7 @@
     }
 })();
 
-/* ==== Script 2 (tách từ payroll.html) ==== */
+/* ==== Script 2 (tách từ /admin/payroll/) ==== */
 const PAYROLL_API = `${API_URL}/payroll`;
 
         document.addEventListener('DOMContentLoaded', () => {

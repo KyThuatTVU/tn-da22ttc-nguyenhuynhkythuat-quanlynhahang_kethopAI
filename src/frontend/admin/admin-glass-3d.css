@@ -1,0 +1,549 @@
+/* ============================================================
+   ADMIN THEME — Glassmorphism 3D, palette 60-30-10
+   (theo docs/glassmorphism-3d.md)
+
+   - 60% Trắng (màu chủ đạo): sidebar, header, nền nội dung, cards, bảng
+   - 30% Xanh dương (màu phụ): viên menu active, nút chính, tiêu đề bảng, modal header
+   - 10% Xanh lá (màu nhấn): vạch nhóm menu, chấm công, trạng thái thành công
+
+   Bảng màu xanh đơn sắc (monochromatic blue):
+   - Oceanic Azure #002B8C  (xanh hải dương đậm)
+   - Sapphire      #0F52BA  (xanh ngọc bích)
+   - Dusk Blue     #3E5D8E  (xanh chạng vạng)
+   - Azure         #F0FFFF  (xanh azure nhạt)
+   - Indigo Blue   #282888  (xanh chàm)
+
+   File được chèn SAU admin-styles.css nên chỉ cần override.
+   Dùng !important để thắng inline style (main) và CSS riêng từng trang.
+   ============================================================ */
+
+/* ===== 1. Nền — trắng chủ đạo pha chút xanh ===== */
+body {
+    background:
+        radial-gradient(1100px 520px at 88% -8%, rgba(15, 82, 186, 0.10), transparent 62%),
+        radial-gradient(900px 480px at -6% 108%, rgba(62, 93, 142, 0.08), transparent 62%),
+        linear-gradient(160deg, #ffffff 0%, #f0ffff 55%, #ffffff 100%) !important;
+}
+
+main {
+    background:
+        radial-gradient(1000px 460px at 92% -6%, rgba(15, 82, 186, 0.08), transparent 60%),
+        radial-gradient(820px 420px at -4% 104%, rgba(62, 93, 142, 0.06), transparent 60%),
+        linear-gradient(160deg, #ffffff, #f4fbfe) !important;
+}
+
+/* ===== 2. Sidebar — kính trắng (60%), chữ xanh hải dương ===== */
+.sidebar {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.94) 0%,
+        rgba(240, 255, 255, 0.88) 50%,
+        rgba(255, 255, 255, 0.94) 100%) !important;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-right: 1px solid rgba(0, 43, 140, 0.10);
+    box-shadow:
+        8px 0 24px rgba(0, 43, 140, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset -1px 0 0 rgba(0, 43, 140, 0.06);
+    transform-style: preserve-3d;
+}
+
+/* Bóng hắt xuống mép dưới sidebar */
+.sidebar::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -8px;
+    height: 8px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0, 43, 140, 0.10), rgba(0, 43, 140, 0));
+}
+
+/* Chữ trong sidebar: xanh hải dương / xanh chạng vạng */
+#sidebar h1 {
+    color: #002b8c !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+#sidebar p {
+    color: #3e5d8e !important;
+}
+
+#sidebar .p-5.border-b {
+    border-color: rgba(0, 43, 140, 0.10) !important;
+}
+
+#sidebar .p-5.border-b img {
+    border-color: rgba(0, 43, 140, 0.12) !important;
+    background: #ffffff !important;
+}
+
+#sidebar .border-t {
+    border-color: rgba(0, 43, 140, 0.10) !important;
+}
+
+/* ===== 3. Menu item — viên kính 3D, active xanh dương ===== */
+.sidebar-item {
+    position: relative;
+    isolation: isolate;
+    transform-style: preserve-3d;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-item:not(.sidebar-staff-only) {
+    color: #3e5d8e !important;
+}
+
+.sidebar-item:not(.sidebar-staff-only):not(.sidebar-admin-only)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(0, 43, 140, 0.10);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-bottom: 2px solid rgba(15, 82, 186, 0.14);
+    background: linear-gradient(135deg,
+        rgba(15, 82, 186, 0.09) 0%,
+        rgba(240, 255, 255, 0.55) 50%,
+        rgba(15, 82, 186, 0.05) 100%);
+    box-shadow:
+        0 6px 14px rgba(0, 43, 140, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.90);
+    transform: perspective(480px) rotateX(16deg) translateY(4px) scale(0.97);
+    transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.sidebar-item:not(.sidebar-staff-only):not(.sidebar-admin-only):hover {
+    background: transparent !important;
+    border-color: transparent;
+    color: #002b8c !important;
+    transform: translateY(-1px);
+}
+
+.sidebar-item:not(.sidebar-staff-only):not(.sidebar-admin-only):hover::before {
+    opacity: 1;
+    transform: perspective(480px) rotateX(0deg) translateY(0) scale(1);
+}
+
+.sidebar-item:active {
+    background: transparent !important;
+}
+
+/* Active — viên kính xanh dương (30%), chữ trắng */
+.sidebar-item.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0f52ba 0%, #002b8c 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-top-color: rgba(255, 255, 255, 0.45);
+    box-shadow:
+        0 8px 18px rgba(15, 82, 186, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30);
+    text-shadow: 0 1px 1px rgba(0, 43, 140, 0.35);
+    transform: translateY(-1px);
+}
+
+.sidebar-item.active::before {
+    display: none;
+}
+
+/* Mục đặc biệt trong sidebar */
+.sidebar-admin-only,
+.sidebar-admin-only i {
+    color: #0f52ba !important;
+}
+
+.sidebar-staff-only {
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Nhóm menu: chữ xanh nhạt, vạch xanh lá (nhấn) */
+#sidebar .nav-group-title {
+    color: #0f52ba !important;
+    text-shadow: none;
+}
+
+.nav-group-title::before {
+    background: #10b981 !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* Thanh cuộn sidebar */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 43, 140, 0.18);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 43, 140, 0.32);
+}
+
+/* ===== 4. Header — kính trắng (60%), chữ xanh hải dương ===== */
+.header-bar {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(240, 255, 255, 0.84) 50%,
+        rgba(255, 255, 255, 0.88) 100%) !important;
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid rgba(0, 43, 140, 0.14);
+    box-shadow:
+        0 12px 26px rgba(0, 43, 140, 0.10),
+        0 3px 8px rgba(0, 43, 140, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    color: #002b8c !important;
+}
+
+.header-bar h2 {
+    color: #002b8c !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.header-bar p {
+    color: #3e5d8e !important;
+}
+
+.header-bar a,
+.header-bar button:not(#admin-notification-dropdown button) {
+    color: #0f52ba !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: color 0.2s ease;
+}
+
+.header-bar a:hover,
+.header-bar button:not(#admin-notification-dropdown button):hover {
+    color: #002b8c !important;
+}
+
+.header-bar .border-amber-900\/15 {
+    border-color: rgba(0, 43, 140, 0.15) !important;
+}
+
+#admin-avatar-header {
+    border-color: rgba(15, 82, 186, 0.35) !important;
+}
+
+/* ===== 5. Cards — kính mờ trắng (60%) ===== */
+.content-card,
+.stat-card,
+.chart-card,
+.kpi-card,
+.filter-section,
+.order-stat-card,
+.table-wrapper {
+    background: linear-gradient(160deg,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(240, 255, 255, 0.85) 100%) !important;
+    backdrop-filter: blur(10px) saturate(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid rgba(62, 93, 142, 0.18);
+    box-shadow:
+        0 14px 28px rgba(0, 43, 140, 0.07),
+        0 3px 8px rgba(0, 43, 140, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+.content-card:hover,
+.stat-card:hover,
+.chart-card:hover,
+.kpi-card:hover,
+.order-stat-card:hover {
+    box-shadow:
+        0 20px 40px rgba(0, 43, 140, 0.10),
+        0 6px 14px rgba(0, 43, 140, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Khung thống kê (KPI) — kính trong suốt nổi 3D */
+.kpi-card,
+.stat-card,
+.order-stat-card {
+    position: relative;
+    isolation: isolate;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.66) 0%,
+        rgba(236, 247, 255, 0.52) 48%,
+        rgba(255, 255, 255, 0.62) 100%) !important;
+    backdrop-filter: blur(20px) saturate(165%);
+    -webkit-backdrop-filter: blur(20px) saturate(165%);
+    border: 1px solid rgba(255, 255, 255, 0.92) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.99);
+    border-bottom: 2px solid rgba(15, 82, 186, 0.16);
+    box-shadow:
+        0 18px 34px rgba(0, 43, 140, 0.10),
+        0 5px 12px rgba(0, 43, 140, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -2px 5px rgba(15, 82, 186, 0.05) !important;
+    transform: perspective(900px) rotateX(2.2deg);
+    transform-style: preserve-3d;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Vệt phản quang chéo trên mặt kính */
+.kpi-card::after,
+.stat-card::after,
+.order-stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(115deg,
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0) 68%,
+        rgba(240, 255, 255, 0.34) 100%);
+}
+
+.kpi-card:hover,
+.stat-card:hover,
+.order-stat-card:hover {
+    transform: perspective(900px) rotateX(0deg) translateY(-4px);
+    box-shadow:
+        0 26px 46px rgba(0, 43, 140, 0.14),
+        0 10px 20px rgba(0, 43, 140, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98),
+        inset 0 -2px 5px rgba(15, 82, 186, 0.05) !important;
+}
+
+/* Ô icon trong khung — cùng chất kính */
+.kpi-card .kpi-icon,
+.order-stat-card .stat-icon-wrap {
+    border: 1px solid rgba(255, 255, 255, 0.60);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        0 4px 10px rgba(0, 43, 140, 0.08);
+}
+
+/* Chữ trong khung KPI — tông xanh hải dương */
+.kpi-value {
+    color: #002b8c !important;
+}
+
+.kpi-label,
+.kpi-compare {
+    color: #3e5d8e !important;
+}
+
+.chart-title {
+    color: #002b8c !important;
+}
+
+/* Tiêu đề bảng — azure nhạt, chữ xanh hải dương */
+.table-header {
+    background: linear-gradient(135deg, #f0ffff 0%, #e8f4ff 100%) !important;
+    color: #002b8c !important;
+    box-shadow:
+        0 2px 8px rgba(0, 43, 140, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Icon thống kê — xanh dương, riêng "thành công" xanh lá (10%) */
+.stat-amber .stat-icon-wrap,
+.stat-purple .stat-icon-wrap {
+    background: linear-gradient(135deg, #e8f1ff, #b8cdeb) !important;
+    color: #0f52ba !important;
+}
+
+.stat-blue .stat-icon-wrap {
+    background: linear-gradient(135deg, #dbe9ff, #9dbff0) !important;
+    color: #002b8c !important;
+}
+
+.stat-emerald .stat-icon-wrap {
+    background: linear-gradient(135deg, #e6fbf0, #a7e8c8) !important;
+    color: #15803d !important;
+}
+
+/* ===== 6. Modal — kính mờ dày, header sapphire ===== */
+.modal {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-content {
+    background: linear-gradient(160deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(240, 255, 255, 0.94) 100%) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+        0 30px 60px rgba(0, 43, 140, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0f52ba 0%, #002b8c 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    text-shadow: 0 1px 1px rgba(0, 43, 140, 0.30);
+}
+
+/* ===== 7. Nút bấm — đồng nhất một kiểu ===== */
+/* Nút chính: sapphire -> hải dương, bo 8px, vệt sáng kính */
+.btn-primary {
+    background: linear-gradient(135deg, #0f52ba 0%, #002b8c 100%) !important;
+    border-radius: 8px !important;
+    font-weight: 600;
+    color: #ffffff !important;
+    text-shadow: 0 1px 1px rgba(0, 43, 140, 0.35);
+    box-shadow:
+        0 4px 12px rgba(15, 82, 186, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -2px 4px rgba(0, 43, 140, 0.30);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 8px 18px rgba(15, 82, 186, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Nút lọc: trắng viền xanh chạng vạng, active đổ sapphire */
+.filter-btn,
+.daily-filter-btn {
+    background: #ffffff !important;
+    border: 1px solid #b8cbe4 !important;
+    color: #002b8c !important;
+    border-radius: 8px !important;
+    font-weight: 500;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease-in-out;
+}
+
+.filter-btn:hover,
+.daily-filter-btn:hover:not(.active) {
+    background: #f0ffff !important;
+    border-color: #9dbff0 !important;
+}
+
+.filter-btn.active,
+.daily-filter-btn.active {
+    background: linear-gradient(135deg, #0f52ba 0%, #002b8c 100%) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    text-shadow: 0 1px 1px rgba(0, 43, 140, 0.35);
+    box-shadow:
+        0 4px 12px rgba(15, 82, 186, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.40);
+}
+
+/* Nút phụ dùng chung (POS) — cùng bo góc + vệt sáng */
+.btn-send,
+.btn-checkout,
+.btn-save {
+    border-radius: 8px !important;
+    font-weight: 600;
+}
+
+.btn-send,
+.btn-save {
+    box-shadow: 0 4px 12px rgba(15, 82, 186, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+.btn-checkout {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ===== 8. Card hồ sơ cuối sidebar — kính trắng viền xanh ===== */
+.admin-card {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(240, 255, 255, 0.90) 100%) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 43, 140, 0.10);
+    box-shadow:
+        0 8px 18px rgba(0, 43, 140, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.admin-card span {
+    color: #0f52ba !important;
+}
+
+.admin-card #admin-name {
+    color: #002b8c !important;
+}
+
+.admin-card #admin-email {
+    color: #3e5d8e !important;
+}
+
+.admin-card [class*="border-white"] {
+    border-color: rgba(0, 43, 140, 0.10) !important;
+}
+
+.admin-card button {
+    color: #dc2626 !important;
+}
+
+.admin-card button:hover {
+    color: #b91c1c !important;
+}
+
+#admin-avatar,
+.admin-card img {
+    border-color: rgba(15, 82, 186, 0.30) !important;
+}
+
+#admin-avatar:hover,
+#admin-avatar-header:hover,
+.admin-card img:hover {
+    border-color: rgba(15, 82, 186, 0.75) !important;
+}
+
+/* ===== 9. Hỗ trợ trình duyệt & chuyển động ===== */
+/* Không có backdrop-filter -> nền đặc hơn để vẫn đọc được */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sidebar {
+        background: linear-gradient(180deg, #ffffff 0%, #f0ffff 50%, #ffffff 100%) !important;
+    }
+    .header-bar {
+        background: linear-gradient(135deg, #ffffff, #f0ffff, #ffffff) !important;
+    }
+    .content-card, .stat-card, .chart-card, .kpi-card,
+    .filter-section, .order-stat-card, .table-wrapper {
+        background: linear-gradient(160deg, #ffffff, #f0ffff) !important;
+    }
+    .modal-content {
+        background: #ffffff !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-item,
+    .sidebar-item::before,
+    .content-card, .stat-card, .chart-card, .kpi-card,
+    .filter-section, .order-stat-card,
+    .btn-primary, .filter-btn, .daily-filter-btn {
+        transition: none !important;
+    }
+    .sidebar-item::before {
+        transform: none !important;
+    }
+    .sidebar-item:hover::before {
+        transform: none !important;
+    }
+    .kpi-card, .stat-card, .order-stat-card {
+        transform: none !important;
+    }
+    .sidebar-item.active,
+    .btn-primary:hover,
+    .content-card:hover, .stat-card:hover,
+    .chart-card:hover, .kpi-card:hover, .order-stat-card:hover {
+        transform: none !important;
+    }
+}

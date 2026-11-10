@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ chatbot-knowledge.html) ==== */
+/* ==== Script 1 (tách từ /admin/chatbot-knowledge/) ==== */
 let allKnowledge = [];
         let filteredKnowledge = [];
 

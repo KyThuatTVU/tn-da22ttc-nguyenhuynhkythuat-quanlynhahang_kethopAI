@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ settings.html) ==== */
+/* ==== Script 1 (tách từ /admin/settings/) ==== */
 let map;
         let marker;
         let geocoder;

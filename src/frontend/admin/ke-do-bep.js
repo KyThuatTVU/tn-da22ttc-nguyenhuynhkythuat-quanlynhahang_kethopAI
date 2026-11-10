@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ ke-do-bep.html) ==== */
+/* ==== Script 1 (tách từ /admin/ke-do-bep/) ==== */
 const SLIP_API = `${API_URL}/kitchen-slips`;
         const INV_API = `${API_URL}/inventory`;
         let allIngredients = [];

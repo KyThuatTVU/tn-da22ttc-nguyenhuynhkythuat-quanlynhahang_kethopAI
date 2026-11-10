@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ reviews.html) ==== */
+/* ==== Script 1 (tách từ /admin/reviews/) ==== */
 let reviews = [];
         let selectedIds = [];
         let apiStats = null;

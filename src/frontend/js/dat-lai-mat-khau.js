@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dat-lai-mat-khau.html) ==== */
+/* ==== Script 1 (tách từ /dat-lai-mat-khau/) ==== */
 const API_URL = 'http://localhost:3000/api/auth';
 
         // Kiểm tra xem có thông tin reset không
@@ -9,7 +9,7 @@ const API_URL = 'http://localhost:3000/api/auth';
             if (!resetEmail || !resetCode) {
                 showNotification('Phiên làm việc đã hết hạn. Vui lòng thử lại!', 'error');
                 setTimeout(() => {
-                    window.location.href = 'quen-mat-khau.html';
+                    window.location.href = '/quen-mat-khau/';
                 }, 2000);
             }
         });
@@ -68,7 +68,7 @@ const API_URL = 'http://localhost:3000/api/auth';
             if (!resetEmail || !resetCode) {
                 showNotification('Phiên làm việc đã hết hạn!', 'error');
                 setTimeout(() => {
-                    window.location.href = 'quen-mat-khau.html';
+                    window.location.href = '/quen-mat-khau/';
                 }, 2000);
                 return;
             }
@@ -101,7 +101,7 @@ const API_URL = 'http://localhost:3000/api/auth';
                     
                     // Chuyển hướng về trang đăng nhập
                     setTimeout(() => {
-                        window.location.href = 'dang-nhap.html';
+                        window.location.href = '/dang-nhap/';
                     }, 2000);
                 } else {
                     showNotification(data.message || 'Có lỗi xảy ra!', 'error');

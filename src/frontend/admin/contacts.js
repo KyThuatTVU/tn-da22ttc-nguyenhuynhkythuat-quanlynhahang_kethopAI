@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ contacts.html) ==== */
+/* ==== Script 1 (tách từ /admin/contacts/) ==== */
 let contacts = [];
         let currentPage = 1;
         const limit = 10;

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ products.html) ==== */
+/* ==== Script 1 (tách từ /admin/products/) ==== */
 document.addEventListener('DOMContentLoaded', () => {
             window.productDraftManager = new FormDraftManager('product-form', { excludeClasses: ['no-draft'] });
         });

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ customer-preferences.html) ==== */
+/* ==== Script 1 (tách từ /admin/customer-preferences/) ==== */
 let categoryChartInstance = null;
         let keywordChartInstance = null;
         

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ kiem-ke.html) ==== */
+/* ==== Script 1 (tách từ /admin/kiem-ke/) ==== */
 let auditHistory = [];
         let ingredients = [];
 

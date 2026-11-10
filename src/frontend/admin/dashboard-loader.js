@@ -35,7 +35,7 @@ async function loadDashboardDataWithAuth(retryCount = 0) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     return loadDashboardDataWithAuth(retryCount + 1);
                 }
-                window.location.href = '../staff/login.html';
+                window.location.href = '/staff/login/';
                 return;
             }
 
@@ -48,7 +48,7 @@ async function loadDashboardDataWithAuth(retryCount = 0) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     return loadDashboardDataWithAuth(retryCount + 1);
                 }
-                window.location.href = '../staff/login.html';
+                window.location.href = '/staff/login/';
                 return;
             }
         }
@@ -66,7 +66,7 @@ async function loadDashboardDataWithAuth(retryCount = 0) {
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Unauthorized, redirecting to login...');
-                window.location.href = '../staff/login.html';
+                window.location.href = '/staff/login/';
                 return;
             }
             throw new Error(`HTTP error! status: ${response.status}`);

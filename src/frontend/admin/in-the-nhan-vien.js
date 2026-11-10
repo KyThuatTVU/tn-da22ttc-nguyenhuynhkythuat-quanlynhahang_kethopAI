@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ in-the-nhan-vien.html) ==== */
+/* ==== Script 1 (tách từ /admin/in-the-nhan-vien/) ==== */
 const API_BASE = 'http://localhost:3000/api';
         let staffData = [];
 
@@ -128,7 +128,7 @@ const API_BASE = 'http://localhost:3000/api';
                 const element = document.getElementById(`qr-${code}`);
                 if (element && element.innerHTML === '') {
                     const origin = window.location.origin;
-                    const url = `${origin}/cham-cong-guong-mat.html?code=${code}`;
+                    const url = `${origin}/cham-cong-guong-mat/?code=${code}`;
                     new QRCode(element, {
                         text: url,
                         width: 80,

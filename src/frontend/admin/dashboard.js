@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dashboard.html) ==== */
+/* ==== Script 1 (tách từ /admin/dashboard/) ==== */
 // API_URL đã được khai báo trong admin-layout.js
          // Alias để tương thích
         let gaugeChart, revenueChart, ordersChart, customerChart, reservationChart, newsViewsChart, reviewStarChart, reviewStatusChart, paymentMethodsChart, dailyRevenueChart;
@@ -1978,7 +1978,7 @@
             return num.toString();
         }
 
-/* ==== Script 2 (tách từ dashboard.html) ==== */
+/* ==== Script 2 (tách từ /admin/dashboard/) ==== */
 // Initialize admin notifications after page load
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ cham-cong.html) ==== */
+/* ==== Script 1 (tách từ /staff/cham-cong/) ==== */
 const API_URL = 'http://localhost:3000/api';
         let video, canvas, stream;
         let currentLocation = null;
@@ -10,7 +10,7 @@ const API_URL = 'http://localhost:3000/api';
             staffData = JSON.parse(sessionStorage.getItem('staff_user'));
             if (!staffData) {
                 alert('Vui lòng đăng nhập!');
-                window.location.href = 'login.html';
+                window.location.href = '/staff/login/';
                 return;
             }
 

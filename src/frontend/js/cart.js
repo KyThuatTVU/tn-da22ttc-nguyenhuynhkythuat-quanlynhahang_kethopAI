@@ -112,7 +112,7 @@ class CartManager {
             if (!this.isAuthenticated()) {
                 this.showNotification('Vui lòng đăng nhập để thêm vào giỏ hàng', 'warning');
                 // Redirect to login page
-                window.location.href = 'dang-nhap.html';
+                window.location.href = '/dang-nhap/';
                 return;
             }
 
@@ -215,7 +215,7 @@ class CartManager {
                     
                     <!-- Buttons -->
                     <div class="flex flex-col space-y-3">
-                        <a href="dat-ban.html" 
+                        <a href="/dat-ban/" 
                            class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-6 rounded-xl font-semibold text-center hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2">
                             <i class="fas fa-calendar-check"></i>
                             <span>Đặt bàn ngay</span>
@@ -491,7 +491,7 @@ class CartManager {
                         </div>
                         <h3 class="text-xl font-semibold text-gray-600 mb-2">Giỏ hàng trống</h3>
                         <p class="text-gray-500 mb-6">Hãy thêm món ăn yêu thích vào giỏ hàng của bạn</p>
-                        <a href="thuc-don.html" class="inline-flex items-center px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                        <a href="/thuc-don/" class="inline-flex items-center px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
                             <i class="fas fa-utensils mr-2"></i>
                             Khám phá thực đơn
                         </a>

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ apriori-rules.html) ==== */
+/* ==== Script 1 (tách từ /admin/apriori-rules/) ==== */
 let allRules = [];
         let filteredRules = [];
 

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ loai-chi-phi.html) ==== */
+/* ==== Script 1 (tách từ /admin/loai-chi-phi/) ==== */
 let categories = [];
 
         document.addEventListener('DOMContentLoaded', () => {

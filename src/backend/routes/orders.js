@@ -388,7 +388,7 @@ router.post('/create', authenticateToken, async (req, res) => {
             'new_order',
             `Đơn hàng mới #${ma_don_hang}`,
             `${customerName} đã đặt ${cartItems.length} món - Tổng: ${new Intl.NumberFormat('vi-VN').format(tong_tien)}đ`,
-            `orders.html?id=${ma_don_hang}`,
+            `/admin/orders/?id=${ma_don_hang}`,
             ma_don_hang
         );
 
@@ -1124,7 +1124,7 @@ router.put('/:orderId/status', requireAdmin, async (req, res) => {
                     orderInfo[0].ma_nguoi_dung,
                     `Cập nhật đơn hàng #${orderId}`,
                     statusMessages[dbStatus] || `Trạng thái: ${dbStatus}`,
-                    `don-hang-cua-toi.html`,
+                    `/don-hang-cua-toi/`,
                     orderId
                 ]);
                 console.log(`📢 Đã gửi thông báo cập nhật đơn hàng #${orderId} cho user ${orderInfo[0].ma_nguoi_dung}`);

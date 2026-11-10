@@ -425,7 +425,7 @@ router.post('/', requireAdmin, upload.single('anh_dai_dien'), async (req, res) =
                     await db.query(`
                         INSERT INTO thong_bao (ma_nguoi_dung, loai, tieu_de, noi_dung, duong_dan, ma_lien_quan)
                         VALUES (?, 'news', ?, ?, ?, ?)
-                    `, [user.ma_nguoi_dung, `Bài viết mới: ${tieu_de}`, tom_tat || 'Xem ngay bài viết mới từ Phương Nam!', `tin-tuc-chi-tiet.html?id=${result.insertId}`, result.insertId]);
+                    `, [user.ma_nguoi_dung, `Bài viết mới: ${tieu_de}`, tom_tat || 'Xem ngay bài viết mới từ Phương Nam!', `/tin-tuc-chi-tiet/?id=${result.insertId}`, result.insertId]);
                 }
                 console.log(`📢 Đã gửi thông báo tin tức mới cho ${users.length} users`);
             } catch (notifError) {
@@ -675,7 +675,7 @@ router.post('/comments/:commentId/reply', async (req, res) => {
                     parentComment[0].ma_nguoi_dung,
                     `Admin đã trả lời bình luận của bạn`,
                     noi_dung.substring(0, 100) + (noi_dung.length > 100 ? '...' : ''),
-                    `tin-tuc-chi-tiet.html?id=${parentComment[0].ma_tin_tuc}`,
+                    `/tin-tuc-chi-tiet/?id=${parentComment[0].ma_tin_tuc}`,
                     commentId
                 ]);
                 console.log(`📢 Đã gửi thông báo trả lời bình luận cho user ${parentComment[0].ma_nguoi_dung}`);
@@ -796,7 +796,7 @@ router.post('/:id/comments', async (req, res) => {
             'new_comment',
             `Bình luận mới từ ${ten_nguoi_binh_luan}`,
             `"${noi_dung.substring(0, 100)}${noi_dung.length > 100 ? '...' : ''}" - Tin tức: ${newsTitle}`,
-            `../tin-tuc-chi-tiet.html?id=${id}`,
+            `/tin-tuc-chi-tiet/?id=${id}`,
             result.insertId
         );
 
@@ -1023,7 +1023,7 @@ router.post('/:id/reactions', async (req, res) => {
                 'comment_like',
                 `${userName} thả ${emoji} vào bài viết`,
                 `Tin tức: "${newsTitle}"`,
-                `../tin-tuc-chi-tiet.html?id=${id}`,
+                `/tin-tuc-chi-tiet/?id=${id}`,
                 id
             );
             
@@ -1264,7 +1264,7 @@ router.post('/comments/:commentId/reactions', async (req, res) => {
                         commentInfo[0].ma_nguoi_dung,
                         `${ten_nguoi_dung} đã ${reactionEmoji[loai_cam_xuc]} bình luận của bạn`,
                         'Xem bình luận của bạn',
-                        `tin-tuc-chi-tiet.html?id=${commentInfo[0].ma_tin_tuc}`,
+                        `/tin-tuc-chi-tiet/?id=${commentInfo[0].ma_tin_tuc}`,
                         commentId
                     ]);
                 } catch (notifError) {
@@ -1282,7 +1282,7 @@ router.post('/comments/:commentId/reactions', async (req, res) => {
                     'comment_like',
                     `${ten_nguoi_dung} thả ${reactionEmoji[loai_cam_xuc]} vào bình luận`,
                     `Tin tức: "${newsTitle}"`,
-                    `../tin-tuc-chi-tiet.html?id=${commentInfo[0].ma_tin_tuc}`,
+                    `/tin-tuc-chi-tiet/?id=${commentInfo[0].ma_tin_tuc}`,
                     commentId
                 );
             }
@@ -1365,7 +1365,7 @@ router.post('/comments/:commentId/replies', async (req, res) => {
                     parentComment[0].ma_nguoi_dung,
                     `${ten_nguoi_binh_luan} đã trả lời bình luận của bạn`,
                     noi_dung.trim().substring(0, 100) + (noi_dung.length > 100 ? '...' : ''),
-                    `tin-tuc-chi-tiet.html?id=${parentComment[0].ma_tin_tuc}`,
+                    `/tin-tuc-chi-tiet/?id=${parentComment[0].ma_tin_tuc}`,
                     commentId
                 ]);
                 console.log(`📢 Đã gửi thông báo trả lời bình luận cho user ${parentComment[0].ma_nguoi_dung}`);

@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ cham-cong-guong-mat.html) ==== */
+/* ==== Script 1 (tách từ /cham-cong-guong-mat/) ==== */
 // Ngăn chặn Live Server tự động reload trang khi lưu ảnh chấm công
         (function() {
             const OriginalWebSocket = window.WebSocket;

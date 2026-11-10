@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ admins.html) ==== */
+/* ==== Script 1 (tách từ /admin/admins/) ==== */
 // Kiểm tra quyền truy cập ngay khi load trang
         async function checkAdminAccess() {
             // Kiểm tra xem có phải admin không
@@ -12,7 +12,7 @@
                     confirmButtonText: 'Quay lại Dashboard',
                     allowOutsideClick: false
                 }).then(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/admin/dashboard/';
                 });
                 return false;
             }
@@ -45,7 +45,7 @@
                                     <p class="font-semibold">Chưa đăng nhập Admin</p>
                                     <p class="text-sm text-gray-600 mt-2">Trang này chỉ dành cho Admin. Vui lòng đăng nhập bằng tài khoản Admin.</p>
                                 </div>
-                                <a href="dang-nhap-admin.html" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                <a href="/admin/dang-nhap-admin/" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                                     <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập Admin
                                 </a>
                             </td>

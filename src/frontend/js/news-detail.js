@@ -206,7 +206,7 @@ function displayRelatedNews(relatedNews) {
     }
 
     relatedContainer.innerHTML = relatedNews.map(news => `
-        <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}" class="group">
+        <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}" class="group">
             <img src="${news.anh_dai_dien ? `http://localhost:3000/${news.anh_dai_dien}` : 'images/default-news.jpg'}"
                  alt="${news.tieu_de}"
                  class="w-full h-48 object-cover rounded-lg mb-3 group-hover:opacity-90 transition">
@@ -266,7 +266,7 @@ async function loadRecentPosts(currentNewsId) {
                          class="w-20 h-20 rounded-lg object-cover"
                          onerror="this.src='images/default-news.jpg'">
                     <div class="flex-1">
-                        <a href="tin-tuc-chi-tiet.html?id=${news.ma_tin_tuc}" class="font-medium hover:text-orange-600 line-clamp-2">
+                        <a href="/tin-tuc-chi-tiet/?id=${news.ma_tin_tuc}" class="font-medium hover:text-orange-600 line-clamp-2">
                             ${news.tieu_de}
                         </a>
                         <p class="text-sm text-gray-500 mt-1">${formatDate(news.ngay_dang)}</p>
@@ -331,7 +331,7 @@ function showError(message) {
             <div class="text-center py-12">
                 <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
                 <p class="text-gray-600 text-lg mb-4">${message}</p>
-                <a href="tin-tuc.html" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">
+                <a href="/tin-tuc/" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">
                     <i class="fas fa-arrow-left mr-2"></i>Quay lại trang tin tức
                 </a>
             </div>
@@ -845,7 +845,7 @@ async function submitComment(event) {
         } else {
             if (response.status === 401) {
                 alert('Vui lòng đăng nhập để bình luận');
-                window.location.href = 'dang-nhap.html?redirect=' + encodeURIComponent(window.location.href);
+                window.location.href = '/dang-nhap/?redirect=' + encodeURIComponent(window.location.href);
             } else {
                 alert(result.message || 'Không thể gửi bình luận');
             }
@@ -1131,7 +1131,7 @@ async function toggleReaction(reactionType) {
                     showNotification('Vui lòng đăng nhập để thả cảm xúc', 'warning');
                 }
                 setTimeout(() => {
-                    window.location.href = 'dang-nhap.html?redirect=' + encodeURIComponent(window.location.href);
+                    window.location.href = '/dang-nhap/?redirect=' + encodeURIComponent(window.location.href);
                 }, 1500);
             } else {
                 if (typeof showNotification === 'function') {

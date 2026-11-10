@@ -289,7 +289,7 @@ function renderMenuProducts() {
         return `
         <div class="dish-card flex flex-col bg-white rounded-2xl overflow-hidden shadow-md h-full">
             <!-- Image Container -->
-            <a href="chitietmonan.html?id=${product.ma_mon}" class="block">
+            <a href="/chitietmonan/?id=${product.ma_mon}" class="block">
                 <div class="dish-image-container">
                 <img src="http://localhost:3000${imagePath}" 
                      alt="${product.ten_mon}" 
@@ -325,7 +325,7 @@ function renderMenuProducts() {
             <!-- Content -->
             <div class="p-5 flex flex-col flex-1">
                 <!-- Title -->
-                <a href="chitietmonan.html?id=${product.ma_mon}" class="block">
+                <a href="/chitietmonan/?id=${product.ma_mon}" class="block">
                     <h3 class="font-bold text-lg mb-2 text-gray-800 line-clamp-1 hover:text-orange-600 transition cursor-pointer">
                         ${product.ten_mon}
                     </h3>
@@ -361,7 +361,7 @@ function renderMenuProducts() {
                     </div>
                     <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
                         <!-- Mua ngay (Primary Call-to-action) -->
-                        <button onclick="addToCart(${product.ma_mon}); setTimeout(() => window.location.href='gio-hang.html', 300)" 
+                        <button onclick="addToCart(${product.ma_mon}); setTimeout(() => window.location.href='/gio-hang/', 300)" 
                                 ${product.trang_thai === 0 || product.so_luong_ton === 0 ? 'disabled' : ''}
                                 class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed text-xs sm:text-sm">
                             Mua ngay

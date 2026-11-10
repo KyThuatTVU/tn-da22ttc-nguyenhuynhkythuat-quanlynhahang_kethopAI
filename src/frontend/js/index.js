@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ index.html) ==== */
+/* ==== Script 1 (tách từ /) ==== */
 const swiper = new Swiper(".mySwiper", {
             loop: true,
             autoplay: {
@@ -18,7 +18,7 @@ const swiper = new Swiper(".mySwiper", {
             },
         });
 
-/* ==== Script 2 (tách từ index.html) ==== */
+/* ==== Script 2 (tách từ /) ==== */
 // Danh sách lưu trữ mã các món ăn đã hiển thị ở phần cá nhân hóa để lọc trùng ở phần "Món ngon bán chạy"
         let personalizedDishIds = [];
 
@@ -97,7 +97,7 @@ const swiper = new Swiper(".mySwiper", {
                             <div class="card-3d-container">
                                 <div class="card-3d-inner bg-white rounded-xl overflow-hidden shadow-sm">
                                     <div class="card-shine"></div>
-                                    <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                                    <a href="/chitietmonan/?id=${dish.ma_mon}" class="block">
                                         <div class="relative bg-gray-50 overflow-hidden">
                                             <img src="${imageUrl}" alt="${dish.ten_mon}"
                                                 class="w-full h-48 sm:h-56 md:h-64 object-cover"
@@ -105,7 +105,7 @@ const swiper = new Swiper(".mySwiper", {
                                         </div>
                                     </a>
                                     <div class="p-3 sm:p-4">
-                                        <a href="chitietmonan.html?id=${dish.ma_mon}">
+                                        <a href="/chitietmonan/?id=${dish.ma_mon}">
                                             <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
                                         </a>
                                         <div class="flex items-center mb-2">
@@ -141,7 +141,7 @@ const swiper = new Swiper(".mySwiper", {
             }
         }
 
-/* ==== Script 3 (tách từ index.html) ==== */
+/* ==== Script 3 (tách từ /) ==== */
 // Load top selling dishes from API (loại trừ món đã có trong personalized)
         async function loadFeaturedDishes() {
             const container = document.getElementById('featured-dishes-container');
@@ -184,7 +184,7 @@ const swiper = new Swiper(".mySwiper", {
                             <div class="card-3d-container">
                                 <div class="card-3d-inner bg-white rounded-xl overflow-hidden shadow-sm">
                                     <div class="card-shine"></div>
-                                    <a href="chitietmonan.html?id=${dish.ma_mon}" class="block">
+                                    <a href="/chitietmonan/?id=${dish.ma_mon}" class="block">
                                         <div class="relative bg-gray-50 overflow-hidden">
                                             <img src="${imageUrl}" alt="${dish.ten_mon}"
                                                 class="w-full h-48 sm:h-56 md:h-64 object-cover"
@@ -199,7 +199,7 @@ const swiper = new Swiper(".mySwiper", {
                                         </div>
                                     </a>
                                     <div class="p-3 sm:p-4">
-                                        <a href="chitietmonan.html?id=${dish.ma_mon}">
+                                        <a href="/chitietmonan/?id=${dish.ma_mon}">
                                             <h3 class="font-medium text-base sm:text-lg mb-2 text-gray-800 hover:text-orange-600 transition truncate" title="${dish.ten_mon}">${dish.ten_mon}</h3>
                                         </a>
                                         <div class="flex items-center mb-2">
@@ -242,7 +242,7 @@ const swiper = new Swiper(".mySwiper", {
             });
         });
 
-/* ==== Script 4 (tách từ index.html) ==== */
+/* ==== Script 4 (tách từ /) ==== */
 // Function để play video YouTube
         function playYoutubeVideo() {
             const thumbnail = document.getElementById('video-thumbnail');
@@ -257,7 +257,7 @@ const swiper = new Swiper(".mySwiper", {
             iframe.src = iframe.dataset.src;
         }
 
-/* ==== Script 5 (tách từ index.html) ==== */
+/* ==== Script 5 (tách từ /) ==== */
 document.addEventListener('DOMContentLoaded', function () {
             const testimonialSwiper = new Swiper(".testimonialSwiper", {
                 loop: true,
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-/* ==== Script 6 (tách từ index.html) ==== */
+/* ==== Script 6 (tách từ /) ==== */
 // Scroll to Top functionality
         (function() {
             const scrollBtn = document.getElementById('back-to-top');
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })();
 
-/* ==== Script 7 (tách từ index.html) ==== */
+/* ==== Script 7 (tách từ /) ==== */
 // Logic chọn UI Style
         function bindSelectableLabels(containerId, activeClasses, inactiveClasses) {
             const container = document.getElementById(containerId);
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-/* ==== Script 8 (tách từ index.html) ==== */
+/* ==== Script 8 (tách từ /) ==== */
 // 3D Card Tilt Interaction for Homepage
         window.initHome3DTiltEffects = function() {
             // Filter out touch devices

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khuyến mãi - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+                <!-- Top Actions -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-slate-800">Mã giảm giá</h2>
+                    <button onclick="openModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl hover:bg-slate-900 font-medium text-sm">
+                        <i class="fas fa-plus mr-2"></i>Thêm mã
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-4 sm:mb-6">
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-xs sm:text-sm">Tổng mã</p><p id="stat-total" class="text-xl sm:text-2xl font-bold text-slate-800">0</p></div><div class="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-xl flex items-center justify-center"><i class="fas fa-ticket-alt text-slate-600 text-base sm:text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-xs sm:text-sm">Đang hoạt động</p><p id="stat-active" class="text-xl sm:text-2xl font-bold text-green-600">0</p></div><div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center"><i class="fas fa-check-circle text-green-600 text-base sm:text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-xs sm:text-sm">Đã hết hạn</p><p id="stat-expired" class="text-xl sm:text-2xl font-bold text-red-600">0</p></div><div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl flex items-center justify-center"><i class="fas fa-times-circle text-red-600 text-base sm:text-xl"></i></div></div></div>
+                    <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-slate-500 text-xs sm:text-sm">Lượt sử dụng</p><p id="stat-used" class="text-xl sm:text-2xl font-bold text-blue-600">0</p></div><div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-chart-line text-blue-600 text-base sm:text-xl"></i></div></div></div>
+                </div>
+
+                <!-- Table -->
+                <div class="content-card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Mã</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Mô tả</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Giảm giá</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Đơn tối thiểu</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Thời gian</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Sử dụng</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Trạng thái</th>
+                                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="promotions-table">
+                                <tr><td colspan="8" class="text-center py-8 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="promo-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex items-center justify-between bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold" id="modal-title">Thêm mã khuyến mãi</h3>
+                <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="promo-form" class="p-6 space-y-4">
+                <input type="hidden" id="promo-id" class="no-draft">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Mã code *</label>
+                        <input type="text" id="ma_code" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl uppercase" placeholder="VD: GIAM10">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Loại giảm *</label>
+                        <select id="loai_giam_gia" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl">
+                            <option value="percentage">Phần trăm (%)</option>
+                            <option value="fixed_amount">Số tiền cố định</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Giá trị giảm *</label>
+                        <input type="number" id="gia_tri" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl" placeholder="10">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Đơn tối thiểu</label>
+                        <input type="number" id="don_hang_toi_thieu" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl" placeholder="100000">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Ngày bắt đầu *</label>
+                        <input type="datetime-local" id="ngay_bat_dau" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Ngày kết thúc *</label>
+                        <input type="datetime-local" id="ngay_ket_thuc" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Giới hạn sử dụng</label>
+                    <input type="number" id="so_luong_gioi_han" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl" placeholder="Để trống = không giới hạn">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Mô tả</label>
+                    <textarea id="mo_ta" rows="2" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl" placeholder="Mô tả khuyến mãi..."></textarea>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="trang_thai" checked class="w-4 h-4 text-blue-600 rounded">
+                    <label for="trang_thai" class="ml-2 text-sm text-slate-700">Kích hoạt</label>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl hover:bg-slate-900 font-medium">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+    <script src="../js/form-draft-manager.js"></script>
+    
+    <script src="promotions.js" defer></script>
+
+</body>
+</html>

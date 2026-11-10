@@ -756,7 +756,7 @@ router.put('/:id/status', requireAdmin, async (req, res) => {
                         reservation.ma_nguoi_dung,
                         message.title,
                         message.content,
-                        '/dat-ban-cua-toi.html',
+                        '/dat-ban-cua-toi/',
                         id
                     ]);
                 } catch (notifError) {

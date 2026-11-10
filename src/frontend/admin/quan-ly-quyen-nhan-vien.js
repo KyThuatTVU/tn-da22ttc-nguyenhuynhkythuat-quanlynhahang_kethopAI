@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ quan-ly-quyen-nhan-vien.html) ==== */
+/* ==== Script 1 (tách từ /admin/quan-ly-quyen-nhan-vien/) ==== */
 let staffId = null;
         let currentPermissions = {};
         let permissionsList = {};
@@ -15,7 +15,7 @@ let staffId = null;
                 staffId = getStaffIdFromUrl();
                 if (!staffId) {
                     alert('Không tìm thấy ID nhân viên!');
-                    window.location.href = 'staff.html';
+                    window.location.href = '/admin/staff/';
                     return;
                 }
 

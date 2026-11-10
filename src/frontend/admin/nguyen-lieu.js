@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ nguyen-lieu.html) ==== */
+/* ==== Script 1 (tách từ /admin/nguyen-lieu/) ==== */
 let categories = [];
 
         document.addEventListener('DOMContentLoaded', () => {

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/staff/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công - Nhân viên</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="cham-cong.css">
+
+</head>
+<body class="flex items-center justify-center p-4">
+    <!-- Main Card -->
+    <div class="card rounded-3xl p-8 w-full max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-block mb-4">
+                <img src="../images/Green Simple Clean Vegan Food Logo.png" 
+                     alt="Logo" 
+                     class="w-20 h-20 mx-auto rounded-full border-4 border-purple-500 shadow-lg">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">Chấm Công</h1>
+            <p class="text-gray-600 mt-2" id="staffInfo">Đang tải thông tin...</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <i class="fas fa-clock mr-2"></i>
+                <span id="currentTime"></span>
+            </div>
+        </div>
+
+        <!-- Camera Section -->
+        <div class="mb-6">
+            <div class="relative bg-gray-900 rounded-2xl overflow-hidden" style="aspect-ratio: 4/3;">
+                <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
+                <div id="preview" class="hidden w-full h-full"></div>
+                
+                <!-- Metadata Overlay -->
+                <div class="metadata-overlay" id="metadataOverlay">
+                    <div id="locationText">📍 Đang lấy vị trí...</div>
+                    <div id="timeText">🕐 --:--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="hidden mb-4 p-4 rounded-xl"></div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <button id="btnCheckin" onclick="capturePhoto('checkin')" 
+                    class="btn-checkin text-white py-4 rounded-xl font-bold text-lg transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-sign-in-alt mr-2"></i>Check In
+            </button>
+            <button id="btnCheckout" onclick="capturePhoto('checkout')" 
+                    class="btn-checkout text-white py-4 rounded-xl font-bold text-lg transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-sign-out-alt mr-2"></i>Check Out
+            </button>
+        </div>
+
+        <!-- Xem lương -->
+        <a href="/staff/luong-cua-toi/" class="block w-full mb-4">
+            <button class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-orange-600 transition">
+                <i class="fas fa-money-bill-wave mr-2"></i>Xem Lương Của Tôi
+            </button>
+        </a>
+
+        <!-- Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+            <p class="text-sm text-blue-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                <strong>Lưu ý:</strong> Ảnh chấm công sẽ tự động lưu vị trí GPS, ngày giờ chụp. 
+                Vui lòng cho phép truy cập camera và vị trí.
+            </p>
+        </div>
+
+        <!-- History Today -->
+        <div class="border-t pt-4">
+            <h3 class="font-bold text-gray-800 mb-3">Lịch sử hôm nay</h3>
+            <div id="historyToday" class="space-y-2">
+                <p class="text-gray-500 text-sm italic">Đang tải...</p>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-6 text-center">
+            <a href="/admin/dashboard/" class="text-purple-600 hover:text-purple-700 font-semibold">
+                <i class="fas fa-arrow-left mr-2"></i>Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+
+    
+    <script src="cham-cong.js" defer></script>
+
+</body>
+</html>

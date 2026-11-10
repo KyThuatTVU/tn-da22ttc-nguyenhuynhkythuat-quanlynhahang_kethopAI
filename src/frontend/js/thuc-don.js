@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ thuc-don.html) ==== */
+/* ==== Script 1 (tách từ /thuc-don/) ==== */
 // Scroll to Top functionality
         (function() {
             const scrollBtn = document.getElementById('back-to-top');

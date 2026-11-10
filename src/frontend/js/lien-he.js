@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ lien-he.html) ==== */
+/* ==== Script 1 (tách từ /lien-he/) ==== */
 const API_URL = 'http://localhost:3000/api';
         let selectedFiles = [];
         
@@ -159,7 +159,7 @@ const API_URL = 'http://localhost:3000/api';
             observer.observe(el);
         });
 
-/* ==== Script 2 (tách từ lien-he.html) ==== */
+/* ==== Script 2 (tách từ /lien-he/) ==== */
 // Scroll to Top functionality
         (function() {
             const scrollBtn = document.getElementById('back-to-top');

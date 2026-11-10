@@ -121,7 +121,7 @@ router.post('/', upload.array('hinh_anh', 5), async (req, res) => {
             'contact_message',
             `Tin nhắn liên hệ mới từ ${ho_ten}`,
             `${tieu_de || 'Câu hỏi chung'} - ${noi_dung.substring(0, 100)}${noi_dung.length > 100 ? '...' : ''}`,
-            `quan-ly-lien-he.html?id=${result.insertId}`,
+            `/admin/contacts/?id=${result.insertId}`,
             result.insertId
         );
         

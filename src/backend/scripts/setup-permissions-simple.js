@@ -146,7 +146,7 @@ async function setupPermissions() {
         console.log(`\n✅ Đã tạo quyền cho ${staff.length} nhân viên\n`);
         console.log('🎉 Hoàn thành!\n');
         console.log('📝 Bạn có thể:');
-        console.log('   1. Vào trang Quản lý Nhân viên (staff.html)');
+        console.log('   1. Vào trang Quản lý Nhân viên (/admin/staff/)');
         console.log('   2. Nhấn nút 🛡️ (màu tím) để phân quyền');
         console.log('   3. Bật/tắt các quyền theo nhu cầu\n');
 

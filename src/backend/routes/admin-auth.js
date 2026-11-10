@@ -222,7 +222,7 @@ router.get('/google',
 router.get('/google/callback',
     passport.authenticate('google-admin', {
         session: true, // Dùng session
-        failureRedirect: '/admin/dang-nhap-admin.html?error=google_auth_failed'
+        failureRedirect: '/admin/dang-nhap-admin/?error=google_auth_failed'
     }),
     async (req, res) => {
         try {
@@ -245,7 +245,7 @@ router.get('/google/callback',
                 console.log('❌ Email không phải admin:', email);
                 // Email không phải admin, từ chối đăng nhập
                 req.logout(() => {
-                    res.redirect('/admin/dang-nhap-admin.html?error=not_admin');
+                    res.redirect('/admin/dang-nhap-admin/?error=not_admin');
                 });
                 return;
             }
@@ -297,7 +297,7 @@ router.get('/google/callback',
             req.session.save((err) => {
                 if (err) {
                     console.error('❌ Lỗi lưu session:', err);
-                    res.redirect('/admin/dang-nhap-admin.html?error=session_save_failed');
+                    res.redirect('/admin/dang-nhap-admin/?error=session_save_failed');
                     return;
                 }
 
@@ -305,12 +305,12 @@ router.get('/google/callback',
                 console.log('🔐 Session after save:', req.session);
                 
                 // Redirect về dashboard với query param để frontend biết đã login thành công
-                res.redirect('/admin/dashboard.html?login=success');
+                res.redirect('/admin/dashboard/?login=success');
             });
 
         } catch (error) {
             console.error('❌ Lỗi Google callback admin:', error);
-            res.redirect('/admin/dang-nhap-admin.html?error=google_callback_failed');
+            res.redirect('/admin/dang-nhap-admin/?error=google_callback_failed');
         }
     }
 );

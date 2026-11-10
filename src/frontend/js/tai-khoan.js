@@ -1,16 +1,16 @@
-/* ==== Script 1 (tách từ tai-khoan.html) ==== */
+/* ==== Script 1 (tách từ /tai-khoan/) ==== */
 // API Configuration
         if (typeof window.API_URL === 'undefined') {
             window.API_URL = 'http://localhost:3000/api';
         }
 
-/* ==== Script 2 (tách từ tai-khoan.html) ==== */
+/* ==== Script 2 (tách từ /tai-khoan/) ==== */
 let isEditMode = false;
         let originalData = {};
 
         // Check login
         if (!isLoggedIn()) {
-            window.location.href = 'dang-nhap.html';
+            window.location.href = '/dang-nhap/';
         }
 
         // Load user data
@@ -18,7 +18,7 @@ let isEditMode = false;
             try {
                 const user = await getCurrentUser();
                 if (!user) {
-                    window.location.href = 'dang-nhap.html';
+                    window.location.href = '/dang-nhap/';
                     return;
                 }
 
@@ -805,7 +805,7 @@ let isEditMode = false;
                     <div class="text-center py-12 text-gray-500">
                         <i class="fas fa-calendar-times text-6xl mb-4 opacity-30"></i>
                         <p class="text-lg">Bạn chưa có lịch đặt bàn nào</p>
-                        <a href="dat-ban.html" class="inline-block mt-4 text-orange-600 hover:text-orange-700 font-semibold">
+                        <a href="/dat-ban/" class="inline-block mt-4 text-orange-600 hover:text-orange-700 font-semibold">
                             Đặt bàn ngay <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>

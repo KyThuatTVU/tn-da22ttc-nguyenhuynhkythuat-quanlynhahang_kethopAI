@@ -27,11 +27,11 @@ ComponentManager.register('footer', (data = {}) => {
                     <div>
                         <h4 class="font-medium text-lg mb-4">Liên kết</h4>
                         <ul class="space-y-2">
-                            <li><a href="gioi-thieu.html" class="text-gray-400 hover:text-white transition">Giới thiệu</a></li>
-                            <li><a href="thuc-don.html" class="text-gray-400 hover:text-white transition">Thực đơn</a></li>
-                            <li><a href="tin-tuc.html" class="text-gray-400 hover:text-white transition">Tin tức</a></li>
-                            <li><a href="lien-he.html" class="text-gray-400 hover:text-white transition">Liên hệ</a></li>
-                            <li><a href="dat-ban.html" class="text-gray-400 hover:text-white transition">Đặt bàn</a></li>
+                            <li><a href="/gioi-thieu/" class="text-gray-400 hover:text-white transition">Giới thiệu</a></li>
+                            <li><a href="/thuc-don/" class="text-gray-400 hover:text-white transition">Thực đơn</a></li>
+                            <li><a href="/tin-tuc/" class="text-gray-400 hover:text-white transition">Tin tức</a></li>
+                            <li><a href="/lien-he/" class="text-gray-400 hover:text-white transition">Liên hệ</a></li>
+                            <li><a href="/dat-ban/" class="text-gray-400 hover:text-white transition">Đặt bàn</a></li>
                         </ul>
                     </div>
                     <div>

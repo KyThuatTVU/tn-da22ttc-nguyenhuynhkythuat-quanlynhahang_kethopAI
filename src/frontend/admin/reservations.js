@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ reservations.html) ==== */
+/* ==== Script 1 (tách từ /admin/reservations/) ==== */
 // API_URL đã được khai báo trong admin-layout.js
         let reservations = [];
         let currentReservation = null;

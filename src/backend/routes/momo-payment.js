@@ -236,7 +236,7 @@ router.get('/momo-return', async (req, res) => {
                     [realOrderId]
                 );
 
-                res.redirect(`/dat-hang-thanh-cong.html?orderId=${realOrderId}&payment=momo&status=success`);
+                res.redirect(`/dat-hang-thanh-cong/?orderId=${realOrderId}&payment=momo&status=success`);
             } else {
                 // Thanh toán thất bại
                 await db.query(
@@ -247,14 +247,14 @@ router.get('/momo-return', async (req, res) => {
                     [JSON.stringify({ resultCode, message }), requestId]
                 );
 
-                res.redirect(`/don-hang-cua-toi.html?payment_failed=true&orderId=${realOrderId}&message=${encodeURIComponent(message || 'Thanh toán không thành công')}`);
+                res.redirect(`/don-hang-cua-toi/?payment_failed=true&orderId=${realOrderId}&message=${encodeURIComponent(message || 'Thanh toán không thành công')}`);
             }
         } else {
-            res.redirect(`/don-hang-cua-toi.html?payment_failed=true&message=${encodeURIComponent('Chữ ký không hợp lệ')}`);
+            res.redirect(`/don-hang-cua-toi/?payment_failed=true&message=${encodeURIComponent('Chữ ký không hợp lệ')}`);
         }
     } catch (error) {
         console.error('❌ Lỗi xử lý callback MoMo:', error);
-        res.redirect(`/don-hang-cua-toi.html?payment_failed=true&message=${encodeURIComponent('Lỗi xử lý thanh toán')}`);
+        res.redirect(`/don-hang-cua-toi/?payment_failed=true&message=${encodeURIComponent('Lỗi xử lý thanh toán')}`);
     }
 });
 

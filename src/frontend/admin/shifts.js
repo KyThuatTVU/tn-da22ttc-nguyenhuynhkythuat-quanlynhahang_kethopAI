@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ shifts.html) ==== */
+/* ==== Script 1 (tách từ /admin/shifts/) ==== */
 // ========== 1. AN TOÀN KHỞI TẠO API URL (chống ReferenceError) ==========
         var BASE_API;
         try {

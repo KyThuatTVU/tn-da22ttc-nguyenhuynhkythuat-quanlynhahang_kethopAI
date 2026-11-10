@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ login.html) ==== */
+/* ==== Script 1 (tách từ /staff/login/) ==== */
 // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -81,10 +81,10 @@
                     // Chuyển hướng ngay lập tức - tất cả vai trò vào giao diện admin
                     setTimeout(() => {
                         if (role === 'manager') {
-                            window.location.href = '../admin/dashboard.html';
+                            window.location.href = '/admin/dashboard/';
                         } else {
                             // Waiter, kitchen, cashier → trang đơn hàng
-                            window.location.href = '../admin/orders.html';
+                            window.location.href = '/admin/orders/';
                         }
                     }, 500);
                 } else {
@@ -109,9 +109,9 @@
                     
                     // Đã đăng nhập, chuyển hướng
                     if (role === 'manager') {
-                        window.location.href = '../admin/dashboard.html';
+                        window.location.href = '/admin/dashboard/';
                     } else {
-                        window.location.href = '../admin/orders.html';
+                        window.location.href = '/admin/orders/';
                     }
                 } catch (err) {
                     sessionStorage.removeItem('staff_user');

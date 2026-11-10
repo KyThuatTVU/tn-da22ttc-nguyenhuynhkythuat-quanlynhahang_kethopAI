@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ attendance.html) ==== */
+/* ==== Script 1 (tách từ /admin/attendance/) ==== */
 const ATTENDANCE_API = `${API_URL}/attendance`;
         const STAFF_API = `${API_URL}/staff`;
 

@@ -5,6 +5,15 @@ const axios = require('axios'); // Add axios for communicating with Python AI Se
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5000/api/ml/admin/chat';
 
+// Tên/đơn vị/icon chuẩn cho 5 loại mục tiêu (chống dữ liệu cũ bị lỗi mã hóa)
+const GOAL_META = {
+    doanh_thu: { ten_muc_tieu: 'Doanh thu tháng', don_vi: 'đồng', icon: '💰' },
+    don_hang: { ten_muc_tieu: 'Số đơn hàng', don_vi: 'đơn', icon: '📦' },
+    khach_hang_moi: { ten_muc_tieu: 'Khách hàng mới', don_vi: 'người', icon: '👥' },
+    dat_ban: { ten_muc_tieu: 'Lượt đặt bàn', don_vi: 'lượt', icon: '🍽️' },
+    danh_gia: { ten_muc_tieu: 'Đánh giá tích cực', don_vi: 'đánh giá', icon: '⭐' }
+};
+
 // Bỏ đoạn khởi tạo Groq cũ bằng Node.js
 
 // Tự động tạo các bảng mục tiêu nếu chưa tồn tại
@@ -212,12 +221,16 @@ async function getBusinessStats() {
             };
             
             goalsData = goals.map(goal => {
+                const meta = GOAL_META[goal.loai_muc_tieu] || {};
                 const actual = actualData[goal.loai_muc_tieu] || 0;
                 const target = parseFloat(goal.gia_tri_muc_tieu) || 1;
                 const progress = Math.min(100, Math.round((actual / target) * 100));
                 
                 return {
                     ...goal,
+                    ten_muc_tieu: meta.ten_muc_tieu || goal.ten_muc_tieu,
+                    don_vi: meta.don_vi || goal.don_vi,
+                    icon: meta.icon || goal.icon,
                     gia_tri_muc_tieu: Math.round(target), // Làm tròn so‘
                     gia_tri_hien_tai: Math.round(actual), // Làm tròn so‘
                     tien_do: progress
@@ -810,12 +823,16 @@ router.get('/goals', requireAdmin, async (req, res) => {
         
         // Tính tiáº¿n độ cho to«ng mục tiêu
         const goalsWithProgress = goals.map(goal => {
+            const meta = GOAL_META[goal.loai_muc_tieu] || {};
             const actual = actualData[goal.loai_muc_tieu] || 0;
             const target = parseFloat(goal.gia_tri_muc_tieu) || 1;
             const progress = Math.min(100, Math.round((actual / target) * 100));
             
             return {
                 ...goal,
+                ten_muc_tieu: meta.ten_muc_tieu || goal.ten_muc_tieu,
+                don_vi: meta.don_vi || goal.don_vi,
+                icon: meta.icon || goal.icon,
                 gia_tri_muc_tieu: Math.round(target), // Làm tròn so‘, bo .00
                 gia_tri_hien_tai: Math.round(actual), // Làm tròn so‘
                 tien_do: progress,
@@ -948,22 +965,22 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
             const estimatedRevenue = Math.round(currentRevenueVal / progressRatio);
             targetRevenue = Math.round(estimatedRevenue * 1.05 / 1000000) * 1000000; // Tăng 5%
             if (targetRevenue < 1000000) targetRevenue = Math.round(estimatedRevenue * 1.05 / 100000) * 100000;
-            revenueDesc = `Dựa trên xu hưo›ng hiện tại (${new Intl.NumberFormat('vi-VN').format(currentRevenueVal)}đ đã đạt)`;
+            revenueDesc = `Dựa trên xu hướng hiện tại (${new Intl.NumberFormat('vi-VN').format(currentRevenueVal)}đ đã đạt)`;
         } else if (currentRevenueVal > 0) {
             // Có doanh thu nhưng còn ít ngày -> ưo›c tính dựa trên trung bình ngày
             const avgPerDay = currentRevenueVal / Math.max(1, dayOfMonth);
             targetRevenue = Math.round(avgPerDay * daysInMonth * 1.1 / 100000) * 100000;
             if (targetRevenue < 500000) targetRevenue = 500000;
-            revenueDesc = `Æ¯o›c tính to« doanh thu hiện tại (${new Intl.NumberFormat('vi-VN').format(currentRevenueVal)}đ)`;
+            revenueDesc = `Ước tính tổng doanh thu hiện tại (${new Intl.NumberFormat('vi-VN').format(currentRevenueVal)}đ)`;
         } else {
             // Không có do¯ liệu -> đáº·t mục tiêu khởi đáº§u co¥ thoƒ
             targetRevenue = 10000000; // 10 triệu - mục tiêu khởi đáº§u rÃµ ràng
-            revenueDesc = 'Mo¥c tiêu khởi đáº§u: 10 triệu đo“ng/tháng';
+            revenueDesc = 'Mục tiêu khởi đầu: 10 triệu đồng/tháng';
         }
         // Äáº£m báº£o luôn có giá tro‹ to‘i thioƒu
         if (!targetRevenue || targetRevenue <= 0) {
             targetRevenue = 10000000;
-            revenueDesc = 'Mo¥c tiêu máº·c đo‹nh: 10 triệu đo“ng/tháng';
+            revenueDesc = 'Mục tiêu mặc định: 10 triệu đồng/tháng';
         }
         
         // Äơn hàng
@@ -973,10 +990,10 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
         } else if (currentOrdersVal > 0 && progressRatio > 0.1) {
             const estimatedOrders = Math.round(currentOrdersVal / progressRatio);
             targetOrders = Math.max(5, Math.round(estimatedOrders * 1.05));
-            ordersDesc = `Dựa trên xu hưo›ng hiện tại (${currentOrdersVal} đơn đã có)`;
+            ordersDesc = `Dựa trên xu hướng hiện tại (${currentOrdersVal} đơn đã có)`;
         } else {
             targetOrders = 10; // Mo¥c tiêu khởi đáº§u
-            ordersDesc = 'Mo¥c tiêu khởi đáº§u cho quán mo›i';
+            ordersDesc = 'Mục tiêu khởi đầu cho quán mới';
         }
         
         // Khách hàng mới
@@ -985,16 +1002,16 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
             customersDesc = `Tăng 15% so với tháng trước (${prevCustomersVal} khách)`;
         } else {
             targetCustomers = 5;
-            customersDesc = 'Mo¥c tiêu thu hÃºt khách hàng mo›i';
+            customersDesc = 'Mục tiêu thu hút khách hàng mới';
         }
         
         // Äáº·t bàn
         if (prevReservationsVal > 0) {
             targetReservations = Math.max(3, Math.round(prevReservationsVal * 1.1)); // Tăng 10%
-            reservationsDesc = `Tăng 10% so với tháng trước (${prevReservationsVal} lưo£t)`;
+            reservationsDesc = `Tăng 10% so với tháng trước (${prevReservationsVal} lượt)`;
         } else {
             targetReservations = 5;
-            reservationsDesc = 'Mo¥c tiêu đáº·t bàn cho quán';
+            reservationsDesc = 'Mục tiêu đặt bàn cho quán';
         }
         
         // Äánh giá
@@ -1003,7 +1020,7 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
             reviewsDesc = `Tăng 20% so với tháng trước (${prevReviewsVal} đánh giá)`;
         } else {
             targetReviews = 3;
-            reviewsDesc = 'Mo¥c tiêu thu tháº­p đánh giá to« khách';
+            reviewsDesc = 'Mục tiêu thu thập đánh giá từ khách';
         }
         
         // 5 mục tiêu đưo£c AI đo xuáº¥t
@@ -1013,13 +1030,13 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
                 ten_muc_tieu: 'Doanh thu tháng',
                 mo_ta: revenueDesc,
                 gia_tri_muc_tieu: targetRevenue,
-                don_vi: 'đo“ng',
+                don_vi: 'đồng',
                 icon: '💰',
                 thu_tu: 1
             },
             {
                 loai_muc_tieu: 'don_hang',
-                ten_muc_tieu: 'So‘ đơn hàng',
+                ten_muc_tieu: 'Số đơn hàng',
                 mo_ta: ordersDesc,
                 gia_tri_muc_tieu: targetOrders,
                 don_vi: 'đơn',
@@ -1031,26 +1048,26 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
                 ten_muc_tieu: 'Khách hàng mới',
                 mo_ta: customersDesc,
                 gia_tri_muc_tieu: targetCustomers,
-                don_vi: 'ngưoi',
+                don_vi: 'người',
                 icon: '👥',
                 thu_tu: 3
             },
             {
                 loai_muc_tieu: 'dat_ban',
-                ten_muc_tieu: 'Lưo£t đáº·t bàn',
+                ten_muc_tieu: 'Lượt đặt bàn',
                 mo_ta: reservationsDesc,
                 gia_tri_muc_tieu: targetReservations,
-                don_vi: 'lưo£t',
-                icon: 'ðŸ½ï¸',
+                don_vi: 'lượt',
+                icon: '🍽️',
                 thu_tu: 4
             },
             {
                 loai_muc_tieu: 'danh_gia',
-                ten_muc_tieu: 'Äánh giá tích cực',
+                ten_muc_tieu: 'Đánh giá tích cực',
                 mo_ta: reviewsDesc,
                 gia_tri_muc_tieu: targetReviews,
                 don_vi: 'đánh giá',
-                icon: 'â­',
+                icon: '⭐',
                 thu_tu: 5
             }
         ];
@@ -1073,7 +1090,7 @@ router.post('/goals/generate', requireAdmin, async (req, res) => {
         
         res.json({
             success: true,
-            message: 'Äã tạo 5 mục tiêu cho tháng ' + currentMonth,
+            message: 'Đã tạo 5 mục tiêu cho tháng ' + currentMonth,
             data: goals
         });
     } catch (error) {
@@ -1188,6 +1205,7 @@ router.get('/goals/report', requireAdmin, async (req, res) => {
         
         // Tính tiáº¿n độ và đánh giá to«ng mục tiêu
         const goalsReport = goals.map(goal => {
+            const meta = GOAL_META[goal.loai_muc_tieu] || {};
             const actual = actualData[goal.loai_muc_tieu] || 0;
             const target = parseFloat(goal.gia_tri_muc_tieu) || 1;
             const progress = Math.round((actual / target) * 100);
@@ -1197,23 +1215,26 @@ router.get('/goals/report', requireAdmin, async (req, res) => {
             if (progress >= 100) {
                 status = 'Hoàn thành';
                 statusColor = 'green';
-                evaluation = 'ðŸŽ‰ Xuất sắc! Vưo£t mục tiêu';
+                evaluation = '🎉 Xuất sắc! Vượt mục tiêu';
             } else if (progress >= 80) {
-                status = 'Gáº§n đạt';
+                status = 'Gần đạt';
                 statusColor = 'blue';
-                evaluation = 'ðŸ‘ To‘t! Cáº§n co‘ gáº¯ng thêm một chÃºt';
+                evaluation = '👍 Tốt! Cần cố gắng thêm một chút';
             } else if (progress >= 50) {
-                status = 'Äang tiáº¿n trioƒn';
+                status = 'Đang tiến triển';
                 statusColor = 'yellow';
-                evaluation = 'âš¡ Cáº§n tăng to‘c đoƒ đạt mục tiêu';
+                evaluation = '⚡ Cần tăng tốc để đạt mục tiêu';
             } else {
-                status = 'Cáº§n cải thiện';
+                status = 'Cần cải thiện';
                 statusColor = 'red';
-                evaluation = 'ðŸ”´ Cáº§n xem xét lại chiến lược';
+                evaluation = '🔴 Cần xem xét lại chiến lược';
             }
             
             return {
                 ...goal,
+                ten_muc_tieu: meta.ten_muc_tieu || goal.ten_muc_tieu,
+                don_vi: meta.don_vi || goal.don_vi,
+                icon: meta.icon || goal.icon,
                 gia_tri_thuc_te: actual,
                 tien_do: progress,
                 chenh_lech: difference,
@@ -1233,20 +1254,20 @@ router.get('/goals/report', requireAdmin, async (req, res) => {
         // Äánh giá to•ng thoƒ
         let overallEvaluation, overallStatus;
         if (totalProgress >= 100) {
-            overallStatus = 'Xuáº¥t sáº¯c';
-            overallEvaluation = 'ðŸ† Tháng này hoàn thành xuáº¥t sáº¯c táº¥t cáº£ mục tiêu!';
+            overallStatus = 'Xuất sắc';
+            overallEvaluation = '🏆 Tháng này hoàn thành xuất sắc tất cả mục tiêu!';
         } else if (totalProgress >= 80) {
-            overallStatus = 'To‘t';
-            overallEvaluation = 'âœ¨ Káº¿t quáº£ to‘t! Háº§u háº¿t mục tiêu đã đạt hoáº·c gáº§n đạt.';
+            overallStatus = 'Tốt';
+            overallEvaluation = '✨ Kết quả tốt! Hầu hết mục tiêu đã đạt hoặc gần đạt.';
         } else if (totalProgress >= 60) {
             overallStatus = 'Khá';
-            overallEvaluation = '📊 Káº¿t quáº£ khá. Cáº§n cải thiện một so‘ mục tiêu.';
+            overallEvaluation = '📊 Kết quả khá. Cần cải thiện một số mục tiêu.';
         } else if (totalProgress >= 40) {
             overallStatus = 'Trung bình';
-            overallEvaluation = 'âš ï¸ Káº¿t quáº£ trung bình. Cáº§n xem xét lại chiến lược kinh doanh.';
+            overallEvaluation = '⚠️ Kết quả trung bình. Cần xem xét lại chiến lược kinh doanh.';
         } else {
-            overallStatus = 'Cáº§n cải thiện';
-            overallEvaluation = 'ðŸ”´ Káº¿t quáº£ chưa đạt. Cáº§n phân tích nguyên nhân và điou cho‰nh.';
+            overallStatus = 'Cần cải thiện';
+            overallEvaluation = '🔴 Kết quả chưa đạt. Cần phân tích nguyên nhân và điều chỉnh.';
         }
         
         res.json({

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin Phương Nam</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+    
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="flex gap-6">
+                    <div class="flex-1">
+                        <!-- Row 1: KPI Cards -->
+                        <div class="grid grid-cols-4 gap-5 mb-6">
+                            <div class="kpi-card">
+                                <div class="flex items-center gap-4">
+                                    <div class="kpi-icon bg-blue-100">
+                                        <i class="fas fa-coins text-blue-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="kpi-label">Tổng doanh thu</p>
+                                        <p class="kpi-value" id="total-revenue">0đ</p>
+                                        <p class="kpi-compare" id="revenue-compare">So với tháng trước: <span class="up"><i class="fas fa-arrow-up"></i> 0%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="flex items-center gap-4">
+                                    <div class="kpi-icon bg-green-100">
+                                        <i class="fas fa-receipt text-green-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="kpi-label">Số đơn hàng</p>
+                                        <p class="kpi-value" id="total-orders">0</p>
+                                        <p class="kpi-compare" id="orders-compare">So với tháng trước: <span class="up"><i class="fas fa-arrow-up"></i> 0%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="flex items-center gap-4">
+                                    <div class="kpi-icon bg-purple-100">
+                                        <i class="fas fa-user text-purple-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="kpi-label">Khách hàng</p>
+                                        <p class="kpi-value" id="total-customers">0</p>
+                                        <p class="kpi-compare" id="customers-compare">So với tháng trước: <span class="up"><i class="fas fa-arrow-up"></i> 0%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="flex items-center gap-4">
+                                    <div class="kpi-icon bg-orange-100">
+                                        <i class="fas fa-calendar text-orange-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="kpi-label">Đặt bàn</p>
+                                        <p class="kpi-value" id="total-reservations">0</p>
+                                        <p class="kpi-compare" id="reservations-compare">So với tháng trước: <span class="up"><i class="fas fa-arrow-up"></i> 0%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: 5 Mục tiêu tháng -->
+                        <div class="chart-card mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="chart-title mb-0"><i class="fas fa-bullseye text-indigo-500 mr-2"></i>5 Mục tiêu tháng <span id="goals-month-year"></span></p>
+                                <div class="flex items-center gap-2">
+                                    <span id="total-progress-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">0%</span>
+                                    <button onclick="generateGoals()" id="btn-generate-goals" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs hover:bg-indigo-700 transition">
+                                        <i class="fas fa-plus mr-1"></i>AI Tạo mục tiêu
+                                    </button>
+                                    <button onclick="resetGoals()" id="btn-reset-goals" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 transition hidden" title="Xóa mục tiêu để tạo lại">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <button onclick="refreshGoals()" class="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-xs hover:bg-blue-200 transition">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="goals-container" class="grid grid-cols-5 gap-4">
+                                <div class="col-span-5 text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                    <p class="text-sm">Đang tải mục tiêu...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Gauge + Revenue Chart -->
+                        <div class="grid grid-cols-3 gap-5 mb-6">
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-chart-pie text-emerald-500 mr-2"></i>Tỷ lệ hoàn thành tổng</p>
+                                <div style="height: 160px; position: relative;">
+                                    <canvas id="gaugeChart"></canvas>
+                                    <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); text-align: center;">
+                                        <p class="text-3xl font-bold text-emerald-600" id="gauge-value">0%</p>
+                                        <p class="text-xs text-gray-500">Hoàn thành mục tiêu</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-card col-span-2">
+                                <p class="chart-title"><i class="fas fa-chart-line text-blue-500 mr-2"></i>Doanh thu 12 tháng gần nhất</p>
+                                <div style="height: 200px;"><canvas id="revenueChart"></canvas></div>
+                                <div class="flex justify-center gap-8 mt-3">
+                                    <div class="legend-item"><div class="legend-dot bg-blue-500"></div> Doanh thu (triệu đồng)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row: Biểu đồ doanh thu chi tiết theo ngày -->
+                        <div class="chart-card mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="chart-title mb-1"><i class="fas fa-chart-area text-green-500 mr-2"></i>Biểu đồ doanh thu</p>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-2xl font-bold text-slate-800" id="daily-revenue-value">0đ</span>
+                                        <span class="text-sm px-2 py-1 rounded" id="daily-revenue-change">
+                                            <i class="fas fa-arrow-up"></i> 0%
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="daily-filter-btn active" data-range="7">7 Ngày</button>
+                                    <button class="daily-filter-btn" data-range="30">1 Tháng</button>
+                                    <button class="daily-filter-btn" data-range="90">3 Tháng</button>
+                                    <button class="daily-filter-btn" data-range="180">6 Tháng</button>
+                                    <button class="daily-filter-btn" data-range="365">1 Năm</button>
+                                    <button class="daily-filter-btn" data-range="all">Tối đa</button>
+                                </div>
+                            </div>
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="dailyRevenueChart"></canvas>
+                            </div>
+                            <div class="flex justify-between items-center mt-3 text-xs text-slate-500">
+                                <span id="daily-chart-start-date"></span>
+                                <span id="daily-chart-end-date"></span>
+                            </div>
+                        </div>
+
+                        <!-- Row: Orders + Top Products + Customers -->
+                        <div class="grid grid-cols-3 gap-5 mb-6">
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-chart-pie text-green-500 mr-2"></i>Đơn hàng theo trạng thái</p>
+                                <div style="height: 200px;"><canvas id="ordersChart"></canvas></div>
+                            </div>
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-star text-amber-500 mr-2"></i>Top 10 món ăn bán chạy</p>
+                                <div id="top-products" class="space-y-2" style="max-height: 220px; overflow-y: auto;"></div>
+                            </div>
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-users text-purple-500 mr-2"></i>Khách hàng mới theo tháng</p>
+                                <div style="height: 200px;"><canvas id="customerChart"></canvas></div>
+                            </div>
+                        </div>
+
+                        <!-- Row: Reservations + Payment Methods + Recent Orders -->
+                        <div class="grid grid-cols-3 gap-5 mb-6">
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-clock text-orange-500 mr-2"></i>Đặt bàn theo khung giờ</p>
+                                <div style="height: 200px;"><canvas id="reservationChart"></canvas></div>
+                            </div>
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-wallet text-teal-500 mr-2"></i>Phương thức thanh toán</p>
+                                <div style="height: 200px;"><canvas id="paymentMethodsChart"></canvas></div>
+                            </div>
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-list text-indigo-500 mr-2"></i>Đơn hàng gần đây</p>
+                                <div id="recent-orders" class="space-y-2" style="max-height: 220px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Row: Reviews Stats -->
+                        <div class="grid grid-cols-3 gap-5 mb-6">
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-star text-yellow-500 mr-2"></i>Phân bố đánh giá sao</p>
+                                <div style="height: 180px;"><canvas id="reviewStarChart"></canvas></div>
+                                <div class="text-center mt-2">
+                                    <p class="text-sm text-slate-500">Điểm trung bình</p>
+                                    <p class="text-2xl font-bold text-yellow-500" id="avg-rating">0.0 <i class="fas fa-star text-lg"></i></p>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-chart-pie text-cyan-500 mr-2"></i>Trạng thái đánh giá</p>
+                                <div style="height: 200px;"><canvas id="reviewStatusChart"></canvas></div>
+                            </div>
+                            <div class="chart-card">
+                                <div class="flex items-center justify-between mb-4">
+                                    <p class="chart-title mb-0"><i class="fas fa-award text-amber-500 mr-2"></i>Top món được đánh giá</p>
+                                    <a href="/admin/reviews/" class="text-xs text-blue-600 hover:text-blue-800">Xem tất cả <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                                <div id="top-reviewed-products" class="space-y-2" style="max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Row: News Stats -->
+                        <div class="grid grid-cols-3 gap-5">
+                            <div class="chart-card">
+                                <p class="chart-title"><i class="fas fa-newspaper text-pink-500 mr-2"></i>Lượt xem bài viết theo tháng</p>
+                                <div style="height: 200px;"><canvas id="newsViewsChart"></canvas></div>
+                            </div>
+                            <div class="chart-card col-span-2">
+                                <div class="flex items-center justify-between mb-4">
+                                    <p class="chart-title mb-0"><i class="fas fa-eye text-rose-500 mr-2"></i>Top bài viết được xem nhiều nhất</p>
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <span class="text-slate-500">Tổng: <span id="total-news" class="font-bold text-rose-600">0</span> bài</span>
+                                        <span class="text-slate-500">Lượt xem: <span id="total-views" class="font-bold text-rose-600">0</span></span>
+                                    </div>
+                                </div>
+                                <div id="top-news" class="space-y-2" style="max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Sidebar -->
+                    <div class="w-52 flex-shrink-0">
+                        <div class="filter-section sticky top-0">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold text-slate-700 uppercase">Bộ lọc</h3>
+                                <button onclick="resetFilters()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                    <i class="fas fa-redo mr-1"></i>Reset
+                                </button>
+                            </div>
+                            <div class="filter-group">
+                                <p class="filter-label">Năm</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="filter-btn" data-year="2023">2023</button>
+                                    <button class="filter-btn" data-year="2024">2024</button>
+                                    <button class="filter-btn" data-year="2025">2025</button>
+                                    <button class="filter-btn active" data-year="2026">2026</button>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <p class="filter-label">Tháng</p>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button class="filter-btn active" data-month="0">All</button>
+                                    <button class="filter-btn" data-month="1">1</button>
+                                    <button class="filter-btn" data-month="2">2</button>
+                                    <button class="filter-btn" data-month="3">3</button>
+                                    <button class="filter-btn" data-month="4">4</button>
+                                    <button class="filter-btn" data-month="5">5</button>
+                                    <button class="filter-btn" data-month="6">6</button>
+                                    <button class="filter-btn" data-month="7">7</button>
+                                    <button class="filter-btn" data-month="8">8</button>
+                                    <button class="filter-btn" data-month="9">9</button>
+                                    <button class="filter-btn" data-month="10">10</button>
+                                    <button class="filter-btn" data-month="11">11</button>
+                                    <button class="filter-btn" data-month="12">12</button>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <p class="filter-label">Trạng thái đơn</p>
+                                <div class="flex flex-col gap-2">
+                                    <button class="filter-btn active" data-status="all">Tất cả</button>
+                                    <button class="filter-btn" data-status="pending">Chờ xử lý</button>
+                                    <button class="filter-btn" data-status="confirmed">Đã xác nhận</button>
+                                    <button class="filter-btn" data-status="delivered">Hoàn thành</button>
+                                    <button class="filter-btn" data-status="cancelled">Đã hủy</button>
+                                </div>
+                            </div>
+                            <!-- Filter Summary -->
+                            <div id="filter-summary" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs">
+                                <p class="font-semibold text-blue-800 mb-1">Đang xem:</p>
+                                <p class="text-blue-700" id="filter-summary-text">Tất cả dữ liệu năm 2026</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    <script src="admin-mobile.js"></script>
+    
+    <script src="dashboard.js" defer></script>
+
+    
+    <!-- Admin AI Chatbot Button -->
+    <button onclick="toggleAdminChat()" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all z-50 flex items-center justify-center group">
+        <i class="fas fa-robot text-xl group-hover:scale-110 transition-transform"></i>
+        <span class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+    </button>
+    
+    <!-- Admin AI Chat Window -->
+    <div id="admin-chat-window" class="fixed bottom-24 right-6 w-96 bg-white rounded-2xl shadow-2xl z-50 hidden scale-95 opacity-0 transition-all duration-200 overflow-hidden" style="max-height: 600px;">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">Phương Nam</h3>
+                        <p class="text-xs text-purple-200">Trợ lý AI của chị Linh 💜</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Nút xem lịch sử -->
+                    <button onclick="toggleAdminChatHistory()" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition" title="Lịch sử chat">
+                        <i class="fas fa-history text-sm"></i>
+                    </button>
+                    <!-- Nút chat mới -->
+                    <button onclick="resetAdminChatSession(); loadAdminChatHistory();" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition" title="Cuộc trò chuyện mới">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                    <!-- Nút đóng -->
+                    <button onclick="toggleAdminChat()" class="text-white/80 hover:text-white p-1.5">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Dropdown -->
+        <div id="adminChatHistoryDropdown" class="absolute left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-20 hidden" style="top: 72px;">
+            <div class="p-3 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">📜 Lịch sử trò chuyện Admin</span>
+                    <button onclick="toggleAdminChatHistory()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="adminHistoryList" class="max-h-[250px] overflow-y-auto">
+                <div class="text-center text-gray-400 text-sm py-6">
+                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        <div id="admin-chat-messages" class="p-4 overflow-y-auto" style="height: 350px;">
+            <!-- Welcome message -->
+            <div class="flex justify-start mb-3">
+                <div class="flex items-start space-x-2 max-w-[90%]">
+                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-xs"></i>
+                    </div>
+                    <div class="bg-gray-100 px-4 py-2 rounded-2xl rounded-tl-sm text-sm text-gray-800">
+                        👋 <strong>Chào chị Linh!</strong><br><br>
+                        Em là <strong>Phương Nam</strong> - trợ lý AI của chị.<br><br>
+                        Em có thể giúp chị:<br>
+                        📊 Xem báo cáo kinh doanh<br>
+                        🎯 Đặt và theo dõi mục tiêu<br>
+                        📈 Đề xuất chiến lược tăng doanh thu<br><br>
+                        <em>Chị cần em hỗ trợ gì ạ?</em> 😊
+                    </div>
+                </div>
+            </div>
+            <!-- Quick suggestions -->
+            <div class="flex flex-wrap gap-2 mb-3 ml-10">
+                <button onclick="quickAdminChat('Báo cáo tháng này')" class="bg-white border border-blue-200 text-blue-600 px-3 py-1 rounded-full text-xs hover:bg-blue-50 transition">📊 Báo cáo</button>
+                <button onclick="quickAdminChat('Tiến độ mục tiêu')" class="bg-white border border-blue-200 text-blue-600 px-3 py-1 rounded-full text-xs hover:bg-blue-50 transition">🎯 Tiến độ</button>
+                <button onclick="quickAdminChat('Đề xuất chiến lược')" class="bg-white border border-blue-200 text-blue-600 px-3 py-1 rounded-full text-xs hover:bg-blue-50 transition">📈 Chiến lược</button>
+            </div>
+        </div>
+        
+        <!-- Input -->
+        <div class="p-4 border-t bg-gray-50">
+            <div class="flex space-x-2">
+                <input type="text" id="admin-chat-input" placeholder="Hỏi về doanh thu, chiến lược..." 
+                       class="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+                       onkeypress="if(event.key==='Enter') sendAdminChat()">
+                <button onclick="sendAdminChat()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-xl hover:opacity-90 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Notification Script -->
+    <script src="js/admin-notifications.js"></script>
+    
+</body>
+</html>

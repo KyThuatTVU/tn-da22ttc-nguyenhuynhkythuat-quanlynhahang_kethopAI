@@ -96,7 +96,7 @@ function logout() {
     
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    window.location.href = 'index.html';
+    window.location.href = '/';
 }
 
 // Register function
@@ -116,7 +116,7 @@ async function handleRegister(formData) {
             saveUserData(result.data);
             showNotification('Đăng ký thành công!', 'success');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }, 1500);
         } else {
             showNotification(result.message || 'Đăng ký thất bại', 'error');
@@ -159,7 +159,7 @@ async function handleLogin(formData) {
             }
             
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }, 1500);
         } else {
             showNotification(result.message || 'Đăng nhập thất bại', 'error');

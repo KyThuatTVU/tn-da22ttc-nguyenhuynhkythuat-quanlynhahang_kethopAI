@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dat-ban.html) ==== */
+/* ==== Script 1 (tách từ /dat-ban/) ==== */
 // API URL
         const API_URL = window.API_URL || 'http://localhost:3000/api';
         
@@ -39,11 +39,11 @@
                         <h4 class="font-bold text-gray-800 mb-1">Vui lòng đăng nhập để đặt bàn</h4>
                         <p class="text-sm text-gray-600 mb-3">Đăng nhập để chúng tôi có thể phục vụ bạn tốt hơn và lưu lại lịch sử đặt bàn.</p>
                         <div class="flex flex-wrap gap-2">
-                            <a href="dang-nhap.html?redirect=dat-ban.html" 
+                            <a href="/dang-nhap/?redirect=/dat-ban/" 
                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:opacity-90 transition text-sm">
                                 <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
                             </a>
-                            <a href="dang-ky.html?redirect=dat-ban.html" 
+                            <a href="/dang-ky/?redirect=/dat-ban/" 
                                class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-sm">
                                 <i class="fas fa-user-plus mr-2"></i>Đăng ký tài khoản
                             </a>
@@ -883,7 +883,7 @@
             // Reset form
             showNotification('Đã hủy thanh toán. Bạn có thể thanh toán sau tại trang "Đơn hàng của tôi"', 'info');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }, 2000);
         }
         
@@ -934,7 +934,7 @@
                             Đặt bàn đã được xác nhận và thanh toán thành công!<br>
                             Nhà hàng sẽ liên hệ nếu cần thêm thông tin.
                         </p>
-                        <button onclick="window.location.href='index.html'" 
+                        <button onclick="window.location.href='/'" 
                                 class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-medium hover:opacity-90 transition">
                             Về trang chủ
                         </button>
@@ -957,7 +957,7 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-/* ==== Script 2 (tách từ dat-ban.html) ==== */
+/* ==== Script 2 (tách từ /dat-ban/) ==== */
 // Scroll to Top functionality
         (function() {
             const scrollBtn = document.getElementById('back-to-top');

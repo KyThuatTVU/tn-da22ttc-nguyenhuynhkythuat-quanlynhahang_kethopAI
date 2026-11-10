@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ gioi-thieu.html) ==== */
+/* ==== Script 1 (tách từ /gioi-thieu/) ==== */
 // Lightbox Gallery Script
         const galleryImages = [
             { src: 'images/g1.jpg', alt: 'Logo Nhà hàng' },
@@ -104,7 +104,7 @@
             });
         }
 
-/* ==== Script 2 (tách từ gioi-thieu.html) ==== */
+/* ==== Script 2 (tách từ /gioi-thieu/) ==== */
 // Scroll to Top functionality
         (function() {
             const scrollBtn = document.getElementById('back-to-top');

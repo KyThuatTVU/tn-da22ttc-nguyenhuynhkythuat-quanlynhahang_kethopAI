@@ -6,10 +6,10 @@ const API_BASE = 'http://localhost:3000/api';
 
 // Danh sách trang không cần xác thực
 const PUBLIC_PAGES = [
-    'dang-nhap-admin.html',
-    'index.html',
-    'debug-session.html',
-    'select-login.html'
+    'dang-nhap-admin',
+    'admin',
+    'debug-session',
+    'select-login'
 ];
 
 /**
@@ -33,7 +33,7 @@ function getCurrentUser() {
  * Kiểm tra xác thực
  */
 function checkAuth() {
-    const currentPage = window.location.pathname.split('/').pop();
+    const currentPage = window.location.pathname.split('/').filter(Boolean).pop();
     
     // Bỏ qua kiểm tra cho các trang public
     if (PUBLIC_PAGES.includes(currentPage)) {
@@ -52,7 +52,7 @@ function checkAuth() {
 
     // Chưa đăng nhập
     console.log('⚠️ Chưa đăng nhập, redirect về login');
-    window.location.href = '../staff/login.html';
+    window.location.href = '/staff/login/';
 }
 
 /**
@@ -65,7 +65,7 @@ function logout() {
     sessionStorage.removeItem('staff_user');
     
     console.log('✅ Logout successful');
-    window.location.href = '../staff/login.html';
+    window.location.href = '/staff/login/';
 }
 
 /**

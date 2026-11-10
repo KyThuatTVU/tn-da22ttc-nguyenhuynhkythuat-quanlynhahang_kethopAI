@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ admin-pos-tables.html) ==== */
+/* ==== Script 1 (tách từ /admin/admin-pos-tables/) ==== */
 const API_BASE = 'http://localhost:3000/api';
         let allTables = [];
         let currentFilter = 'all';
@@ -125,5 +125,5 @@ const API_BASE = 'http://localhost:3000/api';
 
         function selectTable(tableId, tableName, status) {
             localStorage.setItem('selected_table', JSON.stringify({ id: tableId, name: tableName, status: status }));
-            window.location.href = `admin-pos-order.html?table=${tableId}`;
+            window.location.href = `/admin/admin-pos-order/?table=${tableId}`;
         }

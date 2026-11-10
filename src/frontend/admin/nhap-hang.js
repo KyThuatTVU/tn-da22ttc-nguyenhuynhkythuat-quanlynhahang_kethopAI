@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ nhap-hang.html) ==== */
+/* ==== Script 1 (tách từ /admin/nhap-hang/) ==== */
 let allIngredients = [];
         let allSuppliers = [];
         let receipts = [];

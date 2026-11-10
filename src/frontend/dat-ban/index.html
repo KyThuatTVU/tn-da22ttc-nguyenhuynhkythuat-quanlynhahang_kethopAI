@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Bàn & Đặt Món - Nhà hàng Phương Nam Vĩnh Long</title>
+    <link rel="icon" type="image/png" href="images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/loading.css">
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <link rel="stylesheet" href="css/dat-ban.css">
+
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
+    <!-- Navigation Container -->
+    <div id="navbar-container"></div>
+
+    <!-- Payment QR Modal -->
+    <div id="payment-qr-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden overflow-y-auto py-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 my-auto">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-center">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-qrcode text-white text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">Thanh toán đặt bàn</h3>
+                <p class="text-white/90 mt-2">Quét mã QR để thanh toán</p>
+            </div>
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
+                <!-- QR Code -->
+                <div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl p-4 mb-4">
+                    <img id="qr-code-image" src="" alt="QR Code" class="w-full max-w-xs mx-auto rounded-lg shadow-lg">
+                </div>
+
+                <!-- Bank Info -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-4 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Ngân hàng:</span>
+                        <span class="font-bold" id="bank-name">Vietcombank</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Số tài khoản:</span>
+                        <span class="font-bold" id="account-number">1052053578</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Chủ tài khoản:</span>
+                        <span class="font-bold" id="account-name">NGUYEN HUYNH KY THUAT</span>
+                    </div>
+                    <div class="flex justify-between border-t pt-2 mt-2">
+                        <span class="text-gray-600">Số tiền:</span>
+                        <span class="font-bold text-orange-600 text-xl" id="payment-amount">0đ</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Nội dung:</span>
+                        <span class="font-bold text-blue-600" id="transfer-content">DB000001</span>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-center">
+                    <i class="fas fa-clock text-yellow-600 mr-2"></i>
+                    <span class="text-sm text-yellow-800">Mã QR có hiệu lực trong: </span>
+                    <span class="font-bold text-yellow-900 text-lg" id="qr-timer">5:00</span>
+                </div>
+
+                <!-- Instructions -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <p class="text-sm text-blue-800 font-medium mb-2">
+                        <i class="fas fa-info-circle mr-1"></i> Hướng dẫn thanh toán:
+                    </p>
+                    <ol class="text-sm text-blue-700 space-y-1 ml-4 list-decimal">
+                        <li>Mở ứng dụng ngân hàng của bạn</li>
+                        <li>Quét mã QR hoặc chuyển khoản thủ công</li>
+                        <li>Nhập đúng nội dung chuyển khoản</li>
+                        <li>Sau khi chuyển khoản, bấm "Đã thanh toán"</li>
+                    </ol>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button onclick="cancelPayment()" 
+                            class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-300 transition">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button id="btn-confirm-payment" onclick="confirmPayment()" 
+                            class="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-xl font-medium hover:opacity-90 transition">
+                        <i class="fas fa-check mr-2"></i>Đã thanh toán
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Banner Section -->
+    <section class="relative w-full text-white overflow-hidden h-[250px] sm:h-[320px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-center">
+        <div class="absolute inset-0 opacity-80" style="background-image: url('images/Banner-Com-ngon-scaled.jpg'); background-size: cover; background-position: center;"></div>
+        <div class="relative z-10 px-4">
+            <h1 class="font-dancing text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 drop-shadow-lg text-[#4b2c16]">
+                Đặt bàn & Đặt món
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-light text-[#5b3a1e]">
+                Đặt bàn trước và chọn món để được phục vụ nhanh chóng
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-8 sm:py-12 md:py-16" id="main-content">
+        <div class="container mx-auto px-4">
+            <!-- Step Indicators -->
+            <div class="flex justify-center mb-8">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div id="step1-indicator" class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-bold active">1</div>
+                        <span class="ml-2 font-medium text-gray-700 hidden sm:inline">Thông tin đặt bàn</span>
+                    </div>
+                    <div class="w-8 sm:w-16 h-1 bg-gray-300 rounded" id="step-line-1"></div>
+                    <div class="flex items-center">
+                        <div id="step2-indicator" class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gray-300 text-gray-600">2</div>
+                        <span class="ml-2 font-medium text-gray-500 hidden sm:inline">Chọn món ăn</span>
+                    </div>
+                    <div class="w-8 sm:w-16 h-1 bg-gray-300 rounded" id="step-line-2"></div>
+                    <div class="flex items-center">
+                        <div id="step3-indicator" class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gray-300 text-gray-600">3</div>
+                        <span class="ml-2 font-medium text-gray-500 hidden sm:inline">Xác nhận</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto">
+                <!-- Step 1: Booking Info -->
+                <div id="step1-content" class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+                    <!-- Booking Form -->
+                    <div class="bg-white rounded-2xl shadow-xl p-5 sm:p-8 lg:p-10 border border-orange-100">
+                        <div class="flex items-center mb-6 sm:mb-8">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                                <i class="fas fa-calendar-alt text-white text-lg sm:text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Thông tin đặt bàn</h2>
+                        </div>
+                        <form id="booking-info-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Họ và tên *</label>
+                                <input type="text" id="ten_nguoi_dat" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600" placeholder="Nguyễn Văn A">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Số điện thoại *</label>
+                                    <input type="tel" id="so_dien_thoai" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600" placeholder="0123456789">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Email</label>
+                                    <input type="email" id="email" class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600" placeholder="email@example.com">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Ngày đặt *</label>
+                                    <input type="date" id="ngay_dat" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Giờ đến *</label>
+                                    <div class="relative">
+                                        <input type="text" id="gio_den" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600 time-picker" placeholder="Chọn giờ đến">
+                                        <i class="fas fa-clock absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start">
+                                <i class="fas fa-info-circle text-yellow-600 mr-2 mt-0.5"></i>
+                                <p class="text-sm text-yellow-800">
+                                    <strong>Lưu ý:</strong> Thời gian đặt bàn phải trước ít nhất 3 tiếng so với giờ hiện tại. Nhà hàng mở cửa từ 7:00 đến 23:00.
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Số lượng khách *</label>
+                                    <select id="so_luong" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                        <option value="">Chọn số lượng khách</option>
+                                        <option value="1">1 người</option>
+                                        <option value="2">2 người</option>
+                                        <option value="3">3 người</option>
+                                        <option value="4">4 người</option>
+                                        <option value="5">5 người</option>
+                                        <option value="6">6 người</option>
+                                        <option value="7">7-10 người</option>
+                                        <option value="10">Trên 10 người</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Khu vực *</label>
+                                    <select id="khu_vuc" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                        <option value="">Đang tải khu vực...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Chọn bàn trống *</label>
+                                <select id="ma_ban" required class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600">
+                                    <option value="">Vui lòng chọn khu vực trước</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Ghi chú</label>
+                                <textarea id="ghi_chu" rows="3" class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-orange-600" placeholder="Yêu cầu đặc biệt, dị ứng thực phẩm..."></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-4 rounded-lg font-medium text-lg hover:opacity-90 transition">
+                                <i class="fas fa-arrow-right mr-2"></i> Tiếp tục chọn món
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Restaurant Info -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-orange-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-info-circle text-white text-lg"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Thông tin nhà hàng</h3>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-map-marker-alt text-orange-600 text-xl mr-3 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">Địa chỉ</p>
+                                        <p class="text-gray-600" data-setting="dia_chi">123 Đường ABC, Phường 1, TP. Vĩnh Long</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-phone text-orange-600 text-xl mr-3 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">Điện thoại</p>
+                                        <p class="text-gray-600" data-setting="so_dien_thoai">0123 456 789</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-clock text-orange-600 text-xl mr-3 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">Giờ mở cửa</p>
+                                        <p class="text-gray-600">T2-T6: <span data-setting="gio_mo_cua_t2_t6">08:00-22:00</span></p>
+                                        <p class="text-gray-600">T7-CN: <span data-setting="gio_mo_cua_t7_cn">07:00-23:00</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-5 sm:p-8 border border-orange-200">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-exclamation-circle text-white"></i>
+                                </div>
+                                <h4 class="font-bold text-xl text-gray-800">Lưu ý quan trọng</h4>
+                            </div>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start bg-white rounded-lg p-3 border-l-4 border-red-500">
+                                    <i class="fas fa-exclamation-triangle text-red-600 mr-3 mt-0.5 text-lg"></i>
+                                    <span><strong class="text-red-600">Vui lòng đặt bàn trước ít nhất 3 tiếng</strong> để nhà hàng có thời gian chuẩn bị tốt nhất</span>
+                                </li>
+                                <li class="flex items-start bg-white rounded-lg p-3">
+                                    <i class="fas fa-check-circle text-orange-600 mr-3 mt-0.5 text-lg"></i>
+                                    <span><strong>Bắt buộc đặt món trước</strong> để nhà hàng chuẩn bị kịp thời</span>
+                                </li>
+                                <li class="flex items-start bg-white rounded-lg p-3">
+                                    <i class="fas fa-check-circle text-orange-600 mr-3 mt-0.5 text-lg"></i>
+                                    <span>Bàn được giữ trong vòng <strong>15 phút</strong> kể từ giờ đặt</span>
+                                </li>
+                                <li class="flex items-start bg-white rounded-lg p-3">
+                                    <i class="fas fa-check-circle text-orange-600 mr-3 mt-0.5 text-lg"></i>
+                                    <span>Thanh toán tại nhà hàng sau khi dùng bữa</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Select Menu Items -->
+                <div id="step2-content" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Menu Items -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-orange-100">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-3">
+                                            <i class="fas fa-utensils text-white text-lg"></i>
+                                        </div>
+                                        <h2 class="text-2xl font-bold text-gray-800">Chọn món ăn</h2>
+                                    </div>
+                                    <button onclick="goToStep(1)" class="text-orange-600 hover:text-orange-700 font-medium">
+                                        <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                                    </button>
+                                </div>
+
+                                <!-- Category Filter -->
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <button class="category-filter px-4 py-2 rounded-full bg-orange-600 text-white font-medium" data-category="all">
+                                        Tất cả
+                                    </button>
+                                </div>
+
+                                <!-- Search -->
+                                <div class="relative mb-6">
+                                    <input type="text" id="menu-search" placeholder="Tìm kiếm món ăn..." 
+                                           class="w-full px-4 py-3 pl-12 border rounded-lg focus:outline-none focus:border-orange-600">
+                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                </div>
+
+                                <!-- Menu Grid -->
+                                <div id="menu-items-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- Menu items will be loaded here -->
+                                    <div class="col-span-full text-center py-8">
+                                        <i class="fas fa-spinner fa-spin text-4xl text-orange-600 mb-4"></i>
+                                        <p class="text-gray-600">Đang tải thực đơn...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selected Items Summary -->
+                        <div class="lg:col-span-1">
+                            <div class="cart-summary bg-white rounded-2xl shadow-xl p-5 border border-orange-100">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-3">
+                                        <i class="fas fa-shopping-basket text-white text-lg"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-800">Món đã chọn</h3>
+                                </div>
+
+                                <div id="selected-items-list" class="space-y-3 max-h-[300px] overflow-y-auto mb-4">
+                                    <p class="text-gray-500 text-center py-4">Chưa chọn món nào</p>
+                                </div>
+
+                                <div class="border-t pt-4">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="font-medium text-gray-700">Tổng dự kiến:</span>
+                                        <span id="total-price" class="text-2xl font-bold text-orange-600">0đ</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-4">* Thanh toán tại nhà hàng sau khi dùng bữa</p>
+                                    <button id="btn-continue-step3" onclick="goToStep(3)" disabled
+                                            class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <i class="fas fa-arrow-right mr-2"></i> Xác nhận đặt bàn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="step3-content" class="hidden">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-orange-100">
+                            <div class="flex items-center mb-6">
+                                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-clipboard-check text-white text-lg"></i>
+                                </div>
+                                <h2 class="text-2xl font-bold text-gray-800">Xác nhận đặt bàn</h2>
+                            </div>
+
+                            <!-- Booking Summary -->
+                            <div class="bg-orange-50 rounded-xl p-5 mb-6">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">Thông tin đặt bàn</h3>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Họ tên:</span>
+                                        <p id="confirm-name" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Số điện thoại:</span>
+                                        <p id="confirm-phone" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Ngày đặt:</span>
+                                        <p id="confirm-date" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Giờ đến:</span>
+                                        <p id="confirm-time" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Số khách:</span>
+                                        <p id="confirm-guests" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Khu vực:</span>
+                                        <p id="confirm-area" class="font-medium"></p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Bàn được chọn:</span>
+                                        <p id="confirm-table" class="font-medium"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Selected Items Summary -->
+                            <div class="mb-6">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">Món ăn đã đặt trước</h3>
+                                <div id="confirm-items-list" class="space-y-3">
+                                    <!-- Items will be listed here -->
+                                </div>
+                                <div class="flex justify-between items-center mt-4 pt-4 border-t">
+                                    <span class="font-bold text-lg">Tổng dự kiến:</span>
+                                    <span id="confirm-total" class="text-2xl font-bold text-orange-600"></span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button onclick="goToStep(2)" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                                    <i class="fas fa-arrow-left mr-2"></i> Quay lại
+                                </button>
+                                <button id="btn-submit-booking" onclick="submitBooking()" 
+                                        class="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
+                                    <i class="fas fa-check mr-2"></i> Xác nhận đặt bàn
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+    <!-- Chatbot Container -->
+    <div id="chatbot-container"></div>
+    
+    <script src="js/loading.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/form-draft-manager.js"></script>
+    <script src="js/load-components.js"></script>
+    <script src="js/auth.js"></script>
+
+    
+    <script src="js/dat-ban.js" defer></script>
+
+    
+    <!-- Back to Top Button -->
+    <button id="back-to-top" 
+        class="fixed bottom-4 left-8 bg-gradient-to-r from-orange-500 to-orange-600 text-white w-14 h-14 rounded-full shadow-2xl hover:shadow-3xl flex items-center justify-center border-2 border-white opacity-0 invisible transition-all duration-300 hover:scale-110"
+        style="z-index: 99999 !important;"
+        aria-label="Back to top">
+        <i class="fas fa-arrow-up text-xl"></i>
+    </button>
+
+    
+
+    
+    
+    <!-- Snow Effect -->
+    <script src="js/snow-effect.js"></script>
+    
+    <!-- Cherry Blossom Effect -->
+    <script src="js/cherry-blossom-effect.js"></script>
+    
+    <!-- Responsive Helper -->
+    <script src="js/responsive-helper.js"></script>
+</body>
+</html>

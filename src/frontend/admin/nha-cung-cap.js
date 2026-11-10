@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ nha-cung-cap.html) ==== */
+/* ==== Script 1 (tách từ /admin/nha-cung-cap/) ==== */
 let allSuppliers = [];
         const SUPPLIER_API = `${API_URL}/suppliers`;
 

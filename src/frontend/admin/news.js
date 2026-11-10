@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ news.html) ==== */
+/* ==== Script 1 (tách từ /admin/news/) ==== */
 document.addEventListener('DOMContentLoaded', () => {
             window.newsDraftManager = new FormDraftManager('news-form');
         });
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch(`${API_URL}/news/admin/all`, { credentials: 'include' });
                 if (!response.ok) {
-                    if (response.status === 401) { window.location.href = 'dang-nhap-admin.html'; return; }
+                    if (response.status === 401) { window.location.href = '/admin/dang-nhap-admin/'; return; }
                     throw new Error(`HTTP ${response.status}`);
                 }
                 const data = await response.json();

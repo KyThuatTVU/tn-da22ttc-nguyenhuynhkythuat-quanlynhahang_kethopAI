@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Nhà hàng Phương Nam Vĩnh Long</title>
+    <link rel="icon" type="image/png" href="images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="stylesheet" href="css/glass-theme.css">
+</head>
+<body class="bg-3d min-h-screen flex items-center justify-center overflow-x-hidden py-6 sm:py-8">
+    <div class="w-full max-w-md px-4">
+        <!-- Logo Section -->
+        <div class="text-center mb-6 sm:mb-8">
+            <a href="/" class="inline-flex items-center gap-3 bg-white/80 backdrop-blur-xl px-5 py-3 sm:px-6 sm:py-4 rounded-3xl border border-white/50 shadow-2xl hover:shadow-orange-200/50 transform hover:scale-105 transition-all duration-300">
+                <img src="images/Green Simple Clean Vegan Food Logo.png" alt="Phương Nam Logo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-3 border-orange-500 shadow-lg object-cover">
+                <div class="text-left">
+                    <h1 class="font-dancing text-2xl sm:text-3xl font-black text-gray-900 leading-none">Phương Nam</h1>
+                    <p class="text-[10px] sm:text-xs text-orange-600 font-bold uppercase tracking-wider mt-0.5">Vĩnh Long</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass-card w-full p-6 sm:p-8 shadow-2xl mb-6">
+            <h2 class="text-2xl sm:text-3xl font-black text-center mb-1 sm:mb-2 text-gray-800 tracking-tight">ĐĂNG NHẬP</h2>
+            <p class="text-gray-500 text-center mb-6 sm:mb-8 text-xs sm:text-sm font-medium italic">Chào mừng bạn trở lại!</p>
+
+            <form id="login-form" class="space-y-4 sm:space-y-5">
+                <!-- Email -->
+                <div>
+                    <label class="block text-[10px] sm:text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5 sm:mb-2">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fas fa-envelope text-xs sm:text-sm"></i>
+                        </div>
+                        <input type="email" id="email" name="email" required 
+                               class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 text-xs sm:text-sm input-glass" 
+                               placeholder="email@example.com">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-[10px] sm:text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5 sm:mb-2">Mật khẩu</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fas fa-lock text-xs sm:text-sm"></i>
+                        </div>
+                        <input type="password" id="password" name="mat_khau" required 
+                               class="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 text-xs sm:text-sm input-glass" 
+                               placeholder="Nhập mật khẩu">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center">
+                            <i id="password-icon" class="fas fa-eye text-xs sm:text-sm text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember & Forgot -->
+                <div class="flex items-center justify-between pt-1">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600 rounded-md sm:rounded-lg border-gray-300 focus:ring-orange-500">
+                        <span class="ml-2 text-[10px] sm:text-[11px] text-gray-500 font-black uppercase tracking-wider group-hover:text-gray-700">GHI NHỚ</span>
+                    </label>
+                    <a href="/quen-mat-khau/" class="text-[10px] sm:text-[11px] text-orange-600 hover:text-orange-700 font-black uppercase tracking-widest">
+                        Quên mật khẩu?
+                    </a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 sm:py-3.5 rounded-xl font-black text-xs sm:text-sm hover:from-orange-700 hover:to-red-700 transition transform hover:-translate-y-1 shadow-lg sm:shadow-xl tracking-[0.2em] uppercase mt-2">
+                    ĐĂNG NHẬP
+                </button>
+
+                <!-- Divider -->
+                <div class="relative py-3 sm:py-4 flex items-center">
+                    <div class="flex-grow border-t border-gray-200/60"></div>
+                    <span class="flex-shrink mx-3 sm:mx-4 text-[10px] sm:text-[11px] text-gray-400 font-black uppercase tracking-[0.3em]">Hoặc</span>
+                    <div class="flex-grow border-t border-gray-200/60"></div>
+                </div>
+
+                <!-- Google Login Button -->
+                <button type="button" id="google-login-btn"
+                        class="w-full flex items-center justify-center gap-2.5 sm:gap-3 bg-white border-2 border-gray-100 text-gray-700 py-2.5 sm:py-3 rounded-xl font-black text-[11px] sm:text-xs hover:bg-gray-50 transition shadow-sm sm:shadow-md transform hover:-translate-y-1">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4 sm:w-5 sm:h-5" alt="Google Logo">
+                    <span>TIẾP TỤC QUA GOOGLE</span>
+                </button>
+
+                <!-- Register Link -->
+                <p class="text-center text-gray-500 mt-4 sm:mt-6 text-[10px] sm:text-[11px] font-black tracking-wider">
+                    CHƯA CÓ TÀI KHOẢN? 
+                    <a href="/dang-ky/" class="text-orange-600 hover:text-orange-700 hover:underline font-black ml-1 uppercase">ĐĂNG KÝ NGAY</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="text-center">
+            <a href="/" class="inline-flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-all font-semibold text-sm bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/80 shadow-sm hover:shadow-md">
+                <i class="fas fa-arrow-left"></i>
+                <span>Quay lại trang chủ</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="js/loading.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script src="js/dang-nhap.js" defer></script>
+
+</body>
+</html>

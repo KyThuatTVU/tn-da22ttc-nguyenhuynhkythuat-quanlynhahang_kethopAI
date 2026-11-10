@@ -19,25 +19,25 @@ ComponentManager.register('navbar', (data = {}) => {
 
                     <!-- Desktop Menu -->
                     <div class="hidden lg:flex items-center space-x-8">
-                        <a href="index.html" class="${isActive('index')} transition">
+                        <a href="/" class="${isActive('index')} transition">
                             <i class="fas fa-home mr-1"></i> Trang chủ
                         </a>
-                        <a href="gioi-thieu.html" class="${isActive('about')} transition">
+                        <a href="/gioi-thieu/" class="${isActive('about')} transition">
                             <i class="fas fa-info-circle mr-1"></i> Giới thiệu
                         </a>
-                        <a href="tin-tuc.html" class="${isActive('news')} transition">
+                        <a href="/tin-tuc/" class="${isActive('news')} transition">
                             <i class="fas fa-newspaper mr-1"></i> Tin tức
                         </a>
-                        <a href="album.html" class="${isActive('album')} transition">
+                        <a href="/album/" class="${isActive('album')} transition">
                             <i class="fas fa-images mr-1"></i> Album ảnh
                         </a>
-                        <a href="thuc-don.html" class="${isActive('menu')} transition">
+                        <a href="/thuc-don/" class="${isActive('menu')} transition">
                             <i class="fas fa-book-open mr-1"></i> Thực đơn
                         </a>
-                        <a href="dat-ban.html" class="${isActive('booking')} transition">
+                        <a href="/dat-ban/" class="${isActive('booking')} transition">
                             <i class="fas fa-calendar-check mr-1"></i> Đặt bàn
                         </a>
-                        <a href="lien-he.html" class="${isActive('contact')} transition">
+                        <a href="/lien-he/" class="${isActive('contact')} transition">
                             <i class="fas fa-phone mr-1"></i> Liên hệ
                         </a>
                     </div>
@@ -50,7 +50,7 @@ ComponentManager.register('navbar', (data = {}) => {
                         </button>
 
                         <!-- Cart -->
-                        <a href="gio-hang.html" class="relative text-gray-700 hover:text-orange-600 transition">
+                        <a href="/gio-hang/" class="relative text-gray-700 hover:text-orange-600 transition">
                             <i class="fas fa-shopping-cart text-xl"></i>
                             <span class="absolute cart-badge bg-orange-600 text-white text-xs rounded-full flex items-center justify-center">0</span>
                         </a>
@@ -67,16 +67,16 @@ ComponentManager.register('navbar', (data = {}) => {
 
                 <!-- Mobile Menu -->
                 <div id="mobile-menu" class="hidden lg:hidden pb-4">
-                    <a href="index.html" class="block py-2 ${isActive('index')}">Trang chủ</a>
-                    <a href="gioi-thieu.html" class="block py-2 ${isActive('about')}">Giới thiệu</a>
-                    <a href="tin-tuc.html" class="block py-2 ${isActive('news')}">Tin tức</a>
-                    <a href="album.html" class="block py-2 ${isActive('album')}">Album ảnh</a>
-                    <a href="thuc-don.html" class="block py-2 ${isActive('menu')}">Thực đơn</a>
-                    <a href="dat-ban.html" class="block py-2 ${isActive('booking')}">Đặt bàn</a>
-                    <a href="lien-he.html" class="block py-2 ${isActive('contact')}">Liên hệ</a>
-                    <a href="gio-hang.html" class="block py-2 text-gray-700 hover:text-orange-600">Giỏ hàng</a>
-                    <a href="dang-nhap.html" class="block py-2 text-gray-700 hover:text-orange-600">Đăng nhập</a>
-                    <a href="dang-ky.html" class="block py-2 text-gray-700 hover:text-orange-600">Đăng ký</a>
+                    <a href="/" class="block py-2 ${isActive('index')}">Trang chủ</a>
+                    <a href="/gioi-thieu/" class="block py-2 ${isActive('about')}">Giới thiệu</a>
+                    <a href="/tin-tuc/" class="block py-2 ${isActive('news')}">Tin tức</a>
+                    <a href="/album/" class="block py-2 ${isActive('album')}">Album ảnh</a>
+                    <a href="/thuc-don/" class="block py-2 ${isActive('menu')}">Thực đơn</a>
+                    <a href="/dat-ban/" class="block py-2 ${isActive('booking')}">Đặt bàn</a>
+                    <a href="/lien-he/" class="block py-2 ${isActive('contact')}">Liên hệ</a>
+                    <a href="/gio-hang/" class="block py-2 text-gray-700 hover:text-orange-600">Giỏ hàng</a>
+                    <a href="/dang-nhap/" class="block py-2 text-gray-700 hover:text-orange-600">Đăng nhập</a>
+                    <a href="/dang-ky/" class="block py-2 text-gray-700 hover:text-orange-600">Đăng ký</a>
                 </div>
             </div>
         </nav>
@@ -165,10 +165,10 @@ window.renderUserMenu = function() {
                             <p class="text-sm font-medium text-gray-800 truncate">${displayName}</p>
                             <p class="text-xs text-gray-500 truncate">${user.email || ''}</p>
                         </div>
-                        <a href="tai-khoan.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                        <a href="/tai-khoan/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                             <i class="fas fa-user-circle mr-2"></i> Tài khoản của tôi
                         </a>
-                        <a href="dat-ban.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                        <a href="/dat-ban/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                             <i class="fas fa-calendar-check mr-2"></i> Đặt bàn
                         </a>
                         <button onclick="handleLogout()" class="w-full text-left block px-4 py-3 text-red-600 hover:bg-red-50 border-t border-gray-100">
@@ -195,10 +195,10 @@ window.renderUserMenu = function() {
                             <p class="text-xs text-gray-500 truncate">${user.email || ''}</p>
                         </div>
                     </div>
-                    <a href="tai-khoan.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+                    <a href="/tai-khoan/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                         <i class="fas fa-user-circle mr-2"></i> Tài khoản của tôi
                     </a>
-                    <a href="dat-ban.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+                    <a href="/dat-ban/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                         <i class="fas fa-calendar-check mr-2"></i> Đặt bàn
                     </a>
                     <button onclick="handleLogout()" class="w-full text-left py-3 px-4 text-red-600 hover:bg-red-50 font-medium border-t border-gray-200">
@@ -233,10 +233,10 @@ window.renderGuestMenu = function() {
                 <i class="fas fa-user text-xl"></i>
             </button>
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                <a href="dang-nhap.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                <a href="/dang-nhap/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                     <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập
                 </a>
-                <a href="dang-ky.html" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
+                <a href="/dang-ky/" class="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                     <i class="fas fa-user-plus mr-2"></i> Đăng ký
                 </a>
             </div>
@@ -247,10 +247,10 @@ window.renderGuestMenu = function() {
     const mobileUserMenu = document.getElementById('mobile-user-menu');
     if (mobileUserMenu) {
         mobileUserMenu.innerHTML = `
-            <a href="dang-nhap.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/dang-nhap/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập
             </a>
-            <a href="dang-ky.html" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
+            <a href="/dang-ky/" class="block py-3 px-4 text-gray-800 hover:text-orange-600 hover:bg-orange-50 transition font-medium">
                 <i class="fas fa-user-plus mr-2"></i> Đăng ký
             </a>
         `;
@@ -262,7 +262,7 @@ window.handleLogout = function() {
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
         localStorage.removeItem('user'); sessionStorage.removeItem('user');
         localStorage.removeItem('token'); sessionStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 }
 
@@ -272,7 +272,7 @@ window.updateUserMenu = window.renderUserMenu;
 // Set active navigation link based on current page
 function setActiveNavLink() {
     // Get current page filename
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').pop() || '/';
     const pageName = currentPage.replace('.html', '');
     
     console.log('📍 Current page:', pageName);

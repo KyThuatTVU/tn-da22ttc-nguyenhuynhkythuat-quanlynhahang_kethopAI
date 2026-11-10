@@ -41,7 +41,7 @@ async function initPOS() {
                         document.getElementById('user-role-badge').innerHTML = `<i class="fas fa-id-badge mr-1"></i>${roleMap[staff.vai_tro] || 'Nhân viên'}`;
                     }
 
-                    if (window.location.pathname.includes('admin-pos-order.html')) {
+                    if (window.location.pathname.includes('/admin/admin-pos-order/')) {
                         initOrderScreen();
                     }
                     return;
@@ -62,11 +62,11 @@ async function initPOS() {
                 document.getElementById('user-role-badge').innerHTML = `<i class="fas fa-id-badge mr-1"></i>${roleName}`;
             }
 
-            if (window.location.pathname.includes('admin-pos-order.html')) {
+            if (window.location.pathname.includes('/admin/admin-pos-order/')) {
                 initOrderScreen();
             }
         } else {
-            window.location.href = '../staff/login.html';
+            window.location.href = '/staff/login/';
         }
     } catch (err) {
         console.error("Lỗi xác thực POS:", err);
@@ -74,7 +74,7 @@ async function initPOS() {
 }
 
 // ============================================
-// LOGIC MÀN HÌNH ORDER (admin-pos-order.html)
+// LOGIC MÀN HÌNH ORDER (/admin/admin-pos-order/)
 // ============================================
 
 function initOrderScreen() {
@@ -88,7 +88,7 @@ function initOrderScreen() {
     
     if (!currentTable || currentTable.id != tableId) {
         alert('Không tìm thấy thông tin bàn!');
-        window.location.href = 'admin-pos-tables.html';
+        window.location.href = '/admin/admin-pos-tables/';
         return;
     }
 
@@ -289,7 +289,7 @@ async function autoSaveOrder() {
             originalOrderJson = JSON.stringify(orderItems);
             if (!currentOrderId) {
                 alert('Giỏ hàng rỗng, đơn hàng đã tự động bị hủy!');
-                window.location.href = 'admin-pos-tables.html';
+                window.location.href = '/admin/admin-pos-tables/';
             }
         } else {
             console.error('Lỗi auto-save:', data.message);
@@ -459,7 +459,7 @@ async function sendToKitchen() {
             renderCart();
             if(!currentOrderId) {
                 alert('Đã hủy order thành công!');
-                window.location.href = 'admin-pos-tables.html';
+                window.location.href = '/admin/admin-pos-tables/';
                 return;
             }
             // Show modal instead of alert
@@ -483,7 +483,7 @@ function goBack() {
     if (JSON.stringify(orderItems) !== originalOrderJson) {
         if (!confirm('Có thay đổi chưa gửi bếp, bạn có chắc chắn thoát?')) return;
     }
-    window.location.href = 'admin-pos-tables.html';
+    window.location.href = '/admin/admin-pos-tables/';
 }
 
 function showCheckoutModal() {
@@ -592,6 +592,6 @@ function printBill() {
 function closeBillAndRedirect() {
     if (currentTable) localStorage.removeItem(`draft_pos_${currentTable.id}`);
     document.getElementById('billModal').classList.remove('show');
-    window.location.href = 'admin-pos-tables.html';
+    window.location.href = '/admin/admin-pos-tables/';
 }
 

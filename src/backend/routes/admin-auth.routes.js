@@ -14,14 +14,14 @@ router.get('/google',
 // Callback route sau khi Google xác thực
 router.get('/google/callback',
   passport.authenticate('google-admin', { 
-    failureRedirect: '/frontend/admin/dang-nhap-admin.html?error=google_auth_failed',
+    failureRedirect: '/admin/dang-nhap-admin/?error=google_auth_failed',
     session: true
   }),
   (req, res) => {
     // Kiểm tra nếu user không phải admin
     if (!req.user) {
       console.log('❌ Callback: No user found');
-      return res.redirect('/frontend/admin/dang-nhap-admin.html?error=not_admin');
+      return res.redirect('/admin/dang-nhap-admin/?error=not_admin');
     }
 
     // Log để debug
@@ -33,7 +33,7 @@ router.get('/google/callback',
     req.session.save((err) => {
       if (err) {
         console.error('❌ Error saving session:', err);
-        return res.redirect('/frontend/admin/dang-nhap-admin.html?error=session_error');
+        return res.redirect('/admin/dang-nhap-admin/?error=session_error');
       }
       
       console.log('✅ Session saved successfully');
@@ -42,7 +42,7 @@ router.get('/google/callback',
       // Đăng nhập thành công - REDIRECT TRỰC TIẾP ĐẾN DASHBOARD
       // Thêm delay nhỏ để đảm bảo cookie được set
       setTimeout(() => {
-        res.redirect('/frontend/admin/dashboard.html');
+        res.redirect('/admin/dashboard/');
       }, 100);
     });
   }

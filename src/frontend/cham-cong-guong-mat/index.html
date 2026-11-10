@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công Khuôn Mặt - Nhà hàng Phương Nam</title>
+    <link rel="icon" type="image/png" href="images/Green Simple Clean Vegan Food Logo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    
+    <link rel="stylesheet" href="css/cham-cong-guong-mat.css">
+
+</head>
+<body class="p-4 md:p-8 flex flex-col justify-between">
+    <div class="animated-bg"></div>
+
+    <!-- Header Section -->
+    <header class="max-w-7xl mx-auto w-full flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <img src="images/Green Simple Clean Vegan Food Logo.png" alt="Logo" class="w-12 h-12 rounded-full border-2 border-indigo-500 shadow-md">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Phương Nam Restaurant</h1>
+                <p class="text-xs text-slate-400">Hệ Thống Điểm Danh Sinh Trắc Học</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="header-clock" class="text-lg font-bold clock-time text-indigo-400">00:00:00</div>
+            <div id="header-date" class="text-xs text-slate-400">Thứ Sáu, 22/05/2026</div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto">
+        
+        <!-- Left Column: Staff Info & History -->
+        <div class="lg:col-span-5 flex flex-col gap-6 order-2 lg:order-1">
+            
+            <!-- Staff Card / Verification target -->
+            <div id="staff-card-section" class="glass-card rounded-3xl p-6 relative overflow-hidden">
+                <!-- Decorative background elements -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-indigo-400"></i> Nhân Viên Xác Minh
+                </h2>
+
+                <!-- State 1: Loading Skeleton -->
+                <div id="staff-loading" class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full shimmer bg-slate-800"></div>
+                        <div class="space-y-2 flex-1">
+                            <div class="h-4 w-1/2 shimmer rounded bg-slate-800"></div>
+                            <div class="h-3 w-1/3 shimmer rounded bg-slate-800"></div>
+                        </div>
+                    </div>
+                    <div class="h-10 w-full shimmer rounded bg-slate-800 mt-2"></div>
+                </div>
+
+                <!-- State 2: Staff Details -->
+                <div id="staff-details" class="hidden flex flex-col gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <img id="staff-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/50 bg-slate-800 shadow-lg">
+                            <span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center text-[10px] text-white">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h3 id="staff-name" class="text-xl font-bold text-white">Nguyễn Văn A</h3>
+                            <p id="staff-role" class="text-sm text-indigo-300">Phục vụ bàn</p>
+                            <span id="staff-code-badge" class="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">NV001</span>
+                        </div>
+                    </div>
+
+                    <!-- Shift Info Dynamic Alert (Optional/Placeholder based on API results later) -->
+                    <div class="p-3.5 bg-slate-800/40 rounded-2xl border border-white/5 text-sm text-slate-300 flex items-start gap-2.5">
+                        <i class="fa-solid fa-clock text-indigo-400 mt-0.5"></i>
+                        <div>
+                            <p class="font-medium text-slate-200">Ca làm việc hôm nay</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Hệ thống sẽ tự động đối chiếu thời gian điểm danh của bạn với ca trực đã phân công.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State 3: Standby / Ready for Facial Recognition -->
+                <div id="staff-standby" class="hidden flex flex-col items-center justify-center text-center py-6 px-4 space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 animate-pulse">
+                        <i class="fa-solid fa-face-viewfinder text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-200">Sẵn Sàng Nhận Diện</h3>
+                        <p class="text-xs text-slate-400 mt-1 max-w-[280px] mx-auto">Vui lòng hướng khuôn mặt vào camera và chọn "VÀO CA" hoặc "TAN CA" để chấm công tự động.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Geolocation Validation Status Card -->
+            <div class="glass-card rounded-3xl p-6">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-indigo-400"></i> Định Vị Toàn Cầu (GPS)
+                </h2>
+                <div id="gps-box" class="p-4 bg-slate-800/20 border border-white/5 rounded-2xl flex items-center gap-3">
+                    <div id="gps-icon-container" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-800 text-slate-400">
+                        <i id="gps-icon" class="fa-solid fa-location-dot animate-pulse text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center">
+                            <span id="gps-status" class="text-sm font-bold text-slate-300">Đang tìm tín hiệu...</span>
+                            <span id="gps-distance" class="text-xs font-semibold text-slate-400">-- m</span>
+                        </div>
+                        <p id="gps-desc" class="text-xs text-slate-400 mt-0.5 truncate">Đang dò tìm tọa độ thiết bị của bạn...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History List Card -->
+            <div class="glass-card rounded-3xl p-6 flex-1 flex flex-col min-h-[220px]">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Nhật Ký Hôm Nay
+                </h2>
+                <div id="attendance-history-list" class="space-y-3 overflow-y-auto max-h-[250px] flex-1 pr-1">
+                    <div class="text-center py-8 text-slate-500 text-sm flex flex-col items-center gap-2">
+                        <i class="fa-regular fa-folder-open text-2xl"></i>
+                        Chưa có lịch sử chấm công hôm nay
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Live Camera feed & Authentication triggers -->
+        <div class="lg:col-span-7 flex flex-col gap-6 order-1 lg:order-2">
+            
+            <!-- Camera View Container -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col items-center">
+                
+                <!-- High tech viewport wrapper -->
+                <div id="viewport-wrapper" class="camera-container scanning w-full aspect-[4/3] max-w-[560px] bg-slate-950 flex items-center justify-center">
+                    
+                    <!-- Scanline laser animation -->
+                    <div class="scan-line"></div>
+
+                    <!-- HTML5 Video element -->
+                    <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover rounded-[18px] transform -scale-x-100" style="display: none;"></video>
+                    
+                    <!-- Fallback loader/instructions -->
+                    <div id="camera-placeholder" class="text-center p-6 text-slate-400 space-y-4">
+                        <div class="w-20 h-20 rounded-full border border-dashed border-slate-700 flex items-center justify-center mx-auto bg-slate-900/50">
+                            <i class="fa-solid fa-video-slash text-3xl text-slate-500 animate-pulse"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-300">Đang chuẩn bị Camera...</p>
+                            <p class="text-xs text-slate-500 mt-1">Cấp quyền truy cập webcam nếu có yêu cầu từ trình duyệt</p>
+                        </div>
+                    </div>
+
+                    <!-- Canvas for frame grabbing -->
+                    <canvas id="snapshot-canvas" class="hidden"></canvas>
+
+                    <!-- Realtime Processing Overlay -->
+                    <div id="processing-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex-col items-center justify-center gap-4 z-20 rounded-[18px]">
+                        <div class="relative w-20 h-20 flex items-center justify-center">
+                            <!-- High-tech circular scanner spinner -->
+                            <div class="absolute inset-0 rounded-full border-4 border-t-indigo-500 border-indigo-500/20 animate-spin"></div>
+                            <i class="fa-solid fa-face-recognition text-indigo-400 text-3xl animate-pulse"></i>
+                        </div>
+                        <div class="text-center">
+                            <h4 class="text-lg font-bold text-white">Đang Xác Minh Khuôn Mặt</h4>
+                            <p class="text-xs text-slate-400 mt-1">Vui lòng giữ nguyên khuôn mặt trước camera...</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating result modal overlay inside camera container -->
+                    <div id="result-overlay" class="absolute inset-x-4 bottom-4 p-4 rounded-2xl glass-card border-l-4 border-l-emerald-500 hidden z-30 transition-all transform translate-y-2 opacity-0">
+                        <div class="flex items-center gap-3">
+                            <div id="result-status-icon" class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i class="fa-solid fa-circle-check text-lg"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 id="result-status-title" class="text-sm font-bold text-white">Điểm danh thành công!</h4>
+                                <p id="result-status-desc" class="text-xs text-slate-300 mt-0.5 truncate">Chúc bạn một ngày làm việc hiệu quả.</p>
+                            </div>
+                            <button onclick="hideResultOverlay()" class="text-slate-400 hover:text-white p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Camera Switcher / Toggle Tools -->
+                <div class="w-full max-w-[560px] flex justify-between items-center mt-4 px-2 text-xs text-slate-400">
+                    <span id="camera-status-text"><i class="fa-solid fa-circle text-[8px] text-yellow-500 mr-1 animate-pulse"></i> Khởi động máy ảnh...</span>
+                    <button onclick="toggleCameraMirror()" class="hover:text-white transition flex items-center gap-1.5 bg-slate-800/40 hover:bg-slate-800 px-2.5 py-1 rounded-lg border border-white/5">
+                        <i class="fa-solid fa-arrows-left-right"></i> Đối xứng
+                    </button>
+                </div>
+
+                <!-- Major Check-in / Check-out actions -->
+                <div class="w-full max-w-[560px] mt-6 grid grid-cols-2 gap-4">
+                    <button id="btn-checkin" onclick="performFaceAttendance('checkin')" disabled
+                            class="btn-glow-green text-white py-4 px-6 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fa-solid fa-door-open text-xl"></i>
+                        <span>VÀO CA</span>
+                    </button>
+                    <button id="btn-checkout" onclick="performFaceAttendance('checkout')" disabled
+                            class="btn-glow-red text-white py-4 px-6 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fa-solid fa-door-closed text-xl"></i>
+                        <span>TAN CA</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="max-w-7xl mx-auto w-full text-center text-xs text-slate-500 mt-10 pt-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <p>&copy; 2026 Nhà hàng Ẩm thực Phương Nam. Bảo lưu mọi quyền.</p>
+        <p class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">AI SFace Offline</span>
+            <span>| Trí Tuệ Nhân Tạo offline</span>
+        </p>
+    </footer>
+
+    <!-- Audio Effects for Biometrics Feedback -->
+    <audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/active_storage/sfx/950/950-84.wav" preload="auto"></audio>
+
+    
+    <script src="js/cham-cong-guong-mat.js" defer></script>
+
+</body>
+</html>

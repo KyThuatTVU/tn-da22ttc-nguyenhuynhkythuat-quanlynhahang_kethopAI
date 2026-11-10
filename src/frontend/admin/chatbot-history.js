@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ chatbot-history.html) ==== */
+/* ==== Script 1 (tách từ /admin/chatbot-history/) ==== */
 let chatHistory = [];
         let currentPage = 1;
         const limit = 20;

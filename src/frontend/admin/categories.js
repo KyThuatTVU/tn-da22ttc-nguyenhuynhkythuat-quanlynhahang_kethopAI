@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ categories.html) ==== */
+/* ==== Script 1 (tách từ /admin/categories/) ==== */
 let categories = [];
 
         async function loadCategories() {

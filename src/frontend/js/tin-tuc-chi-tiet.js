@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ tin-tuc-chi-tiet.html) ==== */
+/* ==== Script 1 (tách từ /tin-tuc-chi-tiet/) ==== */
 // Smooth scroll animations
         gsap.registerPlugin(ScrollTrigger);
 

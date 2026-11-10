@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <base href="/admin/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Kê Kho - Admin</title>
+    <link rel="icon" type="image/png" href="../images/Green Simple Clean Vegan Food Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-responsive.css">
+    <link rel="stylesheet" href="admin-glass-3d.css">
+</head>
+
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Kiểm Kê Kho</h1>
+                        <p class="text-slate-500 text-sm">Đối soát kho thực tế và hệ thống (thường làm mỗi tối)</p>
+                    </div>
+                    <button onclick="startNewAudit()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center shadow-lg shadow-indigo-200">
+                        <i class="fas fa-clipboard-check mr-2"></i> Bắt đầu Kiểm kê
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="content-card mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select id="food-drink-filter" onchange="applyFilters()" class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-semibold bg-white text-indigo-800">
+                            <option value="all">🍽️ Tất cả loại hàng</option>
+                            <option value="food">🥩 Chỉ Đồ ăn</option>
+                            <option value="drink">🥤 Chỉ Hàng nước</option>
+                        </select>
+                        <input type="text" id="search" oninput="applyFilters()" placeholder="Tìm theo ghi chú..."
+                            class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Audit History Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Mã Phiếu</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Thời gian</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nhân viên</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Ghi chú</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Trạng thái</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audits-container" class="bg-white divide-y divide-slate-200">
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-slate-500">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Đang tải dữ liệu...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Audit Session Modal -->
+    <div id="audit-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b flex items-center justify-between bg-gradient-to-r from-indigo-700 to-indigo-600 text-white rounded-t-2xl">
+                <div>
+                    <h3 class="text-xl font-bold" id="audit-modal-title">Phiếu Kiểm Kê Thực Tế</h3>
+                    <p class="text-xs text-indigo-100">Ngày kiểm kê: <span id="current-date"></span></p>
+                </div>
+                <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <div class="p-6 flex-1 overflow-y-auto bg-slate-50">
+                <input type="hidden" id="editing-audit-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Ghi chú kiểm kê</label>
+                    <input type="text" id="audit-note" placeholder="Ví dụ: Kiểm kê cuối ngày 30/03..." class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div class="bg-white border rounded-xl overflow-hidden shadow-sm">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Nguyên liệu</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Đơn vị</th>
+                                <th class="px-4 py-3 text-right text-xs font-bold text-slate-600 uppercase">Tồn hệ thống</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-slate-600 uppercase w-40">Tồn thực tế (Đếm tay)</th>
+                                <th class="px-4 py-3 text-right text-xs font-bold text-slate-600 uppercase">Chênh lệch</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-items-list" class="bg-white divide-y divide-slate-100">
+                            <!-- Items here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="edit-warning" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-xs flex items-center space-x-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Lưu ý: Khi cập nhật số lượng thực tế, hệ thống sẽ tự động điều chỉnh tồn kho hiện tại theo mức chênh lệch mới.</span>
+                </div>
+            </div>
+
+            <div class="p-4 border-t bg-white flex justify-end space-x-3 rounded-b-2xl">
+                <button onclick="closeModal()" class="px-6 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 font-medium">Hủy</button>
+                <button id="btn-submit-audit" onclick="submitAudit()" class="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition">
+                    Xác nhận & Cân bằng kho
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b flex items-center justify-between bg-slate-800 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold">Kết quả kiểm kê #<span id="detail-id"></span></h3>
+                <button onclick="closeDetailModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto" id="detail-content">
+                <!-- Content here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-layout.js"></script>
+    
+    <script src="kiem-ke.js" defer></script>
+
+</body>
+
+</html>

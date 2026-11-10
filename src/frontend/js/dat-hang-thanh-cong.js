@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ dat-hang-thanh-cong.html) ==== */
+/* ==== Script 1 (tách từ /dat-hang-thanh-cong/) ==== */
 // API Configuration
         const API_URL = window.API_URL || 'http://localhost:3000/api';
 
@@ -164,7 +164,7 @@
                 console.error('Error loading suggested products:', error);
                 document.getElementById('suggested-products').innerHTML = `
                     <div class="col-span-full text-center py-4">
-                        <a href="thuc-don.html" class="text-orange-600 hover:underline">
+                        <a href="/thuc-don/" class="text-orange-600 hover:underline">
                             <i class="fas fa-utensils mr-2"></i>Xem thực đơn
                         </a>
                     </div>
@@ -189,7 +189,7 @@
                 const formattedPrice = !isNaN(price) ? formatCurrency(price) : 'Liên hệ';
                 
                 return `
-                    <a href="chitietmonan.html?id=${product.ma_mon}" class="group block">
+                    <a href="/chitietmonan/?id=${product.ma_mon}" class="group block">
                         <div class="bg-gray-100 rounded-lg overflow-hidden aspect-square mb-2">
                             <img src="${imageUrl}" 
                                  alt="${product.ten_mon}"

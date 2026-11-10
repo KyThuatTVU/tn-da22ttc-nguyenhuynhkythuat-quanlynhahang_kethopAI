@@ -1,4 +1,4 @@
-/* ==== Script 1 (tách từ navbar-test.html) ==== */
+/* ==== Script 1 (tách từ /navbar-test/) ==== */
 function updateInfo() {
             document.getElementById('screen-width').textContent = screen.width;
             document.getElementById('viewport-width').textContent = window.innerWidth;
