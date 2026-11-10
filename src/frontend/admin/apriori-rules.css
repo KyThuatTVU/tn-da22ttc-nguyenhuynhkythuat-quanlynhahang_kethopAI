@@ -1,0 +1,13 @@
+/* ==== Style 1 (tách từ apriori-rules.html) ==== */
+.rule-card {
+            transition: all 0.3s ease;
+        }
+        .rule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .confidence-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #f87171 0%, #fbbf24 50%, #34d399 100%);
+            border-radius: 4px;
+        }

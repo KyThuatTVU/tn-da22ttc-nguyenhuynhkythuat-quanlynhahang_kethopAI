@@ -1,0 +1,41 @@
+/* ==== Style 1 (tách từ settings.html) ==== */
+#map {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 12px;
+            background: #f1f5f9;
+        }
+        .location-info {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        .map-placeholder {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        .map-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        .api-key-notice {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #92400e;
+        }

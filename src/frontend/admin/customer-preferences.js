@@ -1,0 +1,741 @@
+/* ==== Script 1 (tách từ customer-preferences.html) ==== */
+let categoryChartInstance = null;
+        let keywordChartInstance = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(fetchStats, 500);
+        });
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/recommendations/admin/stats', {
+                    credentials: 'include'
+                });
+                
+                if (!res.ok) {
+                    const message = await res.text();
+                    throw new Error(`Failed to fetch data (${res.status}): ${message || res.statusText}`);
+                }
+                
+                const data = await res.json();
+                if (data.success) {
+                    renderCategoryChart(data.data.categories);
+                    renderKeywordChart(data.data.keywords);
+                    renderPreferenceTags(data.data.preferenceTags, data.data.negativePreferenceTags);
+                    renderUsersTable(data.data.users);
+                    renderClickStats(data.data.dishClicks, data.data.flavorClicks);
+                    renderSimilarityGroups(data.data.similarityGroups);
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('users-table-body').innerHTML = `
+                    <tr><td colspan="8" class="py-8 text-center text-red-500">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Có lỗi xảy ra khi tải dữ liệu
+                    </td></tr>
+                `;
+            }
+        }
+
+        async function rebuildPreferenceProfiles(button) {
+            const originalHtml = button?.innerHTML;
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang huấn luyện...';
+            }
+
+            try {
+                const res = await fetch('/api/recommendations/admin/rebuild-preferences', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (!res.ok) throw new Error('Không thể huấn luyện lại hồ sơ sở thích');
+                await fetchStats();
+            } catch (err) {
+                console.error(err);
+                alert('Không thể huấn luyện lại hồ sơ sở thích. Vui lòng kiểm tra server.');
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        function renderCategoryChart(categories) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+            
+            // Xóa danh mục 0 người dùng để chart đẹp hơn
+            const filtered = categories.filter(c => c.total_users > 0);
+            const labels = filtered.map(c => c.ten_danh_muc);
+            const data = filtered.map(c => c.total_users);
+            
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+                            '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+        }
+        
+        function renderKeywordChart(keywords) {
+            const ctx = document.getElementById('keywordChart').getContext('2d');
+            
+            if (keywordChartInstance) {
+                keywordChartInstance.destroy();
+            }
+            
+            const labels = keywords.map(k => k.keyword.substring(0, 15) + (k.keyword.length > 15 ? '...' : ''));
+            const data = keywords.map(k => k.total_orders);
+            
+            keywordChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số Lượt Đặt Từ Món Có Chứa Từ Khóa',
+                        data: data,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function renderPreferenceTags(positiveTags = [], negativeTags = []) {
+            renderTagList('positive-preference-tags', positiveTags, 'positive');
+            renderTagList('negative-preference-tags', negativeTags, 'negative');
+        }
+
+        function renderTagList(containerId, tags, type) {
+            const container = document.getElementById(containerId);
+            const isNegative = type === 'negative';
+
+            if (!tags || tags.length === 0) {
+                container.innerHTML = `<div class="py-6 text-center text-slate-400">Chưa có tín hiệu ${isNegative ? 'tiêu cực' : 'tích cực'} từ đánh giá</div>`;
+                return;
+            }
+
+            const barColor = isNegative ? 'bg-rose-500' : 'bg-emerald-500';
+            const badgeColor = isNegative ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700';
+            const maxValue = Math.max(...tags.map(tag => Math.abs(Number(tag.avg_score || 0))), 1);
+
+            container.innerHTML = tags.map(tag => {
+                const score = Math.abs(Number(tag.avg_score || 0));
+                const width = Math.max(8, Math.round((score / maxValue) * 100));
+                return `
+                    <div class="border border-slate-100 rounded-lg p-3">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <div>
+                                <div class="font-semibold text-slate-800">${tag.ten_tag}</div>
+                                <div class="text-xs text-slate-500">${tag.nhom_tag} · ${tag.total_users || 0} khách</div>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full ${badgeColor}">${Number(tag.avg_score || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full ${barColor}" style="width:${width}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">Chưa có dữ liệu</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3 px-4 border-b border-slate-100">
+                        <div class="font-medium text-slate-800">${user.ho_ten || 'Không tên'}</div>
+                        <div class="text-xs text-slate-500">ID: ${user.ma_nguoi_dung}</div>
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-600">${user.so_dien_thoai || '-'}</td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${user.ten_danh_muc_thich ? 
+                            `<div class="flex flex-col gap-1 text-xs text-slate-700">
+                                ${user.ten_danh_muc_thich.split(', ').map(t => `
+                                    <div class="flex items-center py-0.5">
+                                        <span class="text-blue-500 mr-2 text-[10px]">•</span>
+                                        <span class="font-medium text-slate-800">${t}</span>
+                                    </div>
+                                `).join('')}
+                            </div>` 
+                            : '<span class="text-slate-400 italic">Chưa khai báo</span>'
+                        }
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${user.top_flavors_click && user.top_flavors_click.length > 0 ? 
+                            `<div class="flex flex-col gap-1 text-xs text-slate-700">
+                                ${user.top_flavors_click.slice(0, 1).map(f => {
+                                    const countColor = f.click_count >= 5 ? 'text-orange-600 font-bold' : 'text-slate-500';
+                                    return `
+                                        <div class="flex items-center py-0.5">
+                                            <i class="fas fa-mouse-pointer text-orange-400 mr-2 text-[9px]"></i>
+                                            <span class="font-medium text-slate-800">${f.ten_thuoc_tinh}</span>
+                                            <span class="ml-1.5 ${countColor} text-[10px]">(${f.click_count} tương tác)</span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                                ${user.top_flavors_click.length > 1 ? `
+                                    <div id="extra-flavors-${user.ma_nguoi_dung}" class="hidden flex flex-col gap-1">
+                                        ${user.top_flavors_click.slice(1).map(f => {
+                                            const countColor = f.click_count >= 5 ? 'text-orange-600 font-bold' : 'text-slate-500';
+                                            return `
+                                                <div class="flex items-center py-0.5">
+                                                    <i class="fas fa-mouse-pointer text-orange-400 mr-2 text-[9px]"></i>
+                                                    <span class="font-medium text-slate-800">${f.ten_thuoc_tinh}</span>
+                                                    <span class="ml-1.5 ${countColor} text-[10px]">(${f.click_count} tương tác)</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                    <button onclick="toggleInPlaceDetail('extra-flavors-${user.ma_nguoi_dung}', this)" class="text-[10px] text-blue-500 hover:text-blue-700 font-bold flex items-center gap-0.5 mt-0.5 transition active:scale-95 w-max">
+                                        <span>Xem thêm (${user.top_flavors_click.length - 1})</span> <i class="fas fa-chevron-down text-[8px]"></i>
+                                    </button>
+                                ` : ''}
+                            </div>` 
+                            : '<span class="text-slate-400 italic text-xs">Chưa tương tác món nào</span>'
+                        }
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100">
+                        ${user.top_dish_click ? 
+                            `<div class="flex flex-col gap-1 text-xs text-slate-700">
+                                <div class="flex items-center py-0.5">
+                                    <span class="mr-2 text-[11px]">🍽️</span>
+                                    <span class="font-medium text-slate-800 truncate max-w-[150px]" title="${user.top_dish_click.ten_mon}">${user.top_dish_click.ten_mon}</span>
+                                </div>
+                                <div class="flex items-center py-0.5">
+                                    <span class="mr-2 text-[10px] opacity-75"><i class="fas fa-mouse-pointer text-orange-500"></i></span>
+                                    <span class="text-slate-500 text-[11px] font-semibold">${user.top_dish_click.click_count} tương tác</span>
+                                </div>
+                                <div class="py-0.5 mt-0.5">
+                                    <button onclick="showUserClickHistory(${user.ma_nguoi_dung}, '${user.ho_ten || 'Khách hàng'}')" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 transition">
+                                        <i class="fas fa-list text-[10px]"></i> Xem lịch sử
+                                    </button>
+                                </div>
+                            </div>` 
+                            : '<span class="text-slate-400 italic text-xs">Chưa xem món nào</span>'
+                        }
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${renderUserPreferenceBadges(user.preference_tags, user.ma_nguoi_dung)}
+                    </td>
+                    <td class="py-3 px-4 border-b border-slate-100 text-slate-800">
+                        ${renderChatbotDishes(user.chatbot_dishes, user.ma_nguoi_dung, user.ho_ten)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderChatbotDishes(dishes = [], userId, userName) {
+            if (!dishes || dishes.length === 0) {
+                return '<span class="text-slate-400 italic text-xs">Chưa có dữ liệu chat</span>';
+            }
+
+            const topDish = dishes[0];
+            const score = parseFloat(topDish.score || 0);
+            const icon = topDish.ma_mon ? '🍽️' : '💬';
+            
+            let html = `<div class="flex flex-col gap-1 text-xs text-slate-700">
+                <div class="flex items-center py-0.5">
+                    <span class="mr-2 text-xs w-4 flex justify-center">${icon}</span>
+                    <span class="font-medium text-slate-800 truncate max-w-[120px]" title="${topDish.ten_mon}">${topDish.ten_mon}</span>
+                    <span class="text-purple-600 font-bold text-[10px] ml-1.5">(+${score})</span>
+                </div>
+                <div class="py-0.5 mt-1">
+                    <button onclick="showChatbotKeywords(${userId}, '${userName}')" class="text-[10px] text-purple-600 hover:text-purple-800 font-bold flex items-center gap-1 transition">
+                        <i class="fas fa-comments text-[9px]"></i> Xem chi tiết (${dishes.length})
+                    </button>
+                </div>
+            </div>`;
+            
+            return html;
+        }
+
+        function renderUserPreferenceBadges(tags = [], userId) {
+            if (!tags || tags.length === 0) {
+                return '<span class="text-slate-400 italic text-xs">Chưa đủ dữ liệu</span>';
+            }
+
+            const topTag = tags[0];
+            const extraTags = tags.slice(1);
+            
+            const renderSingleTag = (tag) => {
+                const score = Number(tag.score || 0);
+                const isPositive = score >= 0;
+                const icon = isPositive ? 'fa-thumbs-up text-emerald-500' : 'fa-thumbs-down text-rose-500';
+                const textColor = isPositive ? 'text-emerald-700' : 'text-rose-700';
+                return `
+                    <div class="flex items-center py-0.5">
+                        <span class="mr-2 w-4 flex justify-center"><i class="fas ${icon} text-[10px]"></i></span>
+                        <span class="font-medium text-slate-800">${tag.ten_tag}</span>
+                        <span class="${textColor} font-bold text-[10px] ml-1.5">(${score > 0 ? '+' : ''}${score.toFixed(1)})</span>
+                    </div>
+                `;
+            };
+
+            let html = `<div class="flex flex-col gap-1 text-xs text-slate-700">
+                ${renderSingleTag(topTag)}
+                ${extraTags.length > 0 ? `
+                    <div id="extra-tags-${userId}" class="hidden flex flex-col gap-1">
+                        ${extraTags.map(tag => renderSingleTag(tag)).join('')}
+                    </div>
+                    <button onclick="toggleInPlaceDetail('extra-tags-${userId}', this)" class="text-[10px] text-blue-500 hover:text-blue-700 font-bold flex items-center gap-0.5 mt-0.5 transition active:scale-95 w-max">
+                        <span>Xem thêm (${extraTags.length})</span> <i class="fas fa-chevron-down text-[8px]"></i>
+                    </button>
+                ` : ''}
+            </div>`;
+
+            return html;
+        }
+
+        function renderClickStats(dishClicks = [], flavorClicks = []) {
+            // Render Dish Clicks Table
+            const dishBody = document.getElementById('top-dish-clicks-body');
+            if (dishBody) {
+                if (!dishClicks || dishClicks.length === 0) {
+                    dishBody.innerHTML = `<tr><td colspan="2" class="py-4 text-center text-slate-400">Chưa ghi nhận lượt click món ăn nào</td></tr>`;
+                } else {
+                    const maxClicks = Math.max(...dishClicks.map(d => d.total_clicks), 1);
+                    dishBody.innerHTML = dishClicks.map((dish, index) => {
+                        const pct = Math.round((dish.total_clicks / maxClicks) * 100);
+                        return `
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-2.5 px-1 font-medium text-slate-800">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">${index + 1}</span>
+                                        <span>${dish.ten_mon}</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-1.5 rounded-full mt-1.5">
+                                        <div class="bg-orange-500 h-1.5 rounded-full" style="width: ${pct}%"></div>
+                                    </div>
+                                </td>
+                                <td class="py-2.5 px-1 text-right font-bold text-slate-700 w-32">${dish.total_clicks} tương tác</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Render Flavor Clicks Progress Bars
+            const flavorBody = document.getElementById('top-flavor-clicks-body');
+            if (flavorBody) {
+                if (!flavorClicks || flavorClicks.length === 0) {
+                    flavorBody.innerHTML = `<div class="py-6 text-center text-slate-400">Chưa ghi nhận lượt click khẩu vị nào</div>`;
+                } else {
+                    const maxFlavorClicks = Math.max(...flavorClicks.map(f => f.total_clicks), 1);
+                    flavorBody.innerHTML = flavorClicks.map((flavor, index) => {
+                        const pct = Math.round((flavor.total_clicks / maxFlavorClicks) * 100);
+                        const colors = ['bg-rose-500', 'bg-violet-500', 'bg-amber-500', 'bg-emerald-500', 'bg-cyan-500'];
+                        const colorClass = colors[index % colors.length];
+                        return `
+                            <div>
+                                <div class="flex items-center justify-between text-sm mb-1">
+                                    <span class="font-medium text-slate-700">${flavor.ten_khau_vi}</span>
+                                    <span class="text-xs font-semibold text-slate-500">${flavor.total_clicks} tương tác</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div class="${colorClass} h-2.5 rounded-full" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function renderSimilarityGroups(groups = []) {
+            const container = document.getElementById('similarity-groups-container');
+            if (!container) return;
+
+            // Xóa class grid cũ
+            container.className = 'overflow-x-auto';
+
+            if (!groups || groups.length === 0) {
+                container.innerHTML = `
+                    <div class="py-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <i class="fas fa-people-arrows text-2xl mb-2 text-slate-300"></i>
+                        <p class="text-sm">Chưa có đủ dữ liệu hành vi để kết nhóm đồng điệu sở thích</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHtml = `
+                <table class="w-full text-left border-collapse border border-slate-200 rounded-lg overflow-hidden min-w-[800px]">
+                    <thead>
+                        <tr class="bg-indigo-50 text-indigo-900 text-sm">
+                            <th class="py-3 px-4 font-bold border-b border-indigo-100 w-1/3">Cặp Khách Hàng (Mức độ tương đồng)</th>
+                            <th class="py-3 px-4 font-bold border-b border-indigo-100 w-1/4">Sở Thích & Điểm Chung</th>
+                            <th class="py-3 px-4 font-bold border-b border-indigo-100">Gợi Ý Chéo (AI Đề xuất)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        ${groups.map(group => {
+                            const badgeColor = group.similarity >= 80 ? 'bg-emerald-500 text-white' : 
+                                               group.similarity >= 50 ? 'bg-blue-500 text-white' : 'bg-slate-500 text-white';
+                            
+                            const sharedTags = group.sharedFlavors && group.sharedFlavors.length > 0 
+                                ? group.sharedFlavors.map(f => `<span class="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded border border-slate-200 mr-1 mb-1 font-medium">${f}</span>`).join('')
+                                : '<span class="text-xs text-slate-400 italic">Chưa xác định rõ</span>';
+
+                            // Hàm render chi tiết món đề xuất
+                            const renderRecs = (recArray, targetUser, sourceUser) => {
+                                if (!recArray || recArray.length === 0) return '';
+                                return `
+                                    <div class="mb-3 last:mb-0 border border-slate-100 bg-slate-50/50 p-2.5 rounded-lg shadow-sm">
+                                        <div class="text-[11px] font-bold text-slate-500 mb-2 border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                                            <span>👉 Gợi ý cho <span class="text-indigo-600 font-extrabold uppercase">${targetUser}</span></span>
+                                            <span class="font-normal">(Vì <span class="text-slate-700 font-semibold">${sourceUser}</span> đã mua)</span>
+                                        </div>
+                                        ${recArray.map(item => `
+                                            <div class="flex items-center justify-between py-1 border-b border-dashed border-slate-200 last:border-0">
+                                                <span class="text-sm font-semibold text-slate-800"><i class="fas fa-utensils text-slate-300 mr-1.5 text-xs"></i>${item.name}</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-100 flex items-center gap-1">
+                                                    <i class="fas fa-exclamation-circle"></i> Khách chưa từng mua
+                                                </span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `;
+                            };
+
+                            let recsForAHtml = renderRecs(group.recForA, group.userA.name, group.userB.name);
+                            let recsForBHtml = renderRecs(group.recForB, group.userB.name, group.userA.name);
+
+                            // Phân biệt 2 trường hợp không có gợi ý:
+                            // 1) Cả 2 khách chưa từng mua món nào → chưa có đủ dữ liệu
+                            // 2) Có mua nhưng các món trùng lặp hoàn toàn
+                            if (!recsForAHtml && !recsForBHtml) {
+                                const aBought = group.purchasesACount || 0;
+                                const bBought = group.purchasesBCount || 0;
+                                if (aBought === 0 && bBought === 0) {
+                                    recsForAHtml = `<div class="text-xs text-amber-600 italic p-2 text-center bg-amber-50 rounded border border-dashed border-amber-200">Cả 2 khách chưa có đơn hàng đã hoàn tất nào để dùng làm gợi ý chéo.</div>`;
+                                } else if (aBought === 0 || bBought === 0) {
+                                    const noBuyer = aBought === 0 ? group.userA.name : group.userB.name;
+                                    recsForAHtml = `<div class="text-xs text-amber-600 italic p-2 text-center bg-amber-50 rounded border border-dashed border-amber-200">${noBuyer} chưa có đơn hàng hoàn tất, chưa thể tạo gợi ý chéo.</div>`;
+                                } else {
+                                    recsForAHtml = `<div class="text-xs text-slate-400 italic p-2 text-center bg-slate-50 rounded border border-dashed border-slate-200">Hai khách hàng đã mua trùng lặp các món, chưa có món mới để đề xuất.</div>`;
+                                }
+                            }
+
+                            return `
+                                <tr class="hover:bg-slate-50 transition duration-150">
+                                    <!-- User Pair -->
+                                    <td class="py-4 px-4 align-top border-r border-slate-50">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-1 text-center bg-white border border-slate-100 rounded p-2 shadow-sm">
+                                                <div class="font-bold text-slate-800 text-sm truncate w-24 mx-auto" title="${group.userA.name}">${group.userA.name}</div>
+                                                <div class="text-[10px] text-slate-500 mt-1">${group.userA.phone || '-'}</div>
+                                            </div>
+                                            <div class="flex flex-col items-center px-1">
+                                                <i class="fas fa-exchange-alt text-slate-300 text-base mb-1.5"></i>
+                                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${badgeColor} shadow-sm">${group.similarity}%</span>
+                                            </div>
+                                            <div class="flex-1 text-center bg-white border border-slate-100 rounded p-2 shadow-sm">
+                                                <div class="font-bold text-slate-800 text-sm truncate w-24 mx-auto" title="${group.userB.name}">${group.userB.name}</div>
+                                                <div class="text-[10px] text-slate-500 mt-1">${group.userB.phone || '-'}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Shared Flavors -->
+                                    <td class="py-4 px-4 align-top border-r border-slate-50">
+                                        <div class="flex flex-wrap">${sharedTags}</div>
+                                    </td>
+                                    
+                                    <!-- Cross Recommendations -->
+                                    <td class="py-4 px-4 align-top">
+                                        ${recsForAHtml}
+                                        ${recsForBHtml}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHtml;
+        }
+
+        async function showUserClickHistory(userId, userName) {
+            document.getElementById('clickHistoryModal').classList.remove('hidden');
+            document.getElementById('clickHistoryCustomerName').textContent = `Khách hàng: ${userName}`;
+            const listContainer = document.getElementById('clickHistoryList');
+            listContainer.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p>Đang tải dữ liệu...</p></div>`;
+
+            try {
+                const res = await fetch(`/api/recommendations/admin/user-click-history/${userId}`, {
+                    credentials: 'include'
+                });
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    listContainer.innerHTML = data.data.map(item => {
+                        const date = new Date(item.last_clicked);
+                        const formattedDate = date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN');
+                        const price = item.gia_tien ? new Intl.NumberFormat('vi-VN').format(item.gia_tien) + ' ₫' : 'Liên hệ';
+                        const image = item.anh_mon 
+                            ? (item.anh_mon.startsWith('http') ? item.anh_mon : (item.anh_mon.startsWith('/') ? item.anh_mon : '/' + item.anh_mon)) 
+                            : '/images/placeholder.jpg';
+                        
+                        return `
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                                <img src="${image}" alt="${item.ten_mon}" class="w-16 h-16 rounded-lg object-cover shadow-sm bg-white" onerror="this.src='/images/placeholder.jpg'">
+                                <div class="flex-1 w-full">
+                                    <h4 class="font-bold text-slate-800 text-sm mb-1">${item.ten_mon}</h4>
+                                    <p class="text-emerald-600 text-xs font-bold">${price}</p>
+                                </div>
+                                <div class="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
+                                    <div class="text-[11px] text-slate-500 mb-1 flex items-center sm:justify-end gap-1"><i class="far fa-clock"></i>Lần cuối: ${formattedDate}</div>
+                                    <div class="flex flex-col gap-1 sm:items-end">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100 inline-block w-max">
+                                            Click: ${item.click_count || 0} lần
+                                        </span>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100 inline-block w-max">
+                                            Xem (>50s): ${item.view_count || 0} lần
+                                        </span>
+                                        ${item.like_count > 0 ? `
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100 inline-block w-max flex items-center gap-1">
+                                            <i class="fas fa-heart text-[9px]"></i> Thích: ${item.like_count} lần
+                                        </span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    listContainer.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-ghost text-3xl mb-3 opacity-30"></i><p>Không có lịch sử xem món nào.</p></div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                listContainer.innerHTML = `<div class="text-center py-8 text-rose-500"><i class="fas fa-exclamation-circle text-2xl mb-2"></i><p>Lỗi khi tải dữ liệu!</p></div>`;
+            }
+        }
+
+        function closeClickHistoryModal() {
+            document.getElementById('clickHistoryModal').classList.add('hidden');
+        }
+
+        function toggleInPlaceDetail(id, btn) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isHidden = el.classList.contains('hidden');
+            
+            if (isHidden) {
+                el.classList.remove('hidden');
+                btn.querySelector('span').textContent = 'Thu gọn';
+                btn.querySelector('i').className = 'fas fa-chevron-up text-[8px]';
+            } else {
+                el.classList.add('hidden');
+                const count = el.children.length;
+                btn.querySelector('span').textContent = `Xem thêm (${count})`;
+                btn.querySelector('i').className = 'fas fa-chevron-down text-[8px]';
+            }
+        }
+
+        // ==================== CHATBOT KEYWORDS MODAL ====================
+        
+        let currentChatbotData = null;
+
+        async function showChatbotKeywords(userId, userName) {
+            document.getElementById('chatbotKeywordsModal').classList.remove('hidden');
+            document.getElementById('chatbotKeywordsCustomerName').textContent = `Khách hàng: ${userName}`;
+            
+            // Reset tabs
+            switchChatbotTab('dishes');
+            
+            // Show loading
+            ['chatbotDishesList', 'chatbotKeywordsList', 'chatbotMessagesList'].forEach(id => {
+                document.getElementById(id).innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p>Đang tải dữ liệu...</p></div>`;
+            });
+
+            try {
+                const res = await fetch(`/api/recommendations/admin/chatbot-keywords/${userId}`, {
+                    credentials: 'include'
+                });
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+                
+                if (data.success) {
+                    currentChatbotData = data.data;
+                    renderChatbotKeywordsData(data.data);
+                } else {
+                    throw new Error(data.message || 'Failed to load data');
+                }
+            } catch (err) {
+                console.error(err);
+                ['chatbotDishesList', 'chatbotKeywordsList', 'chatbotMessagesList'].forEach(id => {
+                    document.getElementById(id).innerHTML = `<div class="text-center py-8 text-rose-500"><i class="fas fa-exclamation-circle text-2xl mb-2"></i><p>Lỗi khi tải dữ liệu!</p></div>`;
+                });
+            }
+        }
+
+        function renderChatbotKeywordsData(data) {
+            const { dishes = [], keywords = [], messages = [], stats = {} } = data;
+            
+            // Update stats
+            document.getElementById('totalKeywords').textContent = stats.total_keywords || 0;
+            document.getElementById('totalDishes').textContent = stats.total_dishes || 0;
+            document.getElementById('totalScore').textContent = (stats.total_score || 0).toFixed(1);
+            
+            // Update tab counts
+            document.getElementById('tab-dishes').innerHTML = `🍽️ Món ăn (${dishes.length})`;
+            document.getElementById('tab-keywords').innerHTML = `💬 Từ khóa khẩu vị (${keywords.length})`;
+            document.getElementById('tab-messages').innerHTML = `📝 Tin nhắn gốc (${messages.length})`;
+            
+            // Render dishes
+            const dishesContainer = document.getElementById('chatbotDishesList');
+            if (dishes.length === 0) {
+                dishesContainer.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-ghost text-3xl mb-3 opacity-30"></i><p>Chưa có món ăn nào được nhắc đến.</p></div>`;
+            } else {
+                dishesContainer.innerHTML = dishes.map(dish => {
+                    const score = parseFloat(dish.score || 0);
+                    const sentiment = dish.sentiment || 'neutral';
+                    const sentimentColor = sentiment === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 
+                                          sentiment === 'negative' ? 'text-rose-600 bg-rose-50 border-rose-200' : 
+                                          'text-slate-600 bg-slate-50 border-slate-200';
+                    const sentimentIcon = sentiment === 'positive' ? '👍' : sentiment === 'negative' ? '👎' : '➖';
+                    
+                    return `
+                        <div class="flex items-start gap-4 p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 text-base mb-1">🍽️ ${dish.ten_mon}</h4>
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    ${dish.tags ? dish.tags.split(', ').map(tag => 
+                                        `<span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">${tag}</span>`
+                                    ).join('') : ''}
+                                </div>
+                                <p class="text-xs text-slate-500 italic">"${dish.evidence || ''}"</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold ${score >= 0 ? 'text-emerald-600' : 'text-rose-600'} mb-1">
+                                    ${score >= 0 ? '+' : ''}${score.toFixed(1)}
+                                </div>
+                                <div class="text-[10px] px-2 py-1 rounded-full ${sentimentColor} border font-semibold">
+                                    ${sentimentIcon} ${sentiment}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Render keywords
+            const keywordsContainer = document.getElementById('chatbotKeywordsList');
+            if (keywords.length === 0) {
+                keywordsContainer.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-ghost text-3xl mb-3 opacity-30"></i><p>Chưa có từ khóa khẩu vị nào.</p></div>`;
+            } else {
+                keywordsContainer.innerHTML = keywords.map(kw => {
+                    const score = parseFloat(kw.score || 0);
+                    const sentiment = kw.sentiment || 'neutral';
+                    const sentimentColor = sentiment === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 
+                                          sentiment === 'negative' ? 'text-rose-600 bg-rose-50 border-rose-200' : 
+                                          'text-slate-600 bg-slate-50 border-slate-200';
+                    const sentimentIcon = sentiment === 'positive' ? '👍' : sentiment === 'negative' ? '👎' : '➖';
+                    
+                    return `
+                        <div class="flex items-start gap-4 p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 text-base mb-1">💬 ${kw.tag_name}</h4>
+                                <div class="text-[11px] text-slate-500 mb-2">
+                                    <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">${kw.nhom_tag}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 italic">"${kw.evidence || ''}"</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold ${score >= 0 ? 'text-emerald-600' : 'text-rose-600'} mb-1">
+                                    ${score >= 0 ? '+' : ''}${score.toFixed(1)}
+                                </div>
+                                <div class="text-[10px] px-2 py-1 rounded-full ${sentimentColor} border font-semibold">
+                                    ${sentimentIcon} ${sentiment}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Render messages
+            const messagesContainer = document.getElementById('chatbotMessagesList');
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `<div class="text-center py-8 text-slate-400"><i class="fas fa-ghost text-3xl mb-3 opacity-30"></i><p>Chưa có tin nhắn nào.</p></div>`;
+            } else {
+                messagesContainer.innerHTML = messages.map(msg => {
+                    const date = new Date(msg.thoi_diem_chat);
+                    const formattedDate = date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN');
+                    const hasInsights = msg.insights_count > 0;
+                    
+                    return `
+                        <div class="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition ${hasInsights ? 'bg-purple-50/30 border-purple-200' : ''}">
+                            <div class="flex items-start justify-between gap-3 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs px-2 py-1 rounded-full ${msg.nguoi_gui === 'user' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200'} font-semibold">
+                                        ${msg.nguoi_gui === 'user' ? '👤 Khách' : '🤖 Bot'}
+                                    </span>
+                                    ${hasInsights ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500 text-white font-bold">+${msg.insights_count} insights</span>` : ''}
+                                </div>
+                                <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                                    <i class="far fa-clock"></i>
+                                    ${formattedDate}
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-700 leading-relaxed">${msg.noi_dung}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function switchChatbotTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.chatbot-tab').forEach(tab => {
+                tab.classList.remove('border-purple-500', 'text-purple-600');
+                tab.classList.add('border-transparent', 'text-slate-500');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('border-transparent', 'text-slate-500');
+            document.getElementById(`tab-${tabName}`).classList.add('border-purple-500', 'text-purple-600');
+            
+            // Update content
+            document.querySelectorAll('.chatbot-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+        }
+
+        function closeChatbotKeywordsModal() {
+            document.getElementById('chatbotKeywordsModal').classList.add('hidden');
+            currentChatbotData = null;
+        }

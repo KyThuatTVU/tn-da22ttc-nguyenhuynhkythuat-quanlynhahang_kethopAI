@@ -1,0 +1,23 @@
+/* ==== Style 1 (tách từ navbar-test.html) ==== */
+/* Visual alignment guides */
+        .alignment-guide {
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: red;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .test-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            z-index: 9999;
+        }

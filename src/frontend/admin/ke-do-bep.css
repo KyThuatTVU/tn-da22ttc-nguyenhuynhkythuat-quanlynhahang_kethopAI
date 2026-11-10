@@ -1,0 +1,11 @@
+/* ==== Style 1 (tách từ ke-do-bep.html) ==== */
+@media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+            .no-print { display: none !important; }
+        }
+        .status-cho_duyet { background: #fef3c7; color: #92400e; }
+        .status-da_duyet { background: #dcfce7; color: #166534; }
+        .status-da_nhap { background: #dbeafe; color: #1e40af; }
+        .warning-row { background: #fef2f2 !important; }

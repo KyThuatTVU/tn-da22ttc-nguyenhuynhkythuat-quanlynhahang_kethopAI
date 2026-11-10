@@ -1,0 +1,58 @@
+/* ==== Style 1 (tách từ dat-ban.html) ==== */
+.menu-item-card {
+            transition: all 0.3s ease;
+        }
+        .menu-item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .menu-item-card.selected {
+            border-color: #ea580c;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        }
+        .quantity-btn {
+            transition: all 0.2s ease;
+        }
+        .quantity-btn:hover {
+            background-color: #ea580c;
+            color: white;
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-indicator.active {
+            background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+            color: white;
+        }
+        .step-indicator.completed {
+            background: #22c55e;
+            color: white;
+        }
+        .cart-summary {
+            position: sticky;
+            top: 100px;
+        }
+        @media (max-width: 1024px) {
+            .cart-summary {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+                border-radius: 1rem 1rem 0 0;
+            }
+        }
+
+/* ==== Style 2 (tách từ dat-ban.html) ==== */
+@media (max-width: 640px) {
+            #back-to-top {
+                bottom: 1.5rem !important;
+                left: 1rem !important;
+                width: 3rem !important;
+                height: 3rem !important;
+            }
+            
+            #scroll-to-top i {
+                font-size: 1rem !important;
+            }
+        }

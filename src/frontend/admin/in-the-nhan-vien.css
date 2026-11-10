@@ -1,0 +1,38 @@
+/* ==== Style 1 (tách từ in-the-nhan-vien.html) ==== */
+body { font-family: 'Quicksand', 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Quicksand', 'Plus Jakarta Sans', 'Be Vietnam Pro', system-ui, sans-serif !important; }
+        @media print {
+            .no-print { display: none !important; }
+            .card { page-break-inside: avoid; }
+            body { background: white; }
+        }
+        .card {
+            width: 8.5cm;
+            height: 5.5cm;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        .qr-code {
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }

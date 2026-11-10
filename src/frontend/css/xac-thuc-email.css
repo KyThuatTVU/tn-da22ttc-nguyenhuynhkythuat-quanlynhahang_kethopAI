@@ -1,0 +1,21 @@
+/* ==== Style 1 (tách từ xac-thuc-email.html) ==== */
+.code-input {
+            width: 45px;
+            height: 55px;
+            font-size: 22px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .code-input:focus {
+            border-color: #ea580c;
+            outline: none;
+            transform: scale(1.05);
+        }
+        
+        .code-input.filled {
+            border-color: #ea580c;
+            background-color: #fff5f0;
+        }

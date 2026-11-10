@@ -1,0 +1,25 @@
+/* ==== Style 1 (tách từ thanh-toan.html) ==== */
+.payment-option { cursor: pointer; transition: all 0.3s; }
+        .payment-option.active { border-color: #ea580c; background-color: #fff7ed; }
+        .step-active { background: #ea580c; color: white; }
+        .step-complete { background: #22c55e; color: white; }
+        
+        /* Mobile Checkout Improvements */
+        @media (max-width: 639px) {
+            .payment-option {
+                padding: 0.875rem;
+            }
+            
+            .payment-option .flex {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .payment-option p.font-medium {
+                font-size: 0.9375rem;
+            }
+            
+            .payment-option p.text-sm {
+                font-size: 0.8125rem;
+            }
+        }

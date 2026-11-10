@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="admin-pos-new.css">
-    <style>
-        body { background: #f0f4f8; }
-    </style>
+    
+    <link rel="stylesheet" href="admin-pos-new-page.css">
+
 </head>
 <body>
 <div class="flex h-screen overflow-hidden">
@@ -213,15 +213,7 @@
         </div>
     </div>
 
-    <style>
-        .modal.flex { display: flex; }
-        @media print {
-            .no-print { display: none !important; }
-            body * { visibility: hidden; }
-            #billModal, #billModal *, #kitchenModal, #kitchenModal * { visibility: visible; }
-            .modal { position: fixed; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white !important; }
-        }
-    </style>
+    
 
     <script src="admin-layout.js"></script> <!-- For RBAC and Session -->
     <script src="admin-pos-new.js"></script>

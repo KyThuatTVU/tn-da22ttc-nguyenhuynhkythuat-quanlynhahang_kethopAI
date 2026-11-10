@@ -1,0 +1,48 @@
+/* ==== Style 1 (tách từ tin-tuc.html) ==== */
+/* Mobile optimization */
+        @media (max-width: 768px) {
+
+            /* Add padding bottom to prevent chatbot overlap */
+            body {
+                padding-bottom: 80px;
+            }
+
+            /* Ensure chatbot doesn't cover content */
+            #chatbot-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 9999;
+            }
+
+            /* Line clamp utilities */
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .line-clamp-3 {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        }
+
+/* ==== Style 2 (tách từ tin-tuc.html) ==== */
+@media (max-width: 640px) {
+            #back-to-top {
+                bottom: 1.5rem !important;
+                left: 1rem !important;
+                width: 3rem !important;
+                height: 3rem !important;
+            }
+            
+            #scroll-to-top i {
+                font-size: 1rem !important;
+            }
+        }

@@ -1,0 +1,7 @@
+/* ==== Style 1 (tách từ quan-ly-thuat-toan.html) ==== */
+.algo-tab-content { display: none; }
+        .algo-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .algo-tab.active { border-bottom: 2px solid #10b981; color: #10b981; font-weight: 600; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .score-bar { transition: width 0.8s ease-out; }

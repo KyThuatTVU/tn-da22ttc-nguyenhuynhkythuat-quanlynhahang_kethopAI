@@ -1,0 +1,208 @@
+/* ==== Style 1 (tách từ tin-tuc-chi-tiet.html) ==== */
+/* Main reaction button - Facebook style */
+        .reaction-main-btn {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .reaction-main-btn:hover {
+            background-color: #f3f4f6 !important;
+        }
+        
+        .reaction-main-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Reaction picker popup - Facebook style */
+        .reaction-picker-popup {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border: 1px solid #e5e7eb;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px) scale(0.8); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        .reaction-option {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .reaction-option:hover {
+            transform: scale(1.4) translateY(-8px);
+        }
+        
+        .reaction-option:active {
+            transform: scale(1.2) translateY(-4px);
+        }
+
+        /* Reaction wrapper */
+        .reaction-wrapper {
+            position: relative;
+        }
+        
+        .reaction-wrapper:hover .reaction-picker-popup {
+            display: flex !important;
+        }
+
+        /* Comment reaction picker - Facebook style */
+        .comment-item {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-item:hover {
+            background: rgba(249, 115, 22, 0.02);
+            border-radius: 12px;
+        }
+        
+        .reaction-btn-trigger {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        
+        .reaction-btn-trigger:active {
+            transform: scale(0.95);
+        }
+
+        /* News Content Styling */
+        .news-content .prose {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #374151;
+        }
+        
+        .news-content .prose p {
+            margin-bottom: 1.25rem;
+        }
+        
+        .news-content .prose h2,
+        .news-content .prose h3,
+        .news-content .prose h4 {
+            color: #1f2937;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .news-content .prose h2 {
+            font-size: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f97316;
+        }
+        
+        .news-content .prose h3 {
+            font-size: 1.25rem;
+            color: #f97316;
+        }
+        
+        .news-content .prose ul,
+        .news-content .prose ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .news-content .prose li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .news-content .prose ul li::before {
+            content: "•";
+            color: #f97316;
+            font-weight: bold;
+            position: absolute;
+            left: -1rem;
+        }
+        
+        .news-content .prose ol {
+            list-style: decimal;
+        }
+        
+        .news-content .prose ol li::marker {
+            color: #f97316;
+            font-weight: 600;
+        }
+        
+        .news-content .prose strong,
+        .news-content .prose b {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .news-content .prose em,
+        .news-content .prose i {
+            color: #6b7280;
+        }
+        
+        .news-content .prose blockquote {
+            border-left: 4px solid #f97316;
+            background: #fff7ed;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #92400e;
+        }
+        
+        .news-content .prose a {
+            color: #f97316;
+            text-decoration: underline;
+        }
+        
+        .news-content .prose a:hover {
+            color: #ea580c;
+        }
+        
+        .news-content .prose img {
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .news-content .prose table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .news-content .prose th,
+        .news-content .prose td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        .news-content .prose th {
+            background: #f97316;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .news-content .prose tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        /* Info box styling */
+        .news-content .info-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1px solid #fed7aa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .news-content .info-box h4 {
+            color: #c2410c;
+            margin-top: 0;
+        }

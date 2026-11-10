@@ -1,0 +1,11 @@
+/* ==== Style 1 (tách từ admin-pos-new.html) ==== */
+body { background: #f0f4f8; }
+
+/* ==== Style 2 (tách từ admin-pos-new.html) ==== */
+.modal.flex { display: flex; }
+        @media print {
+            .no-print { display: none !important; }
+            body * { visibility: hidden; }
+            #billModal, #billModal *, #kitchenModal, #kitchenModal * { visibility: visible; }
+            .modal { position: fixed; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white !important; }
+        }

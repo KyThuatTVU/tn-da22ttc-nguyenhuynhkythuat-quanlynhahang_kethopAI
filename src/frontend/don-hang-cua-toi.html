@@ -10,30 +10,9 @@
     <link rel="stylesheet" href="css/modern-style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/loading.css">
-    <style>
-        .status-badge {
-            @apply px-3 py-1 rounded-full text-xs font-medium;
-        }
-        .order-card {
-            transition: all 0.3s;
-        }
-        .order-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        
-        /* Mobile order card improvements */
-        @media (max-width: 639px) {
-            .order-card {
-                padding: 1rem;
-            }
-            
-            .order-item-row {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-        }
-    </style>
+    
+    <link rel="stylesheet" href="css/don-hang-cua-toi.css">
+
 </head>
 <body class="bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
     <!-- Navigation Container -->
@@ -171,25 +150,9 @@
     <script src="js/my-orders.js"></script>
 
     <!-- GSAP Animation -->
-    <script>
-        // Animate page header only (không animate order cards vì my-orders.js đã xử lý)
-        document.addEventListener('DOMContentLoaded', () => {
-            gsap.from('.text-center.mb-8', {
-                y: 30,
-                opacity: 0,
-                duration: 0.6,
-                ease: 'power3.out'
-            });
+    
+    <script src="js/don-hang-cua-toi.js" defer></script>
 
-            gsap.from('.filter-buttons', {
-                y: 20,
-                opacity: 0,
-                duration: 0.6,
-                delay: 0.2,
-                ease: 'power3.out'
-            });
-        });
-    </script>
     
     <!-- Snow Effect -->
     <script src="js/snow-effect.js"></script>

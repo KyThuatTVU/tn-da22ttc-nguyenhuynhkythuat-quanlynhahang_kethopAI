@@ -1,0 +1,6 @@
+/* ==== Style 1 (tách từ attendance.html) ==== */
+body { background: #f0f4f8; }
+        .status-on-time { background: #dcfce7; color: #16a34a; }
+        .status-late { background: #fef3c7; color: #d97706; }
+        .status-early { background: #fee2e2; color: #dc2626; }
+        .status-outside { background: #f1f5f9; color: #475569; }

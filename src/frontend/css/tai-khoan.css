@@ -1,0 +1,14 @@
+/* ==== Style 1 (tách từ tai-khoan.html) ==== */
+/* Hide mobile menu toggle on desktop */
+                @media (min-width: 1024px) {
+                    #mobile-menu-toggle {
+                        display: none !important;
+                    }
+                }
+                
+                /* Show mobile menu toggle on mobile */
+                @media (max-width: 1023px) {
+                    #mobile-menu-toggle {
+                        display: flex !important;
+                    }
+                }

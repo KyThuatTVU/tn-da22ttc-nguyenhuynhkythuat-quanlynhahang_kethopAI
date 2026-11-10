@@ -1,0 +1,280 @@
+/* ==== Script 1 (tách từ chatbot-history.html) ==== */
+let chatHistory = [];
+        let currentPage = 1;
+        const limit = 20;
+
+        async function loadChatHistory(page = 1) {
+            try {
+                const search = document.getElementById('search').value;
+                const userFilter = document.getElementById('user-filter').value;
+                const senderFilter = document.getElementById('sender-filter').value;
+                
+                let url = `${API_URL}/chatbot/admin/history?page=${page}&limit=${limit}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (userFilter) url += `&user_type=${userFilter}`;
+                if (senderFilter) url += `&nguoi_gui=${senderFilter}`;
+                
+                const response = await fetch(url, { credentials: 'include' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    chatHistory = result.data || [];
+                    renderChatHistory(chatHistory);
+                    renderPagination(result.pagination);
+                    loadStats();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('chat-tbody').innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-red-500"><i class="fas fa-exclamation-circle text-2xl mb-2"></i><br>Không thể tải dữ liệu</td></tr>`;
+            }
+        }
+
+        let messagesChart = null;
+        let senderChart = null;
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/chatbot/admin/stats`, { credentials: 'include' });
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data;
+                    document.getElementById('total-messages').textContent = data.total_messages || 0;
+                    document.getElementById('total-sessions').textContent = data.total_sessions || 0;
+                    document.getElementById('logged-users').textContent = data.logged_users || 0;
+                    document.getElementById('guest-users').textContent = data.guest_sessions || 0;
+                    
+                    // Vẽ biểu đồ
+                    renderMessagesChart(data.daily_stats || []);
+                    renderSenderChart(data.user_messages || 0, data.bot_messages || 0);
+                }
+            } catch (error) { console.error('Error loading stats:', error); }
+        }
+
+        function renderMessagesChart(dailyStats) {
+            const ctx = document.getElementById('messagesChart').getContext('2d');
+            
+            // Tạo mảng 7 ngày gần nhất
+            const labels = [];
+            const dataMap = {};
+            dailyStats.forEach(item => {
+                dataMap[item.ngay] = item.so_tin_nhan;
+            });
+            
+            const values = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                labels.push(date.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric' }));
+                values.push(dataMap[dateStr] || 0);
+            }
+            
+            if (messagesChart) messagesChart.destroy();
+            
+            messagesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tin nhắn',
+                        data: values,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        function renderSenderChart(userCount, botCount) {
+            const ctx = document.getElementById('senderChart').getContext('2d');
+            
+            if (senderChart) senderChart.destroy();
+            
+            senderChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tin nhắn User', 'Tin nhắn Bot'],
+                    datasets: [{
+                        data: [userCount, botCount],
+                        backgroundColor: ['#3b82f6', '#22c55e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getSenderBadge(sender) {
+            if (sender === 'user') {
+                return '<span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><i class="fas fa-user mr-1"></i>User</span>';
+            }
+            return '<span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><i class="fas fa-robot mr-1"></i>Bot</span>';
+        }
+
+        function renderChatHistory(items) {
+            const tbody = document.getElementById('chat-tbody');
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-500">Chưa có lịch sử chat</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = items.map(c => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-4">
+                        ${c.ma_nguoi_dung ? 
+                            `<div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-purple-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-slate-800 text-sm">${c.ten_nguoi_dung || 'User #' + c.ma_nguoi_dung}</p>
+                                    <p class="text-xs text-slate-400">${c.email || ''}</p>
+                                </div>
+                            </div>` : 
+                            `<div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-secret text-orange-600 text-sm"></i>
+                                </div>
+                                <span class="text-sm text-slate-500">Khách vãng lai</span>
+                            </div>`
+                        }
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded">${c.session_id ? c.session_id.substring(0, 15) + '...' : 'N/A'}</span>
+                    </td>
+                    <td class="px-4 py-4">${getSenderBadge(c.nguoi_gui)}</td>
+                    <td class="px-4 py-4 text-sm text-slate-600 max-w-xs">
+                        <p class="truncate">${c.noi_dung.substring(0, 100)}${c.noi_dung.length > 100 ? '...' : ''}</p>
+                    </td>
+                    <td class="px-4 py-4 text-sm text-slate-500 hidden sm:table-cell">
+                        ${new Date(c.thoi_diem_chat).toLocaleString('vi-VN')}
+                    </td>
+                    <td class="px-4 py-4">
+                        <div class="flex space-x-1">
+                            <button onclick="viewSession('${c.session_id}')" class="p-2 rounded-lg text-blue-600 hover:bg-blue-50" title="Xem cuộc trò chuyện"><i class="fas fa-eye"></i></button>
+                            <button onclick="deleteMessage(${c.ma_tin_nhan})" class="p-2 rounded-lg text-red-600 hover:bg-red-50" title="Xóa"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(pagination) {
+            if (!pagination || pagination.totalPages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            let html = '';
+            for (let i = 1; i <= Math.min(pagination.totalPages, 10); i++) {
+                html += `<button onclick="loadChatHistory(${i})" class="px-4 py-2 rounded-lg ${i === pagination.page ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">${i}</button>`;
+            }
+            document.getElementById('pagination').innerHTML = html;
+        }
+
+        async function viewSession(sessionId) {
+            if (!sessionId) return alert('Session không hợp lệ');
+            try {
+                const response = await fetch(`${API_URL}/chatbot/admin/session/${sessionId}`, { credentials: 'include' });
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const messages = result.data;
+                    let html = `<div class="space-y-4">`;
+                    
+                    messages.forEach(msg => {
+                        if (msg.nguoi_gui === 'user') {
+                            html += `
+                                <div class="flex justify-end">
+                                    <div class="bg-blue-500 text-white p-3 rounded-2xl rounded-tr-none max-w-[80%]">
+                                        <p class="text-sm">${msg.noi_dung}</p>
+                                        <p class="text-xs text-blue-200 mt-1">${new Date(msg.thoi_diem_chat).toLocaleString('vi-VN')}</p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="flex gap-2">
+                                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-200">
+                                        <svg viewBox="0 0 64 64" class="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <ellipse cx="32" cy="18" rx="22" ry="8" fill="#fff5e6" stroke="#fbbf24" stroke-width="1.5"/>
+                                            <path d="M10 18 L32 4 L54 18" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.5" stroke-linejoin="round"/>
+                                            <circle cx="32" cy="36" r="14" fill="#fef3c7"/>
+                                            <path d="M18 32 Q18 24 26 22 Q32 20 38 22 Q46 24 46 32 Q46 28 44 26 Q40 22 32 22 Q24 22 20 26 Q18 28 18 32" fill="#1c1917"/>
+                                            <ellipse cx="27" cy="35" rx="2" ry="2.5" fill="#1c1917"/>
+                                            <ellipse cx="37" cy="35" rx="2" ry="2.5" fill="#1c1917"/>
+                                            <path d="M28 42 Q32 46 36 42" stroke="#dc2626" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                                            <path d="M22 50 Q32 48 42 50 L44 60 L20 60 Z" fill="#ea580c"/>
+                                        </svg>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm">
+                                        <p class="text-sm text-gray-700">${msg.noi_dung}</p>
+                                        <p class="text-xs text-gray-400 mt-1">${new Date(msg.thoi_diem_chat).toLocaleString('vi-VN')}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    html += `</div>`;
+                    document.getElementById('modal-content').innerHTML = html;
+                    document.getElementById('detail-modal').classList.remove('hidden');
+                    document.getElementById('detail-modal').classList.add('flex');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Không thể tải cuộc trò chuyện');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            document.getElementById('detail-modal').classList.remove('flex');
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Bạn có chắc muốn xóa tin nhắn này?')) return;
+            try {
+                const response = await fetch(`${API_URL}/chatbot/admin/message/${id}`, { 
+                    method: 'DELETE', 
+                    credentials: 'include' 
+                });
+                if ((await response.json()).success) {
+                    loadChatHistory(currentPage);
+                }
+            } catch (error) { 
+                console.error('Error:', error); 
+                alert('Có lỗi xảy ra!'); 
+            }
+        }
+
+        function applyFilters() {
+            currentPage = 1;
+            loadChatHistory(1);
+        }
+
+        document.getElementById('search').addEventListener('keypress', e => { if (e.key === 'Enter') applyFilters(); });
+        
+        loadChatHistory();

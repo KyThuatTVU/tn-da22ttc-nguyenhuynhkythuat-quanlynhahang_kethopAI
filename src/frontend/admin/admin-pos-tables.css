@@ -1,0 +1,121 @@
+/* ==== Style 1 (tách từ admin-pos-tables.html) ==== */
+body { background: #f0f4f8; }
+        
+        /* POS custom classes */
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid #e2e8f0;
+            position: relative;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .table-card.available {
+            border-color: #10b981;
+        }
+        .table-card.available:hover {
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .table-card.occupied {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+        .table-card.occupied:hover {
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .table-card.reserved {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .table-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .table-card.available .table-icon { color: #10b981; }
+        .table-card.occupied .table-icon { color: #f59e0b; }
+        .table-card.reserved .table-icon { color: #3b82f6; }
+
+        .table-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .table-capacity {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .table-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .table-card.available .table-status { background: #d1fae5; color: #047857; }
+        .table-card.occupied .table-status { background: #fef3c7; color: #b45309; }
+        .table-card.reserved .table-status { background: #dbeafe; color: #1d4ed8; }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.available { background: #d1fae5; color: #10b981; }
+        .stat-icon.occupied { background: #fef3c7; color: #f59e0b; }
+        .stat-icon.reserved { background: #dbeafe; color: #3b82f6; }
