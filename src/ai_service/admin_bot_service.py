@@ -1,4 +1,4 @@
-import os
+﻿import os
 from langchain_community.utilities import SQLDatabase
 from langchain_groq import ChatGroq
 from langchain_classic.chains import create_sql_query_chain
@@ -12,11 +12,11 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 
 # MySQL connection string format for SQLAlchemy
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004")
+DB_PASS = os.getenv("DB_PASSWORD", "")
 # URL-encode password in case it contains special characters like @
 DB_PASS_ENCODED = urllib.parse.quote_plus(DB_PASS)
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 # Create SQLAlchemy connection string
@@ -49,3 +49,4 @@ NHIỆM VỤ: Quan sát trong Database, viết truy vấn MySQL. Khi có kết q
     except Exception as e:
         print(f"Error in ask_business_bot: {e}")
         return f"Em đang gặp chút vấn đề khi lấy dữ liệu: {str(e)}"
+

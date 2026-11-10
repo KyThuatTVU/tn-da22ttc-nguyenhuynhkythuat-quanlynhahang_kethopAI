@@ -71,11 +71,13 @@ CREATE TABLE IF NOT EXISTS `nhan_vien` (
 
 -- Thêm tài khoản quản lý mặc định (username: admin, password: admin123)
 INSERT INTO `nhan_vien` (`ten_nhan_vien`, `tai_khoan`, `mat_khau_hash`, `vai_tro`) 
-VALUES ('Quản lý', 'admin', '$2a$10$YourHashedPasswordHere', 'manager');
+VALUES ('Quản lý', 'admin', '$2a$10$YourHashedPasswordHere', 'manager')
+ON DUPLICATE KEY UPDATE `tai_khoan` = VALUES(`tai_khoan`);
 
 -- Thêm nhân viên mẫu (username: nhanvien1, password: 123456)
 INSERT INTO `nhan_vien` (`ten_nhan_vien`, `tai_khoan`, `mat_khau_hash`, `so_dien_thoai`, `vai_tro`) 
-VALUES ('Nguyễn Văn A', 'nhanvien1', '$2a$10$YourHashedPasswordHere', '0901234567', 'staff');
+VALUES ('Nguyễn Văn A', 'nhanvien1', '$2a$10$YourHashedPasswordHere', '0901234567', 'staff')
+ON DUPLICATE KEY UPDATE `tai_khoan` = VALUES(`tai_khoan`);
 
 -- --------------------------------------------------------
 -- 4. Bảng: mon_an (Thực đơn)
@@ -740,16 +742,81 @@ INSERT INTO `quyen_vai_tro` (`role_id`, `permission_id`)
 SELECT 2, id FROM `quyen_han` WHERE `ten_quyen` NOT IN ('manage_settings', 'manage_staff');
 
 -- 4. Cập nhật bảng nhân viên (Thêm vai_tro_id và thông tin lương)
-ALTER TABLE `nhan_vien` 
-ADD COLUMN `vai_tro_id` int DEFAULT NULL AFTER `vai_tro`,
-ADD COLUMN `luong_co_ban` decimal(14,2) DEFAULT 0 AFTER `so_dien_thoai`,
-ADD COLUMN `luong_theo_gio` decimal(14,2) DEFAULT 0 AFTER `luong_co_ban`,
-ADD COLUMN `ngay_vao_lam` date DEFAULT (CURRENT_DATE) AFTER `trang_thai`,
-ADD COLUMN `anh_dai_dien` varchar(500) DEFAULT NULL AFTER `ten_nhan_vien`,
-ADD CONSTRAINT `fk_nhanvien_role` FOREIGN KEY (`vai_tro_id`) REFERENCES `vai_tro_he_thong` (`id`) ON DELETE SET NULL;
+DROP PROCEDURE IF EXISTS `UpdateNhanVienColumns`;
+DELIMITER //
+
+CREATE PROCEDURE `UpdateNhanVienColumns`()
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND COLUMN_NAME = 'vai_tro_id'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD COLUMN `vai_tro_id` int DEFAULT NULL AFTER `vai_tro`;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND COLUMN_NAME = 'luong_co_ban'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD COLUMN `luong_co_ban` decimal(14,2) DEFAULT 0 AFTER `so_dien_thoai`;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND COLUMN_NAME = 'luong_theo_gio'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD COLUMN `luong_theo_gio` decimal(14,2) DEFAULT 0 AFTER `luong_co_ban`;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND COLUMN_NAME = 'ngay_vao_lam'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD COLUMN `ngay_vao_lam` date DEFAULT (CURRENT_DATE) AFTER `trang_thai`;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND COLUMN_NAME = 'anh_dai_dien'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD COLUMN `anh_dai_dien` varchar(500) DEFAULT NULL AFTER `ten_nhan_vien`;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+        WHERE CONSTRAINT_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'nhan_vien'
+          AND CONSTRAINT_NAME = 'fk_nhanvien_role'
+    ) THEN
+        ALTER TABLE `nhan_vien`
+        ADD CONSTRAINT `fk_nhanvien_role`
+        FOREIGN KEY (`vai_tro_id`) REFERENCES `vai_tro_he_thong` (`id`)
+        ON DELETE SET NULL;
+    END IF;
+END //
+
+DELIMITER ;
+
+CALL `UpdateNhanVienColumns`();
+DROP PROCEDURE IF EXISTS `UpdateNhanVienColumns`;
 
 -- Cập nhật Role ID cho nhân viên cũ dựa trên enum cũ
-UPDATE `nhan_vien` SET `vai_tro_id` = 1 WHERE `vai_tro` = 'manager';
+UPDATE `nhan_vien` SET `vai_tro_id` = 2 WHERE `vai_tro` = 'manager';
 UPDATE `nhan_vien` SET `vai_tro_id` = 4 WHERE `vai_tro` = 'staff';
 
 -- 5. Bảng Ca làm việc (Shifts)

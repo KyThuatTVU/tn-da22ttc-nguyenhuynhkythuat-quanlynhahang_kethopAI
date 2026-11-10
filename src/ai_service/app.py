@@ -1,4 +1,4 @@
-import os
+﻿import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from model import get_svd_recommendations, train_collaborative_model
@@ -443,3 +443,4 @@ if __name__ == '__main__':
         print(f"Error training face model at startup: {e}")
     print("🚀 AI Microservice is running on port 5000!")
     app.run(host='0.0.0.0', port=5000, debug=True)
+

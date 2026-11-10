@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Test script to verify face recognition models can be loaded
@@ -49,3 +49,4 @@ except Exception as e:
 
 print("\nSUCCESS: All face recognition models loaded successfully!")
 print("Face recognition system is ready to use.")
+

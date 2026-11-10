@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import urllib.request
 import pickle
@@ -24,8 +24,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004")
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_PASS = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 
 # Paths configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -289,3 +289,4 @@ if __name__ == "__main__":
     # If run directly, run training
     get_face_objects()
     train_face_model()
+

@@ -1,4 +1,4 @@
-import os
+﻿import os
 import pandas as pd
 import numpy as np
 import mysql.connector
@@ -12,8 +12,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 # Lấy config db từ env
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004") # Note: backend uses DB_PASSWORD
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_PASS = os.getenv("DB_PASSWORD", "") # Note: backend uses DB_PASSWORD
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -39,7 +39,8 @@ def train_collaborative_model():
             FROM chi_tiet_don_hang ct
             JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang
             LEFT JOIN danh_gia_san_pham dg ON ct.ma_mon = dg.ma_mon AND dh.ma_nguoi_dung = dg.ma_nguoi_dung
-            WHERE dh.ma_nguoi_dung IS NOT NULL AND dh.trang_thai = 'delivered'
+            WHERE dh.ma_nguoi_dung IS NOT NULL
+            AND dh.trang_thai IN ('delivered', 'completed', 'paid', 'processing', 'confirmed')
             GROUP BY dh.ma_nguoi_dung, ct.ma_mon
         """
         
@@ -121,7 +122,7 @@ def get_svd_recommendations(target_user_id, top_n=5):
         
         # Tìm những items người dùng ĐÃ MUA (giao thành công) để loại trừ khỏi gợi ý (Không bắt khách mua lại nếu ko cần)
         conn = get_db_connection()
-        purchased_query = f"SELECT DISTINCT ct.ma_mon FROM chi_tiet_don_hang ct JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang WHERE dh.ma_nguoi_dung = {target_user_id} AND dh.trang_thai = 'delivered'"
+        purchased_query = f"SELECT DISTINCT ct.ma_mon FROM chi_tiet_don_hang ct JOIN don_hang dh ON ct.ma_don_hang = dh.ma_don_hang WHERE dh.ma_nguoi_dung = {target_user_id} AND dh.trang_thai IN ('delivered', 'completed', 'paid', 'processing', 'confirmed')"
         purchased_df = pd.read_sql(purchased_query, conn)
         conn.close()
         
@@ -146,3 +147,5 @@ def get_svd_recommendations(target_user_id, top_n=5):
 
 if __name__ == "__main__":
     train_collaborative_model()
+
+

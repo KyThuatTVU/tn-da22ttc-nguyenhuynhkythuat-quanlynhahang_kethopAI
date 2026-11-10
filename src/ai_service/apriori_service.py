@@ -1,4 +1,4 @@
-import os
+﻿import os
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules
 from mlxtend.preprocessing import TransactionEncoder
@@ -11,8 +11,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004")
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_PASS = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 
 def get_db_connection():
     return mysql.connector.connect(

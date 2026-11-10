@@ -1,4 +1,4 @@
-"""
+﻿"""
 Script test hệ thống gợi ý lai ghép
 """
 
@@ -171,3 +171,4 @@ if __name__ == "__main__":
             print("❌ Không thể kết nối đến AI service!")
             print("Hãy chạy: python app.py")
             print("\nHoặc test từng component với: python test_hybrid.py --components")
+

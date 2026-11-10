@@ -1,4 +1,4 @@
-"""
+﻿"""
 Hybrid Recommendation System
 Kết hợp 4 yếu tố:
 1. Collaborative Filtering (SVD) - Lọc cộng tác
@@ -24,8 +24,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004")
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_PASS = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -321,7 +321,7 @@ def get_new_dish_recommendations(user_id, limit=5):
                 SELECT ma_mon, ten_mon, ngay_tao, DATEDIFF(NOW(), ngay_tao) as days_old
                 FROM mon_an
                 WHERE trang_thai = 1 
-                AND DATEDIFF(NOW(), ngay_tao) <= 30
+                AND DATEDIFF(NOW(), ngay_tao) <= 365
                 ORDER BY ngay_tao DESC, ma_mon DESC
                 LIMIT %s
             """
@@ -353,7 +353,7 @@ def get_new_dish_recommendations(user_id, limit=5):
             JOIN mon_an_khau_vi makv ON ma.ma_mon = makv.ma_mon
             JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
             WHERE ma.trang_thai = 1
-            AND DATEDIFF(NOW(), ma.ngay_tao) <= 30
+            AND DATEDIFF(NOW(), ma.ngay_tao) <= 365
             AND kv.id IN ({placeholders})
             GROUP BY ma.ma_mon
             ORDER BY ma.ngay_tao DESC, ma.ma_mon DESC
@@ -503,3 +503,4 @@ if __name__ == "__main__":
     for i, item in enumerate(results, 1):
         print(f"{i}. Item {item['item_id']}: Score = {item['score']:.3f}")
         print(f"   Breakdown: {item['breakdown']}")
+

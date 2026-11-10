@@ -1,4 +1,4 @@
-"""
+﻿"""
 API endpoint để lấy tất cả các luật Apriori đã train
 """
 import os
@@ -12,8 +12,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../backend/.env'))
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASSWORD", "TVU@842004")
-DB_NAME = os.getenv("DB_NAME", "amthuc_phuongnam")
+DB_PASS = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "quanlynhahangquanlynhah")
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -117,3 +117,4 @@ if __name__ == "__main__":
         print(f"\nTop 10 rules:")
         for i, rule in enumerate(result['data'][:10], 1):
             print(f"{i}. {rule['rule']} (Confidence: {rule['confidence']:.2%}, Lift: {rule['lift']:.2f})")
+

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
@@ -631,11 +631,11 @@ async function getContentBasedRecommendations(userId, limit = 5, preferredFlavor
             
             // Sắp xếp ưu tiên: Món mới (≤30 ngày) → Đánh giá cao → Giá phù hợp
              query += ` GROUP BY m.ma_mon 
-                        HAVING avg_rating IS NULL OR avg_rating >= 3.0
+                        HAVING AVG(dg.so_sao) IS NULL OR AVG(dg.so_sao) >= 3.0
                         ORDER BY 
-                            (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 30 THEN 1 ELSE 0 END) DESC,
+                            (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 365 THEN 1 ELSE 0 END) DESC,
                             m.ma_mon DESC,
-                            COALESCE(avg_rating, 0) DESC, 
+                            COALESCE(AVG(dg.so_sao), 0) DESC, 
                             ABS(m.gia_tien - ?) ASC
                         LIMIT ?`;
              params.push(avgPrice, limit * 2);
@@ -672,11 +672,11 @@ async function getContentBasedRecommendations(userId, limit = 5, preferredFlavor
             
             // Lọc món có đánh giá >= 3.0 hoặc chưa đánh giá, ưu tiên món mới
             query += ` GROUP BY m.ma_mon 
-                       HAVING avg_rating IS NULL OR avg_rating >= 3.0
+                       HAVING AVG(dg.so_sao) IS NULL OR AVG(dg.so_sao) >= 3.0
                        ORDER BY 
-                           (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 30 THEN 1 ELSE 0 END) DESC,
+                           (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 365 THEN 1 ELSE 0 END) DESC,
                            m.ma_mon DESC,
-                           COALESCE(avg_rating, 0) DESC 
+                           COALESCE(AVG(dg.so_sao), 0) DESC 
                        LIMIT ?`;
             params.push(limit - recommendations.length);
             
@@ -1173,7 +1173,7 @@ router.get('/new-dishes', async (req, res) => {
                      JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
                      LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
                      WHERE m.trang_thai = 1
-                     AND DATEDIFF(NOW(), m.ngay_tao) <= 30
+                     AND DATEDIFF(NOW(), m.ngay_tao) <= 365
                      AND kv.id IN (?)
                      GROUP BY m.ma_mon
                      ORDER BY m.ngay_tao DESC, m.ma_mon DESC
@@ -1203,7 +1203,7 @@ router.get('/new-dishes', async (req, res) => {
                     LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
                     LEFT JOIN danh_gia_san_pham dg ON m.ma_mon = dg.ma_mon AND dg.trang_thai = 'approved'
                     WHERE m.trang_thai = 1
-                    AND DATEDIFF(NOW(), m.ngay_tao) <= 30
+                    AND DATEDIFF(NOW(), m.ngay_tao) <= 365
                 `;
                 const params = [];
                 
@@ -1404,7 +1404,7 @@ router.get('/', async (req, res) => {
                 console.log(`🎯 [Filter Debug] User ${userId}: filteredContent=${filteredContent.length}, filteredChat=${filteredChat.length}, collaborative=${collaborative.length}, total=${filteredCount}`);
                 
                 if (filteredCount < 15) {
-                    if (mode === 'homepage') {
+                    if (mode === 'homepage' && filteredCount >= 4) {
                         // Trang chủ: KHÔNG bổ sung popularity — đã có mục "Top Bán Chạy" riêng bên dưới
                         console.log(`ℹ️ [Recommendation] mode=homepage → chỉ trả content-based + collaborative, bỏ qua popularity fallback`);
                         recommendations = [
@@ -1494,7 +1494,7 @@ router.get('/', async (req, res) => {
                         JOIN mon_an_khau_vi makv ON m.ma_mon = makv.ma_mon
                         JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
                         WHERE m.trang_thai = 1
-                        AND DATEDIFF(NOW(), m.ngay_tao) <= 30
+                        AND DATEDIFF(NOW(), m.ngay_tao) <= 365
                         AND kv.id IN (?)
                         GROUP BY m.ma_mon
                         ORDER BY m.ngay_tao DESC, m.ma_mon DESC
@@ -1525,7 +1525,7 @@ router.get('/', async (req, res) => {
                         JOIN mon_an_khau_vi makv ON m.ma_mon = makv.ma_mon
                         JOIN thuoc_tinh_khau_vi kv ON makv.id_thuoc_tinh = kv.id
                         WHERE m.trang_thai = 1
-                        AND DATEDIFF(NOW(), m.ngay_tao) <= 30
+                        AND DATEDIFF(NOW(), m.ngay_tao) <= 365
                     `;
                     const params = [];
                     if (preferredFlavorIds.length > 0) {
@@ -1579,9 +1579,9 @@ router.get('/', async (req, res) => {
                     WHERE m.trang_thai = 1 AND mk.id_thuoc_tinh IN (?) ${excludedIds.length > 0 ? 'AND m.ma_mon NOT IN (?)' : ''}
                     GROUP BY m.ma_mon
                     ORDER BY 
-                        (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 30 THEN 1 ELSE 0 END) DESC,
+                        (CASE WHEN DATEDIFF(NOW(), m.ngay_tao) <= 365 THEN 1 ELSE 0 END) DESC,
                         m.ma_mon DESC,
-                        COALESCE(avg_rating, 0) DESC
+                        COALESCE(AVG(dg.so_sao), 0) DESC
                     LIMIT ?
                 `;
                 const params = excludedIds.length > 0 
@@ -1698,7 +1698,7 @@ router.get('/', async (req, res) => {
                     FROM mon_an m
                     LEFT JOIN danh_muc d ON m.ma_danh_muc = d.ma_danh_muc
                     WHERE m.trang_thai = 1
-                    AND DATEDIFF(NOW(), m.ngay_tao) <= 30
+                    AND DATEDIFF(NOW(), m.ngay_tao) <= 365
                     GROUP BY m.ma_mon
                     ORDER BY m.ngay_tao DESC, m.ma_mon DESC
                     LIMIT 5
@@ -1863,16 +1863,17 @@ router.get('/', async (req, res) => {
             }
         }
 
-        // 4. Bù tiếp bằng Trending (nếu vẫn thiếu và không lọc trùng được)
+        // 4. Bu tiep bang Trending (neu van thieu va khong loc trung duoc)
         if (missing > 0) {
             let allowedTrending = groups.trending;
-            if (userId) {
-                // Nếu đã đăng nhập, chỉ cho phép bù bằng những món khớp khẩu vị (đã được dán nhãn content_based hoặc khớp preferred flavor)
-                allowedTrending = groups.trending.filter(t => {
+            if (userId && preferredFlavorIds.length > 0) {
+                // Neu da dang nhap VA co so thich, uu tien trending khop khau vi truoc
+                const flavorMatched = groups.trending.filter(t => {
                     const isContentBased = t.recommendation_type === 'content_based';
-                    const hasReasonFlavor = t.reason && t.reason.includes('khẩu vị');
+                    const hasReasonFlavor = t.reason && t.reason.includes('kh\u1EA9u v\u1ECB');
                     return isContentBased || hasReasonFlavor;
                 });
+                allowedTrending = flavorMatched.length > 0 ? flavorMatched : groups.trending;
             }
             const takeTrending = Math.min(missing, allowedTrending.length);
             finalRecommendations.push(...allowedTrending.slice(0, takeTrending));

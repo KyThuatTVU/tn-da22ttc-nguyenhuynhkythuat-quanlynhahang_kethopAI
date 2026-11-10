@@ -1,4 +1,4 @@
-"""
+﻿"""
 Script: Test các ngưỡng Apriori khác nhau
 Chạy: python ai_service/test_apriori_thresholds.py
 """
@@ -96,3 +96,4 @@ print("✅ min_confidence=50-60%: Cân bằng giữa độ chính xác và số 
 print("✅ min_confidence=70-80%: Chặt chẽ, chỉ đề xuất khi chắc chắn")
 print("❌ min_confidence=10-30%: Quá lỏng, có thể đề xuất sai")
 print("="*60)
+

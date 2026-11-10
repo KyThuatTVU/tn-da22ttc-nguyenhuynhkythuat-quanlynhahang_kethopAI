@@ -1,5 +1,19 @@
 /* Admin Warm Brown Theme Styles - Clean & Flat */
-body { background: #f0f4f8; }
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --font-body: 'Quicksand', 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-heading: 'Quicksand', 'Plus Jakarta Sans', 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+body { 
+    font-family: var(--font-body);
+    background: #f0f4f8; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+}
 
 /* Flat Sidebar with clean borders and subtle shadow */
 .sidebar { 
