@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Ẩm Thực Phương Nam — Gợi ý cá nhân hóa</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:#050B18;
+    font-family:'Segoe UI','Segoe UI Variable Display',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+  #stage{position:relative;width:1920px;height:1080px;overflow:hidden;color:#F2F8FF;
+    background:radial-gradient(1200px 700px at 78% 10%,#0E2044 0%,#081226 45%,#050B18 100%)}
+  #bg{position:absolute;inset:0;overflow:hidden}
+  #bg .grid{position:absolute;inset:-40px;background-image:
+      linear-gradient(rgba(120,190,255,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,190,255,.055) 1px,transparent 1px);
+    background-size:64px 64px;mask-image:radial-gradient(1200px 800px at 50% 40%,#000 20%,transparent 78%)}
+  #bg .glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+  #bg .g1{width:760px;height:760px;left:-160px;top:-220px;background:radial-gradient(circle,rgba(56,225,255,.22),transparent 68%)}
+  #bg .g2{width:900px;height:900px;right:-260px;bottom:-380px;background:radial-gradient(circle,rgba(124,156,255,.18),transparent 70%)}
+  #bg .vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 55%,rgba(2,6,14,.55) 100%)}
+  .scene{position:absolute;inset:0;opacity:0;visibility:hidden}
+  .scene.on{opacity:1;visibility:visible}
+  .kicker{position:absolute;font-size:23px;font-weight:700;letter-spacing:5px;color:#8FB6D9}
+  .h1{position:absolute;font-weight:800;letter-spacing:-1.2px;line-height:1.04;color:#F5FAFF}
+  .muted{color:rgba(214,232,255,.62)}
+  .cy{color:#38E1FF}
+  .am{color:#FFB347}
+  .num{font-variant-numeric:tabular-nums}
+  .chip{display:inline-flex;align-items:center;gap:10px;background:rgba(56,225,255,.10);
+    border:1px solid rgba(56,225,255,.35);border-radius:999px;color:#BDF3FF;
+    font-weight:700;letter-spacing:1.5px}
+  #hud{position:absolute;inset:0;pointer-events:none}
+  #brand{position:absolute;left:56px;top:40px;display:flex;align-items:center;gap:14px;z-index:60}
+  #brand .dot{width:16px;height:16px;border-radius:4px;background:#38E1FF;box-shadow:0 0 18px rgba(56,225,255,.85)}
+  #brand .t{font-size:18px;font-weight:700;letter-spacing:4px;color:rgba(226,240,255,.78)}
+  #idx{position:absolute;right:56px;top:38px;font-size:18px;letter-spacing:3px;color:rgba(226,240,255,.62);z-index:60}
+  #idx b{color:#38E1FF;font-size:22px}
+  #prog{position:absolute;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,#38E1FF,#7C9CFF);z-index:61}
+  #sweep{position:absolute;inset:0;z-index:40;opacity:0;pointer-events:none;
+    background:linear-gradient(105deg,transparent 34%,rgba(56,225,255,.18) 48%,rgba(56,225,255,.05) 56%,transparent 66%)}
+  #subs{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;z-index:70}
+  #subBox{position:relative;max-width:1580px;background:rgba(3,9,20,.84);border:1px solid rgba(96,170,235,.22);
+    border-radius:16px;padding:9px 30px 11px;font-size:35px;font-weight:600;line-height:1.28;
+    color:#F4F9FF;text-align:center;letter-spacing:.1px;opacity:0;
+    text-shadow:0 2px 10px rgba(0,0,0,.65);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+  #subText{white-space:pre-line}
+  #subBox .bar{position:absolute;left:0;top:0;height:100%;width:5px;border-radius:16px 0 0 16px;background:#38E1FF}
+  .card{position:absolute;background:rgba(12,26,50,.72);border:1px solid rgba(110,175,240,.20);
+    border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.30)}
+  .cell{position:absolute;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-variant-numeric:tabular-nums}
+  .rowline{position:absolute;height:1px;background:linear-gradient(90deg,rgba(120,190,255,.35),rgba(120,190,255,.02))}
+  .plate{position:absolute;border-radius:50%;border:2px solid rgba(160,215,255,.35);
+    display:flex;align-items:center;justify-content:center}
+  .plate:after{content:'';width:56%;height:56%;border-radius:50%;background:rgba(56,225,255,.12)}
+  .sr{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(90deg,rgba(56,225,255,.0),rgba(56,225,255,.55))}
+  svg.arrows{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible}
+  svg.arrows path{fill:none;stroke:#38E1FF;stroke-width:3;stroke-linecap:round;opacity:.55}
+  .opt{position:absolute;display:flex;align-items:center;gap:22px;padding:0 30px;
+    background:rgba(11,24,46,.78);border:2px solid rgba(110,175,240,.22);border-radius:18px}
+  .opt .lt{width:58px;height:58px;border-radius:14px;background:rgba(56,225,255,.12);
+    border:1px solid rgba(56,225,255,.3);display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:800;color:#BDF3FF}
+  .opt .tx{font-size:31px;font-weight:600;line-height:1.2;color:#EAF4FF}
+  .opt.correct{border-color:#38E1FF;background:rgba(56,225,255,.13);box-shadow:0 0 40px rgba(56,225,255,.18)}
+  .opt.correct .lt{background:#38E1FF;color:#04101F;border-color:#38E1FF}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"><div class="grid" id="bggrid"></div><div class="glow g1"></div><div class="glow g2"></div><div class="vig"></div></div>
+  <div id="scenes"></div>
+  <div id="sweep"></div>
+  <div id="subs"><div id="subBox"><div class="bar"></div><span id="subText"></span></div></div>
+  <div id="hud">
+    <div id="brand"><div class="dot"></div><div class="t">ẨM THỰC PHƯƠNG NAM</div></div>
+    <div id="idx"><b id="idxNum">01</b> / 16</div>
+    <div id="prog"></div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="scenes.js"></script>
+</body>
+</html>

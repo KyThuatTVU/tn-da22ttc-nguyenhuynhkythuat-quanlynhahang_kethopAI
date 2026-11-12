@@ -1,0 +1,262 @@
+1
+00:00:00,180 --> 00:00:03,299
+Buổi tối cuối tuần, nhà hàng đón hàng trăm lượt khách.
+
+2
+00:00:04,109 --> 00:00:07,650
+Nhưng ai bước vào cũng thấy đúng
+một thực đơn, giống hệt nhau.
+
+3
+00:00:08,460 --> 00:00:11,259
+Vậy làm sao để mỗi người thấy đúng món mình muốn?
+
+4
+00:00:13,180 --> 00:00:17,251
+Trong năm phút tới, bạn sẽ hiểu cách
+hệ thống biến hành vi thành gợi ý.
+
+5
+00:00:18,061 --> 00:00:23,965
+Chúng ta đi qua bốn tín hiệu, hai thuật toán
+cốt lõi, và cách xử lý khi dữ liệu còn thiếu.
+
+6
+00:00:26,180 --> 00:00:28,473
+Mỗi đơn hàng hoàn tất là một tín hiệu.
+
+7
+00:00:29,283 --> 00:00:33,411
+Hệ thống ghi lại ai đã mua món
+nào, và món đó được chấm mấy sao.
+
+8
+00:00:34,221 --> 00:00:38,541
+Dữ liệu này xếp thành một ma trận,
+hàng là khách, cột là món ăn.
+
+9
+00:00:39,351 --> 00:00:43,611
+Phần lớn các ô còn trống, vì mỗi
+khách chỉ thử một phần nhỏ thực đơn.
+
+10
+00:00:48,180 --> 00:00:51,280
+Từ ma trận đó, hệ thống tính bốn điểm riêng biệt.
+
+11
+00:00:52,010 --> 00:00:55,898
+Thứ nhất là lọc cộng tác, dựa trên
+những khách có khẩu vị giống nhau.
+
+12
+00:00:56,628 --> 00:01:00,905
+Thứ hai là độ khớp nội dung, so
+từ khóa với tên và mô tả món.
+
+13
+00:01:01,635 --> 00:01:04,952
+Thứ ba là ngữ cảnh chatbot
+trong hai mươi bốn giờ gần nhất.
+
+14
+00:01:05,682 --> 00:01:08,877
+Thứ tư là chất lượng món, tính từ điểm sao của khách.
+
+15
+00:01:10,180 --> 00:01:14,685
+Bốn điểm này có thang đo khác nhau, nên
+phải chuẩn hóa về khoảng không đến một.
+
+16
+00:01:15,386 --> 00:01:18,525
+Sau đó, mỗi điểm được nhân với trọng số của nó.
+
+17
+00:01:19,226 --> 00:01:22,972
+Lọc cộng tác chiếm ba mươi phần
+trăm, nội dung hai mươi lăm.
+
+18
+00:01:23,673 --> 00:01:27,233
+Chatbot hai mươi lăm, và đánh
+giá sao hai mươi phần trăm.
+
+19
+00:01:27,934 --> 00:01:30,922
+Tổng lại, ta được một điểm duy nhất cho từng món.
+
+20
+00:01:32,180 --> 00:01:36,828
+Thuật toán đầu tiên là SVD, viết
+đầy đủ là phân rã giá trị suy biến.
+
+21
+00:01:37,638 --> 00:01:40,492
+Nó tách ma trận thưa thành hai ma trận nhỏ hơn.
+
+22
+00:01:41,302 --> 00:01:45,397
+Mỗi khách và mỗi món được mô tả
+bằng tối đa hai mươi đặc trưng ẩn.
+
+23
+00:01:46,207 --> 00:01:50,767
+Nhân hai ma trận này lại, hệ thống dự
+đoán số sao cho những món chưa thử.
+
+24
+00:01:54,180 --> 00:01:58,292
+Thuật toán thứ hai là Apriori,
+tìm luật kết hợp giữa các món.
+
+25
+00:01:59,102 --> 00:02:03,165
+Giả sử trong một trăm đơn gần nhất,
+gà nướng xuất hiện mười hai lần.
+
+26
+00:02:03,975 --> 00:02:08,767
+Chín trong số đó có thêm cơm trắng, nên
+confidence là bảy mươi lăm phần trăm.
+
+27
+00:02:09,577 --> 00:02:14,541
+Lift bằng hai phẩy năm, nghĩa là mua gà thì
+khả năng mua cơm cao gấp hai phẩy năm lần.
+
+28
+00:02:16,180 --> 00:02:20,452
+Khi khách bỏ món vào giỏ, hệ thống
+tra những luật liên quan đến món đó.
+
+29
+00:02:21,262 --> 00:02:25,653
+Nó loại các món đã có trong giỏ,
+rồi cộng điểm lift nhân confidence.
+
+30
+00:02:26,463 --> 00:02:30,219
+Bốn món có điểm cao nhất sẽ được
+gợi ý kèm ngay dưới giỏ hàng.
+
+31
+00:02:31,029 --> 00:02:33,678
+Cách này bắt đúng thói quen gọi món theo nhóm.
+
+32
+00:02:38,180 --> 00:02:41,327
+Điểm cuối cùng là tổng có trọng số của bốn tín hiệu.
+
+33
+00:02:42,137 --> 00:02:45,895
+Nhìn vào ví dụ này, món C đứng
+đầu với không phẩy sáu bảy.
+
+34
+00:02:46,705 --> 00:02:51,532
+Điểm chatbot rất cao đã kéo món này
+lên, dù lọc cộng tác chỉ ở mức khá.
+
+35
+00:02:52,342 --> 00:02:57,308
+Món B theo sau với không phẩy sáu bốn
+lăm, và món A đạt không phẩy năm một lăm.
+
+36
+00:03:00,180 --> 00:03:04,367
+Vấn đề lớn nhất là cold start, khi
+khách hoàn toàn chưa có lịch sử.
+
+37
+00:03:05,177 --> 00:03:10,258
+Lúc đó SVD không thể dự đoán, nên hệ thống
+chuyển sang danh sách món thịnh hành.
+
+38
+00:03:11,068 --> 00:03:14,754
+Với món mới, hệ thống dựa vào
+khẩu vị khách đã chọn để lọc.
+
+39
+00:03:15,564 --> 00:03:19,729
+Nếu vẫn thiếu tín hiệu, món đó nhận
+điểm không và tụt xuống cuối bảng.
+
+40
+00:03:22,180 --> 00:03:27,417
+Để kiểm chứng, dữ liệu chia tám mươi phần
+trăm để học, hai mươi phần trăm để kiểm thử.
+
+41
+00:03:27,830 --> 00:03:33,986
+SVD đạt RMSE 0,82, và precision@5 gần 68,5%.
+
+42
+00:03:34,399 --> 00:03:38,572
+NCF chính xác hơn, nhưng phản hồi chậm hơn gần tám lần.
+
+43
+00:03:38,985 --> 00:03:43,482
+Với nhà hàng, mười hai mili giây đủ
+nhanh để gợi ý ngay khi khách mở trang.
+
+44
+00:03:44,180 --> 00:03:45,362
+Ba điều cần nhớ.
+
+45
+00:03:46,172 --> 00:03:51,602
+Một, hành vi của khách tạo ra ma trận thưa,
+và phần trống chính là cơ hội để gợi ý.
+
+46
+00:03:52,412 --> 00:03:57,547
+Hai, SVD dự đoán khẩu vị, còn
+Apriori bắt thói quen mua kèm.
+
+47
+00:03:58,357 --> 00:04:03,301
+Ba, trọng số quyết định món nào lên đầu,
+nên cần chỉnh theo mục tiêu kinh doanh.
+
+48
+00:04:04,111 --> 00:04:08,457
+Ghép lại, bốn tín hiệu và hai thuật
+toán cho ra một bảng xếp hạng duy nhất.
+
+49
+00:04:12,200 --> 00:04:14,903
+Câu một: tín hiệu nào có trọng số lớn nhất?
+
+50
+00:04:19,203 --> 00:04:23,383
+Đáp án A: lọc cộng tác SVD, ba mươi phần trăm.
+
+51
+00:04:24,200 --> 00:04:29,610
+Câu hai: bảy mươi lăm trên một trăm
+đơn có gà cũng có cơm. Đó là gì?
+
+52
+00:04:33,910 --> 00:04:38,112
+Đáp án B: confidence, xác suất mua cơm khi đã mua gà.
+
+53
+00:04:38,760 --> 00:04:42,581
+Câu ba: khách mới hoàn toàn chưa
+có lịch sử thì hệ thống làm gì?
+
+54
+00:04:46,881 --> 00:04:50,759
+Đáp án A: dùng danh sách món thịnh hành thay cho SVD.
+
+55
+00:04:51,380 --> 00:04:55,163
+Từ một thực đơn chung, mỗi khách
+giờ đây nhận một danh sách riêng.
+
+56
+00:04:55,973 --> 00:05:02,226
+Không phải đoán mò, mà là bốn tín hiệu, hai
+thuật toán, và cách xử lý thiếu dữ liệu rõ ràng.

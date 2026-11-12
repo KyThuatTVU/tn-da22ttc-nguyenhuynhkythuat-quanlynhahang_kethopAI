@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;padding:0;width:1920px;height:1080px;background:#0a1228;overflow:hidden;font-family:'Segoe UI',sans-serif}
+#wrap{position:relative;width:1920px;height:1080px}
+.t{position:absolute;left:120px;top:300px;font-size:96px;font-weight:800;color:#fff;letter-spacing:-1px}
+.s{position:absolute;left:120px;top:430px;font-size:44px;color:#5ee7ff}
+.bar{position:absolute;left:120px;top:560px;height:18px;background:#5ee7ff;border-radius:9px}
+</style></head><body><div id="wrap">
+<div class="t">Gợi ý món ăn cá nhân hóa</div>
+<div class="s" id="sub">Kiểm tra tốc độ render khung hình</div>
+<div class="bar" id="bar"></div>
+</div>
+<script>
+window.renderAt = (t) => {
+  const p = (t % 4) / 4;
+  document.getElementById('bar').style.width = (100 + p*600) + 'px';
+  document.getElementById('sub').style.opacity = (0.3 + 0.7*Math.sin(t*2)).toFixed(3);
+  document.querySelector('.t').style.transform = 'translateX(' + (p*40) + 'px)';
+  return true;
+};
+</script></body></html>

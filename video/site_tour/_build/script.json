@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "title": "Ẩm Thực Phương Nam — Một nền tảng, trọn vẹn trải nghiệm",
+    "brand": "ẨM THỰC PHƯƠNG NAM",
+    "subtitle": "Giới thiệu website · KLTN 2026 · Nguyễn Huỳnh Kỹ Thuật",
+    "voice": "vi-VN-NamMinhNeural",
+    "rate": "+0%",
+    "fps": 25
+  },
+  "scenes": [
+    {
+      "id": "s01",
+      "num": 1,
+      "kind": "hook",
+      "topic": "Một nhà hàng, một nền tảng số",
+      "planned": 16,
+      "narration": [
+        "Một nhà hàng miền Tây, giờ đây có mặt trên một nền tảng số duy nhất.",
+        "Từ điện thoại của khách, đến quầy phục vụ và phòng quản trị.",
+        "Mời bạn cùng xem, từ giao diện đến từng chức năng."
+      ]
+    },
+    {
+      "id": "s02",
+      "num": 2,
+      "kind": "overview",
+      "topic": "Ba vai trò, một hệ thống",
+      "planned": 24,
+      "narration": [
+        "Website phục vụ ba nhóm người dùng: khách hàng, nhân viên và quản trị viên.",
+        "Khách đặt món, đặt bàn, thanh toán và trò chuyện với trợ lý ảo.",
+        "Nhân viên chấm công bằng khuôn mặt, xem ca làm và bán hàng tại quầy.",
+        "Quản trị viên theo dõi toàn bộ hoạt động qua dashboard.",
+        "Phía sau là Node.js, Flask, MySQL và các mô hình học máy."
+      ]
+    },
+    {
+      "id": "s03",
+      "num": 3,
+      "kind": "home",
+      "topic": "Trang chủ khách hàng",
+      "planned": 22,
+      "narration": [
+        "Trang chủ là điểm chạm đầu tiên của khách.",
+        "Ảnh lớn giới thiệu không gian, bên dưới là top món bán chạy.",
+        "Mỗi khách còn thấy một khối gợi ý dành riêng cho mình.",
+        "Thanh điều hướng giữ mọi chức năng trong tầm tay.",
+        "Từ đây, chỉ một cú nhấp để xem thực đơn hoặc đặt bàn."
+      ]
+    },
+    {
+      "id": "s04",
+      "num": 4,
+      "kind": "menu",
+      "topic": "Thực đơn và bộ lọc",
+      "planned": 24,
+      "narration": [
+        "Trang thực đơn hiển thị hai mươi lăm món, chia theo danh mục.",
+        "Khách lọc theo món chính, khai vị, đồ uống hoặc khoảng giá.",
+        "Thanh tìm kiếm và sắp xếp giúp chọn món trong vài giây.",
+        "Những món phù hợp khẩu vị được gắn nhãn ngay trên ảnh.",
+        "Giá và trạng thái còn hàng cập nhật trực tiếp từ cơ sở dữ liệu."
+      ]
+    },
+    {
+      "id": "s05",
+      "num": 5,
+      "kind": "detail",
+      "topic": "Chi tiết món và giỏ hàng",
+      "planned": 24,
+      "narration": [
+        "Bấm vào một món, hộp chi tiết mở ra với ảnh, mô tả và giá.",
+        "Khách chọn số lượng rồi thêm vào giỏ.",
+        "Giỏ hàng cập nhật ngay, kèm gợi ý những món dùng chung.",
+        "Toàn bộ nội dung được giữ lại khi chuyển sang thanh toán.",
+        "Nhờ vậy, khách không phải chọn lại từ đầu."
+      ]
+    },
+    {
+      "id": "s06",
+      "num": 6,
+      "kind": "checkout",
+      "topic": "Đặt món và thanh toán MoMo",
+      "planned": 26,
+      "narration": [
+        "Quy trình đặt món đi qua ba bước: thông tin, thanh toán và hoàn tất.",
+        "Hệ thống hỗ trợ thanh toán khi nhận hàng và ví MoMo.",
+        "Với MoMo, khách quét mã QR và nhận xác nhận tức thì.",
+        "Đơn hàng lập tức xuất hiện trong màn hình quản trị.",
+        "Trạng thái đơn được cập nhật theo từng công đoạn."
+      ]
+    },
+    {
+      "id": "s07",
+      "num": 7,
+      "kind": "booking",
+      "topic": "Đặt bàn trực tuyến",
+      "planned": 22,
+      "narration": [
+        "Với đặt bàn, khách tự chọn ngày, giờ và số người.",
+        "Hệ thống kiểm tra sức chứa trước khi xác nhận.",
+        "Mã đặt bàn được gửi ngay trên màn hình.",
+        "Lịch sử đặt bàn nằm trong tài khoản cá nhân.",
+        "Nhà hàng cũng thấy danh sách này trong mục quản lý."
+      ]
+    },
+    {
+      "id": "s08",
+      "num": 8,
+      "kind": "chatbot",
+      "topic": "Trợ lý ảo Trà My",
+      "planned": 24,
+      "narration": [
+        "Nếu chưa biết chọn món nào, khách có thể hỏi Trà My.",
+        "Trà My là trợ lý ảo hoạt động hai bốn trên bảy.",
+        "Câu hỏi được tìm trong kho tri thức bằng tìm kiếm ngữ nghĩa.",
+        "Sau đó mô hình ngôn ngữ lớn soạn câu trả lời tự nhiên.",
+        "Trà My cũng gợi ý món và hỗ trợ đặt bàn ngay trong đoạn chat."
+      ]
+    },
+    {
+      "id": "s09",
+      "num": 9,
+      "kind": "recommend",
+      "topic": "Gợi ý cá nhân hóa",
+      "planned": 26,
+      "narration": [
+        "Điểm khác biệt của đồ án nằm ở gợi ý cá nhân hóa.",
+        "Hệ thống học từ lịch sử đơn hàng, đánh giá và câu hỏi chatbot.",
+        "Bốn tín hiệu được chuẩn hóa rồi kết hợp với trọng số.",
+        "Lọc cộng tác, độ khớp nội dung, ngữ cảnh chat và chất lượng món.",
+        "Kết quả là danh sách món phù hợp với từng khách.",
+        "Khách mới chưa có dữ liệu sẽ nhận danh sách món thịnh hành."
+      ]
+    },
+    {
+      "id": "s10",
+      "num": 10,
+      "kind": "staff",
+      "topic": "Không gian nhân viên",
+      "planned": 24,
+      "narration": [
+        "Nhân viên đăng nhập ở cổng riêng, với vai trò được phân quyền.",
+        "Chấm công bằng khuôn mặt, không cần thẻ từ.",
+        "Hệ thống nhận diện và ghi nhận giờ vào, giờ ra.",
+        "Màn hình POS giúp gọi món và thanh toán tại bàn.",
+        "Ca làm và lương tạm tính cũng xem được ngay.",
+        "Mọi thao tác đều đồng bộ với quản trị."
+      ]
+    },
+    {
+      "id": "s11",
+      "num": 11,
+      "kind": "dashboard",
+      "topic": "Dashboard quản trị",
+      "planned": 26,
+      "narration": [
+        "Phía quản trị là một dashboard tổng hợp.",
+        "Doanh thu, đơn hàng theo trạng thái, top món bán chạy.",
+        "Biểu đồ khách hàng mới và phương thức thanh toán.",
+        "Mọi con số cập nhật theo thời gian thực.",
+        "Từ đây, quản lý điều hướng đến thực đơn, kho, nhân sự và báo cáo.",
+        "Phân quyền chi tiết quyết định mỗi người được xem gì."
+      ]
+    },
+    {
+      "id": "s12",
+      "num": 12,
+      "kind": "admin_ai",
+      "topic": "AI trong vận hành",
+      "planned": 24,
+      "narration": [
+        "Hệ thống còn ghi lại khẩu vị và món khách quan tâm.",
+        "Quản trị viên thấy được mức độ tương đồng giữa các khách.",
+        "Kho tri thức chatbot có thể chỉnh sửa trực tiếp.",
+        "Nhờ vậy, trợ lý ảo luôn trả lời đúng thông tin nhà hàng.",
+        "Luật kết hợp Apriori cũng được hiển thị để kiểm tra."
+      ]
+    },
+    {
+      "id": "s13",
+      "num": 13,
+      "kind": "outro",
+      "topic": "Tổng kết và thông tin đồ án",
+      "planned": 18,
+      "narration": [
+        "Một website, ba vai trò, và toàn bộ vận hành trong một nền tảng.",
+        "Ẩm Thực Phương Nam, hương vị Vĩnh Long.",
+        "Đồ án tốt nghiệp 2026, Nguyễn Huỳnh Kỹ Thuật, Đại học Trà Vinh."
+      ]
+    }
+  ]
+}

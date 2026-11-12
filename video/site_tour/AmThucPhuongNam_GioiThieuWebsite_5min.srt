@@ -1,0 +1,274 @@
+1
+00:00:00,220 --> 00:00:03,896
+Một nhà hàng miền Tây, giờ đây có
+mặt trên một nền tảng số duy nhất.
+
+2
+00:00:04,726 --> 00:00:07,776
+Từ điện thoại của khách, đến
+quầy phục vụ và phòng quản trị.
+
+3
+00:00:08,606 --> 00:00:11,482
+Mời bạn cùng xem, từ giao diện đến từng chức năng.
+
+4
+00:00:16,220 --> 00:00:20,444
+Website phục vụ ba nhóm người dùng:
+khách hàng, nhân viên và quản trị viên.
+
+5
+00:00:21,274 --> 00:00:25,037
+Khách đặt món, đặt bàn, thanh
+toán và trò chuyện với trợ lý ảo.
+
+6
+00:00:25,867 --> 00:00:29,494
+Nhân viên chấm công bằng khuôn mặt,
+xem ca làm và bán hàng tại quầy.
+
+7
+00:00:30,324 --> 00:00:33,039
+Quản trị viên theo dõi toàn bộ hoạt động qua dashboard.
+
+8
+00:00:33,869 --> 00:00:38,173
+Phía sau là Node.js, Flask, MySQL và các mô hình học máy.
+
+9
+00:00:40,220 --> 00:00:42,132
+Trang chủ là điểm chạm đầu tiên của khách.
+
+10
+00:00:42,962 --> 00:00:46,340
+Ảnh lớn giới thiệu không gian,
+bên dưới là top món bán chạy.
+
+11
+00:00:47,170 --> 00:00:49,752
+Mỗi khách còn thấy một khối gợi ý dành riêng cho mình.
+
+12
+00:00:50,582 --> 00:00:52,814
+Thanh điều hướng giữ mọi chức năng trong tầm tay.
+
+13
+00:00:53,644 --> 00:00:56,625
+Từ đây, chỉ một cú nhấp để xem thực đơn hoặc đặt bàn.
+
+14
+00:01:02,220 --> 00:01:05,201
+Trang thực đơn hiển thị hai mươi
+lăm món, chia theo danh mục.
+
+15
+00:01:06,031 --> 00:01:09,503
+Khách lọc theo món chính, khai
+vị, đồ uống hoặc khoảng giá.
+
+16
+00:01:10,333 --> 00:01:13,085
+Thanh tìm kiếm và sắp xếp giúp chọn món trong vài giây.
+
+17
+00:01:13,915 --> 00:01:16,694
+Những món phù hợp khẩu vị được gắn nhãn ngay trên ảnh.
+
+18
+00:01:17,524 --> 00:01:20,868
+Giá và trạng thái còn hàng cập
+nhật trực tiếp từ cơ sở dữ liệu.
+
+19
+00:01:26,220 --> 00:01:30,174
+Bấm vào một món, hộp chi tiết mở ra với ảnh, mô tả và giá.
+
+20
+00:01:31,004 --> 00:01:32,929
+Khách chọn số lượng rồi thêm vào giỏ.
+
+21
+00:01:33,759 --> 00:01:37,022
+Giỏ hàng cập nhật ngay, kèm gợi ý những món dùng chung.
+
+22
+00:01:37,852 --> 00:01:40,527
+Toàn bộ nội dung được giữ lại khi chuyển sang thanh toán.
+
+23
+00:01:41,357 --> 00:01:43,687
+Nhờ vậy, khách không phải chọn lại từ đầu.
+
+24
+00:01:50,220 --> 00:01:53,973
+Quy trình đặt món đi qua ba bước:
+thông tin, thanh toán và hoàn tất.
+
+25
+00:01:54,803 --> 00:01:57,579
+Hệ thống hỗ trợ thanh toán khi nhận hàng và ví MoMo.
+
+26
+00:01:58,409 --> 00:02:01,784
+Với MoMo, khách quét mã QR và nhận xác nhận tức thì.
+
+27
+00:02:02,614 --> 00:02:04,985
+Đơn hàng lập tức xuất hiện trong màn hình quản trị.
+
+28
+00:02:05,815 --> 00:02:08,086
+Trạng thái đơn được cập nhật theo từng công đoạn.
+
+29
+00:02:16,220 --> 00:02:19,380
+Với đặt bàn, khách tự chọn ngày, giờ và số người.
+
+30
+00:02:20,210 --> 00:02:22,510
+Hệ thống kiểm tra sức chứa trước khi xác nhận.
+
+31
+00:02:23,340 --> 00:02:25,236
+Mã đặt bàn được gửi ngay trên màn hình.
+
+32
+00:02:26,066 --> 00:02:28,371
+Lịch sử đặt bàn nằm trong tài khoản cá nhân.
+
+33
+00:02:29,201 --> 00:02:31,597
+Nhà hàng cũng thấy danh sách này trong mục quản lý.
+
+34
+00:02:38,220 --> 00:02:41,098
+Nếu chưa biết chọn món nào, khách có thể hỏi Trà My.
+
+35
+00:02:41,928 --> 00:02:44,586
+Trà My là trợ lý ảo hoạt động hai bốn trên bảy.
+
+36
+00:02:45,416 --> 00:02:48,355
+Câu hỏi được tìm trong kho tri
+thức bằng tìm kiếm ngữ nghĩa.
+
+37
+00:02:49,185 --> 00:02:52,159
+Sau đó mô hình ngôn ngữ lớn soạn câu trả lời tự nhiên.
+
+38
+00:02:52,989 --> 00:02:56,140
+Trà My cũng gợi ý món và hỗ trợ
+đặt bàn ngay trong đoạn chat.
+
+39
+00:03:02,220 --> 00:03:05,083
+Điểm khác biệt của đồ án nằm ở gợi ý cá nhân hóa.
+
+40
+00:03:05,913 --> 00:03:09,313
+Hệ thống học từ lịch sử đơn hàng,
+đánh giá và câu hỏi chatbot.
+
+41
+00:03:10,143 --> 00:03:12,912
+Bốn tín hiệu được chuẩn hóa rồi kết hợp với trọng số.
+
+42
+00:03:13,742 --> 00:03:17,612
+Lọc cộng tác, độ khớp nội dung,
+ngữ cảnh chat và chất lượng món.
+
+43
+00:03:18,442 --> 00:03:20,653
+Kết quả là danh sách món phù hợp với từng khách.
+
+44
+00:03:21,483 --> 00:03:24,247
+Khách mới chưa có dữ liệu sẽ
+nhận danh sách món thịnh hành.
+
+45
+00:03:28,220 --> 00:03:31,379
+Nhân viên đăng nhập ở cổng riêng,
+với vai trò được phân quyền.
+
+46
+00:03:32,209 --> 00:03:34,549
+Chấm công bằng khuôn mặt, không cần thẻ từ.
+
+47
+00:03:35,379 --> 00:03:38,161
+Hệ thống nhận diện và ghi nhận giờ vào, giờ ra.
+
+48
+00:03:38,991 --> 00:03:41,820
+Màn hình POS giúp gọi món và thanh toán tại bàn.
+
+49
+00:03:42,650 --> 00:03:44,966
+Ca làm và lương tạm tính cũng xem được ngay.
+
+50
+00:03:45,796 --> 00:03:47,823
+Mọi thao tác đều đồng bộ với quản trị.
+
+51
+00:03:52,220 --> 00:03:54,322
+Phía quản trị là một dashboard tổng hợp.
+
+52
+00:03:55,152 --> 00:03:58,506
+Doanh thu, đơn hàng theo trạng thái, top món bán chạy.
+
+53
+00:03:59,336 --> 00:04:01,745
+Biểu đồ khách hàng mới và phương thức thanh toán.
+
+54
+00:04:02,575 --> 00:04:04,534
+Mọi con số cập nhật theo thời gian thực.
+
+55
+00:04:05,364 --> 00:04:09,688
+Từ đây, quản lý điều hướng đến
+thực đơn, kho, nhân sự và báo cáo.
+
+56
+00:04:10,518 --> 00:04:12,938
+Phân quyền chi tiết quyết định mỗi người được xem gì.
+
+57
+00:04:18,220 --> 00:04:20,866
+Hệ thống còn ghi lại khẩu vị và món khách quan tâm.
+
+58
+00:04:21,696 --> 00:04:24,212
+Quản trị viên thấy được mức độ tương đồng giữa các khách.
+
+59
+00:04:25,042 --> 00:04:27,307
+Kho tri thức chatbot có thể chỉnh sửa trực tiếp.
+
+60
+00:04:28,137 --> 00:04:31,149
+Nhờ vậy, trợ lý ảo luôn trả lời đúng thông tin nhà hàng.
+
+61
+00:04:31,979 --> 00:04:34,930
+Luật kết hợp Apriori cũng được hiển thị để kiểm tra.
+
+62
+00:04:42,220 --> 00:04:46,203
+Một website, ba vai trò, và toàn
+bộ vận hành trong một nền tảng.
+
+63
+00:04:47,033 --> 00:04:49,226
+Ẩm Thực Phương Nam, hương vị Vĩnh Long.
+
+64
+00:04:50,056 --> 00:04:54,875
+Đồ án tốt nghiệp 2026, Nguyễn
+Huỳnh Kỹ Thuật, Đại học Trà Vinh.

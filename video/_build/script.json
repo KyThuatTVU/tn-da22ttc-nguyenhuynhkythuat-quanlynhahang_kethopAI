@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "title": "Gợi ý món ăn cá nhân hóa: từ hành vi khách hàng đến Hybrid Recommendation",
+    "brand": "ẨM THỰC PHƯƠNG NAM",
+    "subtitle": "KLTN 2026 · Nguyễn Huỳnh Kỹ Thuật",
+    "voice": "vi-VN-NamMinhNeural",
+    "rate": "-12%",
+    "fps": 25
+  },
+  "scenes": [
+    {
+      "id": "s01",
+      "num": 1,
+      "kind": "hook",
+      "planned": 13,
+      "topic": "Hook: một thực đơn cho mọi khách",
+      "narration": [
+        "Buổi tối cuối tuần, nhà hàng đón hàng trăm lượt khách.",
+        "Nhưng ai bước vào cũng thấy đúng một thực đơn, giống hệt nhau.",
+        "Vậy làm sao để mỗi người thấy đúng món mình muốn?"
+      ],
+      "onscreen": ["100 KHÁCH", "1 THỰC ĐƠN", "?"],
+      "visual": "Lưới 8 thẻ món giống hệt, số khách đếm tăng, dấu hỏi lớn xuất hiện."
+    },
+    {
+      "id": "s02",
+      "num": 2,
+      "kind": "goals",
+      "planned": 13,
+      "topic": "Ba mục tiêu bài giảng",
+      "narration": [
+        "Trong năm phút tới, bạn sẽ hiểu cách hệ thống biến hành vi thành gợi ý.",
+        "Chúng ta đi qua bốn tín hiệu, hai thuật toán cốt lõi, và cách xử lý khi dữ liệu còn thiếu."
+      ],
+      "onscreen": ["01 · PIPELINE 4 TÍN HIỆU", "02 · SVD & APRIORI", "03 · COLD START & ĐÁNH GIÁ"],
+      "visual": "Ba thanh mục tiêu trượt vào, gạch chân cyan chạy từ trái sang."
+    },
+    {
+      "id": "s03",
+      "num": 3,
+      "kind": "data",
+      "planned": 22,
+      "topic": "Hành vi thành ma trận thưa",
+      "narration": [
+        "Mỗi đơn hàng hoàn tất là một tín hiệu.",
+        "Hệ thống ghi lại ai đã mua món nào, và món đó được chấm mấy sao.",
+        "Dữ liệu này xếp thành một ma trận, hàng là khách, cột là món ăn.",
+        "Phần lớn các ô còn trống, vì mỗi khách chỉ thử một phần nhỏ thực đơn."
+      ],
+      "onscreen": ["KHÁCH × MÓN", "65% Ô TRỐNG", "MUA = 3 ĐIỂM"],
+      "visual": "Ma trận 4×5: các ô điểm sáng dần, ô trống nét đứt; nhãn hàng/cột."
+    },
+    {
+      "id": "s04",
+      "num": 4,
+      "kind": "signals",
+      "planned": 22,
+      "topic": "Bốn tín hiệu đầu vào",
+      "narration": [
+        "Từ ma trận đó, hệ thống tính bốn điểm riêng biệt.",
+        "Thứ nhất là lọc cộng tác, dựa trên những khách có khẩu vị giống nhau.",
+        "Thứ hai là độ khớp nội dung, so từ khóa với tên và mô tả món.",
+        "Thứ ba là ngữ cảnh chatbot trong hai mươi bốn giờ gần nhất.",
+        "Thứ tư là chất lượng món, tính từ điểm sao của khách."
+      ],
+      "onscreen": ["SVD · LỌC CỘNG TÁC", "TF-IDF · NỘI DUNG", "CHATBOT · 24 GIỜ", "RATING · BAYESIAN"],
+      "visual": "Bốn thẻ tín hiệu hiện lần lượt, mũi tên hội tụ về nút ĐIỂM TỔNG HỢP."
+    },
+    {
+      "id": "s05",
+      "num": 5,
+      "kind": "weights",
+      "planned": 22,
+      "topic": "Chuẩn hóa và trọng số 30/25/25/20",
+      "narration": [
+        "Bốn điểm này có thang đo khác nhau, nên phải chuẩn hóa về khoảng không đến một.",
+        "Sau đó, mỗi điểm được nhân với trọng số của nó.",
+        "Lọc cộng tác chiếm ba mươi phần trăm, nội dung hai mươi lăm.",
+        "Chatbot hai mươi lăm, và đánh giá sao hai mươi phần trăm.",
+        "Tổng lại, ta được một điểm duy nhất cho từng món."
+      ],
+      "onscreen": ["MIN-MAX → [0, 1]", "30% · 25% · 25% · 20%"],
+      "visual": "Thanh xếp chồng 4 đoạn lớn dần; công thức hiện từng số hạng."
+    },
+    {
+      "id": "s06",
+      "num": 6,
+      "kind": "svd",
+      "planned": 22,
+      "topic": "SVD: phân rã ma trận",
+      "narration": [
+        "Thuật toán đầu tiên là SVD, viết đầy đủ là phân rã giá trị suy biến.",
+        "Nó tách ma trận thưa thành hai ma trận nhỏ hơn.",
+        "Mỗi khách và mỗi món được mô tả bằng tối đa hai mươi đặc trưng ẩn.",
+        "Nhân hai ma trận này lại, hệ thống dự đoán số sao cho những món chưa thử."
+      ],
+      "onscreen": ["SVD · SINGULAR VALUE DECOMPOSITION", "k ≤ 20", "4×5 → 4×k · k×5"],
+      "visual": "Ma trận 4×5 tách thành 4×2 và 2×5, dấu nhân, ô dự đoán 4.4 sáng lên."
+    },
+    {
+      "id": "s07",
+      "num": 7,
+      "kind": "apriori",
+      "planned": 22,
+      "topic": "Apriori: support, confidence, lift",
+      "narration": [
+        "Thuật toán thứ hai là Apriori, tìm luật kết hợp giữa các món.",
+        "Giả sử trong một trăm đơn gần nhất, gà nướng xuất hiện mười hai lần.",
+        "Chín trong số đó có thêm cơm trắng, nên confidence là bảy mươi lăm phần trăm.",
+        "Lift bằng hai phẩy năm, nghĩa là mua gà thì khả năng mua cơm cao gấp hai phẩy năm lần."
+      ],
+      "onscreen": ["SUPPORT({GÀ}) 12%", "CONFIDENCE 75%", "LIFT 2.5", "NGƯỠNG: 1.5% · 30%"],
+      "visual": "Lưới 100 điểm: 12 điểm gà, 9 giao nhau, 21 cơm; ba ô số đếm tăng."
+    },
+    {
+      "id": "s08",
+      "num": 8,
+      "kind": "cart",
+      "planned": 22,
+      "topic": "Gợi ý kèm trong giỏ hàng",
+      "narration": [
+        "Khi khách bỏ món vào giỏ, hệ thống tra những luật liên quan đến món đó.",
+        "Nó loại các món đã có trong giỏ, rồi cộng điểm lift nhân confidence.",
+        "Bốn món có điểm cao nhất sẽ được gợi ý kèm ngay dưới giỏ hàng.",
+        "Cách này bắt đúng thói quen gọi món theo nhóm."
+      ],
+      "onscreen": ["GIỎ HÀNG → LUẬT → TOP 4", "LIFT × CONFIDENCE = 1.875"],
+      "visual": "Chip món trong giỏ, luật gà→cơm, mũi tên sang danh sách 4 món gợi ý."
+    },
+    {
+      "id": "s09",
+      "num": 9,
+      "kind": "fusion",
+      "planned": 22,
+      "topic": "Ghép điểm và xếp hạng",
+      "narration": [
+        "Điểm cuối cùng là tổng có trọng số của bốn tín hiệu.",
+        "Nhìn vào ví dụ này, món C đứng đầu với không phẩy sáu bảy.",
+        "Điểm chatbot rất cao đã kéo món này lên, dù lọc cộng tác chỉ ở mức khá.",
+        "Món B theo sau với không phẩy sáu bốn lăm, và món A đạt không phẩy năm một lăm."
+      ],
+      "onscreen": ["C 0.670", "B 0.645", "A 0.515"],
+      "visual": "Ba hàng xếp hạng, mỗi hàng bốn đoạn đóng góp; số tổng đếm lên."
+    },
+    {
+      "id": "s10",
+      "num": 10,
+      "kind": "coldstart",
+      "planned": 22,
+      "topic": "Cold start và fallback",
+      "narration": [
+        "Vấn đề lớn nhất là cold start, khi khách hoàn toàn chưa có lịch sử.",
+        "Lúc đó SVD không thể dự đoán, nên hệ thống chuyển sang danh sách món thịnh hành.",
+        "Với món mới, hệ thống dựa vào khẩu vị khách đã chọn để lọc.",
+        "Nếu vẫn thiếu tín hiệu, món đó nhận điểm không và tụt xuống cuối bảng."
+      ],
+      "onscreen": ["COLD START", "CHƯA CÓ LỊCH SỬ → TRENDING", "MÓN MỚI → NHÃN KHẨU VỊ", "THIẾU TÍN HIỆU → 0"],
+      "visual": "Cây quyết định ba nhánh mở dần, nhánh kết quả sáng lên."
+    },
+    {
+      "id": "s11",
+      "num": 11,
+      "kind": "eval",
+      "planned": 22,
+      "topic": "Đánh giá mô hình",
+      "narration": [
+        "Để kiểm chứng, dữ liệu chia tám mươi phần trăm để học, hai mươi phần trăm để kiểm thử.",
+        "SVD đạt RMSE không phẩy tám hai, và precision at five gần sáu mươi chín phần trăm.",
+        "NCF chính xác hơn, nhưng phản hồi chậm hơn gần tám lần.",
+        "Với nhà hàng, mười hai mili giây đủ nhanh để gợi ý ngay khi khách mở trang."
+      ],
+      "onscreen": ["80/20 TRAIN–TEST", "SVD · NCF", "RMSE 0.82 / 0.79", "P@5 68.5% / 78.5%", "12ms / 95ms"],
+      "visual": "Bảng so sánh SVD và NCF, cột latency chạy; footnote nguồn dữ liệu."
+    },
+    {
+      "id": "s12",
+      "num": 12,
+      "kind": "summary",
+      "planned": 28,
+      "topic": "Tóm tắt ba điểm",
+      "narration": [
+        "Ba điều cần nhớ.",
+        "Một, hành vi của khách tạo ra ma trận thưa, và phần trống chính là cơ hội để gợi ý.",
+        "Hai, SVD dự đoán khẩu vị, còn Apriori bắt thói quen mua kèm.",
+        "Ba, trọng số quyết định món nào lên đầu, nên cần chỉnh theo mục tiêu kinh doanh.",
+        "Ghép lại, bốn tín hiệu và hai thuật toán cho ra một bảng xếp hạng duy nhất."
+      ],
+      "onscreen": ["MA TRẬN THƯA", "SVD + APRIORI", "TRỌNG SỐ"],
+      "visual": "Ba thẻ recap lớn, công thức ghép lại ở dưới."
+    },
+    {
+      "id": "s13",
+      "num": 13,
+      "kind": "quiz",
+      "planned": 12,
+      "topic": "Quiz 1: trọng số lớn nhất",
+      "narration": [
+        "Câu một: tín hiệu nào có trọng số lớn nhất?",
+        "Đáp án A: lọc cộng tác SVD, ba mươi phần trăm."
+      ],
+      "quiz": {
+        "q": "Tín hiệu nào có trọng số lớn nhất?",
+        "options": ["Lọc cộng tác SVD — 30%", "Đánh giá sao — 20%", "Ngữ cảnh chatbot — 25%", "Độ khớp nội dung — 25%"],
+        "answer": 0,
+        "explain": "SVD chiếm 30%, cao nhất trong bốn tín hiệu."
+      }
+    },
+    {
+      "id": "s14",
+      "num": 14,
+      "kind": "quiz",
+      "planned": 12,
+      "topic": "Quiz 2: 75% là confidence",
+      "narration": [
+        "Câu hai: bảy mươi lăm trên một trăm đơn có gà cũng có cơm. Đó là gì?",
+        "Đáp án B: confidence, xác suất mua cơm khi đã mua gà."
+      ],
+      "quiz": {
+        "q": "75% số đơn có gà nướng cũng có cơm trắng. Chỉ số này là gì?",
+        "options": ["Support", "Confidence", "Lift", "RMSE"],
+        "answer": 1,
+        "explain": "Confidence = P(cơm | gà) = 9/12 = 75%."
+      }
+    },
+    {
+      "id": "s15",
+      "num": 15,
+      "kind": "quiz",
+      "planned": 12,
+      "topic": "Quiz 3: cold start",
+      "narration": [
+        "Câu ba: khách mới hoàn toàn chưa có lịch sử thì hệ thống làm gì?",
+        "Đáp án A: dùng danh sách món thịnh hành thay cho SVD."
+      ],
+      "quiz": {
+        "q": "Khách mới hoàn toàn chưa có lịch sử đặt món, hệ thống xử lý thế nào?",
+        "options": ["Dùng danh sách món thịnh hành", "Vẫn dùng SVD như bình thường", "Chặn khách đặt món", "Xóa lịch sử giỏ hàng"],
+        "answer": 0,
+        "explain": "Khách mới → fallback trending; món mới → lọc theo nhãn khẩu vị."
+      }
+    },
+    {
+      "id": "s16",
+      "num": 16,
+      "kind": "outro",
+      "planned": 12,
+      "topic": "Outro khép hook",
+      "narration": [
+        "Từ một thực đơn chung, mỗi khách giờ đây nhận một danh sách riêng.",
+        "Không phải đoán mò, mà là bốn tín hiệu, hai thuật toán, và cách xử lý thiếu dữ liệu rõ ràng."
+      ],
+      "onscreen": ["MỖI KHÁCH · MỘT THỰC ĐƠN RIÊNG"],
+      "visual": "Tám thẻ món tách ra thành tám thực đơn khác nhau; logo và lời kết."
+    }
+  ]
+}

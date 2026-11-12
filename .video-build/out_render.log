@@ -1,0 +1,37 @@
+13:53:30 [w1] 0/2527 0.0 fps eta 4211.7m
+13:53:30 [w0] 0/2527 0.0 fps eta 4211.7m
+13:53:30 [w2] 0/2526 0.0 fps eta 4210.0m
+13:54:10 [w2] 250/2526 6.3 fps eta 6.0m
+13:54:10 [w0] 250/2527 6.3 fps eta 6.1m
+13:54:10 [w1] 250/2527 6.2 fps eta 6.1m
+13:54:52 [w2] 500/2526 6.1 fps eta 5.5m
+13:54:53 [w0] 500/2527 6.1 fps eta 5.6m
+13:54:53 [w1] 500/2527 6.0 fps eta 5.6m
+13:55:31 [w1] 750/2527 6.2 fps eta 4.8m
+13:55:33 [w2] 750/2526 6.1 fps eta 4.9m
+13:55:34 [w0] 750/2527 6.0 fps eta 4.9m
+13:56:11 [w1] 1000/2527 6.2 fps eta 4.1m
+13:56:15 [w2] 1000/2526 6.1 fps eta 4.2m
+13:56:18 [w0] 1000/2527 6.0 fps eta 4.3m
+13:56:50 [w1] 1250/2527 6.2 fps eta 3.4m
+13:56:56 [w2] 1250/2526 6.1 fps eta 3.5m
+13:57:00 [w0] 1250/2527 6.0 fps eta 3.6m
+13:57:30 [w1] 1500/2527 6.3 fps eta 2.7m
+13:57:36 [w2] 1500/2526 6.1 fps eta 2.8m
+13:57:40 [w0] 1500/2527 6.0 fps eta 2.8m
+13:58:09 [w1] 1750/2527 6.3 fps eta 2.1m
+13:58:15 [w2] 1750/2526 6.1 fps eta 2.1m
+13:58:19 [w0] 1750/2527 6.1 fps eta 2.1m
+13:58:47 [w1] 2000/2527 6.3 fps eta 1.4m
+13:58:54 [w2] 2000/2526 6.2 fps eta 1.4m
+13:58:58 [w0] 2000/2527 6.1 fps eta 1.4m
+13:59:23 [w1] 2250/2527 6.4 fps eta 0.7m
+13:59:34 [w2] 2250/2526 6.2 fps eta 0.7m
+13:59:36 [w0] 2250/2527 6.1 fps eta 0.8m
+14:00:04 [w1] 2500/2527 6.3 fps eta 0.1m
+14:00:10 [w1] done D:\KhoaLuanTotNghiep2026\video\_build\out\seg_1.mp4
+14:00:14 [w2] 2500/2526 6.2 fps eta 0.1m
+14:00:16 [w0] 2500/2527 6.2 fps eta 0.1m
+14:00:18 [w2] done D:\KhoaLuanTotNghiep2026\video\_build\out\seg_2.mp4
+14:00:20 [w0] done D:\KhoaLuanTotNghiep2026\video\_build\out\seg_0.mp4
+14:00:21 video_silent: D:\KhoaLuanTotNghiep2026\video\_build\out\video_silent.mp4
